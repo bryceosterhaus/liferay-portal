@@ -55,6 +55,7 @@
 	<classpathentry kind="lib" path="lib/development/jhighlight.jar"/>
 	<classpathentry kind="lib" path="lib/development/jms.jar"/>
 	<classpathentry kind="lib" path="lib/development/jndi.jar"/>
+	<classpathentry kind="lib" path="lib/development/jsch.jar"/>
 	<classpathentry kind="lib" path="lib/development/jserrorcollector.jar"/>
 	<classpathentry kind="lib" path="lib/development/jsp-api.jar"/>
 	<classpathentry kind="lib" path="lib/development/jta.jar"/>
@@ -80,6 +81,7 @@
 	<classpathentry kind="lib" path="lib/development/selenium-java.jar"/>
 	<classpathentry kind="lib" path="lib/development/selenium-server.jar"/>
 	<classpathentry kind="lib" path="lib/development/servlet-api.jar"/>
+	<classpathentry kind="lib" path="lib/development/sikuli-api.jar"/>
 	<classpathentry kind="lib" path="lib/development/sikuli-script.jar"/>
 	<classpathentry kind="lib" path="lib/development/smtp.jar"/>
 	<classpathentry kind="lib" path="lib/development/sonar-ant-task.jar"/>
@@ -97,12 +99,7 @@
 	<classpathentry kind="lib" path="lib/portal/antlr3.jar"/>
 	<classpathentry kind="lib" path="lib/portal/antlr3-runtime.jar"/>
 	<classpathentry kind="lib" path="lib/portal/aopalliance.jar"/>
-	<classpathentry kind="lib" path="lib/portal/asm.jar"/>
-	<classpathentry kind="lib" path="lib/portal/asm-analysis.jar"/>
-	<classpathentry kind="lib" path="lib/portal/asm-commons.jar"/>
-	<classpathentry kind="lib" path="lib/portal/asm-tree.jar"/>
-	<classpathentry kind="lib" path="lib/portal/asm-util.jar"/>
-	<classpathentry kind="lib" path="lib/portal/asm-xml.jar"/>
+	<classpathentry kind="lib" path="lib/portal/asm-debug-all.jar"/>
 	<classpathentry kind="lib" path="lib/portal/aspectj-rt.jar"/>
 	<classpathentry kind="lib" path="lib/portal/aspectj-weaver.jar"/>
 	<classpathentry kind="lib" path="lib/portal/axiom-api.jar"/>
@@ -251,6 +248,7 @@
 	<classpathentry kind="lib" path="lib/portal/poi-ooxml.jar"/>
 	<classpathentry kind="lib" path="lib/portal/poi-ooxml-schemas.jar"/>
 	<classpathentry kind="lib" path="lib/portal/poi-scratchpad.jar"/>
+	<classpathentry kind="lib" path="lib/portal/portal-ant-shared.jar"/>
 	<classpathentry kind="lib" path="lib/portal/portal-client.jar"/>
 	<classpathentry kind="lib" path="lib/portal/portal-settings-impl-shared.jar"/>
 	<classpathentry kind="lib" path="lib/portal/portals-bridges.jar"/>

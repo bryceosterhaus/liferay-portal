@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -64,9 +64,8 @@ boolean splitThread = ParamUtil.getBoolean(request, "splitThread");
 	<aui:input name="threadId" type="hidden" value="<%= threadId %>" />
 	<aui:input name="parentMessageId" type="hidden" value="<%= parentMessageId %>" />
 	<aui:input name="subject" type="hidden" value="<%= subject %>" />
+	<aui:input name="propagatePermissions" type="hidden" value="<%= true %>" />
 	<aui:input name="workflowAction" type="hidden" value="<%= String.valueOf(WorkflowConstants.ACTION_PUBLISH) %>" />
-	<aui:input name="addGuestPermissions" type="hidden" value="true" />
-	<aui:input name="addGroupPermissions" type="hidden" value="true" />
 
 	<aui:model-context bean="<%= message %>" model="<%= MBMessage.class %>" />
 

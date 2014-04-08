@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -32,21 +32,23 @@ import java.lang.reflect.Field;
 public abstract class BaseSeleniumImpl
 	extends SeleniumWrapper implements LiferaySelenium {
 
-	public BaseSeleniumImpl(String projectDir, Selenium selenium) {
+	public BaseSeleniumImpl(String projectDirName, Selenium selenium) {
 		super(selenium);
 
-		_projectDir = projectDir;
+		_projectDirName = projectDirName;
 
 		if (OSDetector.isWindows()) {
-			_dependenciesDir = StringUtil.replace(_dependenciesDir, "//", "\\");
+			_dependenciesDirName = StringUtil.replace(
+				_dependenciesDirName, "//", "\\");
 
-			_outputDir = StringUtil.replace(_outputDir, "//", "\\");
+			_outputDirName = StringUtil.replace(_outputDirName, "//", "\\");
 
-			_projectDir = StringUtil.replace(_projectDir, "//", "\\");
+			_projectDirName = StringUtil.replace(_projectDirName, "//", "\\");
 
-			_sikuliImagesDir = StringUtil.replace(_sikuliImagesDir, "//", "\\");
-			_sikuliImagesDir = StringUtil.replace(
-				_sikuliImagesDir, "linux", "windows");
+			_sikuliImagesDirName = StringUtil.replace(
+				_sikuliImagesDirName, "//", "\\");
+			_sikuliImagesDirName = StringUtil.replace(
+				_sikuliImagesDirName, "linux", "windows");
 		}
 
 		initCommandProcessor();
@@ -112,7 +114,8 @@ public abstract class BaseSeleniumImpl
 	}
 
 	@Override
-	public void assertJavaScriptErrors() throws Exception {
+	public void assertJavaScriptErrors(String ignoreJavaScriptError)
+		throws Exception {
 	}
 
 	@Override
@@ -276,8 +279,8 @@ public abstract class BaseSeleniumImpl
 	}
 
 	@Override
-	public String getDependenciesDir() {
-		return _dependenciesDir;
+	public String getDependenciesDirName() {
+		return _dependenciesDirName;
 	}
 
 	@Override
@@ -313,8 +316,8 @@ public abstract class BaseSeleniumImpl
 	}
 
 	@Override
-	public String getOutputDir() {
-		return _outputDir;
+	public String getOutputDirName() {
+		return _outputDirName;
 	}
 
 	@Override
@@ -323,13 +326,13 @@ public abstract class BaseSeleniumImpl
 	}
 
 	@Override
-	public String getProjectDir() {
-		return _projectDir;
+	public String getProjectDirName() {
+		return _projectDirName;
 	}
 
 	@Override
-	public String getSikuliImagesDir() {
-		return _sikuliImagesDir;
+	public String getSikuliImagesDirName() {
+		return _sikuliImagesDirName;
 	}
 
 	@Override
@@ -449,6 +452,10 @@ public abstract class BaseSeleniumImpl
 		sb.append("}");
 
 		super.runScript(sb.toString());
+	}
+
+	@Override
+	public void mouseRelease() {
 	}
 
 	@Override
@@ -626,7 +633,7 @@ public abstract class BaseSeleniumImpl
 
 	@Override
 	public void uploadCommonFile(String location, String value) {
-		super.type(location, _projectDir + _dependenciesDir + value);
+		super.type(location, _projectDirName + _dependenciesDirName + value);
 	}
 
 	@Override
@@ -638,7 +645,7 @@ public abstract class BaseSeleniumImpl
 
 	@Override
 	public void uploadTempFile(String location, String value) {
-		super.type(location, TestPropsValues.OUTPUT_DIR + value);
+		super.type(location, TestPropsValues.OUTPUT_DIR_NAME + value);
 	}
 
 	@Override
@@ -801,16 +808,17 @@ public abstract class BaseSeleniumImpl
 	}
 
 	private static final String _OUTPUT_SCREENSHOTS_DIR =
-		TestPropsValues.OUTPUT_DIR + "screenshots/";
+		TestPropsValues.OUTPUT_DIR_NAME + "screenshots/";
 
 	private String _clipBoard = "";
 	private CommandProcessor _commandProcessor;
-	private String _dependenciesDir =
+	private String _dependenciesDirName =
 		"portal-web//test//functional//com//liferay//portalweb//dependencies//";
-	private String _outputDir = TestPropsValues.OUTPUT_DIR;
+	private String _outputDirName = TestPropsValues.OUTPUT_DIR_NAME;
 	private String _primaryTestSuiteName;
-	private String _projectDir;
-	private String _sikuliImagesDir = _dependenciesDir + "sikuli//linux//";
+	private String _projectDirName;
+	private String _sikuliImagesDirName =
+		_dependenciesDirName + "sikuli//linux//";
 	private String _timeout = "90000";
 
 }

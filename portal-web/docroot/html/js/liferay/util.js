@@ -781,7 +781,7 @@
 			Liferay.Util.openWindow(
 				{
 					cache: false,
-					title: Liferay.Util.escapeHTML(event.title),
+					title: event.title,
 					uri: event.uri
 				}
 			);
@@ -1964,6 +1964,13 @@
 
 				docBody.addClass(currentClass);
 
+				Liferay.fire(
+					'toggleControls',
+					{
+						enabled: (Liferay._editControlsState === 'visible')
+					}
+				);
+
 				trigger.on(
 					'gesturemovestart',
 					function(event) {
@@ -1981,6 +1988,14 @@
 								Liferay._editControlsState = (docBody.hasClass(visibleClass) ? 'visible' : 'hidden');
 
 								Liferay.Store('liferay_toggle_controls', Liferay._editControlsState);
+
+								Liferay.fire(
+									'toggleControls',
+									{
+										enabled: (Liferay._editControlsState === 'visible'),
+										src: 'ui'
+									}
+								);
 							}
 						);
 					}

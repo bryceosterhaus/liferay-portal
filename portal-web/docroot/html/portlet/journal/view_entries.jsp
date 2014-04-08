@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -35,6 +35,8 @@ else {
 if (!ArrayUtil.contains(displayViews, displayStyle)) {
 	displayStyle = displayViews[0];
 }
+
+long ddmStructureId = 0;
 
 String ddmStructureName = LanguageUtil.get(pageContext, "basic-web-content");
 
@@ -83,16 +85,14 @@ ArticleDisplayTerms displayTerms = (ArticleDisplayTerms)searchContainer.getDispl
 	<aui:input name="<%= displayTerms.STRUCTURE_ID %>" type="hidden" value="<%= displayTerms.getStructureId() %>" />
 
 	<%
-	if (!displayTerms.getStructureId().equals("0")) {
-		DDMStructure ddmStructure = null;
+	try {
+		DDMStructure ddmStructure = DDMStructureLocalServiceUtil.getStructure(themeDisplay.getSiteGroupId(), PortalUtil.getClassNameId(JournalArticle.class), displayTerms.getStructureId(), true);
 
-		try {
-			ddmStructure = DDMStructureLocalServiceUtil.getStructure(themeDisplay.getSiteGroupId(), PortalUtil.getClassNameId(JournalArticle.class), displayTerms.getStructureId(), true);
+		ddmStructureId = ddmStructure.getStructureId();
 
-			ddmStructureName = ddmStructure.getName(locale);
-		}
-		catch (NoSuchStructureException nsse) {
-		}
+		ddmStructureName = ddmStructure.getName(locale);
+	}
+	catch (NoSuchStructureException nsse) {
 	}
 	%>
 
@@ -131,11 +131,11 @@ if (displayTerms.isNavigationRecent()) {
 	searchContainer.setOrderByType(orderByType);
 }
 
-boolean advancedSearch = ParamUtil.getBoolean(request, displayTerms.ADVANCED_SEARCH);
+int status = WorkflowConstants.STATUS_APPROVED;
 
-String keywords = ParamUtil.getString(request, "keywords");
-
-int status = WorkflowConstants.STATUS_ANY;
+if (permissionChecker.isContentReviewer(user.getCompanyId(), scopeGroupId)) {
+	status = WorkflowConstants.STATUS_ANY;
+}
 
 List results = null;
 int total = 0;
@@ -149,9 +149,8 @@ int total = 0;
 
 		if (displayTerms.getNavigation().equals("mine")) {
 			userId = themeDisplay.getUserId();
-		}
-		else if (!permissionChecker.isContentReviewer(user.getCompanyId(), scopeGroupId)) {
-			status = WorkflowConstants.STATUS_APPROVED;
+
+			status = WorkflowConstants.STATUS_ANY;
 		}
 
 		total = JournalArticleServiceUtil.getGroupArticlesCount(scopeGroupId, userId, folderId, status);
@@ -187,10 +186,6 @@ int total = 0;
 	<c:otherwise>
 
 		<%
-		if (!permissionChecker.isContentReviewer(user.getCompanyId(), scopeGroupId)) {
-			status = WorkflowConstants.STATUS_APPROVED;
-		}
-
 		total = JournalFolderServiceUtil.getFoldersAndArticlesCount(scopeGroupId, folderId, status);
 
 		searchContainer.setTotal(total);
@@ -217,12 +212,17 @@ request.setAttribute("view_entries.jsp-entryEnd", String.valueOf(searchContainer
 		boolean subscribed = false;
 		boolean unsubscribable = true;
 
-		subscribed = JournalUtil.isSubscribedToFolder(themeDisplay.getCompanyId(), scopeGroupId, user.getUserId(), folderId);
+		if (Validator.isNull(displayTerms.getStructureId())) {
+			subscribed = JournalUtil.isSubscribedToFolder(themeDisplay.getCompanyId(), scopeGroupId, user.getUserId(), folderId);
 
-		if (subscribed) {
-			if (!JournalUtil.isSubscribedToFolder(themeDisplay.getCompanyId(), scopeGroupId, user.getUserId(), folderId, false)) {
-				unsubscribable = false;
+			if (subscribed) {
+				if (!JournalUtil.isSubscribedToFolder(themeDisplay.getCompanyId(), scopeGroupId, user.getUserId(), folderId, false)) {
+					unsubscribable = false;
+				}
 			}
+		}
+		else {
+			subscribed = JournalUtil.isSubscribedToStructure(themeDisplay.getCompanyId(), scopeGroupId, user.getUserId(), ddmStructureId);
 		}
 		%>
 
@@ -231,10 +231,18 @@ request.setAttribute("view_entries.jsp-entryEnd", String.valueOf(searchContainer
 				<c:choose>
 					<c:when test="<%= unsubscribable %>">
 						<portlet:actionURL var="unsubscribeURL">
-							<portlet:param name="struts_action" value="/journal/edit_folder" />
+							<portlet:param name="struts_action" value='<%= Validator.isNull(displayTerms.getStructureId()) ? "/journal/edit_folder" : "/journal/edit_article" %>' />
 							<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.UNSUBSCRIBE %>" />
 							<portlet:param name="redirect" value="<%= currentURL %>" />
-							<portlet:param name="folderId" value="<%= String.valueOf(folderId) %>" />
+
+							<c:choose>
+								<c:when test="<%= Validator.isNull(displayTerms.getStructureId()) %>">
+									<portlet:param name="folderId" value="<%= String.valueOf(folderId) %>" />
+								</c:when>
+								<c:otherwise>
+									<portlet:param name="ddmStructureId" value="<%= String.valueOf(ddmStructureId) %>" />
+								</c:otherwise>
+							</c:choose>
 						</portlet:actionURL>
 
 						<liferay-ui:icon
@@ -254,10 +262,18 @@ request.setAttribute("view_entries.jsp-entryEnd", String.valueOf(searchContainer
 			</c:when>
 			<c:otherwise>
 				<portlet:actionURL var="subscribeURL">
-					<portlet:param name="struts_action" value="/journal/edit_folder" />
+					<portlet:param name="struts_action" value='<%= Validator.isNull(displayTerms.getStructureId()) ? "/journal/edit_folder" : "/journal/edit_article" %>' />
 					<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.SUBSCRIBE %>" />
 					<portlet:param name="redirect" value="<%= currentURL %>" />
-					<portlet:param name="folderId" value="<%= String.valueOf(folderId) %>" />
+
+					<c:choose>
+						<c:when test="<%= Validator.isNull(displayTerms.getStructureId()) %>">
+							<portlet:param name="folderId" value="<%= String.valueOf(folderId) %>" />
+						</c:when>
+						<c:otherwise>
+							<portlet:param name="ddmStructureId" value="<%= String.valueOf(ddmStructureId) %>" />
+						</c:otherwise>
+					</c:choose>
 				</portlet:actionURL>
 
 				<liferay-ui:icon
@@ -308,10 +324,6 @@ for (int i = 0; i < results.size(); i++) {
 					tempRowURL.setParameter("folderId", String.valueOf(curArticle.getFolderId()));
 					tempRowURL.setParameter("articleId", curArticle.getArticleId());
 
-					if (!permissionChecker.isContentReviewer(user.getCompanyId(), scopeGroupId)) {
-						status = WorkflowConstants.STATUS_APPROVED;
-					}
-
 					tempRowURL.setParameter("status", String.valueOf(status));
 
 					request.setAttribute("view_entries.jsp-article", curArticle);
@@ -339,10 +351,6 @@ for (int i = 0; i < results.size(); i++) {
 						rowURL.setParameter("groupId", String.valueOf(curArticle.getGroupId()));
 						rowURL.setParameter("folderId", String.valueOf(curArticle.getFolderId()));
 						rowURL.setParameter("articleId", curArticle.getArticleId());
-
-						if (!permissionChecker.isContentReviewer(user.getCompanyId(), scopeGroupId)) {
-							status = WorkflowConstants.STATUS_APPROVED;
-						}
 
 						rowURL.setParameter("status", String.valueOf(status));
 						%>

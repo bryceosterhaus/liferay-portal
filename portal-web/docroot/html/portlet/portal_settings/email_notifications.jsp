@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -22,7 +22,7 @@
 String adminEmailFromName = PrefsPropsUtil.getString(company.getCompanyId(), PropsKeys.ADMIN_EMAIL_FROM_NAME);
 String adminEmailFromAddress = PrefsPropsUtil.getString(company.getCompanyId(), PropsKeys.ADMIN_EMAIL_FROM_ADDRESS);
 
-PortletPreferences preferences = PrefsPropsUtil.getPreferences(company.getCompanyId(), true);
+PortletPreferences companyPortletPreferences = PrefsPropsUtil.getPreferences(company.getCompanyId(), true);
 %>
 
 <liferay-ui:error-marker key="errorSection" value="email_notifications" />
@@ -49,13 +49,20 @@ PortletPreferences preferences = PrefsPropsUtil.getPreferences(company.getCompan
 
 			<liferay-ui:error key="emailUserAddedSubject" message="please-enter-a-valid-subject" />
 
-			<aui:input cssClass="lfr-input-text-container" label="subject" name="settings--adminEmailUserAddedSubject--" type="text" value='<%= preferences.getValue("adminEmailUserAddedSubject", PropsValues.ADMIN_EMAIL_USER_ADDED_SUBJECT) %>' />
+			<aui:field-wrapper label="subject">
+				<liferay-ui:input-localized
+					fieldPrefix="settings"
+					fieldPrefixSeparator="--"
+					name="adminEmailUserAddedSubject"
+					xml='<%= LocalizationUtil.getLocalizationXmlFromPreferences(companyPortletPreferences, renderRequest, "adminEmailUserAddedSubject", "settings", ContentUtil.get(PropsValues.ADMIN_EMAIL_USER_ADDED_SUBJECT)) %>'
+				/>
+			</aui:field-wrapper>
 
 			<liferay-ui:error key="emailUserAddedBody" message="please-enter-a-valid-body" />
 
-			<liferay-ui:email-notifications-settings
+			<liferay-ui:email-notification-settings
 				bodyLabel="body-with-password"
-				emailBody='<%= ContentUtil.get(preferences.getValue("adminEmailUserAddedBody", PropsValues.ADMIN_EMAIL_USER_ADDED_BODY)) %>'
+				emailBody='<%= LocalizationUtil.getLocalizationXmlFromPreferences(companyPortletPreferences, renderRequest, "adminEmailUserAddedBody", "settings", ContentUtil.get(PropsValues.ADMIN_EMAIL_USER_ADDED_BODY)) %>'
 				emailParam="adminEmailUserAdded"
 				fieldPrefix="settings"
 				helpMessage="account-created-notification-body-with-password-help"
@@ -65,9 +72,9 @@ PortletPreferences preferences = PrefsPropsUtil.getPreferences(company.getCompan
 
 			<liferay-ui:error key="emailUserAddedNoPasswordBody" message="please-enter-a-valid-body" />
 
-			<liferay-ui:email-notifications-settings
+			<liferay-ui:email-notification-settings
 				bodyLabel="body-without-password"
-				emailBody='<%= ContentUtil.get(preferences.getValue("adminEmailUserAddedNoPasswordBody", PropsValues.ADMIN_EMAIL_USER_ADDED_NO_PASSWORD_BODY)) %>'
+				emailBody='<%= LocalizationUtil.getLocalizationXmlFromPreferences(companyPortletPreferences, renderRequest, "adminEmailUserAddedNoPasswordBody", "settings", ContentUtil.get(PropsValues.ADMIN_EMAIL_USER_ADDED_NO_PASSWORD_BODY)) %>'
 				emailParam="adminEmailUserAddedNoPassword"
 				fieldPrefix="settings"
 				helpMessage="account-created-notification-body-without-password-help"
@@ -85,10 +92,10 @@ PortletPreferences preferences = PrefsPropsUtil.getPreferences(company.getCompan
 		<liferay-ui:error key="emailVerificationSubject" message="please-enter-a-valid-subject" />
 		<liferay-ui:error key="emailVerificationBody" message="please-enter-a-valid-body" />
 
-		<liferay-ui:email-notifications-settings
-			emailBody='<%= ContentUtil.get(preferences.getValue("adminEmailVerificationBody", PropsValues.ADMIN_EMAIL_VERIFICATION_BODY)) %>'
+		<liferay-ui:email-notification-settings
+			emailBody='<%= LocalizationUtil.getLocalizationXmlFromPreferences(companyPortletPreferences, renderRequest, "adminEmailVerificationBody", "settings", ContentUtil.get(PropsValues.ADMIN_EMAIL_VERIFICATION_BODY)) %>'
 			emailParam="adminEmailVerification"
-			emailSubject='<%= ContentUtil.get(preferences.getValue("adminEmailVerificationSubject", PropsValues.ADMIN_EMAIL_VERIFICATION_SUBJECT)) %>'
+			emailSubject='<%= LocalizationUtil.getLocalizationXmlFromPreferences(companyPortletPreferences, renderRequest, "adminEmailVerificationSubject", "settings", ContentUtil.get(PropsValues.ADMIN_EMAIL_VERIFICATION_SUBJECT)) %>'
 			fieldPrefix="settings"
 			showEmailEnabled="<%= false %>"
 		/>
@@ -99,13 +106,13 @@ PortletPreferences preferences = PrefsPropsUtil.getPreferences(company.getCompan
 	</liferay-ui:section>
 
 	<liferay-ui:section>
-			<liferay-ui:error key="emailPasswordSentSubject" message="please-enter-a-valid-subject" />
-			<liferay-ui:error key="emailPasswordSentBody" message="please-enter-a-valid-body" />
+		<liferay-ui:error key="emailPasswordSentSubject" message="please-enter-a-valid-subject" />
+		<liferay-ui:error key="emailPasswordSentBody" message="please-enter-a-valid-body" />
 
-		<liferay-ui:email-notifications-settings
-			emailBody='<%= ContentUtil.get(preferences.getValue("adminEmailPasswordSentBody", PropsValues.ADMIN_EMAIL_PASSWORD_SENT_BODY)) %>'
+		<liferay-ui:email-notification-settings
+			emailBody='<%= LocalizationUtil.getLocalizationXmlFromPreferences(companyPortletPreferences, renderRequest, "adminEmailPasswordSentBody", "settings", ContentUtil.get(PropsValues.ADMIN_EMAIL_PASSWORD_SENT_BODY)) %>'
 			emailParam="adminEmailPasswordSent"
-			emailSubject='<%= ContentUtil.get(preferences.getValue("adminEmailPasswordSentSubject", PropsValues.ADMIN_EMAIL_PASSWORD_SENT_SUBJECT)) %>'
+			emailSubject='<%= LocalizationUtil.getLocalizationXmlFromPreferences(companyPortletPreferences, renderRequest, "adminEmailPasswordSentSubject", "settings", ContentUtil.get(PropsValues.ADMIN_EMAIL_PASSWORD_SENT_SUBJECT)) %>'
 			fieldPrefix="settings"
 			showEmailEnabled="<%= false %>"
 		/>
@@ -119,10 +126,10 @@ PortletPreferences preferences = PrefsPropsUtil.getPreferences(company.getCompan
 			<liferay-ui:error key="emailPasswordResetSubject" message="please-enter-a-valid-subject" />
 			<liferay-ui:error key="emailPasswordResetBody" message="please-enter-a-valid-body" />
 
-		<liferay-ui:email-notifications-settings
-			emailBody='<%= ContentUtil.get(preferences.getValue("adminEmailPasswordResetBody", PropsValues.ADMIN_EMAIL_PASSWORD_RESET_BODY)) %>'
+		<liferay-ui:email-notification-settings
+			emailBody='<%= LocalizationUtil.getLocalizationXmlFromPreferences(companyPortletPreferences, renderRequest, "adminEmailPasswordResetBody", "settings", ContentUtil.get(PropsValues.ADMIN_EMAIL_PASSWORD_RESET_BODY)) %>'
 			emailParam="adminEmailPasswordReset"
-			emailSubject='<%= ContentUtil.get(preferences.getValue("adminEmailPasswordResetSubject", PropsValues.ADMIN_EMAIL_PASSWORD_RESET_SUBJECT)) %>'
+			emailSubject='<%= LocalizationUtil.getLocalizationXmlFromPreferences(companyPortletPreferences, renderRequest, "adminEmailPasswordResetSubject", "settings", ContentUtil.get(PropsValues.ADMIN_EMAIL_PASSWORD_RESET_SUBJECT)) %>'
 			fieldPrefix="settings"
 			showEmailEnabled="<%= false %>"
 		/>
@@ -132,37 +139,3 @@ PortletPreferences preferences = PrefsPropsUtil.getPreferences(company.getCompan
 		</aui:fieldset>
 	</liferay-ui:section>
 </liferay-ui:tabs>
-
-<aui:script>
-	function <portlet:namespace />saveEmails() {
-		try {
-			document.<portlet:namespace />fm['<portlet:namespace />settings--adminEmailUserAddedBody--'].value = window['<portlet:namespace />adminEmailUserAdded'].getHTML();
-		}
-		catch (e) {
-		}
-
-		try {
-			document.<portlet:namespace />fm['<portlet:namespace />settings--adminEmailUserAddedNoPasswordBody--'].value = window['<portlet:namespace />adminEmailUserAddedNoPassword'].getHTML();
-		}
-		catch (e) {
-		}
-
-		try {
-			document.<portlet:namespace />fm['<portlet:namespace />settings--adminEmailPasswordSentBody--'].value = window['<portlet:namespace />emailPasswordSent'].getHTML();
-		}
-		catch (e) {
-		}
-
-		try {
-			document.<portlet:namespace />fm['<portlet:namespace />settings--adminEmailPasswordResetBody--'].value = window['<portlet:namespace />adminEmailPasswordReset'].getHTML();
-		}
-		catch (e) {
-		}
-
-		try {
-			document.<portlet:namespace />fm['<portlet:namespace />settings--adminEmailVerificationBody--'].value = window['<portlet:namespace />emailVerification'].getHTML();
-		}
-		catch (e) {
-		}
-	}
-</aui:script>

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -119,6 +119,23 @@ public interface Localization {
 		String xml, String requestedLanguageId, boolean useDefault);
 
 	/**
+	 * Returns the localized string from the localizations XML in the language,
+	 * optionally using the default language if the no localization exists for
+	 * the requested language.
+	 *
+	 * @param  xml the localizations XML
+	 * @param  requestedLanguageId the ID of the language
+	 * @param  useDefault whether to use the default language if no localization
+	 *         exists for the requested language
+	 * @return the localized string. If <code>useDefault</code> is
+	 *         <code>false</code> and no localization exists for the requested
+	 *         language, an empty string will be returned.
+	 */
+	public String getLocalization(
+		String xml, String requestedLanguageId, boolean useDefault,
+		String defaultValue);
+
+	/**
 	 * Returns a map of locales and localized strings for the parameter in the
 	 * request.
 	 *
@@ -132,17 +149,22 @@ public interface Localization {
 		HttpServletRequest request, String parameter);
 
 	/**
-	 * Returns a map of locales and localized strings for the parameter in the
+	 * Returns a map of locales and localized strings for the preference in the
 	 * preferences container.
 	 *
 	 * @param  preferences the preferences container
-	 * @param  parameter the prefix of the parameters containing the localized
-	 *         strings. Each localization will be loaded from a parameter with
-	 *         this prefix, followed by an underscore, and the language ID.
+	 * @param  preferenceName the prefix of the preference containing the
+	 *         localized strings. Each localization will be loaded from a
+	 *         preference with this prefix, followed by an underscore, and the
+	 *         language ID.
 	 * @return the locales and localized strings
 	 */
 	public Map<Locale, String> getLocalizationMap(
-		PortletPreferences preferences, String parameter);
+		PortletPreferences preferences, String preferenceName);
+
+	public Map<Locale, String> getLocalizationMap(
+		PortletPreferences preferences, String preferenceName,
+		String propertyName);
 
 	/**
 	 * Returns a map of locales and localized strings for the parameter in the
@@ -199,6 +221,28 @@ public interface Localization {
 	public String getLocalizationXmlFromPreferences(
 		PortletPreferences preferences, PortletRequest portletRequest,
 		String parameter);
+
+	/**
+	 * Returns the localizations XML for the parameter in the portlet request,
+	 * attempting to get data from the preferences container when it is not
+	 * available in the portlet request.
+	 *
+	 * @param  preferences the preferences container
+	 * @param  portletRequest the portlet request
+	 * @param  parameter the prefix of the parameters containing the localized
+	 *         strings. Each localization will be loaded from a parameter with
+	 *         this prefix, followed by an underscore, and the language ID.
+	 * @return the locales and localized strings
+	 */
+	public String getLocalizationXmlFromPreferences(
+		PortletPreferences preferences, PortletRequest portletRequest,
+		String parameter, String defaultValue);
+
+	public String getLocalizationXmlFromPreferences(
+		PortletPreferences preferences, PortletRequest portletRequest,
+		String parameter, String prefix, String defaultValue);
+
+	public String getLocalizedName(String name, String languageId);
 
 	/**
 	 * @deprecated As of 6.2.0, replaced by {@link

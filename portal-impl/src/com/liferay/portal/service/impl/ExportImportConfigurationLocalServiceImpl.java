@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -43,7 +43,7 @@ public class ExportImportConfigurationLocalServiceImpl
 	@Override
 	public ExportImportConfiguration addExportImportConfiguration(
 			long userId, long groupId, String name, String description,
-			int type, Map<String, Serializable> settingsMap,
+			int type, Map<String, Serializable> settingsMap, int status,
 			ServiceContext serviceContext)
 		throws PortalException, SystemException {
 
@@ -67,10 +67,6 @@ public class ExportImportConfigurationLocalServiceImpl
 		exportImportConfiguration.setName(name);
 		exportImportConfiguration.setDescription(description);
 		exportImportConfiguration.setType(type);
-		exportImportConfiguration.setStatus(WorkflowConstants.STATUS_APPROVED);
-		exportImportConfiguration.setStatusByUserId(userId);
-		exportImportConfiguration.setStatusByUserName(user.getScreenName());
-		exportImportConfiguration.setStatusDate(now);
 
 		if (settingsMap != null) {
 			String settings = JSONFactoryUtil.serialize(settingsMap);
@@ -78,8 +74,25 @@ public class ExportImportConfigurationLocalServiceImpl
 			exportImportConfiguration.setSettings(settings);
 		}
 
+		exportImportConfiguration.setStatus(status);
+		exportImportConfiguration.setStatusByUserId(userId);
+		exportImportConfiguration.setStatusByUserName(user.getScreenName());
+		exportImportConfiguration.setStatusDate(now);
+
 		return exportImportConfigurationPersistence.update(
 			exportImportConfiguration);
+	}
+
+	@Override
+	public ExportImportConfiguration addExportImportConfiguration(
+			long userId, long groupId, String name, String description,
+			int type, Map<String, Serializable> settingsMap,
+			ServiceContext serviceContext)
+		throws PortalException, SystemException {
+
+		return addExportImportConfiguration(
+			userId, groupId, name, description, type, settingsMap,
+			WorkflowConstants.STATUS_APPROVED, serviceContext);
 	}
 
 	@Override
@@ -211,15 +224,19 @@ public class ExportImportConfigurationLocalServiceImpl
 
 	@Override
 	public ExportImportConfiguration updateExportImportConfiguration(
-			long exportImportConfigurationId, String name, String description,
-			Map<String, Serializable> settingsMap,
+			long userId, long exportImportConfigurationId, String name,
+			String description, Map<String, Serializable> settingsMap,
 			ServiceContext serviceContext)
 		throws PortalException, SystemException {
+
+		User user = userPersistence.findByPrimaryKey(userId);
 
 		ExportImportConfiguration exportImportConfiguration =
 			exportImportConfigurationPersistence.findByPrimaryKey(
 				exportImportConfigurationId);
 
+		exportImportConfiguration.setUserId(userId);
+		exportImportConfiguration.setUserName(user.getFullName());
 		exportImportConfiguration.setModifiedDate(
 			serviceContext.getModifiedDate(new Date()));
 		exportImportConfiguration.setName(name);

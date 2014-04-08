@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -70,9 +70,6 @@ public class EditFolderAction extends PortletAction {
 			}
 			else if (cmd.equals(Constants.MOVE_TO_TRASH)) {
 				deleteFolders(actionRequest, true);
-			}
-			else if (cmd.equals(Constants.MOVE)) {
-				moveFolder(actionRequest);
 			}
 			else if (cmd.equals(Constants.SUBSCRIBE)) {
 				subscribeFolder(actionRequest);
@@ -167,19 +164,6 @@ public class EditFolderAction extends PortletAction {
 
 			hideDefaultSuccessMessage(actionRequest);
 		}
-	}
-
-	protected void moveFolder(ActionRequest actionRequest) throws Exception {
-		long folderId = ParamUtil.getLong(actionRequest, "folderId");
-
-		long parentFolderId = ParamUtil.getLong(
-			actionRequest, "parentFolderId");
-
-		ServiceContext serviceContext = ServiceContextFactory.getInstance(
-			JournalFolder.class.getName(), actionRequest);
-
-		JournalFolderServiceUtil.moveFolder(
-			folderId, parentFolderId, serviceContext);
 	}
 
 	protected void subscribeFolder(ActionRequest actionRequest)

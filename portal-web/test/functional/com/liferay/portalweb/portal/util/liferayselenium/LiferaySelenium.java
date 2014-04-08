@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -45,7 +45,8 @@ public interface LiferaySelenium extends Selenium {
 	public void assertEmailSubject(String index, String subject)
 		throws Exception;
 
-	public void assertJavaScriptErrors() throws Exception;
+	public void assertJavaScriptErrors(String ignoreJavaScriptError)
+		throws Exception;
 
 	public void assertLiferayErrors() throws Exception;
 
@@ -108,7 +109,7 @@ public interface LiferaySelenium extends Selenium {
 
 	public String getCurrentYear();
 
-	public String getDependenciesDir();
+	public String getDependenciesDirName();
 
 	public String getEmailBody(String index) throws Exception;
 
@@ -122,13 +123,13 @@ public interface LiferaySelenium extends Selenium {
 
 	public String getNumberIncrement(String value);
 
-	public String getOutputDir();
+	public String getOutputDirName();
 
 	public String getPrimaryTestSuiteName();
 
-	public String getProjectDir();
+	public String getProjectDirName();
 
-	public String getSikuliImagesDir();
+	public String getSikuliImagesDirName();
 
 	public void goBackAndWait();
 
@@ -167,6 +168,8 @@ public interface LiferaySelenium extends Selenium {
 	public void keyUpAndWait(String locator, String keySequence);
 
 	public void makeVisible(String locator);
+
+	public void mouseRelease();
 
 	public void paste(String locator);
 

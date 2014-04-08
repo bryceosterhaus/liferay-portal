@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -32,9 +32,6 @@ import java.util.List;
  * @author Eudaldo Alonso
  */
 public class AssetCategoryUtil {
-
-	public static final String[] SELECTED_FIELD_NAMES =
-		{Field.COMPANY_ID, Field.GROUP_ID, Field.UID, Field.ASSET_CATEGORY_ID};
 
 	public static List<AssetCategory> getCategories(Hits hits)
 		throws PortalException, SystemException {

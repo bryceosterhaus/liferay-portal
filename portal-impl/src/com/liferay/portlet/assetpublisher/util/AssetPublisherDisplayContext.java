@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -32,7 +32,6 @@ import com.liferay.portal.model.Group;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.theme.PortletDisplay;
 import com.liferay.portal.theme.ThemeDisplay;
-import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PortletKeys;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.util.WebKeys;
@@ -157,8 +156,7 @@ public class AssetPublisherDisplayContext {
 
 			AssetRendererFactory assetRendererFactory =
 				AssetRendererFactoryRegistryUtil.
-					getAssetRendererFactoryByClassName(
-						PortalUtil.getClassName(classNameIds[0]));
+					getAssetRendererFactoryByClassNameId(classNameIds[0]);
 
 			Tuple classTypeFieldName =
 				assetRendererFactory.getClassTypeFieldName(
@@ -865,8 +863,7 @@ public class AssetPublisherDisplayContext {
 
 				AssetRendererFactory assetRendererFactory =
 					AssetRendererFactoryRegistryUtil.
-						getAssetRendererFactoryByClassName(
-							PortalUtil.getClassName(classNameIds[0]));
+						getAssetRendererFactoryByClassNameId(classNameIds[0]);
 
 				Tuple classTypeFieldName =
 					assetRendererFactory.getClassTypeFieldName(

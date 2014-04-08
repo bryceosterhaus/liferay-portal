@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -32,6 +32,8 @@ import org.openqa.selenium.Dimension;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Action;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.internal.WrapsDriver;
 
 /**
@@ -41,22 +43,24 @@ public abstract class BaseWebDriverImpl
 	extends WebDriverToSeleniumBridge implements LiferaySelenium {
 
 	public BaseWebDriverImpl(
-		String projectDir, String browserURL, WebDriver webDriver) {
+		String projectDirName, String browserURL, WebDriver webDriver) {
 
 		super(webDriver);
 
-		_projectDir = projectDir;
+		_projectDirName = projectDirName;
 
 		if (OSDetector.isWindows()) {
-			_dependenciesDir = StringUtil.replace(_dependenciesDir, "//", "\\");
+			_dependenciesDirName = StringUtil.replace(
+				_dependenciesDirName, "//", "\\");
 
-			_outputDir = StringUtil.replace(_outputDir, "//", "\\");
+			_outputDirName = StringUtil.replace(_outputDirName, "//", "\\");
 
-			_projectDir = StringUtil.replace(_projectDir, "//", "\\");
+			_projectDirName = StringUtil.replace(_projectDirName, "//", "\\");
 
-			_sikuliImagesDir = StringUtil.replace(_sikuliImagesDir, "//", "\\");
-			_sikuliImagesDir = StringUtil.replace(
-				_sikuliImagesDir, "linux", "windows");
+			_sikuliImagesDirName = StringUtil.replace(
+				_sikuliImagesDirName, "//", "\\");
+			_sikuliImagesDirName = StringUtil.replace(
+				_sikuliImagesDirName, "linux", "windows");
 		}
 
 		WebDriver.Options options = webDriver.manage();
@@ -126,7 +130,9 @@ public abstract class BaseWebDriverImpl
 	}
 
 	@Override
-	public void assertJavaScriptErrors() throws Exception {
+	public void assertJavaScriptErrors(String ignoreJavaScriptError)
+		throws Exception {
+
 		if (!TestPropsValues.TEST_ASSSERT_JAVASCRIPT_ERRORS) {
 			return;
 		}
@@ -165,6 +171,12 @@ public abstract class BaseWebDriverImpl
 				String javaScriptErrorValue = javaScriptError.toString();
 
 				System.out.println("JS_ERROR: " + javaScriptErrorValue);
+
+				if (Validator.isNotNull(ignoreJavaScriptError) &&
+					javaScriptErrorValue.contains(ignoreJavaScriptError)) {
+
+					continue;
+				}
 
 				// LPS-41634
 
@@ -354,8 +366,8 @@ public abstract class BaseWebDriverImpl
 	}
 
 	@Override
-	public String getDependenciesDir() {
-		return _dependenciesDir;
+	public String getDependenciesDirName() {
+		return _dependenciesDirName;
 	}
 
 	@Override
@@ -419,8 +431,8 @@ public abstract class BaseWebDriverImpl
 	}
 
 	@Override
-	public String getOutputDir() {
-		return _outputDir;
+	public String getOutputDirName() {
+		return _outputDirName;
 	}
 
 	@Override
@@ -429,13 +441,13 @@ public abstract class BaseWebDriverImpl
 	}
 
 	@Override
-	public String getProjectDir() {
-		return _projectDir;
+	public String getProjectDirName() {
+		return _projectDirName;
 	}
 
 	@Override
-	public String getSikuliImagesDir() {
-		return _sikuliImagesDir;
+	public String getSikuliImagesDirName() {
+		return _sikuliImagesDirName;
 	}
 
 	@Override
@@ -574,6 +586,23 @@ public abstract class BaseWebDriverImpl
 	}
 
 	@Override
+	public void mouseRelease() {
+		WebElement bodyWebElement = getWebElement("//body");
+
+		WrapsDriver wrapsDriver = (WrapsDriver)bodyWebElement;
+
+		WebDriver webDriver = wrapsDriver.getWrappedDriver();
+
+		Actions actions = new Actions(webDriver);
+
+		actions.release();
+
+		Action action = actions.build();
+
+		action.perform();
+	}
+
+	@Override
 	public void paste(String location) {
 		super.type(location, _clipBoard);
 	}
@@ -707,7 +736,7 @@ public abstract class BaseWebDriverImpl
 
 	@Override
 	public void uploadCommonFile(String location, String value) {
-		uploadFile(location, _projectDir + _dependenciesDir + value);
+		uploadFile(location, _projectDirName + _dependenciesDirName + value);
 	}
 
 	@Override
@@ -727,7 +756,7 @@ public abstract class BaseWebDriverImpl
 			slash = "\\";
 		}
 
-		uploadFile(location, _outputDir + slash + value);
+		uploadFile(location, _outputDirName + slash + value);
 	}
 
 	@Override
@@ -838,11 +867,12 @@ public abstract class BaseWebDriverImpl
 	}
 
 	private String _clipBoard = "";
-	private String _dependenciesDir =
+	private String _dependenciesDirName =
 		"portal-web//test//functional//com//liferay//portalweb//dependencies//";
-	private String _outputDir = TestPropsValues.OUTPUT_DIR;
+	private String _outputDirName = TestPropsValues.OUTPUT_DIR_NAME;
 	private String _primaryTestSuiteName;
-	private String _projectDir;
-	private String _sikuliImagesDir = _dependenciesDir + "sikuli//linux//";
+	private String _projectDirName;
+	private String _sikuliImagesDirName =
+		_dependenciesDirName + "sikuli//linux//";
 
 }

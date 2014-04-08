@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -26,9 +26,7 @@ import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.DateRange;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.kernel.util.UniqueList;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.Layout;
@@ -78,7 +76,7 @@ public class ExportLayoutsAction extends PortletAction {
 		}
 
 		try {
-			long groupId = ParamUtil.getLong(actionRequest, "groupId");
+			long groupId = ParamUtil.getLong(actionRequest, "liveGroupId");
 			boolean privateLayout = ParamUtil.getBoolean(
 				actionRequest, "privateLayout");
 			long[] layoutIds = getLayoutIds(actionRequest);
@@ -86,24 +84,16 @@ public class ExportLayoutsAction extends PortletAction {
 				actionRequest, groupId, privateLayout, 0, null,
 				ExportImportDateUtil.RANGE_ALL);
 
-			StringBundler sb = new StringBundler(4);
+			String fileName = StringPool.BLANK;
 
 			if (privateLayout) {
-				sb.append(
-					LanguageUtil.get(
-						actionRequest.getLocale(), "private-pages"));
+				fileName = LanguageUtil.get(
+					actionRequest.getLocale(), "private-pages");
 			}
 			else {
-				sb.append(
-					LanguageUtil.get(
-						actionRequest.getLocale(), "public-pages"));
+				fileName = LanguageUtil.get(
+					actionRequest.getLocale(), "public-pages");
 			}
-
-			sb.append(StringPool.DASH);
-			sb.append(Time.getShortTimestamp());
-			sb.append(".lar");
-
-			String fileName = sb.toString();
 
 			LayoutServiceUtil.exportLayoutsAsFileInBackground(
 				fileName, groupId, privateLayout, layoutIds,

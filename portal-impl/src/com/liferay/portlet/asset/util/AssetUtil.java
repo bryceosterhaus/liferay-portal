@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -115,9 +115,6 @@ public class AssetUtil {
 		CharPool.QUESTION, CharPool.QUOTE, CharPool.RETURN, CharPool.SEMICOLON,
 		CharPool.SLASH, CharPool.STAR, CharPool.TILDE
 	};
-
-	public static final String[] SELECTED_FIELD_NAMES =
-		{Field.ENTRY_CLASS_NAME, Field.ENTRY_CLASS_PK};
 
 	public static Set<String> addLayoutTags(
 		HttpServletRequest request, List<AssetTag> tags) {
@@ -716,7 +713,7 @@ public class AssetUtil {
 		AssetSearcher assetSearcher = getAssetSearcher(
 			searchContext, assetEntryQuery, start, end);
 
-		Hits hits = assetSearcher.search(searchContext, SELECTED_FIELD_NAMES);
+		Hits hits = assetSearcher.search(searchContext);
 
 		List<AssetEntry> assetEntries = getAssetEntries(hits);
 

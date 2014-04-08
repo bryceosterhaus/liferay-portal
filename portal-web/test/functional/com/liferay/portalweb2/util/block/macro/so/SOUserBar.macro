@@ -1,7 +1,89 @@
 <definition>
-	<command name="addSOSite">
-		<execute action="SOUserBar#click" locator-key1="DASHBOARD" />
+	<command name="addPage">
+		<if>
+			<condition action="SOUserBar#isElementNotPresent" locator-key1="VISIBLE_PAGE_CONTROLS" />
+			<then>
+				<execute action="SOUserBar#click" locator-key1="TOGGLE_DOCKBAR" />
+			</then>
+		</if>
 
+		<execute action="Dockbar#click" locator-key1="ADD" value1="Add" />
+		<execute action="Dockbar#assertClick" locator-key1="ADD_PAGE_LINK" value1="Page" />
+		<execute action="Dockbar#type" locator-key1="ADD_PAGE_NAME_FIELD" value1="${pageName}" />
+
+		<if>
+			<isset var="pageType" />
+			<then>
+				<execute macro="Page#selectPageTypeRadioPG">
+					<var name="pageType" value="${pageType}" />
+				</execute>
+			</then>
+		</if>
+
+		<execute action="Dockbar#assertClick" locator-key1="ADD_PAGE_BUTTON" value1="Add Page" />
+
+		<var name="key_pageName" value="${pageName}" />
+
+		<execute action="Home#assertClick" locator-key1="PAGE" value1="${pageName}" />
+	</command>
+
+	<command name="addPortlet">
+		<var name="portletTypeKey" value="PORTLET" />
+
+		<if>
+			<equals arg1="${portletName}" arg2="Map" />
+			<then>
+				<var name="portletName" value="Where are the Liferay members?" />
+			</then>
+			<elseif>
+				<equals arg1="${portletName}" arg2="Requests" />
+				<then>
+					<var name="portletTypeKey" value="PORTLET_BORDERLESS" />
+				</then>
+			</elseif>
+		</if>
+
+		<var name="i" value="1" />
+
+		<while>
+			<not>
+				<equals arg1="${i}" arg2="5" />
+			</not>
+			<then>
+				<var name="i" value="${i?increment()}" />
+				<var name="key_portletName" value="${portletName}" />
+
+				<execute action="Home#refresh" />
+
+				<execute action="Dockbar#pause" locator1="1000" />
+
+				<if>
+					<and>
+						<condition action="Home#isElementNotPresent" locator-key1="${portletTypeKey}" />
+					</and>
+					<then>
+						<if>
+							<condition action="SOUserBar#isElementNotPresent" locator-key1="VISIBLE_PAGE_CONTROLS" />
+							<then>
+								<execute action="SOUserBar#click" locator-key1="TOGGLE_DOCKBAR" />
+							</then>
+						</if>
+
+						<execute macro="Portlet#addPGCmd">
+							<var name="portletName" value="${portletName}" />
+						</execute>
+					</then>
+					<else>
+						<var name="i" value="5" />
+					</else>
+				</if>
+			</then>
+		</while>
+
+		<execute action="Home#assertElementPresent" locator-key1="${portletTypeKey}" />
+	</command>
+
+	<command name="addSOSite">
 		<if>
 			<condition action="SOUserBar#isElementPresent" locator-key1="GO_TO_ADD_SITE_BUTTON" />
 			<then>
@@ -41,15 +123,36 @@
 		<execute action="SOUserBarAddSite#type" locator-key1="NAME_FIELD" value1="${siteName}" />
 		<execute action="SOUserBarAddSite#type" locator-key1="DESCRIPTION_FIELD" value1="${siteDescription}" />
 		<execute action="SOUserBarAddSite#click" locator-key1="NEXT_BUTTON" />
-		<execute action="SOUserBarAddSite#select" locator-key1="DEFAULT_PAGES_SELECT" value1="Default Social Office Site" />
 
-		<execute action="SOUserBarAddSite#check" locator-key1="HOME_CHECKBOX" />
-		<execute action="SOUserBarAddSite#check" locator-key1="CALENDAR_CHECKBOX" />
-		<execute action="SOUserBarAddSite#check" locator-key1="DOCUMENTS_CHECKBOX" />
-		<execute action="SOUserBarAddSite#check" locator-key1="FORUMS_CHECKBOX" />
-		<execute action="SOUserBarAddSite#check" locator-key1="BLOGS_CHECKBOX" />
-		<execute action="SOUserBarAddSite#check" locator-key1="WIKI_CHECKBOX" />
-		<execute action="SOUserBarAddSite#check" locator-key1="MEMBERS_CHECKBOX" />
+		<if>
+			<isset var="defaultPages" />
+			<then>
+				<execute action="SOUserBarAddSite#select" locator-key1="DEFAULT_PAGES_SELECT" value1="${defaultPages}" />
+
+				<if>
+					<equals arg1="$[defaultPages}" arg2="None" />
+					<then>
+						<execute action="SOUserBarAddSite#assertElementNotPresent" locator-key1="HOME_CHECKBOX" />
+						<execute action="SOUserBarAddSite#assertElementNotPresent" locator-key1="CALENDAR_CHECKBOX" />
+						<execute action="SOUserBarAddSite#assertElementNotPresent" locator-key1="DOCUMENTS_CHECKBOX" />
+						<execute action="SOUserBarAddSite#assertElementNotPresent" locator-key1="FORUMS_CHECKBOX" />
+						<execute action="SOUserBarAddSite#assertElementNotPresent" locator-key1="BLOGS_CHECKBOX" />
+						<execute action="SOUserBarAddSite#assertElementNotPresent" locator-key1="WIKI_CHECKBOX" />
+						<execute action="SOUserBarAddSite#assertElementNotPresent" locator-key1="MEMBERS_CHECKBOX" />
+					</then>
+				</if>
+			</then>
+			<else>
+				<execute action="SOUserBarAddSite#select" locator-key1="DEFAULT_PAGES_SELECT" value1="Default Social Office Site" />
+				<execute action="SOUserBarAddSite#check" locator-key1="HOME_CHECKBOX" />
+				<execute action="SOUserBarAddSite#check" locator-key1="CALENDAR_CHECKBOX" />
+				<execute action="SOUserBarAddSite#check" locator-key1="DOCUMENTS_CHECKBOX" />
+				<execute action="SOUserBarAddSite#check" locator-key1="FORUMS_CHECKBOX" />
+				<execute action="SOUserBarAddSite#check" locator-key1="BLOGS_CHECKBOX" />
+				<execute action="SOUserBarAddSite#check" locator-key1="WIKI_CHECKBOX" />
+				<execute action="SOUserBarAddSite#check" locator-key1="MEMBERS_CHECKBOX" />
+			</else>
+		</if>
 
 		<if>
 			<equals arg1="${siteType}" arg2="Private" />
@@ -105,7 +208,7 @@
 
 		<execute action="SOUserBarSitesDirectory#type" locator-key1="SITE_SEARCH_FIELD" value1="${siteName}" />
 		<execute action="SOUserBarSitesDirectory#assertTextEquals" locator-key1="SITE_NAME_LINK" value1="${siteName}" />
-		<execute action="SOUserBarSitesDirectory#click" locator-key1="DELETE_SITE_ICON" value1="Delete" />
+		<execute action="SOUserBarSitesDirectory#click" locator-key1="DELETE_SITE_ICON" />
 		<execute action="SOUserBarSitesDirectory#confirm" locator-key1="CONFIRMATION" value1="Are you sure you want to delete ${siteName}?" />
 		<execute action="SOUserBarSitesDirectory#assertElementNotPresent" locator-key1="SITE_NAME_LINK" />
 	</command>

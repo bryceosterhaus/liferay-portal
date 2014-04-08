@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -64,6 +64,7 @@ public class CoberturaClassFileTransformer implements ClassFileTransformer {
 		ProjectDataUtil.addShutdownHook(
 			new Runnable() {
 
+				@Override
 				public void run() {
 					File dataFile =
 						CoverageDataFileHandler.getDefaultDataFile();
@@ -186,7 +187,7 @@ public class CoberturaClassFileTransformer implements ClassFileTransformer {
 	private static class TouchCollectorClassVisitor extends ClassVisitor {
 
 		public TouchCollectorClassVisitor(ClassVisitor classVisitor) {
-			super(Opcodes.ASM4, classVisitor);
+			super(Opcodes.ASM5, classVisitor);
 		}
 
 		@Override
@@ -209,12 +210,19 @@ public class CoberturaClassFileTransformer implements ClassFileTransformer {
 	private static class TouchCollectorCLINITVisitor extends MethodVisitor {
 
 		public TouchCollectorCLINITVisitor(MethodVisitor methodVisitor) {
-			super(Opcodes.ASM4, methodVisitor);
+			super(Opcodes.ASM5, methodVisitor);
 		}
 
 		@Override
 		public void visitMethodInsn(
 			int opcode, String owner, String name, String desc) {
+
+			visitMethodInsn(opcode, owner, name, desc, false);
+		}
+
+		@Override
+		public void visitMethodInsn(
+			int opcode, String owner, String name, String desc, boolean itf) {
 
 			if ((opcode == Opcodes.INVOKESTATIC) &&
 				owner.equals(
@@ -224,7 +232,7 @@ public class CoberturaClassFileTransformer implements ClassFileTransformer {
 				owner = "com/liferay/cobertura/instrument/InstrumentationAgent";
 			}
 
-			super.visitMethodInsn(opcode, owner, name, desc);
+			super.visitMethodInsn(opcode, owner, name, desc, itf);
 		}
 
 	}

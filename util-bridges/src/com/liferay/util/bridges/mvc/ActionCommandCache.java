@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -66,9 +66,8 @@ public class ActionCommandCache {
 		Registry registry = RegistryUtil.getRegistry();
 
 		Filter filter = registry.getFilter(
-			"(&(objectClass=" + ActionCommand.class.getName() +
-				")(javax.portlet.name=" + portletName +
-					")(action.command.name=*))");
+			"(&(action.command.name=*)(javax.portlet.name=" + portletName +
+				")(objectClass=" + ActionCommand.class.getName() + "))");
 
 		_serviceTracker = registry.trackServices(
 			filter, new ActionCommandServiceTrackerCustomizer());

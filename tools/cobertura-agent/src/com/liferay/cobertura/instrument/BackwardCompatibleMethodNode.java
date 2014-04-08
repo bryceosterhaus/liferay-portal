@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,12 +15,13 @@
 package com.liferay.cobertura.instrument;
 
 import org.objectweb.asm.Label;
+import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.LabelNode;
 import org.objectweb.asm.tree.MethodNode;
 
 /**
  * <p>
- * See http://issues.liferay.com/browse/LPS-44718.
+ * See https://issues.liferay.com/browse/LPS-44718.
  * </p>
  *
  * @author Shuyang Zhou
@@ -31,7 +32,7 @@ public class BackwardCompatibleMethodNode extends MethodNode {
 		int access, String name, String desc, String signature,
 		String[] exceptions) {
 
-		super(access, name, desc, signature, exceptions);
+		super(Opcodes.ASM5, access, name, desc, signature, exceptions);
 	}
 
 	@Override

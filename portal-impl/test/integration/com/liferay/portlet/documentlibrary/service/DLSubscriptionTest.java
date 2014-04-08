@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -21,11 +21,18 @@ import com.liferay.portal.service.ServiceTestUtil;
 import com.liferay.portal.test.LiferayIntegrationJUnitTestRunner;
 import com.liferay.portal.test.MainServletExecutionTestListener;
 import com.liferay.portal.test.Sync;
-import com.liferay.portal.test.SynchronousDestinationExecutionTestListener;
+import com.liferay.portal.test.SynchronousMailExecutionTestListener;
 import com.liferay.portal.util.BaseSubscriptionTestCase;
+import com.liferay.portal.util.PortletKeys;
 import com.liferay.portal.util.TestPropsValues;
+import com.liferay.portlet.documentlibrary.model.DLFileEntry;
+import com.liferay.portlet.documentlibrary.model.DLFileEntryType;
+import com.liferay.portlet.documentlibrary.model.DLFileEntryTypeConstants;
 import com.liferay.portlet.documentlibrary.util.DLAppTestUtil;
+import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
+import com.liferay.portlet.dynamicdatamapping.util.DDMStructureTestUtil;
 
+import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -37,7 +44,7 @@ import org.junit.runner.RunWith;
 @ExecutionTestListeners(
 	listeners = {
 		MainServletExecutionTestListener.class,
-		SynchronousDestinationExecutionTestListener.class
+		SynchronousMailExecutionTestListener.class
 	})
 @RunWith(LiferayIntegrationJUnitTestRunner.class)
 @Sync
@@ -58,19 +65,46 @@ public class DLSubscriptionTest extends BaseSubscriptionTestCase {
 	@Override
 	protected long addBaseModel(long containerModelId) throws Exception {
 		FileEntry fileEntry = DLAppTestUtil.addFileEntry(
-			group.getGroupId(), group.getGroupId(), containerModelId,
-			ServiceTestUtil.randomString());
+			group.getGroupId(), group.getGroupId(), containerModelId);
 
 		return fileEntry.getFileEntryId();
 	}
 
 	@Override
+	protected long addBaseModelWithClassType(
+			long containerModelId, long classTypeId)
+		throws Exception {
+
+		FileEntry fileEntry = DLAppTestUtil.addFileEntry(
+			group.getGroupId(), containerModelId,
+			ServiceTestUtil.randomString(), classTypeId);
+
+		return fileEntry.getFileEntryId();
+	}
+
+	@Override
+	protected long addClassType() throws Exception {
+		DDMStructure ddmStructure = DDMStructureTestUtil.addStructure(
+			DLFileEntry.class.getName());
+
+		DLFileEntryType fileEntryType = DLAppTestUtil.addDLFileEntryType(
+			group.getGroupId(), ddmStructure.getStructureId());
+
+		return fileEntryType.getFileEntryTypeId();
+	}
+
+	@Override
 	protected long addContainerModel(long containerModelId) throws Exception {
 		Folder folder = DLAppTestUtil.addFolder(
-			group.getGroupId(), containerModelId,
-			ServiceTestUtil.randomString());
+			group.getGroupId(), containerModelId);
 
 		return folder.getFolderId();
+	}
+
+	@Override
+	protected void addSubscriptionClassType(long classTypeId) throws Exception {
+		DLAppServiceUtil.subscribeFileEntryType(
+			group.getGroupId(), classTypeId);
 	}
 
 	@Override
@@ -79,6 +113,27 @@ public class DLSubscriptionTest extends BaseSubscriptionTestCase {
 
 		DLAppLocalServiceUtil.subscribeFolder(
 			TestPropsValues.getUserId(), group.getGroupId(), containerModelId);
+	}
+
+	@Override
+	protected Long getDefaultClassTypeId() throws Exception {
+		DLFileEntryType basicEntryType =
+			DLFileEntryTypeLocalServiceUtil.getDLFileEntryType(
+				DLFileEntryTypeConstants.FILE_ENTRY_TYPE_ID_BASIC_DOCUMENT);
+
+		Assert.assertNotNull(basicEntryType);
+
+		return basicEntryType.getPrimaryKey();
+	}
+
+	@Override
+	protected String getPortletId() {
+		return PortletKeys.DOCUMENT_LIBRARY;
+	}
+
+	@Override
+	protected String getSubscriptionBodyPreferenceName() throws Exception {
+		return "emailFileEntryAddedBody";
 	}
 
 }

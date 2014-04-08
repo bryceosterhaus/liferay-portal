@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -26,6 +26,7 @@ import com.liferay.portal.theme.PortletDisplay;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.util.WebKeys;
+import com.liferay.portlet.documentlibrary.model.DLFileEntry;
 import com.liferay.portlet.trash.util.TrashUtil;
 
 import javax.servlet.http.HttpServletRequest;
@@ -52,7 +53,17 @@ public class DLActionsDisplayContext {
 			WebKeys.THEME_DISPLAY);
 
 		_companyId = themeDisplay.getCompanyId();
+
 		_fileEntryTypeId = ParamUtil.getLong(request, "fileEntryTypeId", -1);
+
+		if ((_fileEntryTypeId == -1) && (fileEntry != null) &&
+			(fileEntry.getModel() instanceof DLFileEntry)) {
+
+			DLFileEntry dlFileEntry = (DLFileEntry)fileEntry.getModel();
+
+			_fileEntryTypeId = dlFileEntry.getFileEntryTypeId();
+		}
+
 		_folderId = BeanParamUtil.getLong(fileEntry, request, "folderId");
 		_permissionChecker = themeDisplay.getPermissionChecker();
 		_portletDisplay = themeDisplay.getPortletDisplay();

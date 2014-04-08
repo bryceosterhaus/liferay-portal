@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,6 +23,7 @@ import com.liferay.registry.ServiceReference;
 import com.liferay.registry.ServiceRegistration;
 import com.liferay.registry.ServiceTracker;
 import com.liferay.registry.ServiceTrackerCustomizer;
+import com.liferay.registry.collections.StringServiceRegistrationMap;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -134,8 +135,8 @@ public class StrutsActionRegistryUtil {
 
 	private Map<String, Action> _actions =
 		new ConcurrentHashMap<String, Action>();
-	private Map<String, ServiceRegistration<?>> _serviceRegistrations =
-		new ConcurrentHashMap<String, ServiceRegistration<?>>();
+	private StringServiceRegistrationMap<?> _serviceRegistrations =
+		new StringServiceRegistrationMap<Object>();
 	private ServiceTracker<?, Action> _serviceTracker;
 
 	private class ActionServiceTrackerCustomizer

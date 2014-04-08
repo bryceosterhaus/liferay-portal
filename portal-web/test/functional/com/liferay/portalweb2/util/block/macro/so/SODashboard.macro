@@ -1,88 +1,4 @@
 <definition>
-	<command name="addPage">
-		<if>
-			<condition action="SOUserBar#isElementNotPresent" locator-key1="VISIBLE_PAGE_CONTROLS" />
-			<then>
-				<execute action="SOUserBar#click" locator-key1="TOGGLE_DOCKBAR" />
-			</then>
-		</if>
-
-		<execute action="Dockbar#click" locator-key1="ADD" value1="Add" />
-		<execute action="Dockbar#assertClick" locator-key1="ADD_PAGE_LINK" value1="Page" />
-		<execute action="Dockbar#type" locator-key1="ADD_PAGE_NAME_FIELD" value1="${pageName}" />
-
-		<if>
-			<isset var="pageType" />
-			<then>
-				<execute macro="Page#selectPageTypeRadioPG">
-					<var name="pageType" value="${pageType}" />
-				</execute>
-			</then>
-		</if>
-
-		<execute action="Dockbar#assertClick" locator-key1="ADD_PAGE_BUTTON" value1="Add Page" />
-
-		<var name="key_pageName" value="${pageName}" />
-
-		<execute action="Home#assertClick" locator-key1="PAGE" value1="${pageName}" />
-	</command>
-
-	<command name="addPortlet">
-		<var name="portletTypeKey" value="PORTLET" />
-
-		<if>
-			<equals arg1="${portletName}" arg2="Map" />
-			<then>
-				<var name="portletName" value="Where are the Liferay members?" />
-			</then>
-			<elseif>
-				<equals arg1="${portletName}" arg2="Requests" />
-				<then>
-					<var name="portletTypeKey" value="PORTLET_BORDERLESS" />
-				</then>
-			</elseif>
-		</if>
-
-		<var name="i" value="1" />
-
-		<while>
-			<not>
-				<equals arg1="${i}" arg2="5" />
-			</not>
-			<then>
-				<var name="i" value="${i?increment()}" />
-				<var name="key_portletName" value="${portletName}" />
-
-				<execute action="Home#refresh" />
-
-				<execute action="Dockbar#pause" locator1="1000" />
-
-				<if>
-					<and>
-						<condition action="Home#isElementNotPresent" locator-key1="${portletTypeKey}" />
-					</and>
-					<then>
-						<if>
-							<condition action="SOUserBar#isElementNotPresent" locator-key1="VISIBLE_PAGE_CONTROLS" />
-							<then>
-								<execute action="SOUserBar#click" locator-key1="TOGGLE_DOCKBAR" />
-							</then>
-						</if>
-
-						<execute macro="Portlet#addPGCmd">
-							<var name="portletName" value="${portletName}" />
-						</execute>
-					</then>
-					<else>
-						<var name="i" value="5" />
-					</else>
-				</if>
-			</then>
-		</while>
-
-		<execute action="Home#assertElementPresent" locator-key1="${portletTypeKey}" />
-	</command>
-
 	<command name="addWhatsHappeningEntry">
 		<execute action="SOUserBar#click" locator-key1="DASHBOARD" />
 
@@ -162,6 +78,26 @@
 		</if>
 
 		<execute action="SODashboard#assertTextNotPresent" value1="${whatsHappeningEntryContent}" />
+	</command>
+
+	<command name="tearDownCP">
+		<execute action="SOUserBar#click" locator-key1="DASHBOARD" />
+
+		<execute action="Dockbar#assertClick" locator-key1="ADMIN" value1="Admin" />
+		<execute action="Dockbar#assertClick" locator-key1="ADMIN_SITE_ADMINISTRATION_PAGES" value1="Pages" />
+
+		<execute action="CPSitepages#assertClick" locator-key1="NAVIGATION_MY_DASHBOARD" value1="My Dashboard" />
+
+		<if>
+			<condition action="CPSitepages#isElementPresent" locator-key1="PAGE_TREE_PAGE_LINK_8" />
+			<then>
+				<execute action="CPSitepages#click" locator-key1="PAGE_TREE_PAGE_LINK_8" />
+				<execute action="CPSitepages#assertClick" locator-key1="TOOLBAR_DELETE" value1="Delete" />
+				<execute action="CPSitepages#confirm" locator-key1="CONFIRMATION" value1="Are you sure you want to delete the selected page?" />
+			</then>
+		</if>
+
+		<execute action="CPSitepages#assertElementNotPresent" locator-key1="PAGE_TREE_PAGE_LINK_8" />
 	</command>
 
 	<command name="tearDownPG">
@@ -290,9 +226,9 @@
 
 	<command name="viewLinkPrivateMessaging">
 		<execute action="SOMessages#assertTextEquals" locator-key1="INFO_MESSAGE" value1="No messages found." />
-		<execute action="SOMessages#assertTextEquals" locator-key1="MARK_AS_UNREAD_BUTTON" value1="Mark as Unread" />
-		<execute action="SOMessages#assertTextEquals" locator-key1="MARK_AS_READ_BUTTON" value1="Mark as Read" />
-		<execute action="SOMessages#assertTextEquals" locator-key1="DELETE_BUTTON" value1="Delete" />
+		<execute action="SOMessages#assertElementNotPresent" locator-key1="MARK_AS_UNREAD_BUTTON" value1="Mark as Unread" />
+		<execute action="SOMessages#assertElementNotPresent" locator-key1="MARK_AS_READ_BUTTON" value1="Mark as Read" />
+		<execute action="SOMessages#assertElementNotPresent" locator-key1="DELETE_BUTTON" value1="Delete" />
 		<execute action="SOMessages#assertTextEquals" locator-key1="NEW_MESSAGE_BUTTON" value1="New Message" />
 
 		<var name="siteName" value="Liferay" />
@@ -426,6 +362,8 @@
 	</command>
 
 	<command name="viewUpcomingTaskNone">
+		<var name="key_taskDescription" value="${taskDescription}" />
+
 		<execute action="SOUserBar#click" locator-key1="DASHBOARD" />
 
 		<execute action="SODashboard#assertTextEquals" locator-key1="VIEW_ALL_TASKS_LINK" value1="View All Tasks" />

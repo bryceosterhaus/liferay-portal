@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -271,13 +271,9 @@ public class LayoutExporter {
 			startDate = null;
 		}
 
-		StopWatch stopWatch = null;
+		StopWatch stopWatch = new StopWatch();
 
-		if (_log.isInfoEnabled()) {
-			stopWatch = new StopWatch();
-
-			stopWatch.start();
-		}
+		stopWatch.start();
 
 		LayoutCache layoutCache = new LayoutCache();
 
@@ -515,15 +511,21 @@ public class LayoutExporter {
 			portletDataContext.setScopeType(scopeType);
 			portletDataContext.setScopeLayoutUuid(scopeLayoutUuid);
 
-			boolean[] exportPortletControls =
-				ExportImportHelperUtil.getExportPortletControls(
+			Map<String, Boolean> exportPortletControlsMap =
+				ExportImportHelperUtil.getExportPortletControlsMap(
 					companyId, portletId, parameterMap, type);
 
 			_portletExporter.exportPortlet(
 				portletDataContext, layoutCache, portletId, layout,
-				portletsElement, exportPermissions, exportPortletControls[0],
-				exportPortletControls[1], exportPortletControls[2],
-				exportPortletControls[3]);
+				portletsElement, exportPermissions,
+				exportPortletControlsMap.get(
+					PortletDataHandlerKeys.PORTLET_ARCHIVED_SETUPS),
+				exportPortletControlsMap.get(
+					PortletDataHandlerKeys.PORTLET_DATA),
+				exportPortletControlsMap.get(
+					PortletDataHandlerKeys.PORTLET_SETUP),
+				exportPortletControlsMap.get(
+					PortletDataHandlerKeys.PORTLET_USER_PREFERENCES));
 		}
 
 		portletDataContext.setScopeGroupId(previousScopeGroupId);
@@ -545,13 +547,7 @@ public class LayoutExporter {
 			document, portletDataContext.getManifestSummary());
 
 		if (_log.isInfoEnabled()) {
-			if (stopWatch != null) {
-				_log.info(
-					"Exporting layouts takes " + stopWatch.getTime() + " ms");
-			}
-			else {
-				_log.info("Exporting layouts is finished");
-			}
+			_log.info("Exporting layouts takes " + stopWatch.getTime() + " ms");
 		}
 
 		portletDataContext.addZipEntry(
@@ -571,7 +567,7 @@ public class LayoutExporter {
 			Element layoutElement = portletDataContext.getExportDataElement(
 				layout);
 
-			layoutElement.addAttribute("action", Constants.SKIP);
+			layoutElement.addAttribute(Constants.ACTION, Constants.SKIP);
 
 			return;
 		}
@@ -579,9 +575,7 @@ public class LayoutExporter {
 		boolean exportLAR = MapUtil.getBoolean(
 			portletDataContext.getParameterMap(), "exportLAR");
 
-		if (!exportLAR && LayoutStagingUtil.isBranchingLayout(layout) &&
-			!layout.isTypeURL()) {
-
+		if (!exportLAR && LayoutStagingUtil.isBranchingLayout(layout)) {
 			long layoutSetBranchId = MapUtil.getLong(
 				portletDataContext.getParameterMap(), "layoutSetBranchId");
 

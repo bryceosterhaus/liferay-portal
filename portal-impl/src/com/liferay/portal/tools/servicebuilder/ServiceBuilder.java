@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -45,8 +45,8 @@ import com.liferay.portal.model.CacheField;
 import com.liferay.portal.model.ModelHintsUtil;
 import com.liferay.portal.security.permission.ResourceActionsUtil;
 import com.liferay.portal.tools.ArgumentsUtil;
+import com.liferay.portal.tools.ToolDependencies;
 import com.liferay.portal.tools.sourceformatter.JavaSourceProcessor;
-import com.liferay.portal.util.InitUtil;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.util.xml.XMLFormatter;
 
@@ -219,7 +219,7 @@ public class ServiceBuilder {
 	public static void main(String[] args) {
 		Map<String, String> arguments = ArgumentsUtil.parseArguments(args);
 
-		InitUtil.initWithSpring(true);
+		ToolDependencies.wireServiceBuilder();
 
 		String fileName = arguments.get("service.input.file");
 		String hbmFileName = arguments.get("service.hbm.file");
@@ -4008,7 +4008,7 @@ public class ServiceBuilder {
 						hints.get("max-length"), maxLength);
 				}
 
-				if (col.isLocalized()) {
+				if (col.isLocalized() && (maxLength < 4000)) {
 					maxLength = 4000;
 				}
 
@@ -4469,15 +4469,7 @@ public class ServiceBuilder {
 				EntityMapping entityMapping = new EntityMapping(
 					mappingTable, ejbName, collectionEntity);
 
-				int ejbNameWeight = StringUtil.startsWithWeight(
-					mappingTable, ejbName);
-				int collectionEntityWeight = StringUtil.startsWithWeight(
-					mappingTable, collectionEntity);
-
-				if ((ejbNameWeight > collectionEntityWeight) ||
-					((ejbNameWeight == collectionEntityWeight) &&
-					 (ejbName.compareTo(collectionEntity) > 0))) {
-
+				if (!_entityMappings.containsKey(mappingTable)) {
 					_entityMappings.put(mappingTable, entityMapping);
 				}
 			}

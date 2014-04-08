@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -21,15 +21,16 @@ long groupId = ParamUtil.getLong(request, "groupId");
 long[] selectedGroupIds = StringUtil.split(ParamUtil.getString(request, "selectedGroupIds"), 0L);
 long refererAssetEntryId = ParamUtil.getLong(request, "refererAssetEntryId");
 String typeSelection = ParamUtil.getString(request, "typeSelection");
+long subtypeSelectionId = ParamUtil.getLong(request, "subtypeSelectionId");
 String eventName = ParamUtil.getString(request, "eventName", liferayPortletResponse.getNamespace() + "selectAsset");
 
 PortletURL portletURL = renderResponse.createRenderURL();
 
 portletURL.setParameter("struts_action", "/asset_browser/view");
-portletURL.setParameter("groupId", String.valueOf(groupId));
 portletURL.setParameter("selectedGroupIds", StringUtil.merge(selectedGroupIds));
 portletURL.setParameter("refererAssetEntryId", String.valueOf(refererAssetEntryId));
 portletURL.setParameter("typeSelection", typeSelection);
+portletURL.setParameter("subtypeSelectionId", String.valueOf(subtypeSelectionId));
 portletURL.setParameter("eventName", eventName);
 
 request.setAttribute("view.jsp-portletURL", portletURL);
@@ -47,6 +48,7 @@ request.setAttribute("view.jsp-portletURL", portletURL);
 					<liferay-util:include page="/html/portlet/asset_browser/toolbar.jsp">
 						<liferay-util:param name="groupId" value="<%= String.valueOf(groupId) %>" />
 						<liferay-util:param name="typeSelection" value="<%= typeSelection %>" />
+						<liferay-util:param name="subtypeSelectionId" value="<%= String.valueOf(subtypeSelectionId) %>" />
 					</liferay-util:include>
 				</aui:nav>
 
@@ -123,7 +125,7 @@ request.setAttribute("view.jsp-portletURL", portletURL);
 
 						data.put("assetentryid", assetEntry.getEntryId());
 						data.put("assetclassname", assetEntry.getClassName());
-						data.put("assettype", assetRendererFactory.getTypeName(locale, true));
+						data.put("assettype", assetRendererFactory.getTypeName(locale, subtypeSelectionId));
 						data.put("assettitle", assetEntry.getTitle(locale));
 						data.put("groupdescriptivename", group.getDescriptiveName(locale));
 						%>

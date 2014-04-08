@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -24,16 +24,16 @@ boolean advancedSearch = displayTerms.isAdvancedSearch();
 	<div class="form-search">
 		<div class="input-append" id="<%= id %>simple">
 			<div class="advanced-search">
-				<a class="toggle-advanced" href="javascript:;" id="<%= id %>toggleAdvanced">
-					<i class="icon-search"></i>
-					<i class="caret"></i>
-				</a>
-
 				<input class="search-query span9" <%= advancedSearch ? "disabled" : StringPool.BLANK %> id="<%= id + displayTerms.KEYWORDS %>" name="<portlet:namespace /><%= displayTerms.KEYWORDS %>" placeholder="<liferay-ui:message key="keywords" />" type="text" value="<%= HtmlUtil.escapeAttribute(displayTerms.getKeywords()) %>" />
 
 				<button class="btn" type="submit">
 					<%= LanguageUtil.get(pageContext, buttonLabel, "search") %>
 				</button>
+
+				<a class="toggle-advanced" href="javascript:;" id="<%= id %>toggleAdvanced">
+					<i class="icon-search"></i>
+					<i class="caret"></i>
+				</a>
 			</div>
 		</div>
 	</div>

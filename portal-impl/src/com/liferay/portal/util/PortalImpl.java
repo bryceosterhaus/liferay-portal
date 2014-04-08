@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -29,6 +29,7 @@ import com.liferay.portal.kernel.cluster.ClusterRequest;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBFactoryUtil;
 import com.liferay.portal.kernel.dao.jdbc.DataAccess;
+import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.image.ImageBag;
@@ -206,6 +207,8 @@ import com.liferay.portlet.login.util.LoginUtil;
 import com.liferay.portlet.messageboards.action.EditDiscussionAction;
 import com.liferay.portlet.messageboards.model.MBMessage;
 import com.liferay.portlet.messageboards.model.MBThread;
+import com.liferay.portlet.sites.util.Sites;
+import com.liferay.portlet.sites.util.SitesUtil;
 import com.liferay.portlet.social.model.SocialRelationConstants;
 import com.liferay.portlet.social.util.FacebookUtil;
 import com.liferay.portlet.wiki.model.WikiPage;
@@ -1125,7 +1128,7 @@ public class PortalImpl implements Portal {
 	public long[] getAncestorSiteGroupIds(long groupId)
 		throws PortalException, SystemException {
 
-		List<Group> groups = doGetAncestorSiteGroupIds(groupId);
+		List<Group> groups = doGetAncestorSiteGroups(groupId, false);
 
 		long[] groupIds = new long[groups.size()];
 
@@ -1644,7 +1647,8 @@ public class PortalImpl implements Portal {
 
 		sb.append(
 			getPortalURL(
-				company.getVirtualHostname(), getPortalPort(false), false));
+				company.getVirtualHostname(), getPortalServerPort(false),
+				false));
 		sb.append(getPathFriendlyURLPrivateGroup());
 		sb.append(GroupConstants.CONTROL_PANEL_FRIENDLY_URL);
 		sb.append(PropsValues.CONTROL_PANEL_LAYOUT_FRIENDLY_URL);
@@ -1661,6 +1665,10 @@ public class PortalImpl implements Portal {
 		params.put(
 			"p_p_state", new String[] {WindowState.MAXIMIZED.toString()});
 		params.put("p_p_mode", new String[] {PortletMode.VIEW.toString()});
+		params.put("doAsGroupId", new String[] {String.valueOf(scopeGroupId)});
+		params.put(
+			"controlPanelCategory",
+			new String[] {PortletCategoryKeys.CURRENT_SITE});
 
 		sb.append(HttpUtil.parameterMapToString(params, true));
 
@@ -1826,15 +1834,13 @@ public class PortalImpl implements Portal {
 
 		List<Group> groups = new ArrayList<Group>();
 
-		long siteGroupId = getSiteGroupId(groupId);
+		Group siteGroup = doGetCurrentSiteGroup(groupId);
 
-		Group siteGroup = GroupLocalServiceUtil.getGroup(siteGroupId);
-
-		if (!siteGroup.isLayoutPrototype()) {
+		if (siteGroup != null) {
 			groups.add(siteGroup);
 		}
 
-		groups.addAll(doGetAncestorSiteGroupIds(groupId));
+		groups.addAll(doGetAncestorSiteGroups(groupId, false));
 
 		long[] groupIds = new long[groups.size()];
 
@@ -3076,14 +3082,12 @@ public class PortalImpl implements Portal {
 		throws PortalException, SystemException {
 
 		String layoutURL = getLayoutURL(layout, themeDisplay, doAsUser);
-		String portalURL = getPortalURL(layout, themeDisplay);
 
-		if (StringUtil.startsWith(layoutURL, portalURL)) {
-			return layoutURL;
+		if (!HttpUtil.hasProtocol(layoutURL)) {
+			layoutURL = getPortalURL(layout, themeDisplay) + (layoutURL);
 		}
-		else {
-			return portalURL + layoutURL;
-		}
+
+		return layoutURL;
 	}
 
 	@Override
@@ -3133,7 +3137,7 @@ public class PortalImpl implements Portal {
 		}
 
 		String portalURL = getPortalURL(
-			virtualHostname, getPortalPort(secure), secure);
+			virtualHostname, getPortalServerPort(secure), secure);
 
 		sb.append(portalURL);
 
@@ -3160,6 +3164,23 @@ public class PortalImpl implements Portal {
 		throws PortalException, SystemException {
 
 		return getLayoutFullURL(themeDisplay.getLayout(), themeDisplay);
+	}
+
+	@Override
+	public String getLayoutRelativeURL(Layout layout, ThemeDisplay themeDisplay)
+		throws PortalException, SystemException {
+
+		return getLayoutRelativeURL(layout, themeDisplay, true);
+	}
+
+	@Override
+	public String getLayoutRelativeURL(
+			Layout layout, ThemeDisplay themeDisplay, boolean doAsUser)
+		throws PortalException, SystemException {
+
+		String layoutFullURL = getLayoutFullURL(layout, themeDisplay, doAsUser);
+
+		return HttpUtil.removeDomain(layoutFullURL);
 	}
 
 	@Override
@@ -4030,7 +4051,7 @@ public class PortalImpl implements Portal {
 	@Deprecated
 	@Override
 	public int getPortalPort() {
-		return _portalPort.get();
+		return getPortalServerPort(false);
 	}
 
 	/**
@@ -4040,12 +4061,7 @@ public class PortalImpl implements Portal {
 	@Deprecated
 	@Override
 	public int getPortalPort(boolean secure) {
-		if (secure) {
-			return _securePortalPort.get();
-		}
-		else {
-			return _portalPort.get();
-		}
+		return getPortalServerPort(secure);
 	}
 
 	@Override
@@ -4701,7 +4717,14 @@ public class PortalImpl implements Portal {
 			return null;
 		}
 
-		return portletBag.getPreferencesValidatorInstance();
+		List<PreferencesValidator> preferencesValidatorInstances =
+			portletBag.getPreferencesValidatorInstances();
+
+		if (preferencesValidatorInstances.isEmpty()) {
+			return null;
+		}
+
+		return preferencesValidatorInstances.get(0);
 	}
 
 	@Override
@@ -4951,6 +4974,74 @@ public class PortalImpl implements Portal {
 	@Override
 	public String getServletContextName() {
 		return _servletContextName;
+	}
+
+	@Override
+	public long[] getSharedContentSiteGroupIds(
+			long companyId, long groupId, long userId)
+		throws PortalException, SystemException {
+
+		List<Group> groups = new ArrayList<Group>();
+
+		Group siteGroup = doGetCurrentSiteGroup(groupId);
+
+		if (siteGroup != null) {
+
+			// Current site
+
+			groups.add(siteGroup);
+
+			// Layout scopes
+
+			groups.addAll(
+				GroupLocalServiceUtil.getGroups(
+					siteGroup.getCompanyId(), Layout.class.getName(),
+					siteGroup.getGroupId()));
+		}
+
+		// Administered sites
+
+		if (PrefsPropsUtil.getBoolean(
+				companyId,
+				PropsKeys.
+					SITES_CONTENT_SHARING_THROUGH_ADMINISTRATORS_ENABLED)) {
+
+			LinkedHashMap<String, Object> groupParams =
+				new LinkedHashMap<String, Object>();
+
+			groupParams.put("site", Boolean.TRUE);
+			groupParams.put("usersGroups", userId);
+
+			groups.addAll(
+				GroupLocalServiceUtil.search(
+					companyId, null, null, groupParams, QueryUtil.ALL_POS,
+					QueryUtil.ALL_POS, null));
+		}
+
+		// Descendant sites
+
+		groups.addAll(siteGroup.getDescendants(true));
+
+		// Ancestor sites and global site
+
+		int sitesContentSharingWithChildrenEnabled = PrefsPropsUtil.getInteger(
+			companyId, PropsKeys.SITES_CONTENT_SHARING_WITH_CHILDREN_ENABLED);
+
+		if (sitesContentSharingWithChildrenEnabled !=
+				Sites.CONTENT_SHARING_WITH_CHILDREN_DISABLED) {
+
+			groups.addAll(doGetAncestorSiteGroups(groupId, true));
+		}
+
+		long[] groupIds = new long[groups.size()];
+
+		for (int i = 0; i < groups.size(); i++) {
+			Group group = groups.get(i);
+
+			groupIds[i] = group.getGroupId();
+		}
+
+		return groupIds;
 	}
 
 	@Override
@@ -7528,7 +7619,8 @@ public class PortalImpl implements Portal {
 		return StringPool.SLASH.concat(languageId);
 	}
 
-	protected List<Group> doGetAncestorSiteGroupIds(long groupId)
+	protected List<Group> doGetAncestorSiteGroups(
+			long groupId, boolean checkContentSharingWithChildrenEnabled)
 		throws PortalException, SystemException {
 
 		List<Group> groups = new ArrayList<Group>();
@@ -7537,7 +7629,15 @@ public class PortalImpl implements Portal {
 
 		Group siteGroup = GroupLocalServiceUtil.getGroup(siteGroupId);
 
-		groups.addAll(siteGroup.getAncestors());
+		for (Group group : siteGroup.getAncestors()) {
+			if (checkContentSharingWithChildrenEnabled &&
+				!SitesUtil.isContentSharingWithChildrenEnabled(group)) {
+
+				continue;
+			}
+
+			groups.add(group);
+		}
 
 		if (!siteGroup.isCompany()) {
 			groups.add(
@@ -7546,6 +7646,20 @@ public class PortalImpl implements Portal {
 		}
 
 		return groups;
+	}
+
+	protected Group doGetCurrentSiteGroup(long groupId)
+		throws PortalException, SystemException {
+
+		long siteGroupId = getSiteGroupId(groupId);
+
+		Group siteGroup = GroupLocalServiceUtil.getGroup(siteGroupId);
+
+		if (!siteGroup.isLayoutPrototype()) {
+			return siteGroup;
+		}
+
+		return null;
 	}
 
 	protected long doGetPlidFromPortletId(
@@ -8242,6 +8356,11 @@ public class PortalImpl implements Portal {
 	private final AtomicReference<InetSocketAddress>
 		_portalLocalInetSocketAddress =
 			new AtomicReference<InetSocketAddress>();
+
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link
+	 *             #_portalServerInetSocketAddress}
+	 */
 	private final AtomicInteger _portalPort = new AtomicInteger(-1);
 
 	/**

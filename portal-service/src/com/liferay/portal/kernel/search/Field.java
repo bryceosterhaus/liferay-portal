@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,6 +15,7 @@
 package com.liferay.portal.kernel.search;
 
 import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.StringPool;
 
 import java.io.Serializable;
 
@@ -28,6 +29,8 @@ import java.util.Map;
  * @author Alex Wallace
  */
 public class Field implements Serializable {
+
+	public static final String ANY = StringPool.STAR;
 
 	public static final String ASSET_CATEGORY_ID = "assetCategoryId";
 

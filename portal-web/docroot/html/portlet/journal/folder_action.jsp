@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -71,9 +71,9 @@ else {
 					/>
 
 					<portlet:renderURL var="moveURL">
-						<portlet:param name="struts_action" value="/journal/move_folder" />
+						<portlet:param name="struts_action" value="/journal/move_entry" />
 						<portlet:param name="redirect" value="<%= currentURL %>" />
-						<portlet:param name="folderId" value="<%= String.valueOf(folder.getFolderId()) %>" />
+						<portlet:param name="folderIds" value="<%= String.valueOf(folder.getFolderId()) %>" />
 					</portlet:renderURL>
 
 					<liferay-ui:icon

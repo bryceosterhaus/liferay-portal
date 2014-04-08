@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -28,6 +28,7 @@ import com.liferay.portal.kernel.servlet.PortletServlet;
 import com.liferay.portal.kernel.util.ClassUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.JavaConstants;
+import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -307,13 +308,9 @@ public class InvokerPortletImpl implements InvokerPortlet {
 			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws IOException {
 
-		StopWatch stopWatch = null;
+		StopWatch stopWatch = new StopWatch();
 
-		if (_log.isDebugEnabled()) {
-			stopWatch = new StopWatch();
-
-			stopWatch.start();
-		}
+		stopWatch.start();
 
 		try {
 			invokeAction(actionRequest, actionResponse);
@@ -324,14 +321,9 @@ public class InvokerPortletImpl implements InvokerPortlet {
 		}
 
 		if (_log.isDebugEnabled()) {
-			if (stopWatch != null) {
-				_log.debug(
-					"processAction for " + _portletId + " takes " +
-						stopWatch.getTime() + " ms");
-			}
-			else {
-				_log.debug("processAction for " + _portletId + " is finished");
-			}
+			_log.debug(
+				"processAction for " + _portletId + " takes " +
+					stopWatch.getTime() + " ms");
 		}
 	}
 
@@ -340,13 +332,9 @@ public class InvokerPortletImpl implements InvokerPortlet {
 			EventRequest eventRequest, EventResponse eventResponse)
 		throws IOException, PortletException {
 
-		StopWatch stopWatch = null;
+		StopWatch stopWatch = new StopWatch();
 
-		if (_log.isDebugEnabled()) {
-			stopWatch = new StopWatch();
-
-			stopWatch.start();
-		}
+		stopWatch.start();
 
 		invokeEvent(eventRequest, eventResponse);
 
@@ -370,13 +358,9 @@ public class InvokerPortletImpl implements InvokerPortlet {
 			throw portletException;
 		}
 
-		StopWatch stopWatch = null;
+		StopWatch stopWatch = new StopWatch();
 
-		if (_log.isDebugEnabled()) {
-			stopWatch = new StopWatch();
-
-			stopWatch.start();
-		}
+		stopWatch.start();
 
 		String remoteUser = renderRequest.getRemoteUser();
 
@@ -457,13 +441,9 @@ public class InvokerPortletImpl implements InvokerPortlet {
 			ResourceRequest resourceRequest, ResourceResponse resourceResponse)
 		throws IOException {
 
-		StopWatch stopWatch = null;
+		StopWatch stopWatch = new StopWatch();
 
-		if (_log.isDebugEnabled()) {
-			stopWatch = new StopWatch();
-
-			stopWatch.start();
-		}
+		stopWatch.start();
 
 		try {
 			invokeResource(resourceRequest, resourceResponse);
@@ -630,7 +610,7 @@ public class InvokerPortletImpl implements InvokerPortlet {
 
 		Map<String, String[]> properties = portletResponse.getProperties();
 
-		if ((properties != null) && (properties.size() > 0)) {
+		if (MapUtil.isNotEmpty(properties)) {
 			if (_expCache != null) {
 				String[] expCache = properties.get(
 					RenderResponse.EXPIRATION_CACHE);

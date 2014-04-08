@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -547,23 +547,23 @@ public class PortletDataContextImpl implements PortletDataContext {
 				return referenceElement;
 			}
 
-			_missingReferences.add(referenceKey);
+			if (!_missingReferences.contains(referenceKey)) {
+				_missingReferences.add(referenceKey);
 
-			doAddReferenceElement(
-				referrerClassedModel, null, classedModel, className, binPath,
-				referenceType, true);
+				referenceElement.addAttribute(
+					"missing", Boolean.TRUE.toString());
+
+				doAddReferenceElement(
+					referrerClassedModel, null, classedModel, className,
+					binPath, referenceType, true);
+			}
 		}
 		else {
 			_references.add(referenceKey);
 
-			if (_missingReferences.contains(referenceKey)) {
-				_missingReferences.remove(referenceKey);
+			referenceElement.addAttribute("missing", Boolean.FALSE.toString());
 
-				Element missingReferenceElement = getMissingReferenceElement(
-					classedModel);
-
-				_missingReferencesElement.remove(missingReferenceElement);
-			}
+			cleanUpMissingReferences(classedModel);
 		}
 
 		return referenceElement;
@@ -650,6 +650,20 @@ public class PortletDataContextImpl implements PortletDataContext {
 		}
 		catch (IOException ioe) {
 			throw new SystemException(ioe);
+		}
+	}
+
+	@Override
+	public void cleanUpMissingReferences(ClassedModel classedModel) {
+		String referenceKey = getReferenceKey(classedModel);
+
+		if (_missingReferences.contains(referenceKey)) {
+			_missingReferences.remove(referenceKey);
+
+			Element missingReferenceElement = getMissingReferenceElement(
+				classedModel);
+
+			_missingReferencesElement.remove(missingReferenceElement);
 		}
 	}
 
@@ -999,6 +1013,11 @@ public class PortletDataContextImpl implements PortletDataContext {
 		return _missingReferencesElement;
 	}
 
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link
+	 *             #getNewPrimaryKeysMap(String)}
+	 */
+	@Deprecated
 	@Override
 	public List<Layout> getNewLayouts() {
 		return _newLayouts;
@@ -1455,6 +1474,25 @@ public class PortletDataContextImpl implements PortletDataContext {
 			(Map<Long, Long>)getNewPrimaryKeysMap(clazz);
 
 		newPrimaryKeysMap.put(classPK, newClassPK);
+
+		if (classedModel instanceof StagedGroupedModel &&
+			newClassedModel instanceof StagedGroupedModel) {
+
+			Map<Long, Long> groupIds = (Map<Long, Long>)getNewPrimaryKeysMap(
+				Group.class);
+
+			StagedGroupedModel stagedGroupedModel =
+				(StagedGroupedModel)classedModel;
+
+			if (!groupIds.containsKey(stagedGroupedModel.getGroupId())) {
+				StagedGroupedModel newStagedGroupedModel =
+					(StagedGroupedModel)newClassedModel;
+
+				groupIds.put(
+					stagedGroupedModel.getGroupId(),
+					newStagedGroupedModel.getGroupId());
+			}
+		}
 
 		importLocks(clazz, String.valueOf(classPK), String.valueOf(newClassPK));
 		importPermissions(clazz, classPK, newClassPK);

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -212,7 +212,7 @@ public class SetUtil {
 	}
 
 	public static <E> Set<E> fromList(List<? extends E> array) {
-		if ((array == null) || (array.size() == 0)) {
+		if (ListUtil.isEmpty(array)) {
 			return new HashSet<E>();
 		}
 

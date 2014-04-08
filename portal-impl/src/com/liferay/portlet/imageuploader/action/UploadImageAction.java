@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -107,7 +107,7 @@ public class UploadImageAction extends PortletAction {
 				long maxFileSize = ParamUtil.getLong(
 					actionRequest, "maxFileSize");
 
-				if (fileEntry.getSize() > (maxFileSize * 1024)) {
+				if (fileEntry.getSize() > maxFileSize) {
 					throw new FileSizeException();
 				}
 

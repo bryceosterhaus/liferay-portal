@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,8 +17,7 @@
 <%@ include file="/html/portlet/message_boards/init.jsp" %>
 
 <%
-String emailFromName = ParamUtil.getString(request, "preferences--emailFromName--", mbSettings.getEmailFromName());
-String emailFromAddress = ParamUtil.getString(request, "preferences--emailFromAddress--", mbSettings.getEmailFromAddress());
+mbSettings = MBUtil.getMBSettings(themeDisplay.getSiteGroupId(), request);
 %>
 
 <liferay-portlet:renderURL portletConfiguration="<%= true %>" var="portletURL" />
@@ -93,9 +92,9 @@ String emailFromAddress = ParamUtil.getString(request, "preferences--emailFromAd
 
 		<liferay-ui:section>
 			<aui:fieldset>
-				<aui:input cssClass="lfr-input-text-container" label="name" name="preferences--emailFromName--" value="<%= emailFromName %>" />
+				<aui:input cssClass="lfr-input-text-container" label="name" name="preferences--emailFromName--" value="<%= mbSettings.getEmailFromName() %>" />
 
-				<aui:input cssClass="lfr-input-text-container" label="address" name="preferences--emailFromAddress--" value="<%= emailFromAddress %>" />
+				<aui:input cssClass="lfr-input-text-container" label="address" name="preferences--emailFromAddress--" value="<%= mbSettings.getEmailFromAddress() %>" />
 
 				<aui:input label="html-format" name="preferences--emailHtmlFormat--" type="checkbox" value="<%= mbSettings.isEmailHtmlFormat() %>" />
 			</aui:fieldset>
@@ -125,26 +124,26 @@ String emailFromAddress = ParamUtil.getString(request, "preferences--emailFromAd
 		</liferay-ui:section>
 
 		<%
-		Map<String, String> emailDefinitionTerms = MBUtil.getEmailDefinitionTerms(renderRequest, emailFromAddress, emailFromName);
+		Map<String, String> emailDefinitionTerms = MBUtil.getEmailDefinitionTerms(renderRequest, mbSettings.getEmailFromAddress(), mbSettings.getEmailFromName());
 		%>
 
 		<liferay-ui:section>
-			<liferay-ui:email-notifications-settings
-				emailBody='<%= PrefsParamUtil.getString(portletPreferences, request, "emailMessageAddedBody", ContentUtil.get(PropsValues.MESSAGE_BOARDS_EMAIL_MESSAGE_ADDED_BODY)) %>'
+			<liferay-ui:email-notification-settings
+				emailBody="<%= mbSettings.getEmailMessageAddedBodyXml() %>"
 				emailDefinitionTerms="<%= emailDefinitionTerms %>"
-				emailEnabled='<%= ParamUtil.getBoolean(request, "preferences--emailMessageAddedEnabled--", mbSettings.isEmailMessageAddedEnabled()) %>'
+				emailEnabled="<%= mbSettings.isEmailMessageAddedEnabled() %>"
 				emailParam="emailMessageAdded"
-				emailSubject='<%= PrefsParamUtil.getString(portletPreferences, request, "emailMessageAddedSubject", ContentUtil.get(PropsValues.MESSAGE_BOARDS_EMAIL_MESSAGE_ADDED_SUBJECT)) %>'
+				emailSubject="<%= mbSettings.getEmailMessageAddedSubjectXml() %>"
 			/>
 		</liferay-ui:section>
 
 		<liferay-ui:section>
-			<liferay-ui:email-notifications-settings
-				emailBody='<%= PrefsParamUtil.getString(portletPreferences, request, "emailMessageUpdatedBody", ContentUtil.get(PropsValues.MESSAGE_BOARDS_EMAIL_MESSAGE_UPDATED_BODY)) %>'
+			<liferay-ui:email-notification-settings
+				emailBody="<%= mbSettings.getEmailMessageUpdatedBodyXml() %>"
 				emailDefinitionTerms="<%= emailDefinitionTerms %>"
-				emailEnabled='<%= ParamUtil.getBoolean(request, "preferences--emailMessageUpdatedEnabled--", mbSettings.isEmailMessageUpdatedEnabled()) %>'
+				emailEnabled="<%= mbSettings.isEmailMessageUpdatedEnabled() %>"
 				emailParam="emailMessageUpdated"
-				emailSubject='<%= PrefsParamUtil.getString(portletPreferences, request, "emailMessageUpdatedSubject", ContentUtil.get(PropsValues.MESSAGE_BOARDS_EMAIL_MESSAGE_UPDATED_SUBJECT)) %>'
+				emailSubject="<%= mbSettings.getEmailMessageUpdatedSubjectXml() %>"
 			/>
 		</liferay-ui:section>
 
@@ -210,7 +209,7 @@ String emailFromAddress = ParamUtil.getString(request, "preferences--emailFromAd
 						String value = StringPool.BLANK;
 
 						if (priorities.length > i) {
-							String[] priority = StringUtil.split(priorities[i]);
+							String[] priority = StringUtil.split(priorities[i], StringPool.PIPE);
 
 							try {
 								name = priority[0];
@@ -286,7 +285,7 @@ String emailFromAddress = ParamUtil.getString(request, "preferences--emailFromAd
 							continue;
 						}
 
-						String[] tempPriorities = LocalizationUtil.getSettingsValues(mbSettings, "priorities", LocaleUtil.toLanguageId(locales[i]));
+						String[] tempPriorities = mbSettings.getPriorities(LocaleUtil.toLanguageId(locales[i]));
 
 						for (int j = 0; j < 10; j++) {
 							String name = StringPool.BLANK;
@@ -294,7 +293,7 @@ String emailFromAddress = ParamUtil.getString(request, "preferences--emailFromAd
 							String value = StringPool.BLANK;
 
 							if (tempPriorities.length > j) {
-								String[] priority = StringUtil.split(tempPriorities[j]);
+								String[] priority = StringUtil.split(tempPriorities[j], StringPool.PIPE);
 
 								try {
 									name = priority[0];

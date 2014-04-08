@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -1515,18 +1515,18 @@ public class DDMStructureLocalServiceImpl
 	}
 
 	protected void getChildrenStructureIds(
-			List<Long> structureIds, long groupId, long structureId)
+			List<Long> structureIds, long groupId, long parentStructureId)
 		throws PortalException, SystemException {
 
 		List<DDMStructure> structures = ddmStructurePersistence.findByG_P(
-			groupId, structureId);
+			groupId, parentStructureId);
 
 		for (DDMStructure structure : structures) {
 			structureIds.add(structure.getStructureId());
 
 			getChildrenStructureIds(
 				structureIds, structure.getGroupId(),
-				structure.getParentStructureId());
+				structure.getStructureId());
 		}
 	}
 
@@ -1552,19 +1552,8 @@ public class DDMStructureLocalServiceImpl
 		for (Node node : nodes) {
 			Element element = (Element)node;
 
-			String name = element.attributeValue("name");
-
-			Element parentElement = element.getParent();
-
-			while (!parentElement.isRootElement()) {
-				name =
-					parentElement.attributeValue("name") + StringPool.SLASH +
-						name;
-
-				parentElement = parentElement.getParent();
-			}
-
-			name = StringUtil.toLowerCase(name);
+			String name = StringUtil.toLowerCase(
+				element.attributeValue("name"));
 
 			elementNames.add(name);
 		}
@@ -1686,23 +1675,12 @@ public class DDMStructureLocalServiceImpl
 		for (Node node : nodes) {
 			Element element = (Element)node;
 
-			String name = element.attributeValue("name");
+			String name = StringUtil.toLowerCase(
+				element.attributeValue("name"));
 
 			if (name.startsWith(DDMStructureConstants.XSD_NAME_RESERVED)) {
 				throw new StructureXsdException();
 			}
-
-			Element parentElement = element.getParent();
-
-			while (!parentElement.isRootElement()) {
-				name =
-					parentElement.attributeValue("name") + StringPool.SLASH +
-						name;
-
-				parentElement = parentElement.getParent();
-			}
-
-			name = StringUtil.toLowerCase(name);
 
 			if (elementNames.contains(name)) {
 				throw new StructureDuplicateElementException();

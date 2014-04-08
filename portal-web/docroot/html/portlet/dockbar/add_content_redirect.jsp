@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -40,7 +40,7 @@ if (Validator.isNotNull(className) && (classPK > 0)) {
 }
 %>
 
-<span <%= AUIUtil.buildData(data) %> class="aui-helper-hidden portlet-item"></span>
+<span <%= AUIUtil.buildData(data) %> class="hide portlet-item"></span>
 
 <aui:script use="aui-base">
 	<c:if test="<%= assetRenderer != null %>">

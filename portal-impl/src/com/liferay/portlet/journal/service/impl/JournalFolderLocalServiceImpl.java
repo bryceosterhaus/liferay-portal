@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -224,7 +224,7 @@ public class JournalFolderLocalServiceImpl
 		throws SystemException {
 
 		return journalFolderPersistence.fetchByG_P_N(
-				groupId, parentFolderId, name);
+			groupId, parentFolderId, name);
 	}
 
 	@Override
@@ -292,7 +292,7 @@ public class JournalFolderLocalServiceImpl
 		throws SystemException {
 
 		return journalFolderPersistence.findByG_P_S(
-				groupId, parentFolderId, status, start, end);
+			groupId, parentFolderId, status, start, end);
 	}
 
 	@Override

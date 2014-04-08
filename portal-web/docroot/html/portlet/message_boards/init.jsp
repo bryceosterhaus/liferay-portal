@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,8 +16,7 @@
 
 <%@ include file="/html/portlet/init.jsp" %>
 
-<%@ page import="com.liferay.portal.kernel.parsers.bbcode.BBCodeTranslatorUtil" %><%@
-page import="com.liferay.portal.kernel.util.MimeTypesUtil" %><%@
+<%@ page import="com.liferay.portal.kernel.util.MimeTypesUtil" %><%@
 page import="com.liferay.portlet.documentlibrary.DuplicateFileException" %><%@
 page import="com.liferay.portlet.documentlibrary.FileExtensionException" %><%@
 page import="com.liferay.portlet.documentlibrary.FileNameException" %><%@
@@ -42,7 +41,6 @@ page import="com.liferay.portlet.messageboards.model.MBBan" %><%@
 page import="com.liferay.portlet.messageboards.model.MBCategory" %><%@
 page import="com.liferay.portlet.messageboards.model.MBCategoryConstants" %><%@
 page import="com.liferay.portlet.messageboards.model.MBCategoryDisplay" %><%@
-page import="com.liferay.portlet.messageboards.model.MBConstants" %><%@
 page import="com.liferay.portlet.messageboards.model.MBMailingList" %><%@
 page import="com.liferay.portlet.messageboards.model.MBMessageConstants" %><%@
 page import="com.liferay.portlet.messageboards.model.MBMessageDisplay" %><%@
@@ -65,8 +63,8 @@ page import="com.liferay.portlet.messageboards.service.MBThreadServiceUtil" %><%
 page import="com.liferay.portlet.messageboards.service.permission.MBCategoryPermission" %><%@
 page import="com.liferay.portlet.messageboards.service.permission.MBMessagePermission" %><%@
 page import="com.liferay.portlet.messageboards.service.permission.MBPermission" %><%@
+page import="com.liferay.portlet.messageboards.util.MBConstants" %><%@
 page import="com.liferay.portlet.messageboards.util.MBMessageAttachmentsUtil" %><%@
-page import="com.liferay.portlet.messageboards.util.MBUtil" %><%@
 page import="com.liferay.portlet.messageboards.util.comparator.MessageCreateDateComparator" %><%@
 page import="com.liferay.portlet.ratings.model.RatingsStats" %><%@
 page import="com.liferay.portlet.ratings.service.RatingsStatsLocalServiceUtil" %><%@

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,7 @@
 
 package com.liferay.portal.theme;
 
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
@@ -215,7 +216,9 @@ public class PortletDisplay implements Serializable {
 		return _namespace;
 	}
 
-	public Settings getPortletInstanceSettings() throws SystemException {
+	public Settings getPortletInstanceSettings()
+		throws PortalException, SystemException {
+
 		String portletId = _id;
 
 		if (Validator.isNotNull(_portletResource)) {

@@ -35,7 +35,7 @@
 		<execute macro="Site#tearDownCP" />
 	</tear-down>
 
-	<command name="AddAndEditAssetsViaVirtualHostOrganizations" priority="4">
+	<command name="AddAndEditAssetsViaVirtualHostOrganizations" known-issues="LPS-44575" priority="4">
 		<var name="orgName" value="Organization Name" />
 		<var name="orgType" value="Regular Organization" />
 
@@ -172,7 +172,7 @@
 
 		<execute action="PGAssetpublisher#assertClick" locator-key1="DISPLAY_ICON_EDIT" value1="Edit" />
 
-		<execute action="PGSignin#assertTextNotEquals" locator-key1="PORTLET_TITLE" />
+		<execute action="PGSignin#assertTextNotEquals" locator-key1="PORTLET_TITLE" value1="Sign In" />
 
 		<execute macro="Page#gotoPG">
 			<var name="pageName" value="Web Content Page" />
@@ -1036,7 +1036,7 @@
 		</execute>
 	</command>
 
-	<command name="ViewAPPortletAsNewUserSiteAdministratorViaUserSite" priority="4">
+	<command name="ViewAPPortletAsNewUserSiteAdministratorViaUserSite" known-issues="LPS-45472" priority="4">
 		<var name="pageName" value="Asset Publisher Page" />
 		<var name="portletName" value="Asset Publisher" />
 		<var name="siteName" value="Site Name" />

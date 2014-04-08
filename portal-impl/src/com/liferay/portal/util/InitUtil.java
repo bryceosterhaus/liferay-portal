@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -56,13 +56,9 @@ public class InitUtil {
 			return;
 		}
 
-		StopWatch stopWatch = null;
+		StopWatch stopWatch = new StopWatch();
 
-		if (_PRINT_TIME) {
-			stopWatch = new StopWatch();
-
-			stopWatch.start();
-		}
+		stopWatch.start();
 
 		// Set the default locale used by Liferay. This locale is no longer set
 		// at the VM level. See LEP-2584.
@@ -257,8 +253,13 @@ public class InitUtil {
 		initWithSpringAndModuleFramework(false, extraConfigLocations);
 	}
 
-	public synchronized static void stopModuleFramework() throws Exception {
-		ModuleFrameworkUtilAdapter.stopFramework();
+	public synchronized static void stopModuleFramework() {
+		try {
+			ModuleFrameworkUtilAdapter.stopFramework();
+		}
+		catch (Exception e) {
+			new RuntimeException(e);
+		}
 	}
 
 	private static final boolean _PRINT_TIME = false;

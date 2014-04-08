@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -1814,6 +1814,32 @@ public class JournalArticleServiceSoap {
 					displayDateLT, status, reviewDate, andOperator);
 
 			return returnValue;
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	public static void subscribeStructure(long groupId, long userId,
+		long ddmStructureId) throws RemoteException {
+		try {
+			JournalArticleServiceUtil.subscribeStructure(groupId, userId,
+				ddmStructureId);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	public static void unsubscribeStructure(long groupId, long userId,
+		long ddmStructureId) throws RemoteException {
+		try {
+			JournalArticleServiceUtil.unsubscribeStructure(groupId, userId,
+				ddmStructureId);
 		}
 		catch (Exception e) {
 			_log.error(e, e);

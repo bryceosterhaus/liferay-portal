@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -59,7 +59,7 @@ boolean viewPreview = ParamUtil.getBoolean(request, "viewPreview");
 					long[] availableClassNameIds = AssetRendererFactoryRegistryUtil.getClassNameIds(company.getCompanyId());
 
 					for (long classNameId : availableClassNameIds) {
-						AssetRendererFactory assetRendererFactory = AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(PortalUtil.getClassName(classNameId));
+						AssetRendererFactory assetRendererFactory = AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassNameId(classNameId);
 
 						if (!assetRendererFactory.isSelectable()) {
 							availableClassNameIds = ArrayUtil.remove(availableClassNameIds, classNameId);
@@ -153,7 +153,7 @@ boolean viewPreview = ParamUtil.getBoolean(request, "viewPreview");
 										</div>
 
 										<div class="add-content-description">
-											<%= HtmlUtil.escape(StringUtil.shorten(assetRenderer.getSummary(locale), 120)) %>
+											<%= HtmlUtil.escape(StringUtil.shorten(assetRenderer.getSummary(liferayPortletRequest, liferayPortletResponse), 120)) %>
 										</div>
 									</div>
 								</c:when>

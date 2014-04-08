@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -32,7 +32,6 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.UnmodifiableList;
 import com.liferay.portal.model.CacheModel;
 import com.liferay.portal.model.MVCCModel;
 import com.liferay.portal.model.ModelListener;
@@ -231,7 +230,7 @@ public class PasswordPolicyRelPersistenceImpl extends BasePersistenceImpl<Passwo
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<PasswordPolicyRel>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<PasswordPolicyRel>)QueryUtil.list(q,
@@ -1367,7 +1366,7 @@ public class PasswordPolicyRelPersistenceImpl extends BasePersistenceImpl<Passwo
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<PasswordPolicyRel>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<PasswordPolicyRel>)QueryUtil.list(q,

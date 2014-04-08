@@ -300,6 +300,7 @@
 				<classpath mode="compile">lib/development/jhighlight.jar</classpath>
 				<classpath mode="compile">lib/development/jms.jar</classpath>
 				<classpath mode="compile">lib/development/jndi.jar</classpath>
+				<classpath mode="compile">lib/development/jsch.jar</classpath>
 				<classpath mode="compile">lib/development/jserrorcollector.jar</classpath>
 				<classpath mode="compile">lib/development/jsp-api.jar</classpath>
 				<classpath mode="compile">lib/development/jta.jar</classpath>
@@ -326,6 +327,7 @@
 				<classpath mode="compile">lib/development/selenium-java.jar</classpath>
 				<classpath mode="compile">lib/development/selenium-server.jar</classpath>
 				<classpath mode="compile">lib/development/servlet-api.jar</classpath>
+				<classpath mode="compile">lib/development/sikuli-api.jar</classpath>
 				<classpath mode="compile">lib/development/sikuli-script.jar</classpath>
 				<classpath mode="compile">lib/development/smtp.jar</classpath>
 				<classpath mode="compile">lib/development/sonar-ant-task.jar</classpath>
@@ -343,12 +345,7 @@
 				<classpath mode="compile">lib/portal/antlr3-runtime.jar</classpath>
 				<classpath mode="compile">lib/portal/antlr3.jar</classpath>
 				<classpath mode="compile">lib/portal/aopalliance.jar</classpath>
-				<classpath mode="compile">lib/portal/asm-analysis.jar</classpath>
-				<classpath mode="compile">lib/portal/asm-commons.jar</classpath>
-				<classpath mode="compile">lib/portal/asm-tree.jar</classpath>
-				<classpath mode="compile">lib/portal/asm-util.jar</classpath>
-				<classpath mode="compile">lib/portal/asm-xml.jar</classpath>
-				<classpath mode="compile">lib/portal/asm.jar</classpath>
+				<classpath mode="compile">lib/portal/asm-debug-all.jar</classpath>
 				<classpath mode="compile">lib/portal/aspectj-rt.jar</classpath>
 				<classpath mode="compile">lib/portal/aspectj-weaver.jar</classpath>
 				<classpath mode="compile">lib/portal/axiom-api.jar</classpath>
@@ -497,6 +494,7 @@
 				<classpath mode="compile">lib/portal/poi-ooxml.jar</classpath>
 				<classpath mode="compile">lib/portal/poi-scratchpad.jar</classpath>
 				<classpath mode="compile">lib/portal/poi.jar</classpath>
+				<classpath mode="compile">lib/portal/portal-ant-shared.jar</classpath>
 				<classpath mode="compile">lib/portal/portal-client.jar</classpath>
 				<classpath mode="compile">lib/portal/portal-settings-impl-shared.jar</classpath>
 				<classpath mode="compile">lib/portal/portals-bridges.jar</classpath>

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -843,6 +843,13 @@ public class GroupWrapper implements Group, ModelWrapper<Group> {
 	@Override
 	public long getDefaultPublicPlid() {
 		return _group.getDefaultPublicPlid();
+	}
+
+	@Override
+	public java.util.List<com.liferay.portal.model.Group> getDescendants(
+		boolean site)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _group.getDescendants(site);
 	}
 
 	@Override

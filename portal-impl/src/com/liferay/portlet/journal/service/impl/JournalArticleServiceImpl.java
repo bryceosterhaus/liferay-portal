@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -30,6 +30,7 @@ import com.liferay.portlet.journal.model.JournalFolderConstants;
 import com.liferay.portlet.journal.service.base.JournalArticleServiceBaseImpl;
 import com.liferay.portlet.journal.service.permission.JournalArticlePermission;
 import com.liferay.portlet.journal.service.permission.JournalFolderPermission;
+import com.liferay.portlet.journal.service.permission.JournalPermission;
 
 import java.io.File;
 import java.io.Serializable;
@@ -1818,6 +1819,30 @@ public class JournalArticleServiceImpl extends JournalArticleServiceBaseImpl {
 			title, description, content, type, ddmStructureKeys,
 			ddmTemplateKeys, displayDateGT, displayDateLT, reviewDate,
 			andOperator, new QueryDefinition(status));
+	}
+
+	@Override
+	public void subscribeStructure(
+			long groupId, long userId, long ddmStructureId)
+		throws PortalException, SystemException {
+
+		JournalPermission.check(
+			getPermissionChecker(), groupId, ActionKeys.SUBSCRIBE);
+
+		journalArticleLocalService.subscribeStructure(
+			groupId, userId, ddmStructureId);
+	}
+
+	@Override
+	public void unsubscribeStructure(
+			long groupId, long userId, long ddmStructureId)
+		throws PortalException, SystemException {
+
+		JournalPermission.check(
+			getPermissionChecker(), groupId, ActionKeys.SUBSCRIBE);
+
+		journalArticleLocalService.unsubscribeStructure(
+			groupId, userId, ddmStructureId);
 	}
 
 	/**

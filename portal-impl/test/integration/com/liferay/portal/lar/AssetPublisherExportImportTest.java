@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -29,11 +29,14 @@ import com.liferay.portal.model.Group;
 import com.liferay.portal.model.Layout;
 import com.liferay.portal.model.PortletConstants;
 import com.liferay.portal.service.CompanyLocalServiceUtil;
+import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.LayoutLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceTestUtil;
 import com.liferay.portal.test.LiferayIntegrationJUnitTestRunner;
 import com.liferay.portal.test.MainServletExecutionTestListener;
+import com.liferay.portal.test.Sync;
+import com.liferay.portal.test.SynchronousDestinationExecutionTestListener;
 import com.liferay.portal.test.TransactionalCallbackAwareExecutionTestListener;
 import com.liferay.portal.util.GroupTestUtil;
 import com.liferay.portal.util.LayoutTestUtil;
@@ -69,9 +72,11 @@ import org.junit.runner.RunWith;
 @ExecutionTestListeners(
 	listeners = {
 		MainServletExecutionTestListener.class,
+		SynchronousDestinationExecutionTestListener.class,
 		TransactionalCallbackAwareExecutionTestListener.class
 	})
 @RunWith(LiferayIntegrationJUnitTestRunner.class)
+@Sync
 @Transactional
 public class AssetPublisherExportImportTest
 	extends BasePortletExportImportTestCase {
@@ -199,13 +204,20 @@ public class AssetPublisherExportImportTest
 					childGroup.getGroupId()
 			});
 
-		PortletPreferences portletPreferences = getImportedPortletPreferences(
-			preferenceMap);
+		try {
+			PortletPreferences portletPreferences =
+				getImportedPortletPreferences(preferenceMap);
 
-		Assert.assertEquals(null, portletPreferences.getValue("scopeId", null));
-		Assert.assertTrue(
-			"The child group ID should have been filtered out on import",
-			ArrayUtil.isEmpty(portletPreferences.getValues("scopeIds", null)));
+			Assert.assertEquals(
+				null, portletPreferences.getValue("scopeId", null));
+			Assert.assertTrue(
+				"The child group ID should have been filtered out on import",
+				ArrayUtil.isEmpty(
+					portletPreferences.getValues("scopeIds", null)));
+		}
+		finally {
+			GroupLocalServiceUtil.deleteGroup(childGroup);
+		}
 	}
 
 	@Test

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -1183,6 +1183,20 @@ public class PortalUtil {
 		return getPortal().getLayoutFullURL(themeDisplay);
 	}
 
+	public static String getLayoutRelativeURL(
+			Layout layout, ThemeDisplay themeDisplay)
+		throws PortalException, SystemException {
+
+		return getPortal().getLayoutRelativeURL(layout, themeDisplay);
+	}
+
+	public static String getLayoutRelativeURL(
+			Layout layout, ThemeDisplay themeDisplay, boolean doAsUser)
+		throws PortalException, SystemException {
+
+		return getPortal().getLayoutRelativeURL(layout, themeDisplay, doAsUser);
+	}
+
 	public static String getLayoutSetFriendlyURL(
 			LayoutSet layoutSet, ThemeDisplay themeDisplay)
 		throws PortalException, SystemException {
@@ -1734,6 +1748,14 @@ public class PortalUtil {
 		return getPortal().getServletContextName();
 	}
 
+	public static long[] getSharedContentSiteGroupIds(
+			long companyId, long groupId, long userId)
+		throws PortalException, SystemException {
+
+		return getPortal().getSharedContentSiteGroupIds(
+			companyId, groupId, userId);
+	}
+
 	public static Map<String, List<Portlet>> getSiteAdministrationCategoriesMap(
 			HttpServletRequest request)
 		throws SystemException {
@@ -2213,6 +2235,14 @@ public class PortalUtil {
 		return getPortal().isValidResourceId(resourceId);
 	}
 
+	public static boolean removePortalEventListener(
+		PortalInetSocketAddressEventListener
+			portalInetSocketAddressEventListener) {
+
+		return getPortal().removePortalInetSocketAddressEventListener(
+			portalInetSocketAddressEventListener);
+	}
+
 	public static void resetCDNHosts() {
 		getPortal().resetCDNHosts();
 	}
@@ -2392,14 +2422,6 @@ public class PortalUtil {
 
 		return getPortal().updateWindowState(
 			portletId, user, layout, windowState, request);
-	}
-
-	public boolean removePortalEventListener(
-		PortalInetSocketAddressEventListener
-			portalInetSocketAddressEventListener) {
-
-		return getPortal().removePortalInetSocketAddressEventListener(
-			portalInetSocketAddressEventListener);
 	}
 
 	/**

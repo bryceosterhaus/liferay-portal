@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,14 +14,18 @@
 
 package com.liferay.portlet.journal.action;
 
+import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.portlet.DefaultConfigurationAction;
-import com.liferay.portal.kernel.servlet.SessionErrors;
-import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.util.PropsValues;
+import com.liferay.portlet.journal.util.JournalUtil;
+import com.liferay.util.ContentUtil;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
 import javax.portlet.PortletConfig;
+import javax.portlet.PortletPreferences;
+import javax.portlet.PortletRequest;
 
 /**
  * @author Brian Wing Shun Chan
@@ -29,166 +33,92 @@ import javax.portlet.PortletConfig;
 public class ConfigurationActionImpl extends DefaultConfigurationAction {
 
 	@Override
+	public void postProcess(
+			long companyId, PortletRequest portletRequest,
+			PortletPreferences portletPreferences)
+		throws SystemException {
+
+		removeDefaultValue(
+			portletRequest, portletPreferences, "emailFromAddress",
+			JournalUtil.getEmailFromAddress(portletPreferences, companyId));
+		removeDefaultValue(
+			portletRequest, portletPreferences, "emailFromName",
+			JournalUtil.getEmailFromName(portletPreferences, companyId));
+
+		String languageId = LocaleUtil.toLanguageId(
+			LocaleUtil.getSiteDefault());
+
+		removeDefaultValue(
+			portletRequest, portletPreferences,
+			"emailArticleAddedBody_" + languageId,
+			ContentUtil.get(PropsValues.JOURNAL_EMAIL_ARTICLE_ADDED_BODY));
+		removeDefaultValue(
+			portletRequest, portletPreferences,
+			"emailArticleAddedSubject_" + languageId,
+			ContentUtil.get(PropsValues.JOURNAL_EMAIL_ARTICLE_ADDED_SUBJECT));
+		removeDefaultValue(
+			portletRequest, portletPreferences,
+			"emailArticleApprovalDeniedBody_" + languageId,
+			ContentUtil.get(
+				PropsValues.JOURNAL_EMAIL_ARTICLE_APPROVAL_DENIED_BODY));
+		removeDefaultValue(
+			portletRequest, portletPreferences,
+			"emailArticleApprovalDeniedSubject_" + languageId,
+			ContentUtil.get(
+				PropsValues.JOURNAL_EMAIL_ARTICLE_APPROVAL_DENIED_SUBJECT));
+		removeDefaultValue(
+			portletRequest, portletPreferences,
+			"emailArticleApprovalGrantedBody_" + languageId,
+			ContentUtil.get(
+				PropsValues.JOURNAL_EMAIL_ARTICLE_APPROVAL_GRANTED_BODY));
+		removeDefaultValue(
+			portletRequest, portletPreferences,
+			"emailArticleApprovalGrantedSubject_" + languageId,
+			ContentUtil.get(
+				PropsValues.JOURNAL_EMAIL_ARTICLE_APPROVAL_GRANTED_SUBJECT));
+		removeDefaultValue(
+			portletRequest, portletPreferences,
+			"emailArticleApprovalRequestedBody_" + languageId,
+			ContentUtil.get(
+				PropsValues.JOURNAL_EMAIL_ARTICLE_APPROVAL_REQUESTED_BODY));
+		removeDefaultValue(
+			portletRequest, portletPreferences,
+			"emailArticleApprovalRequestedSubject_" + languageId,
+			ContentUtil.get(
+				PropsValues.JOURNAL_EMAIL_ARTICLE_APPROVAL_REQUESTED_SUBJECT));
+		removeDefaultValue(
+			portletRequest, portletPreferences,
+			"emailArticleReviewBody_" + languageId,
+			ContentUtil.get(PropsValues.JOURNAL_EMAIL_ARTICLE_REVIEW_BODY));
+		removeDefaultValue(
+			portletRequest, portletPreferences,
+			"emailArticleReviewSubject_" + languageId,
+			ContentUtil.get(PropsValues.JOURNAL_EMAIL_ARTICLE_REVIEW_SUBJECT));
+		removeDefaultValue(
+			portletRequest, portletPreferences,
+			"emailArticleUpdatedBody_" + languageId,
+			ContentUtil.get(PropsValues.JOURNAL_EMAIL_ARTICLE_UPDATED_BODY));
+		removeDefaultValue(
+			portletRequest, portletPreferences,
+			"emailArticleUpdatedSubject_" + languageId,
+			ContentUtil.get(PropsValues.JOURNAL_EMAIL_ARTICLE_UPDATED_SUBJECT));
+	}
+
+	@Override
 	public void processAction(
 			PortletConfig portletConfig, ActionRequest actionRequest,
 			ActionResponse actionResponse)
 		throws Exception {
 
+		validateEmail(actionRequest, "emailArticleAdded", true);
+		validateEmail(actionRequest, "emailArticleApprovalDenied", true);
+		validateEmail(actionRequest, "emailArticleApprovalGranted", true);
+		validateEmail(actionRequest, "emailArticleApprovalRequested", true);
+		validateEmail(actionRequest, "emailArticleReview", true);
+		validateEmail(actionRequest, "emailArticleUpdated", true);
 		validateEmailFrom(actionRequest);
-		validateEmailArticleAdded(actionRequest);
-		validateEmailArticleApprovalDenied(actionRequest);
-		validateEmailArticleApprovalGranted(actionRequest);
-		validateEmailArticleApprovalRequested(actionRequest);
-		validateEmailArticleReview(actionRequest);
-		validateEmailArticleUpdated(actionRequest);
 
 		super.processAction(portletConfig, actionRequest, actionResponse);
-	}
-
-	protected void validateEmailArticleAdded(ActionRequest actionRequest)
-		throws Exception {
-
-		boolean emailArticleAddedEnabled = GetterUtil.getBoolean(
-			getParameter(actionRequest, "emailArticleAddedEnabled"));
-		String emailArticleAddedSubject = getParameter(
-			actionRequest, "emailArticleAddedSubject");
-		String emailArticleAddedBody = getParameter(
-			actionRequest, "emailArticleAddedBody");
-
-		if (emailArticleAddedEnabled) {
-			if (Validator.isNull(emailArticleAddedSubject)) {
-				SessionErrors.add(actionRequest, "emailArticleAddedSubject");
-			}
-			else if (Validator.isNull(emailArticleAddedBody)) {
-				SessionErrors.add(actionRequest, "emailArticleAddedBody");
-			}
-		}
-	}
-
-	protected void validateEmailArticleApprovalDenied(
-			ActionRequest actionRequest)
-		throws Exception {
-
-		boolean emailArticleApprovalDeniedEnabled = GetterUtil.getBoolean(
-			getParameter(actionRequest, "emailArticleApprovalDeniedEnabled"));
-		String emailArticleApprovalDeniedSubject = getParameter(
-			actionRequest, "emailArticleApprovalDeniedSubject");
-		String emailArticleApprovalDeniedBody = getParameter(
-			actionRequest, "emailArticleApprovalDeniedBody");
-
-		if (emailArticleApprovalDeniedEnabled) {
-			if (Validator.isNull(emailArticleApprovalDeniedSubject)) {
-				SessionErrors.add(
-					actionRequest, "emailArticleApprovalDeniedSubject");
-			}
-			else if (Validator.isNull(emailArticleApprovalDeniedBody)) {
-				SessionErrors.add(
-					actionRequest, "emailArticleApprovalDeniedBody");
-			}
-		}
-	}
-
-	protected void validateEmailArticleApprovalGranted(
-			ActionRequest actionRequest)
-		throws Exception {
-
-		boolean emailArticleApprovalGrantedEnabled = GetterUtil.getBoolean(
-			getParameter(actionRequest, "emailArticleApprovalGrantedEnabled"));
-		String emailArticleApprovalGrantedSubject = getParameter(
-			actionRequest, "emailArticleApprovalGrantedSubject");
-		String emailArticleApprovalGrantedBody = getParameter(
-			actionRequest, "emailArticleApprovalGrantedBody");
-
-		if (emailArticleApprovalGrantedEnabled) {
-			if (Validator.isNull(emailArticleApprovalGrantedSubject)) {
-				SessionErrors.add(
-					actionRequest, "emailArticleApprovalGrantedSubject");
-			}
-			else if (Validator.isNull(emailArticleApprovalGrantedBody)) {
-				SessionErrors.add(
-					actionRequest, "emailArticleApprovalGrantedBody");
-			}
-		}
-	}
-
-	protected void validateEmailArticleApprovalRequested(
-			ActionRequest actionRequest)
-		throws Exception {
-
-		boolean emailArticleApprovalRequestedEnabled =
-			GetterUtil.getBoolean(
-				getParameter(
-					actionRequest, "emailArticleApprovalRequestedEnabled"));
-		String emailArticleApprovalRequestedSubject = getParameter(
-			actionRequest, "emailArticleApprovalRequestedSubject");
-		String emailArticleApprovalRequestedBody = getParameter(
-			actionRequest, "emailArticleApprovalRequestedBody");
-
-		if (emailArticleApprovalRequestedEnabled) {
-			if (Validator.isNull(emailArticleApprovalRequestedSubject)) {
-				SessionErrors.add(
-					actionRequest, "emailArticleApprovalRequestedSubject");
-			}
-			else if (Validator.isNull(emailArticleApprovalRequestedBody)) {
-				SessionErrors.add(
-					actionRequest, "emailArticleApprovalRequestedBody");
-			}
-		}
-	}
-
-	protected void validateEmailArticleReview(ActionRequest actionRequest)
-		throws Exception {
-
-		boolean emailArticleReviewEnabled = GetterUtil.getBoolean(
-			getParameter(actionRequest, "emailArticleReviewEnabled"));
-		String emailArticleReviewSubject = getParameter(
-			actionRequest, "emailArticleReviewSubject");
-		String emailArticleReviewBody = getParameter(
-			actionRequest, "emailArticleReviewBody");
-
-		if (emailArticleReviewEnabled) {
-			if (Validator.isNull(emailArticleReviewSubject)) {
-				SessionErrors.add(actionRequest, "emailArticleReviewSubject");
-			}
-			else if (Validator.isNull(emailArticleReviewBody)) {
-				SessionErrors.add(actionRequest, "emailArticleReviewBody");
-			}
-		}
-	}
-
-	protected void validateEmailArticleUpdated(ActionRequest actionRequest)
-		throws Exception {
-
-		boolean emailArticleUpdatedEnabled = GetterUtil.getBoolean(
-			getParameter(actionRequest, "emailArticleUpdatedEnabled"));
-		String emailArticleUpdatedSubject = getParameter(
-			actionRequest, "emailArticleUpdatedSubject");
-		String emailArticleUpdatedBody = getParameter(
-			actionRequest, "emailArticleUpdatedBody");
-
-		if (emailArticleUpdatedEnabled) {
-			if (Validator.isNull(emailArticleUpdatedSubject)) {
-				SessionErrors.add(actionRequest, "emailArticleUpdatedSubject");
-			}
-			else if (Validator.isNull(emailArticleUpdatedBody)) {
-				SessionErrors.add(actionRequest, "emailArticleUpdatedBody");
-			}
-		}
-	}
-
-	protected void validateEmailFrom(ActionRequest actionRequest)
-		throws Exception {
-
-		String emailFromName = getParameter(actionRequest, "emailFromName");
-		String emailFromAddress = getParameter(
-			actionRequest, "emailFromAddress");
-
-		if (Validator.isNull(emailFromName)) {
-			SessionErrors.add(actionRequest, "emailFromName");
-		}
-		else if (!Validator.isEmailAddress(emailFromAddress)) {
-			SessionErrors.add(actionRequest, "emailFromAddress");
-		}
 	}
 
 }

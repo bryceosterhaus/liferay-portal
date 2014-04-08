@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -1303,7 +1303,10 @@ public class Validator {
 	 *         <code>false</code> otherwise
 	 */
 	public static boolean isXml(String s) {
-		if (s.startsWith(_XML_BEGIN) || s.startsWith(_XML_EMPTY)) {
+		if (isNull(s)) {
+			return false;
+		}
+		else if (s.startsWith(_XML_BEGIN) || s.startsWith(_XML_EMPTY)) {
 			return true;
 		}
 		else {

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -31,6 +31,7 @@ import com.liferay.portal.kernel.search.SearchEngineUtil;
 import com.liferay.portal.kernel.search.Summary;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.util.PortletKeys;
@@ -55,6 +56,11 @@ public class AssetCategoryIndexer extends BaseIndexer {
 	public static final String PORTLET_ID = PortletKeys.ASSET_CATEGORIES_ADMIN;
 
 	public AssetCategoryIndexer() {
+		setDefaultSelectedFieldNames(
+			new String[] {
+				Field.ASSET_CATEGORY_ID, Field.COMPANY_ID, Field.GROUP_ID,
+				Field.UID,
+			});
 		setFilterSearch(true);
 		setPermissionAware(true);
 	}
@@ -108,7 +114,20 @@ public class AssetCategoryIndexer extends BaseIndexer {
 			BooleanQuery searchQuery, SearchContext searchContext)
 		throws Exception {
 
-		addSearchLocalizedTerm(searchQuery, searchContext, Field.TITLE, true);
+		String title = (String)searchContext.getAttribute(Field.TITLE);
+
+		if (Validator.isNotNull(title)) {
+			BooleanQuery localizedQuery = BooleanQueryFactoryUtil.create(
+				searchContext);
+
+			localizedQuery.addTerm(Field.TITLE, title, true);
+			localizedQuery.addTerm(
+				DocumentImpl.getLocalizedName(
+					searchContext.getLocale(), Field.TITLE),
+				title, true);
+
+			searchQuery.add(localizedQuery, BooleanClauseOccur.SHOULD);
+		}
 	}
 
 	@Override

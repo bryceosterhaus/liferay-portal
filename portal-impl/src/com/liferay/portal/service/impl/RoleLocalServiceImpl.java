@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -1632,7 +1632,7 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 			Role role = roleFinder.findByC_N(companyId, name);
 
 			if (role.getRoleId() != roleId) {
-				throw new DuplicateRoleException();
+				throw new DuplicateRoleException("{roleId=" + roleId + "}");
 			}
 		}
 		catch (NoSuchRoleException nsre) {

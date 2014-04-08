@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -737,7 +737,7 @@ public class WikiNodeLocalServiceImpl extends WikiNodeLocalServiceBaseImpl {
 		WikiNode node = wikiNodePersistence.fetchByG_N(groupId, name);
 
 		if ((node != null) && (node.getNodeId() != nodeId)) {
-			throw new DuplicateNodeNameException();
+			throw new DuplicateNodeNameException("{nodeId=" + nodeId + "}");
 		}
 	}
 

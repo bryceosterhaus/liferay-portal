@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -75,19 +75,19 @@ public class AssetCategoryPermission {
 		if (actionId.equals(ActionKeys.VIEW) &&
 			PropsValues.PERMISSIONS_VIEW_DYNAMIC_INHERITANCE) {
 
-			long parentCategoryId = category.getParentCategoryId();
+			long categoryId = category.getCategoryId();
 
-			while (parentCategoryId !=
+			while (categoryId !=
 						AssetCategoryConstants.DEFAULT_PARENT_CATEGORY_ID) {
 
 				category = AssetCategoryLocalServiceUtil.getCategory(
-					parentCategoryId);
+					categoryId);
 
 				if (!_hasPermission(permissionChecker, category, actionId)) {
 					return false;
 				}
 
-				parentCategoryId = category.getParentCategoryId();
+				categoryId = category.getParentCategoryId();
 			}
 
 			return AssetVocabularyPermission.contains(

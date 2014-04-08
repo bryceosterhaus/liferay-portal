@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -1094,6 +1094,12 @@ public class LayoutLocalServiceUtil {
 			com.liferay.portal.kernel.exception.SystemException {
 		return getService()
 				   .getLayoutsCount(group, privateLayout, includeUserGroups);
+	}
+
+	public static int getLayoutsCount(com.liferay.portal.model.Group group,
+		boolean privateLayout, long parentLayoutId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().getLayoutsCount(group, privateLayout, parentLayoutId);
 	}
 
 	public static int getLayoutsCount(com.liferay.portal.model.User user,

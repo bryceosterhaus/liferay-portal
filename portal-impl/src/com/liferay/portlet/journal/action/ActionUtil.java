@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -200,7 +200,7 @@ public class ActionUtil {
 			article = JournalArticleServiceUtil.getLatestArticle(
 				groupId, className, classPK);
 		}
-		else if (Validator.isNotNull(structureId)) {
+		else {
 			DDMStructure ddmStructure = null;
 
 			try {
@@ -380,12 +380,8 @@ public class ActionUtil {
 		long classNameId = ParamUtil.getLong(request, "classNameId");
 		String structureId = ParamUtil.getString(request, "structureId");
 
-		DDMStructure ddmStructure = null;
-
-		if (Validator.isNotNull(structureId)) {
-			ddmStructure = DDMStructureServiceUtil.getStructure(
-				groupId, classNameId, structureId);
-		}
+		DDMStructure ddmStructure = DDMStructureServiceUtil.getStructure(
+			groupId, classNameId, structureId);
 
 		request.setAttribute(WebKeys.JOURNAL_STRUCTURE, ddmStructure);
 	}

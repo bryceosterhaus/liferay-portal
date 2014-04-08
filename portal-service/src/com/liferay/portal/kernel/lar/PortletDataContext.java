@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -243,6 +243,8 @@ public interface PortletDataContext extends Serializable {
 	public void addZipEntry(String name, StringBuilder sb)
 		throws SystemException;
 
+	public void cleanUpMissingReferences(ClassedModel classedModel);
+
 	public void clearScopedPrimaryKeys();
 
 	public ServiceContext createServiceContext(
@@ -370,6 +372,11 @@ public interface PortletDataContext extends Serializable {
 
 	public Element getMissingReferencesElement();
 
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link
+	 *             #getNewPrimaryKeysMap(String)}
+	 */
+	@Deprecated
 	public List<Layout> getNewLayouts();
 
 	public Map<?, ?> getNewPrimaryKeysMap(Class<?> clazz);

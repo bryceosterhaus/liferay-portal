@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -386,6 +386,9 @@ if (hints != null) {
 				else if (displayWidthInt > 270) {
 					cssClass += " input-xxlarge";
 				}
+				else if (editor) {
+					cssClass += " lfr-input-editor";
+				}
 				else {
 					cssClass += " input-large";
 				}
@@ -418,7 +421,7 @@ if (hints != null) {
 							<liferay-ui:input-localized
 								autoFocus="<%= autoFocus %>"
 								availableLocales="<%= availableLocales %>"
-								cssClass='<%= cssClass + " lfr-input-text" %>'
+								cssClass="<%= cssClass %>"
 								defaultLanguageId="<%= defaultLanguageId %>"
 								disabled="<%= disabled %>"
 								formName="<%= formName %>"
@@ -434,7 +437,7 @@ if (hints != null) {
 						</c:when>
 						<c:otherwise>
 							<liferay-ui:input-editor
-								cssClass='<%= cssClass + \" lfr-input-text\" %>'
+								cssClass="<%= cssClass %>"
 								editorImpl="ckeditor"
 								initMethod='<%= fieldParam + \"InitEditor\" %>'
 								name="<%= fieldParam %>"

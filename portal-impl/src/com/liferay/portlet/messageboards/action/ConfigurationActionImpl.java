@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,10 +15,9 @@
 package com.liferay.portlet.messageboards.action;
 
 import com.liferay.portal.kernel.language.LanguageUtil;
-import com.liferay.portal.kernel.portlet.DefaultConfigurationAction;
+import com.liferay.portal.kernel.portlet.SettingsConfigurationAction;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.util.CharPool;
-import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.NaturalOrderStringComparator;
@@ -26,8 +25,10 @@ import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.settings.Settings;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.WebKeys;
+import com.liferay.portlet.messageboards.MBSettings;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,11 +39,43 @@ import java.util.TreeMap;
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
 import javax.portlet.PortletConfig;
+import javax.portlet.PortletRequest;
 
 /**
  * @author Brian Wing Shun Chan
  */
-public class ConfigurationActionImpl extends DefaultConfigurationAction {
+public class ConfigurationActionImpl extends SettingsConfigurationAction {
+
+	@Override
+	public void postProcess(
+		long companyId, PortletRequest portletRequest, Settings settings) {
+
+		MBSettings mbSettings = new MBSettings(settings);
+
+		removeDefaultValue(
+			portletRequest, settings, "emailFromAddress",
+			mbSettings.getEmailFromAddress());
+		removeDefaultValue(
+			portletRequest, settings, "emailFromName",
+			mbSettings.getEmailFromName());
+
+		String languageId = LocaleUtil.toLanguageId(
+			LocaleUtil.getSiteDefault());
+
+		removeDefaultValue(
+			portletRequest, settings, "emailMessageAddedBody_" + languageId,
+			mbSettings.getEmailMessageAddedBody());
+		removeDefaultValue(
+			portletRequest, settings, "emailMessageAddedSubject_" + languageId,
+			mbSettings.getEmailMessageAddedSubject());
+		removeDefaultValue(
+			portletRequest, settings, "emailMessageUpdatedBody_" + languageId,
+			mbSettings.getEmailMessageUpdatedBody());
+		removeDefaultValue(
+			portletRequest, settings,
+			"emailMessageUpdatedSubject_" + languageId,
+			mbSettings.getEmailMessageUpdatedSubject());
+	}
 
 	@Override
 	public void processAction(
@@ -50,9 +83,9 @@ public class ConfigurationActionImpl extends DefaultConfigurationAction {
 			ActionResponse actionResponse)
 		throws Exception {
 
+		validateEmail(actionRequest, "emailMessageAdded", true);
+		validateEmail(actionRequest, "emailMessageUpdated", true);
 		validateEmailFrom(actionRequest);
-		validateEmailMessageAdded(actionRequest);
-		validateEmailMessageUpdated(actionRequest);
 		updateThreadPriorities(actionRequest);
 		updateUserRanks(actionRequest);
 
@@ -96,7 +129,7 @@ public class ConfigurationActionImpl extends DefaultConfigurationAction {
 					(value != 0.0)) {
 
 					priorities.add(
-						name + StringPool.COMMA + image + StringPool.COMMA +
+						name + StringPool.PIPE + image + StringPool.PIPE +
 							value);
 				}
 			}
@@ -158,63 +191,6 @@ public class ConfigurationActionImpl extends DefaultConfigurationAction {
 				"ranks", languageId);
 
 			setPreference(actionRequest, preferenceName, ranks);
-		}
-	}
-
-	protected void validateEmailFrom(ActionRequest actionRequest)
-		throws Exception {
-
-		String emailFromName = getParameter(actionRequest, "emailFromName");
-		String emailFromAddress = getParameter(
-			actionRequest, "emailFromAddress");
-
-		if (Validator.isNull(emailFromName)) {
-			SessionErrors.add(actionRequest, "emailFromName");
-		}
-		else if (!Validator.isEmailAddress(emailFromAddress) &&
-				 !Validator.isVariableTerm(emailFromAddress)) {
-
-			SessionErrors.add(actionRequest, "emailFromAddress");
-		}
-	}
-
-	protected void validateEmailMessageAdded(ActionRequest actionRequest)
-		throws Exception {
-
-		boolean emailMessageAddedEnabled = GetterUtil.getBoolean(
-			getParameter(actionRequest, "emailMessageAddedEnabled"));
-		String emailMessageAddedSubject = getParameter(
-			actionRequest, "emailMessageAddedSubject");
-		String emailMessageAddedBody = getParameter(
-			actionRequest, "emailMessageAddedBody");
-
-		if (emailMessageAddedEnabled) {
-			if (Validator.isNull(emailMessageAddedSubject)) {
-				SessionErrors.add(actionRequest, "emailMessageAddedSubject");
-			}
-			else if (Validator.isNull(emailMessageAddedBody)) {
-				SessionErrors.add(actionRequest, "emailMessageAddedBody");
-			}
-		}
-	}
-
-	protected void validateEmailMessageUpdated(ActionRequest actionRequest)
-		throws Exception {
-
-		boolean emailMessageUpdatedEnabled = GetterUtil.getBoolean(
-			getParameter(actionRequest, "emailMessageUpdatedEnabled"));
-		String emailMessageUpdatedSubject = getParameter(
-			actionRequest, "emailMessageUpdatedSubject");
-		String emailMessageUpdatedBody = getParameter(
-			actionRequest, "emailMessageUpdatedBody");
-
-		if (emailMessageUpdatedEnabled) {
-			if (Validator.isNull(emailMessageUpdatedSubject)) {
-				SessionErrors.add(actionRequest, "emailMessageUpdatedSubject");
-			}
-			else if (Validator.isNull(emailMessageUpdatedBody)) {
-				SessionErrors.add(actionRequest, "emailMessageUpdatedBody");
-			}
 		}
 	}
 

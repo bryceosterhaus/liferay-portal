@@ -204,6 +204,8 @@ if (!defaultFolderView && (folder != null) && portletName.equals(PortletKeys.DOC
 </aui:script>
 
 <aui:script use="liferay-document-library">
+	<liferay-portlet:resourceURL copyCurrentRenderParameters="<%= false %>" varImpl="mainURL" />
+
 	<%
 	String[] escapedEntryColumns = new String[entryColumns.length];
 
@@ -228,8 +230,6 @@ if (!defaultFolderView && (folder != null) && portletName.equals(PortletKeys.DOC
 			%>
 
 			decimalSeparator: '<%= decimalFormatSymbols.getDecimalSeparator() %>',
-
-			<liferay-portlet:resourceURL copyCurrentRenderParameters="<%= false %>" varImpl="mainURL" />
 
 			folders: {
 				defaultParams: {

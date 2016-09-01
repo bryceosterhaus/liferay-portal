@@ -17,6 +17,8 @@ package com.liferay.portal.notifications;
 import com.liferay.portal.kernel.cluster.ClusterExecutorUtil;
 import com.liferay.portal.kernel.cluster.ClusterInvokeThreadLocal;
 import com.liferay.portal.kernel.cluster.ClusterRequest;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.notifications.Channel;
 import com.liferay.portal.kernel.notifications.ChannelException;
 import com.liferay.portal.kernel.notifications.ChannelHub;
@@ -62,25 +64,6 @@ public class ChannelHubManagerImpl implements ChannelHubManager {
 		ChannelHub channelHub = getChannelHub(companyId);
 
 		channelHub.confirmDelivery(userId, notificationEventUuids, archive);
-
-		if (!ClusterInvokeThreadLocal.isEnabled()) {
-			return;
-		}
-
-		MethodHandler methodHandler = new MethodHandler(
-			_confirmDeliveryMethodKey, companyId, userId,
-			notificationEventUuids, archive);
-
-		ClusterRequest clusterRequest = ClusterRequest.createMulticastRequest(
-			methodHandler, true);
-
-		try {
-			ClusterExecutorUtil.execute(clusterRequest);
-		}
-		catch (Exception e) {
-			throw new ChannelException(
-				"Unable to confirm delivery of event across cluster", e);
-		}
 	}
 
 	@Override
@@ -97,9 +80,9 @@ public class ChannelHubManagerImpl implements ChannelHubManager {
 			boolean archive)
 		throws ChannelException {
 
-		confirmDelivery(
-			companyId, userId, Collections.singleton(notificationEventUuid),
-			archive);
+		ChannelHub channelHub = getChannelHub(companyId);
+
+		channelHub.confirmDelivery(userId, notificationEventUuid, archive);
 	}
 
 	@Override
@@ -113,7 +96,7 @@ public class ChannelHubManagerImpl implements ChannelHubManager {
 
 	@Override
 	public ChannelHub createChannelHub(long companyId) throws ChannelException {
-		ChannelHub channelHub = _channelHub.clone(companyId);
+		ChannelHub channelHub = new ChannelHubImpl(companyId);
 
 		if (_channelHubs.putIfAbsent(companyId, channelHub) != null) {
 			throw new DuplicateChannelHubException(
@@ -149,9 +132,11 @@ public class ChannelHubManagerImpl implements ChannelHubManager {
 	public void destroyChannel(long companyId, long userId)
 		throws ChannelException {
 
-		ChannelHub channelHub = getChannelHub(companyId);
+		ChannelHub channelHub = fetchChannelHub(companyId);
 
-		channelHub.destroyChannel(userId);
+		if (channelHub != null) {
+			channelHub.destroyChannel(userId);
+		}
 
 		if (!ClusterInvokeThreadLocal.isEnabled()) {
 			return;
@@ -193,7 +178,7 @@ public class ChannelHubManagerImpl implements ChannelHubManager {
 		ChannelHub channelHub = _channelHubs.get(companyId);
 
 		if (channelHub == null) {
-			synchronized(_channelHubs) {
+			synchronized (_channelHubs) {
 				channelHub = _channelHubs.get(companyId);
 
 				if (channelHub == null) {
@@ -350,9 +335,11 @@ public class ChannelHubManagerImpl implements ChannelHubManager {
 			long companyId, long userId, NotificationEvent notificationEvent)
 		throws ChannelException {
 
-		ChannelHub channelHub = getChannelHub(companyId);
+		ChannelHub channelHub = fetchChannelHub(companyId);
 
-		channelHub.sendNotificationEvent(userId, notificationEvent);
+		if (channelHub != null) {
+			channelHub.sendNotificationEvent(userId, notificationEvent);
+		}
 
 		if (!ClusterInvokeThreadLocal.isEnabled()) {
 			return;
@@ -384,18 +371,19 @@ public class ChannelHubManagerImpl implements ChannelHubManager {
 		channelHub.sendNotificationEvents(userId, notificationEvents);
 	}
 
-	public void setChannelHubPrototype(ChannelHub channelHub) {
-		_channelHub = channelHub;
-	}
-
 	@Override
 	public void storeNotificationEvent(
 			long companyId, long userId, NotificationEvent notificationEvent)
 		throws ChannelException {
 
-		ChannelHub channelHub = getChannelHub(companyId);
+		ChannelHub channelHub = fetchChannelHub(companyId);
 
-		channelHub.storeNotificationEvent(userId, notificationEvent);
+		if (channelHub != null) {
+			channelHub.storeNotificationEvent(userId, notificationEvent);
+		}
+		else if (_log.isDebugEnabled()) {
+			_log.debug("No channel hub exists for company " + companyId);
+		}
 	}
 
 	@Override
@@ -408,20 +396,16 @@ public class ChannelHubManagerImpl implements ChannelHubManager {
 		channelHub.unregisterChannelListener(userId, channelListener);
 	}
 
-	private static final MethodKey _confirmDeliveryMethodKey =
-		new MethodKey(
-			ChannelHubManagerUtil.class, "confirmDelivery", long.class,
-			long.class, Collection.class, boolean.class);
-	private static final MethodKey _destroyChannelMethodKey =
-		new MethodKey(
-			ChannelHubManagerUtil.class, "destroyChannel", long.class,
-			long.class);
+	private static final Log _log = LogFactoryUtil.getLog(
+		ChannelHubManagerImpl.class);
+
+	private static final MethodKey _destroyChannelMethodKey = new MethodKey(
+		ChannelHubManagerUtil.class, "destroyChannel", long.class, long.class);
 	private static final MethodKey _storeNotificationEventMethodKey =
 		new MethodKey(
 			ChannelHubManagerUtil.class, "storeNotificationEvent", long.class,
 			long.class, NotificationEvent.class);
 
-	private ChannelHub _channelHub;
 	private final ConcurrentMap<Long, ChannelHub> _channelHubs =
 		new ConcurrentHashMap<>();
 

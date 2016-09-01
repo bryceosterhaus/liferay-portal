@@ -24,6 +24,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -31,6 +32,7 @@ import org.springframework.mock.web.MockHttpServletRequest;
 /**
  * @author Mika Koivisto
  */
+@PowerMockIgnore("javax.net.ssl.*")
 @RunWith(PowerMockRunner.class)
 public class InvokerFilterTest extends PowerMockito {
 
@@ -39,6 +41,26 @@ public class InvokerFilterTest extends PowerMockito {
 		HttpUtil httpUtil = new HttpUtil();
 
 		httpUtil.setHttp(new HttpImpl());
+	}
+
+	@Test
+	public void testGetURIWithDoubleSlash() {
+		InvokerFilter invokerFilter = new InvokerFilter();
+
+		MockHttpServletRequest mockHttpServletRequest =
+			new MockHttpServletRequest(
+				HttpMethods.GET,
+				"/c///portal/%2e/login;jsessionid=ae01b0f2af.worker1");
+
+		Assert.assertEquals(
+			"/c/portal/login", invokerFilter.getURI(mockHttpServletRequest));
+
+		mockHttpServletRequest = new MockHttpServletRequest(
+			HttpMethods.GET,
+			"/c///portal/%2e/../login;jsessionid=ae01b0f2af.worker1");
+
+		Assert.assertEquals(
+			"/c/portal/login", invokerFilter.getURI(mockHttpServletRequest));
 	}
 
 	@Test

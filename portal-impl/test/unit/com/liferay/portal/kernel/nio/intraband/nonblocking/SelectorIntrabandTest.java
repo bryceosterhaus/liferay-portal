@@ -25,14 +25,14 @@ import com.liferay.portal.kernel.nio.intraband.IntrabandTestUtil;
 import com.liferay.portal.kernel.nio.intraband.RecordCompletionHandler;
 import com.liferay.portal.kernel.nio.intraband.RecordDatagramReceiveHandler;
 import com.liferay.portal.kernel.nio.intraband.RegistrationReference;
-import com.liferay.portal.kernel.test.AggregateTestRule;
 import com.liferay.portal.kernel.test.CaptureHandler;
-import com.liferay.portal.kernel.test.CodeCoverageAssertor;
 import com.liferay.portal.kernel.test.JDKLoggerTestUtil;
-import com.liferay.portal.kernel.test.NewEnv;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
+import com.liferay.portal.kernel.test.rule.NewEnv;
 import com.liferay.portal.kernel.util.Time;
-import com.liferay.portal.test.AdviseWith;
-import com.liferay.portal.test.AspectJNewEnvTestRule;
+import com.liferay.portal.test.rule.AdviseWith;
+import com.liferay.portal.test.rule.AspectJNewEnvTestRule;
 
 import java.io.IOException;
 
@@ -696,7 +696,7 @@ public class SelectorIntrabandTest {
 
 				Assert.fail();
 			}
-			catch (ClosedIntrabandException cibe) {
+			catch (ClosedIntrabandException cie) {
 			}
 		}
 		finally {
@@ -896,7 +896,7 @@ public class SelectorIntrabandTest {
 
 				Assert.fail();
 			}
-			catch (ClosedIntrabandException cibe) {
+			catch (ClosedIntrabandException cie) {
 			}
 		}
 	}
@@ -1061,8 +1061,7 @@ public class SelectorIntrabandTest {
 		Pipe writePipe = Pipe.open();
 
 		try (GatheringByteChannel gatheringByteChannel = writePipe.sink();
-				ScatteringByteChannel scatteringByteChannel =
-					readPipe.source()) {
+			ScatteringByteChannel scatteringByteChannel = readPipe.source()) {
 
 			SelectionKeyRegistrationReference registrationReference =
 				(SelectionKeyRegistrationReference)
@@ -1266,59 +1265,63 @@ public class SelectorIntrabandTest {
 	@Aspect
 	public static class Jdk14LogImplAdvice {
 
-		public static volatile CountDownLatch _errorCalledCountDownLatch =
+		public static volatile CountDownLatch errorCalledCountDownLatch =
 			new CountDownLatch(1);
 		public static volatile CountDownLatch
-			_isWarnEnabledCalledCountDownLatch = new CountDownLatch(1);
-		public static volatile CountDownLatch
-			_warnCalledCountDownLatch = new CountDownLatch(1);
+			isWarnEnabledCalledCountDownLatch = new CountDownLatch(1);
+		public static volatile CountDownLatch warnCalledCountDownLatch =
+			new CountDownLatch(1);
 
 		public static void reset() {
-			_errorCalledCountDownLatch = new CountDownLatch(1);
-			_isWarnEnabledCalledCountDownLatch = new CountDownLatch(1);
-			_warnCalledCountDownLatch = new CountDownLatch(1);
+			errorCalledCountDownLatch = new CountDownLatch(1);
+			isWarnEnabledCalledCountDownLatch = new CountDownLatch(1);
+			warnCalledCountDownLatch = new CountDownLatch(1);
 		}
 
 		public static void waitUntilErrorCalled() throws InterruptedException {
-			_errorCalledCountDownLatch.await();
+			errorCalledCountDownLatch.await();
 		}
 
 		public static void waitUntilIsWarnEnableCalled()
 			throws InterruptedException {
 
-			_isWarnEnabledCalledCountDownLatch.await();
+			isWarnEnabledCalledCountDownLatch.await();
 		}
 
 		public static void waitUntilWarnCalled() throws InterruptedException {
-			_warnCalledCountDownLatch.await();
+			warnCalledCountDownLatch.await();
 		}
 
 		@org.aspectj.lang.annotation.After(
 			"execution(* com.liferay.portal.kernel.log.Jdk14LogImpl.error(" +
-				"Object, Throwable))")
+				"Object, Throwable))"
+		)
 		public void error() {
-			_errorCalledCountDownLatch.countDown();
+			errorCalledCountDownLatch.countDown();
 		}
 
 		@org.aspectj.lang.annotation.After(
 			"execution(* com.liferay.portal.kernel.log.Jdk14LogImpl." +
-				"isWarnEnabled())")
+				"isWarnEnabled())"
+		)
 		public void isWarnEnabled() {
-			_isWarnEnabledCalledCountDownLatch.countDown();
+			isWarnEnabledCalledCountDownLatch.countDown();
 		}
 
 		@org.aspectj.lang.annotation.After(
 			"execution(* com.liferay.portal.kernel.log.Jdk14LogImpl.warn(" +
-				"Object))")
+				"Object))"
+		)
 		public void warn1() {
-			_warnCalledCountDownLatch.countDown();
+			warnCalledCountDownLatch.countDown();
 		}
 
 		@org.aspectj.lang.annotation.After(
 			"execution(* com.liferay.portal.kernel.log.Jdk14LogImpl.warn(" +
-				"Object, Throwable))")
+				"Object, Throwable))"
+		)
 		public void warn2() {
-			_warnCalledCountDownLatch.countDown();
+			warnCalledCountDownLatch.countDown();
 		}
 
 	}
@@ -1466,7 +1469,7 @@ public class SelectorIntrabandTest {
 
 	}
 
-	private class WakeUpRunnable implements Runnable {
+	private static class WakeUpRunnable implements Runnable {
 
 		public WakeUpRunnable(SelectorIntraband selectorIntraband) {
 			_selectorIntraband = selectorIntraband;

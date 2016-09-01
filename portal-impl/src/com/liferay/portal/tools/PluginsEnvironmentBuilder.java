@@ -14,15 +14,16 @@
 
 package com.liferay.portal.tools;
 
+import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.FileComparator;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.StringBundler;
-import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.Element;
+import com.liferay.portal.kernel.xml.SAXReader;
 import com.liferay.portal.util.FileImpl;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.xml.SAXReaderImpl;
@@ -163,6 +164,15 @@ public class PluginsEnvironmentBuilder {
 			String version)
 		throws Exception {
 
+		String string = sb.toString();
+
+		if (string.contains(dependencyName)) {
+			System.out.println(
+				"Skipping duplicate " + dependencyName + " " + version);
+
+			return;
+		}
+
 		System.out.println("Adding " + dependencyName + " " + version);
 
 		if (version.equals("latest.integration")) {
@@ -197,7 +207,7 @@ public class PluginsEnvironmentBuilder {
 				".xml";
 
 		if (_fileUtil.exists(ivyFileName)) {
-			Document document = _saxReaderUtil.read(new File(ivyFileName));
+			Document document = _saxReader.read(new File(ivyFileName));
 
 			Element rootElement = document.getRootElement();
 
@@ -222,7 +232,7 @@ public class PluginsEnvironmentBuilder {
 					String rev = GetterUtil.getString(
 						dependencyElement.attributeValue("rev"));
 
-					String string = sb.toString();
+					string = sb.toString();
 
 					if (string.contains(name)) {
 						continue;
@@ -278,7 +288,7 @@ public class PluginsEnvironmentBuilder {
 			StringBundler sb, String content, String ivyDirName)
 		throws Exception {
 
-		Document document = _saxReaderUtil.read(content);
+		Document document = _saxReader.read(content);
 
 		Element rootElement = document.getRootElement();
 
@@ -487,7 +497,7 @@ public class PluginsEnvironmentBuilder {
 		writeEclipseFiles(libDir, projectDir, dependencyJars);
 
 		String libDirPath = StringUtil.replace(
-			libDir.getPath(), StringPool.BACK_SLASH, StringPool.SLASH);
+			libDir.getPath(), CharPool.BACK_SLASH, CharPool.SLASH);
 
 		List<String> ignores = ListUtil.fromFile(
 			libDir.getCanonicalPath() + "/../.gitignore");
@@ -534,7 +544,7 @@ public class PluginsEnvironmentBuilder {
 		Set<String> extPortalJars = new LinkedHashSet<>();
 
 		String libDirPath = StringUtil.replace(
-			libDir.getPath(), StringPool.BACK_SLASH, StringPool.SLASH);
+			libDir.getPath(), CharPool.BACK_SLASH, CharPool.SLASH);
 
 		if (libDirPath.contains("/ext/")) {
 			FilenameFilter filenameFilter = new GlobFilenameFilter("*.jar");
@@ -681,7 +691,7 @@ public class PluginsEnvironmentBuilder {
 			}
 		}
 
-		addClasspathEntry(sb, "/portal/portal-service/portal-service.jar");
+		addClasspathEntry(sb, "/portal/portal-kernel/portal-kernel.jar");
 		addClasspathEntry(sb, "/portal/util-bridges/util-bridges.jar");
 		addClasspathEntry(sb, "/portal/util-java/util-java.jar");
 
@@ -827,7 +837,7 @@ public class PluginsEnvironmentBuilder {
 			String projectDirName, String projectName, boolean javaProject)
 		throws Exception {
 
-		StringBundler sb = new StringBundler(17);
+		StringBundler sb = new StringBundler(19);
 
 		sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\n");
 		sb.append("<projectDescription>\n");
@@ -877,7 +887,6 @@ public class PluginsEnvironmentBuilder {
 	private static final String[] _TEST_TYPES = {"integration", "unit"};
 
 	private static final FileImpl _fileUtil = FileImpl.getInstance();
-	private static final SAXReaderImpl _saxReaderUtil =
-		SAXReaderImpl.getInstance();
+	private static final SAXReader _saxReader = new SAXReaderImpl();
 
 }

@@ -20,7 +20,7 @@ import com.liferay.portal.fabric.worker.FabricWorker;
 import com.liferay.portal.kernel.concurrent.DefaultNoticeableFuture;
 import com.liferay.portal.kernel.process.ProcessCallable;
 import com.liferay.portal.kernel.process.ProcessException;
-import com.liferay.portal.kernel.test.CodeCoverageAssertor;
+import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
 
 import java.util.Collection;
 import java.util.concurrent.ExecutionException;
@@ -112,8 +112,9 @@ public class LocalFabricAgentTest {
 		Assert.assertEquals(1, fabricWorkers.size());
 		Assert.assertTrue(fabricWorkers.contains(fabricWorker));
 
-		defaultNoticeableFuture = (DefaultNoticeableFuture<String>)
-			fabricWorker.getProcessNoticeableFuture();
+		defaultNoticeableFuture =
+			(DefaultNoticeableFuture<String>)
+				fabricWorker.getProcessNoticeableFuture();
 
 		defaultNoticeableFuture.run();
 

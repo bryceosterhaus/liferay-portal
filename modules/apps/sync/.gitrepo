@@ -1,0 +1,10 @@
+;
+; Do not manually edit this file. See
+; https://github.com/git-commands/git-subrepo#readme for more information.
+;
+[subrepo]
+	cmdver = liferay
+	commit = 35948932d8f69afbd7195e4e2c42d090b6b28d99
+	mode = push
+	parent = 42bb0daa3078ce1c44b7d874d00de917e3ffc473
+	remote = git@github.com:liferay/com-liferay-sync.git

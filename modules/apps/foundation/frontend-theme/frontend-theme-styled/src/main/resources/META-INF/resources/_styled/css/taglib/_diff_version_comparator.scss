@@ -1,0 +1,46 @@
+.diff-version-comparator {
+	.taglib-diff-html {
+		.diff-html-changed {
+			background-image: none;
+			border-bottom-color: #009AE5;
+
+			img {
+				border-color: #009AE5;
+			}
+		}
+	}
+
+	.diff-version-head {
+		border-bottom-color: #E5E5E5;
+
+		.diff-target-selector {
+			border-left-color: #E5E5E5;
+		}
+	}
+
+	.diff-container-column {
+		background-color: #FFF;
+		border-color: #E5E5E5;
+
+		.legend-info {
+			.add.icon-stop {
+				color: #CFC;
+			}
+
+			.delete.icon-stop {
+				color: #FDC6C6;
+			}
+
+			.legend-item {
+				&.diff-html-changed {
+					border-bottom-color: #009AE5;
+				}
+			}
+		}
+
+		.diff-version-filter {
+			background-color: #F9F9F9;
+			border-color: #E5E5E5;
+		}
+	}
+}

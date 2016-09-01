@@ -14,26 +14,26 @@
 
 package com.liferay.portal.repository.portletrepository;
 
+import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.repository.DocumentRepository;
 import com.liferay.portal.kernel.repository.RepositoryFactory;
+import com.liferay.portal.kernel.repository.capabilities.PortalCapabilityLocator;
+import com.liferay.portal.kernel.repository.capabilities.ProcessorCapability;
+import com.liferay.portal.kernel.repository.capabilities.RelatedModelCapability;
 import com.liferay.portal.kernel.repository.capabilities.TrashCapability;
 import com.liferay.portal.kernel.repository.capabilities.WorkflowCapability;
 import com.liferay.portal.kernel.repository.registry.BaseRepositoryDefiner;
 import com.liferay.portal.kernel.repository.registry.CapabilityRegistry;
 import com.liferay.portal.kernel.repository.registry.RepositoryFactoryRegistry;
-import com.liferay.portal.repository.capabilities.LiferayTrashCapability;
-import com.liferay.portal.repository.capabilities.MinimalWorkflowCapability;
 
 /**
  * @author Adolfo Pérez
  */
 public class PortletRepositoryDefiner extends BaseRepositoryDefiner {
 
-	public static final String CLASS_NAME = PortletRepository.class.getName();
-
 	@Override
 	public String getClassName() {
-		return CLASS_NAME;
+		return PortletRepository.class.getName();
 	}
 
 	@Override
@@ -45,11 +45,25 @@ public class PortletRepositoryDefiner extends BaseRepositoryDefiner {
 	public void registerCapabilities(
 		CapabilityRegistry<DocumentRepository> capabilityRegistry) {
 
-		capabilityRegistry.addSupportedCapability(
-			WorkflowCapability.class, _workflowCapability);
+		DocumentRepository documentRepository = capabilityRegistry.getTarget();
 
 		capabilityRegistry.addExportedCapability(
-			TrashCapability.class, new LiferayTrashCapability());
+			RelatedModelCapability.class,
+			portalCapabilityLocator.getRelatedModelCapability(
+				documentRepository));
+
+		capabilityRegistry.addExportedCapability(
+			TrashCapability.class,
+			portalCapabilityLocator.getTrashCapability(documentRepository));
+
+		capabilityRegistry.addExportedCapability(
+			WorkflowCapability.class,
+			portalCapabilityLocator.getWorkflowCapability(
+				documentRepository, WorkflowCapability.OperationMode.MINIMAL));
+
+		capabilityRegistry.addSupportedCapability(
+			ProcessorCapability.class,
+			portalCapabilityLocator.getProcessorCapability(documentRepository));
 	}
 
 	@Override
@@ -63,8 +77,9 @@ public class PortletRepositoryDefiner extends BaseRepositoryDefiner {
 		_repositoryFactory = repositoryFactory;
 	}
 
+	@BeanReference(type = PortalCapabilityLocator.class)
+	protected PortalCapabilityLocator portalCapabilityLocator;
+
 	private RepositoryFactory _repositoryFactory;
-	private final WorkflowCapability _workflowCapability =
-		new MinimalWorkflowCapability();
 
 }

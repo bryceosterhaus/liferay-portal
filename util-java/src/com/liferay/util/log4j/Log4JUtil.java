@@ -15,47 +15,47 @@
 package com.liferay.util.log4j;
 
 import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayOutputStream;
+import com.liferay.portal.kernel.io.unsync.UnsyncStringReader;
 import com.liferay.portal.kernel.log.LogFactory;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
+import com.liferay.portal.kernel.util.ReflectionUtil;
 import com.liferay.portal.kernel.util.ServerDetector;
 import com.liferay.portal.kernel.util.StreamUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.security.xml.SecureXMLFactoryProviderUtil;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Reader;
-import java.io.StringReader;
+
+import java.lang.reflect.Field;
 
 import java.net.URL;
 
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.log4j.Appender;
 import org.apache.log4j.Level;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-import org.apache.log4j.WriterAppender;
 import org.apache.log4j.xml.DOMConfigurator;
 
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 
-import org.xml.sax.XMLReader;
+import org.xml.sax.EntityResolver;
+import org.xml.sax.InputSource;
 
 /**
  * @author Brian Wing Shun Chan
  * @author Tomas Polesovsky
+ * @see com.liferay.petra.log4j.Log4JUtil
  */
 public class Log4JUtil {
 
@@ -78,22 +78,6 @@ public class Log4JUtil {
 				java.util.logging.Level.WARNING,
 				"Unable to load portal-log4j-ext.xml", ioe);
 		}
-
-		if (ServerDetector.isJBoss5()) {
-			Logger rootLogger = LogManager.getRootLogger();
-
-			Enumeration<Appender> enu = rootLogger.getAllAppenders();
-
-			while (enu.hasMoreElements()) {
-				Appender appender = enu.nextElement();
-
-				if (appender instanceof WriterAppender) {
-					WriterAppender writerAppender = (WriterAppender)appender;
-
-					writerAppender.activateOptions();
-				}
-			}
-		}
 	}
 
 	public static void configureLog4J(URL url) {
@@ -111,35 +95,33 @@ public class Log4JUtil {
 
 		DOMConfigurator domConfigurator = new DOMConfigurator();
 
-		Reader urlReader = new StringReader(urlContent);
-
 		domConfigurator.doConfigure(
-			urlReader, LogManager.getLoggerRepository());
-
-		Set<String> currentLoggerNames = new HashSet<>();
-
-		Enumeration<Logger> enu = LogManager.getCurrentLoggers();
-
-		while (enu.hasMoreElements()) {
-			Logger logger = enu.nextElement();
-
-			currentLoggerNames.add(logger.getName());
-		}
+			new UnsyncStringReader(urlContent),
+			LogManager.getLoggerRepository());
 
 		try {
-			XMLReader xmlReader = null;
+			SAXReader saxReader = new SAXReader();
 
-			if (SecureXMLFactoryProviderUtil.getSecureXMLFactoryProvider()
-					!= null) {
+			saxReader.setEntityResolver(
+				new EntityResolver() {
 
-				xmlReader = SecureXMLFactoryProviderUtil.newXMLReader();
-			}
+					@Override
+					public InputSource resolveEntity(
+						String publicId, String systemId) {
 
-			SAXReader saxReader = new SAXReader(xmlReader);
+						if (systemId.endsWith("log4j.dtd")) {
+							return new InputSource(
+								DOMConfigurator.class.getResourceAsStream(
+									"log4j.dtd"));
+						}
 
-			Reader reader = new StringReader(urlContent);
+						return null;
+					}
 
-			Document document = saxReader.read(reader, url.toExternalForm());
+				});
+
+			Document document = saxReader.read(
+				new UnsyncStringReader(urlContent), url.toExternalForm());
 
 			Element rootElement = document.getRootElement();
 
@@ -152,16 +134,19 @@ public class Log4JUtil {
 
 				String priority = priorityElement.attributeValue("value");
 
-				setLevel(name, priority, false);
+				java.util.logging.Logger jdkLogger =
+					java.util.logging.Logger.getLogger(name);
+
+				jdkLogger.setLevel(_getJdkLevel(priority));
 			}
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			_logger.error(e, e);
 		}
 	}
 
 	public static Map<String, String> getCustomLogSettings() {
-		return new HashMap<>(_customLogSettings);
+		return new HashMap<>(_getCustomLogSettings());
 	}
 
 	public static String getOriginalLevel(String className) {
@@ -196,13 +181,11 @@ public class Log4JUtil {
 			LogFactoryUtil.setLogFactory(logFactory);
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			_logger.error(e, e);
 		}
 
-		for (String name : customLogSettings.keySet()) {
-			String priority = customLogSettings.get(name);
-
-			setLevel(name, priority, false);
+		for (Map.Entry<String, String> entry : customLogSettings.entrySet()) {
+			setLevel(entry.getKey(), entry.getValue(), false);
 		}
 	}
 
@@ -217,7 +200,9 @@ public class Log4JUtil {
 		jdkLogger.setLevel(_getJdkLevel(priority));
 
 		if (custom) {
-			_customLogSettings.put(name, priority);
+			Map<String, String> customLogSettings = _getCustomLogSettings();
+
+			customLogSettings.put(name, priority);
 		}
 	}
 
@@ -233,6 +218,26 @@ public class Log4JUtil {
 		StreamUtil.transfer(inputStream, unsyncByteArrayOutputStream, -1, true);
 
 		return unsyncByteArrayOutputStream.toByteArray();
+	}
+
+	private static Map<String, String> _getCustomLogSettings() {
+		ClassLoader classLoader = PortalClassLoaderUtil.getClassLoader();
+
+		if (Log4JUtil.class.getClassLoader() == classLoader) {
+			return _customLogSettings;
+		}
+
+		try {
+			Class<?> clazz = classLoader.loadClass(Log4JUtil.class.getName());
+
+			Field field = ReflectionUtil.getDeclaredField(
+				clazz, "_customLogSettings");
+
+			return (Map<String, String>)field.get(null);
+		}
+		catch (Exception e) {
+			return ReflectionUtil.throwException(e);
+		}
 	}
 
 	private static java.util.logging.Level _getJdkLevel(String priority) {
@@ -285,7 +290,7 @@ public class Log4JUtil {
 			urlContent = new String(bytes, StringPool.UTF8);
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			_logger.error(e, e);
 
 			return null;
 		}
@@ -324,6 +329,8 @@ public class Log4JUtil {
 			content, "<appender-ref ref=\"" + appenderName + "\" />",
 			StringPool.BLANK);
 	}
+
+	private static final Logger _logger = Logger.getRootLogger();
 
 	private static final Map<String, String> _customLogSettings =
 		new ConcurrentHashMap<>();

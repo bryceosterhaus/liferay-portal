@@ -14,9 +14,9 @@
 
 package com.liferay.portlet;
 
+import com.liferay.portal.kernel.model.PortletApp;
+import com.liferay.portal.kernel.model.PortletURLListener;
 import com.liferay.portal.kernel.util.InstanceFactory;
-import com.liferay.portal.model.PortletApp;
-import com.liferay.portal.model.PortletURLListener;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -42,8 +42,7 @@ public class PortletURLListenerFactory {
 	}
 
 	private PortletURLListenerFactory() {
-		_pool = new ConcurrentHashMap
-			<String, Map<String, PortletURLGenerationListener>>();
+		_pool = new ConcurrentHashMap<>();
 	}
 
 	private PortletURLGenerationListener _create(

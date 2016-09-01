@@ -14,13 +14,19 @@
 
 package com.liferay.portal.repository.liferayrepository;
 
+import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.repository.DocumentRepository;
 import com.liferay.portal.kernel.repository.LocalRepository;
 import com.liferay.portal.kernel.repository.Repository;
 import com.liferay.portal.kernel.repository.RepositoryFactory;
 import com.liferay.portal.kernel.repository.capabilities.BulkOperationCapability;
+import com.liferay.portal.kernel.repository.capabilities.CommentCapability;
+import com.liferay.portal.kernel.repository.capabilities.PortalCapabilityLocator;
+import com.liferay.portal.kernel.repository.capabilities.ProcessorCapability;
+import com.liferay.portal.kernel.repository.capabilities.RelatedModelCapability;
 import com.liferay.portal.kernel.repository.capabilities.SyncCapability;
+import com.liferay.portal.kernel.repository.capabilities.ThumbnailCapability;
 import com.liferay.portal.kernel.repository.capabilities.TrashCapability;
 import com.liferay.portal.kernel.repository.capabilities.WorkflowCapability;
 import com.liferay.portal.kernel.repository.model.FileContentReference;
@@ -29,10 +35,7 @@ import com.liferay.portal.kernel.repository.registry.BaseRepositoryDefiner;
 import com.liferay.portal.kernel.repository.registry.CapabilityRegistry;
 import com.liferay.portal.kernel.repository.registry.RepositoryFactoryRegistry;
 import com.liferay.portal.kernel.repository.util.ModelValidatorUtil;
-import com.liferay.portal.repository.capabilities.LiferayBulkOperationCapability;
-import com.liferay.portal.repository.capabilities.LiferaySyncCapability;
-import com.liferay.portal.repository.capabilities.LiferayTrashCapability;
-import com.liferay.portal.repository.capabilities.LiferayWorkflowCapability;
+import com.liferay.portal.util.PropsValues;
 
 /**
  * @author Adolfo Pérez
@@ -55,22 +58,40 @@ public class LiferayRepositoryDefiner extends BaseRepositoryDefiner {
 	public void registerCapabilities(
 		CapabilityRegistry<DocumentRepository> capabilityRegistry) {
 
-		capabilityRegistry.addExportedCapability(
-			TrashCapability.class, _liferayTrashCapability);
-
 		DocumentRepository documentRepository = capabilityRegistry.getTarget();
 
-		BulkOperationCapability bulkOperationCapability =
-			new LiferayBulkOperationCapability(documentRepository);
+		capabilityRegistry.addExportedCapability(
+			BulkOperationCapability.class,
+			portalCapabilityLocator.getBulkOperationCapability(
+				documentRepository));
+
+		if (PropsValues.DL_FILE_ENTRY_COMMENTS_ENABLED) {
+			capabilityRegistry.addExportedCapability(
+				CommentCapability.class,
+				portalCapabilityLocator.getCommentCapability(
+					documentRepository));
+		}
 
 		capabilityRegistry.addExportedCapability(
-			BulkOperationCapability.class, bulkOperationCapability);
-
+			RelatedModelCapability.class,
+			portalCapabilityLocator.getRelatedModelCapability(
+				documentRepository));
+		capabilityRegistry.addExportedCapability(
+			ThumbnailCapability.class,
+			portalCapabilityLocator.getThumbnailCapability(documentRepository));
+		capabilityRegistry.addExportedCapability(
+			TrashCapability.class,
+			portalCapabilityLocator.getTrashCapability(documentRepository));
+		capabilityRegistry.addExportedCapability(
+			WorkflowCapability.class,
+			portalCapabilityLocator.getWorkflowCapability(
+				documentRepository, WorkflowCapability.OperationMode.FULL));
+		capabilityRegistry.addSupportedCapability(
+			ProcessorCapability.class,
+			portalCapabilityLocator.getProcessorCapability(documentRepository));
 		capabilityRegistry.addSupportedCapability(
 			SyncCapability.class,
-			new LiferaySyncCapability(bulkOperationCapability));
-		capabilityRegistry.addSupportedCapability(
-			WorkflowCapability.class, _liferayWorkflowCapability);
+			portalCapabilityLocator.getSyncCapability(documentRepository));
 	}
 
 	@Override
@@ -85,13 +106,13 @@ public class LiferayRepositoryDefiner extends BaseRepositoryDefiner {
 			repositoryFactory);
 	}
 
-	private final LiferayTrashCapability _liferayTrashCapability =
-		new LiferayTrashCapability();
-	private final LiferayWorkflowCapability _liferayWorkflowCapability =
-		new LiferayWorkflowCapability();
+	@BeanReference(type = PortalCapabilityLocator.class)
+	protected PortalCapabilityLocator portalCapabilityLocator;
+
 	private RepositoryFactory _repositoryFactory;
 
-	private class LiferayRepositoryFactoryWrapper implements RepositoryFactory {
+	private static class LiferayRepositoryFactoryWrapper
+		implements RepositoryFactory {
 
 		public LiferayRepositoryFactoryWrapper(
 			RepositoryFactory repositoryFactory) {

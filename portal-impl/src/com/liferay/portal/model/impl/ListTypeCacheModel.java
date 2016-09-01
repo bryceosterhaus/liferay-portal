@@ -16,12 +16,12 @@ package com.liferay.portal.model.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.portal.kernel.model.CacheModel;
+import com.liferay.portal.kernel.model.ListType;
+import com.liferay.portal.kernel.model.MVCCModel;
 import com.liferay.portal.kernel.util.HashUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.model.CacheModel;
-import com.liferay.portal.model.ListType;
-import com.liferay.portal.model.MVCCModel;
 
 import java.io.Externalizable;
 import java.io.IOException;
@@ -121,7 +121,8 @@ public class ListTypeCacheModel implements CacheModel<ListType>, Externalizable,
 	@Override
 	public void readExternal(ObjectInput objectInput) throws IOException {
 		mvccVersion = objectInput.readLong();
-		listTypeId = objectInput.readInt();
+
+		listTypeId = objectInput.readLong();
 		name = objectInput.readUTF();
 		type = objectInput.readUTF();
 	}
@@ -130,7 +131,8 @@ public class ListTypeCacheModel implements CacheModel<ListType>, Externalizable,
 	public void writeExternal(ObjectOutput objectOutput)
 		throws IOException {
 		objectOutput.writeLong(mvccVersion);
-		objectOutput.writeInt(listTypeId);
+
+		objectOutput.writeLong(listTypeId);
 
 		if (name == null) {
 			objectOutput.writeUTF(StringPool.BLANK);
@@ -148,7 +150,7 @@ public class ListTypeCacheModel implements CacheModel<ListType>, Externalizable,
 	}
 
 	public long mvccVersion;
-	public int listTypeId;
+	public long listTypeId;
 	public String name;
 	public String type;
 }

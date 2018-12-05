@@ -58,7 +58,5 @@ page import="com.liferay.segments.web.internal.display.context.SelectSegmentsEnt
 <portlet:defineObjects />
 
 <%
-String segmentsJsRequire = (String)renderRequest.getAttribute(
-	SegmentsWebKeys.SEGMENTS_JS_REQUIRE
-);
+String segmentsJsRequire = (String)renderRequest.getAttribute(SegmentsWebKeys.SEGMENTS_JS_REQUIRE);
 %>

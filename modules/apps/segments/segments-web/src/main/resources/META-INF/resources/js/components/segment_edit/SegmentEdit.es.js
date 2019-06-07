@@ -338,6 +338,8 @@ class SegmentEdit extends Component {
 			values
 		} = this.props;
 
+		const criteriaNamePlaceholder = Liferay.Language.get('segment-name');
+
 		const {contributors, disabledSave, editing, validTitle} = this.state;
 
 		const {assetsPath} = this.context;
@@ -367,6 +369,7 @@ class SegmentEdit extends Component {
 								initialOpen={false}
 								initialValues={values.name}
 								onChange={this._handleLocalizedInputChange}
+								placeholder={criteriaNamePlaceholder}
 								portletNamespace={portletNamespace}
 								readOnly={!editing}
 							/>

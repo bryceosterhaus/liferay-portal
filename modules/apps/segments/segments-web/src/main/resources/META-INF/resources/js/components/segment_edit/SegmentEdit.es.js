@@ -13,7 +13,6 @@
  */
 
 import ClayButton from '@clayui/button';
-import ClayLink from '@clayui/link';
 import ClayToggle from '../shared/ClayToggle.es';
 import ContributorInputs from '../criteria_builder/ContributorInputs.es';
 import ContributorsBuilder from '../criteria_builder/ContributorsBuilder.es';
@@ -96,7 +95,8 @@ class SegmentEdit extends Component {
 			disabledSave: this._isQueryEmpty(contributors),
 			editing: showInEditMode,
 			membersCount: initialMembersCount,
-			validTitle: !!values.name[props.defaultLanguageId]
+			validTitle: !!values.name[props.defaultLanguageId],
+			hasChanged: false
 		};
 
 		this._debouncedFetchMembersCount = debounce(
@@ -114,7 +114,8 @@ class SegmentEdit extends Component {
 	_handleLocalizedInputChange = (event, newValues, invalid) => {
 		this.props.setFieldValue('name', newValues);
 		this.setState({
-			validTitle: !invalid
+			validTitle: !invalid,
+			hasChanged: true
 		});
 	};
 
@@ -160,7 +161,8 @@ class SegmentEdit extends Component {
 			return {
 				contributors,
 				disabledSave: this._isQueryEmpty(contributors),
-				membersCountLoading: true
+				membersCountLoading: true,
+				hasChanged: true
 			};
 		}, this._debouncedFetchMembersCount);
 	};
@@ -188,7 +190,8 @@ class SegmentEdit extends Component {
 
 			return {
 				contributors,
-				membersCountLoading: true
+				membersCountLoading: true,
+				hasChanged: true
 			};
 		}, this._debouncedFetchMembersCount);
 	};
@@ -237,6 +240,37 @@ class SegmentEdit extends Component {
 				supportedPropertyTypes={SUPPORTED_PROPERTY_TYPES}
 			/>
 		) : null;
+	};
+
+	/**
+	 * Decides wether to redirect the user or warn
+	 *
+	 * @memberof SegmentEdit
+	 */
+	_handleCancelButton = () => {
+		const {hasChanged} = this.state;
+
+		if (hasChanged) {
+			const confirmed = confirm(
+				Liferay.Language.get('criteria-cancel-confirmation-message')
+			);
+			if (confirmed) {
+				this._redirect();
+			}
+		} else {
+			this._redirect();
+		}
+	};
+
+	/**
+	 * This redirects to the `redirect` prop.
+	 *
+	 * @memberof SegmentEdit
+	 */
+	_redirect = () => {
+		const {redirect} = this.props;
+
+		Liferay.Util.navigate(redirect);
 	};
 
 	/**
@@ -348,7 +382,6 @@ class SegmentEdit extends Component {
 			defaultLanguageId,
 			hasUpdatePermission,
 			portletNamespace,
-			redirect,
 			source,
 			values
 		} = this.props;
@@ -417,14 +450,14 @@ class SegmentEdit extends Component {
 
 								<div className='btn-group'>
 									<div className='btn-group-item'>
-										<ClayLink
+										<ClayButton
 											className='text-capitalize'
 											displayType='secondary'
-											href={redirect}
-											outline={true}
+											onClick={this._handleCancelButton}
+											small
 										>
 											{Liferay.Language.get('cancel')}
-										</ClayLink>
+										</ClayButton>
 									</div>
 
 									<div className='btn-group-item'>

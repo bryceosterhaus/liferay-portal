@@ -37,7 +37,6 @@ export {default as BREAKPOINTS} from './liferay/breakpoints';
 export {default as CompatibilityEventProxy} from './liferay/CompatibilityEventProxy.es';
 
 export {default as DefaultEventHandler} from './liferay/DefaultEventHandler.es';
-export {default as ItemSelectorDialog} from './liferay/ItemSelectorDialog.es';
 export {default as PortletBase} from './liferay/PortletBase.es';
 
 // Modal API

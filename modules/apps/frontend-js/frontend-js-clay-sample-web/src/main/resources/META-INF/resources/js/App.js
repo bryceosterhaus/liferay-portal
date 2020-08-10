@@ -13,11 +13,67 @@
  */
 
 import ClayAlert from '@clayui/alert';
+import ClayButton from '@clayui/button';
+import {ClayDropDownWithItems} from '@clayui/drop-down';
 import React from 'react';
 
 import '../css/main.scss';
 
 export default () => {
+	const [value, setValue] = React.useState('');
+
+	const items = [
+		{
+			label: 'clickable',
+			onClick: () => {
+				alert('you clicked!');
+			},
+		},
+		{
+			type: 'divider',
+		},
+		{
+			items: [
+				{
+					label: 'one',
+					type: 'radio',
+					value: 'one',
+				},
+				{
+					label: 'two',
+					type: 'radio',
+					value: 'two',
+				},
+			],
+			label: 'radio',
+			name: 'radio',
+			onChange: (value) => alert(`New Radio checked ${value}`),
+			type: 'radiogroup',
+		},
+		{
+			items: [
+				{
+					checked: true,
+					label: 'checkbox',
+					onChange: () => alert('checkbox changed'),
+					type: 'checkbox',
+				},
+				{
+					checked: true,
+					label: 'checkbox 1',
+					onChange: () => alert('checkbox changed'),
+					type: 'checkbox',
+				},
+			],
+			label: 'checkbox',
+			type: 'group',
+		},
+		{
+			href: '#',
+			label: 'linkable',
+		},
+	];
+
 	return (
 		<div>
 			<ClayAlert title="Info">
@@ -25,7 +81,32 @@ export default () => {
 				whatever JS you want to App.js and redeploy.
 			</ClayAlert>
 
-			<div className="clay-test-class">This is where your code goes.</div>
+			<div className="clay-test-class">
+				<ClayDropDownWithItems
+					footerContent={
+						<>
+							<ClayButton displayType="secondary">
+								{'Cancel'}
+							</ClayButton>
+							<ClayButton>{'Done'}</ClayButton>
+						</>
+					}
+					helpText="You can customize this menu or see all you have by pressing 'more'."
+					items={items}
+					onSearchValueChange={setValue}
+					searchable={true}
+					searchProps={{
+						formProps: {
+							onSubmit: (e) => {
+								e.preventDefault();
+								alert('Submitted!');
+							},
+						},
+					}}
+					searchValue={value}
+					trigger={<ClayButton>{'Click Me'}</ClayButton>}
+				/>
+			</div>
 		</div>
 	);
 };

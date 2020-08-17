@@ -66,8 +66,7 @@ const openPortletModal = ({
 				if (titleTextElement) {
 					title = `${titleTextElement.outerHTML} - ${title}`;
 				}
-			}
-			else {
+			} else {
 				title = `${titleElement.textContent} - ${title}`;
 			}
 		}
@@ -209,8 +208,7 @@ const Modal = ({
 	const onButtonClick = ({formId, onClick, type}) => {
 		if (type === 'cancel') {
 			processClose();
-		}
-		else if (url && type === 'submit') {
+		} else if (url && type === 'submit') {
 			const iframe = document.querySelector('.liferay-modal iframe');
 
 			if (iframe) {
@@ -231,8 +229,7 @@ const Modal = ({
 					if (form) {
 						form.submit();
 					}
-				}
-				else if (forms.length >= 1) {
+				} else if (forms.length >= 1) {
 					forms[0].submit();
 				}
 			}
@@ -423,22 +420,7 @@ class Iframe extends React.Component {
 
 		iframeURL.searchParams.set(`_${namespace}_bodyCssClass`, bodyCssClass);
 
-		this.state = {loading: true, src: iframeURL.toString()};
-	}
-
-	componentDidUpdate(prevProps, prevState) {
-		if (!this.state.loading && prevState.loading) {
-			Liferay.fire('modalIframeLoaded', {src: this.state.src});
-
-			if (this.props.onOpen) {
-				const iframeWindow = this.iframeRef.current.contentWindow;
-
-				this.props.onOpen({
-					container: iframeWindow.document.body,
-					processClose: this.props.processClose,
-				});
-			}
-		}
+		this.state = {src: iframeURL.toString()};
 	}
 
 	componentWillUnmount() {
@@ -476,22 +458,24 @@ class Iframe extends React.Component {
 
 		this.props.updateLoading(false);
 
-		this.setState({loading: false});
-
 		iframeWindow.onunload = () => {
 			this.props.updateLoading(true);
-
-			this.setState({loading: true});
 		};
+
+		Liferay.fire('modalIframeLoaded', {src: this.state.src});
+
+		if (this.props.onOpen) {
+			this.props.onOpen({
+				container: iframeWindow.document.body,
+				processClose: this.props.processClose,
+			});
+		}
 	};
 
 	render() {
 		return (
 			<iframe
 				{...this.props.iframeProps}
-				className={classNames({
-					hide: this.state.loading,
-				})}
 				onLoad={this.onLoadHandler}
 				ref={this.iframeRef}
 				src={this.state.src}

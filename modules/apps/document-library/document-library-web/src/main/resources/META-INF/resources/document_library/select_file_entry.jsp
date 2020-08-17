@@ -22,7 +22,6 @@ Folder folder = (Folder)request.getAttribute(WebKeys.DOCUMENT_LIBRARY_FOLDER);
 long folderId = BeanParamUtil.getLong(folder, request, "folderId", DLFolderConstants.DEFAULT_PARENT_FOLDER_ID);
 
 long groupId = BeanParamUtil.getLong(folder, request, "groupId");
-String eventName = ParamUtil.getString(request, "eventName", liferayPortletResponse.getNamespace() + "selectFileEntry_" + groupId);
 
 if (folder != null) {
 	DLBreadcrumbUtil.addPortletBreadcrumbEntries(folder, request, renderResponse);
@@ -133,10 +132,3 @@ dlSearchContainer.setResults(foldersAndFileEntriesAndFileShortcuts);
 		</liferay-ui:search-container>
 	</aui:form>
 </clay:container-fluid>
-
-<aui:script>
-	Liferay.Util.selectEntityHandler(
-		'#<portlet:namespace />selectFileEntryFm',
-		'<%= HtmlUtil.escapeJS(eventName) %>'
-	);
-</aui:script>

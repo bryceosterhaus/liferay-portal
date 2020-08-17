@@ -21,7 +21,6 @@ long templateId = ParamUtil.getLong(request, "templateId");
 
 long classNameId = ParamUtil.getLong(request, "classNameId");
 long classPK = ParamUtil.getLong(request, "classPK");
-String eventName = ParamUtil.getString(request, "eventName", "selectTemplate");
 
 DDMStructure structure = null;
 
@@ -119,12 +118,5 @@ SearchContainer<DDMTemplate> templateSearch = ddmDisplayContext.getTemplateSearc
 <aui:script>
 	Liferay.Util.focusFormField(
 		document.<portlet:namespace />searchForm.<portlet:namespace />keywords
-	);
-</aui:script>
-
-<aui:script>
-	Liferay.Util.selectEntityHandler(
-		'#<portlet:namespace />selectTemplateFm',
-		'<%= HtmlUtil.escapeJS(eventName) %>'
 	);
 </aui:script>

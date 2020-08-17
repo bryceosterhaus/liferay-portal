@@ -119,11 +119,6 @@ String eventName = ParamUtil.getString(request, "eventName", liferayPortletRespo
 			result
 		);
 	});
-
-	Liferay.Util.selectEntityHandler(
-		'#<portlet:namespace />selectAccountUser',
-		'<%= HtmlUtil.escapeJS(eventName) %>'
-	);
 </aui:script>
 
 <c:if test="<%= selectAccountUsersManagementToolbarDisplayContext.isShowCreateButton() %>">

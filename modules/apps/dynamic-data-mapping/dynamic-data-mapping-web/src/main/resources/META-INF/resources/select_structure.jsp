@@ -19,7 +19,6 @@
 <%
 long classPK = ParamUtil.getLong(request, "classPK");
 String displayStyle = ParamUtil.getString(request, "displayStyle", "list");
-String eventName = ParamUtil.getString(request, "eventName", "selectStructure");
 
 SearchContainer<DDMStructure> structureSearch = ddmDisplayContext.getStructureSearch();
 %>
@@ -108,10 +107,5 @@ SearchContainer<DDMStructure> structureSearch = ddmDisplayContext.getStructureSe
 <aui:script>
 	Liferay.Util.focusFormField(
 		document.<portlet:namespace />searchForm.<portlet:namespace />keywords
-	);
-
-	Liferay.Util.selectEntityHandler(
-		'#<portlet:namespace />selectStructureFm',
-		'<%= HtmlUtil.escapeJS(eventName) %>'
 	);
 </aui:script>

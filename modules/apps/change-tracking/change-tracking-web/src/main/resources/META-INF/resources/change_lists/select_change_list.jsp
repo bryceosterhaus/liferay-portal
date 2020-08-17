@@ -95,10 +95,3 @@ searchContainer.setId("selectChangeList");
 		searchContainer="<%= searchContainer %>"
 	/>
 </clay:container-fluid>
-
-<aui:script>
-	Liferay.Util.selectEntityHandler(
-		'#<portlet:namespace />selectChangeListContainer',
-		'<portlet:namespace />selectChangeList'
-	);
-</aui:script>

@@ -18,14 +18,31 @@ import React from 'react';
 import '../css/main.scss';
 
 export default () => {
+	const URL = 'http://localhost:8080/group/guest/~/control_panel/manage?p_p_id=com_liferay_fragment_web_portlet_FragmentPortlet&p_p_lifecycle=1&p_p_state=pop_up&p_p_mode=view&_com_liferay_fragment_web_portlet_FragmentPortlet_mvcRenderCommandName=%2Ffragment%2Fselect_fragment_collection&p_auth=5y9XdDWx&p_p_auth=iN0ElrVI&_com_liferay_fragment_web_portlet_FragmentPortlet_bodyCssClass=dialog-iframe-popup';
+	
 	return (
 		<div>
-			<ClayAlert title="Info">
-				This widget is used to test out Clay components. Simply add
-				whatever JS you want to App.js and redeploy.
-			</ClayAlert>
+			<button
+				onClick={() => {
+					Liferay.Util.openWindow({
+						title: 'IFrame',
+						uri: URL,
+					});
+				}}
+			>
+				IFrame
+			</button>
 
-			<div className="clay-test-class">This is where your code goes.</div>
+			<button
+				onClick={() => {
+					Liferay.Util.openModal({
+						title: 'Modal',
+						url: URL
+					});
+				}}
+			>
+				Modal
+			</button>
 		</div>
 	);
 };

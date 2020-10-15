@@ -75,6 +75,7 @@ import createResourceURL from './util/portlet_url/create_resource_url.es';
 import {getSessionValue, setSessionValue} from './util/session.es';
 import toCharCode from './util/to_char_code.es';
 import toggleDisabled from './util/toggle_disabled';
+import createGlobalState from './store/create_global_state.es';
 
 Liferay = window.Liferay || {};
 
@@ -275,5 +276,7 @@ Liferay.Util.Session = {
 
 Liferay.Util.unescape = unescape;
 Liferay.Util.unescapeHTML = unescapeHTML;
+
+Liferay.State = createGlobalState();
 
 export {portlet};

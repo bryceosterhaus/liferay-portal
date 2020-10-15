@@ -12,20 +12,33 @@
  * details.
  */
 
-import ClayAlert from '@clayui/alert';
 import React from 'react';
+import useLiferayState from 'frontend-js-react-web/js/hooks/useLiferayState.es';
 
 import '../css/main.scss';
 
 export default () => {
+	const [user, setUser] = useLiferayState(
+		'user',
+		{nickname: Liferay.themeDisplay.getUserName()},
+		true
+	);
+
 	return (
 		<div>
-			<ClayAlert title="Info">
-				This widget is used to test out Clay components. Simply add
-				whatever JS you want to App.js and redeploy.
-			</ClayAlert>
+			<h2>Nickname Updater:</h2>
 
-			<div className="clay-test-class">This is where your code goes.</div>
+			<div>
+				<input
+					value={user.nickname}
+					onChange={(e) => {
+						setUser({
+							...user,
+							nickname: e.target.value,
+						});
+					}}
+				/>
+			</div>
 		</div>
 	);
 };

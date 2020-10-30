@@ -237,8 +237,11 @@ class Modal extends Component {
 	 */
 
 	_valueOverlayElementFn() {
-		return dom.buildFragment('<div class="modal-backdrop fade show"></div>')
-			.firstChild;
+		return document
+			.createRange()
+			.createContextualFragment(
+				'<div class="modal-backdrop fade show"></div>'
+			).firstChild;
 	}
 }
 

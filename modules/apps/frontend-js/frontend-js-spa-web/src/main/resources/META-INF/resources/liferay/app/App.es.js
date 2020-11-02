@@ -39,7 +39,6 @@ const PROPAGATED_PARAMS = ['bodyCssClass'];
  */
 
 class LiferayApp extends App {
-
 	/**
 	 * @inheritDoc
 	 */
@@ -78,7 +77,7 @@ class LiferayApp extends App {
 
 		this.addSurfaces(new LiferaySurface(body.id));
 
-		dom.append(body, '<div class="lfr-spa-loading-bar"></div>');
+		body.append('<div class="lfr-spa-loading-bar"></div>');
 	}
 
 	/**
@@ -305,8 +304,7 @@ class LiferayApp extends App {
 	onNavigationError(event) {
 		if (event.error.requestPrematureTermination) {
 			window.location.href = event.path;
-		}
-		else if (
+		} else if (
 			event.error.invalidStatus ||
 			event.error.requestError ||
 			event.error.timeout

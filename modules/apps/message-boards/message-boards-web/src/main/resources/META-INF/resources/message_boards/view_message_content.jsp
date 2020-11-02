@@ -338,7 +338,7 @@ if (portletTitleBasedNavigation) {
 					);
 
 					if (messageContainer) {
-						dom.append(messageContainer, response);
+						messageContainer.append(response);
 
 						dom.globalEval.runScriptsInElement(
 							messageContainer.parentElement
@@ -349,7 +349,7 @@ if (portletTitleBasedNavigation) {
 						);
 
 						if (replyContainer) {
-							dom.append(messageContainer, replyContainer);
+							messageContainer.append(replyContainer);
 						}
 					}
 				});

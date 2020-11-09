@@ -349,7 +349,7 @@ if (portletTitleBasedNavigation) {
 						);
 
 						if (replyContainer) {
-							messageContainer.append(replyContainer);
+							messageContainer.appendChild(replyContainer);
 						}
 					}
 				});

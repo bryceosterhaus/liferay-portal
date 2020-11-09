@@ -179,8 +179,12 @@ DLPortletInstanceSettingsHelper dlPortletInstanceSettingsHelper = new DLPortletI
 
 						if (currentColumnsElement) {
 							if (showActionsInput.checked) {
-								currentColumnsElement.append(
-									'<option value="action"><%= UnicodeLanguageUtil.get(request, "action") %></option>'
+								currentColumnsElement.appendChild(
+									document
+										.createRange()
+										.createContextualFragment(
+											'<option value="action"><%= UnicodeLanguageUtil.get(request, "action") %></option>'
+										)
 								);
 							}
 							else {

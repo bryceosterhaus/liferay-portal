@@ -36,7 +36,13 @@ class OrganizationsManagementToolbarDefaultEventHandler extends DefaultEventHand
 					);
 
 					selectedItem.forEach((item) => {
-						addGroupOrganizationsFm.append(item);
+						if (typeof item === 'string') {
+							item = document
+								.createRange()
+								.createContextualFragment(item);
+						}
+
+						addGroupOrganizationsFm.appendChild(item);
 					});
 
 					submitForm(addGroupOrganizationsFm);

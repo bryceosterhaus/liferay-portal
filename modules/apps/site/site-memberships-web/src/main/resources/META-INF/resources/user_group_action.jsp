@@ -117,7 +117,12 @@ UserGroup userGroup = (UserGroup)row.getObject();
 							selectedItem,
 							index
 						) {
-							addUserGroupGroupRoleFm.append(selectedItem);
+							if (typeof selectedItem === 'string') {
+								selectedItem = document
+									.createRange()
+									.createContextualFragment(selectedItem);
+							}
+							addUserGroupGroupRoleFm.appendChild(selectedItem);
 						});
 
 						submitForm(addUserGroupGroupRoleFm);
@@ -160,7 +165,12 @@ UserGroup userGroup = (UserGroup)row.getObject();
 							selectedItem,
 							index
 						) {
-							unassignUserGroupGroupRoleFm.append(selectedItem);
+							if (typeof selectedItem === 'string') {
+								selectedItem = document
+									.createRange()
+									.createContextualFragment(selectedItem);
+							}
+							unassignUserGroupGroupRoleFm.appendChild(selectedItem);
 						});
 
 						submitForm(unassignUserGroupGroupRoleFm);

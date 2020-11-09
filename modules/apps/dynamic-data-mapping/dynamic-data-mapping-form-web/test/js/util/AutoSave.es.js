@@ -19,13 +19,21 @@ const AUTOSAVE_INTERVAL = 2;
 const URL = '/sample/autosave';
 
 const createForm = () => {
-	document.body.append('<form id="mockForm"></form>');
+	document.body.appendChild(
+		document
+			.createRange()
+			.createContextualFragment('<form id="mockForm"></form>')
+	);
 
 	return document.querySelector('#mockForm');
 };
 
 const createInput = (id) => {
-	document.body.append(`<input id="${id}" value="0" />`);
+	document.body.appendChild(
+		document
+			.createRange()
+			.createContextualFragment(`<input id="${id}" value="0" />`)
+	);
 
 	return document.querySelector(`#${id}`);
 };

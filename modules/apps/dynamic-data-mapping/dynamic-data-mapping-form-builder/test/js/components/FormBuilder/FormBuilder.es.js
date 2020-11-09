@@ -121,9 +121,27 @@ describe('Builder', () => {
 
 		jest.useFakeTimers();
 
-		document.body.append('<button id="addFieldButton"></button>');
-		document.body.append('<div class="ddm-translation-manager"></div>');
-		document.body.append('<div class="ddm-form-basic-info"></div>');
+		document.body.appendChild(
+			document
+				.createRange()
+				.createContextualFragment(
+					'<button id="addFieldButton"></button>'
+				)
+		);
+		document.body.appendChild(
+			document
+				.createRange()
+				.createContextualFragment(
+					'<div class="ddm-translation-manager"></div>'
+				)
+		);
+		document.body.appendChild(
+			document
+				.createRange()
+				.createContextualFragment(
+					'<div class="ddm-form-basic-info"></div>'
+				)
+		);
 
 		addButton = document.querySelector('#addFieldButton');
 		basicInfo = document.querySelector('.ddm-form-basic-info');

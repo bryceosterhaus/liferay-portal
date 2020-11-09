@@ -36,7 +36,13 @@ class UserDropdownDefaultEventHandler extends DefaultEventHandler {
 					);
 
 					selectedItem.forEach((item) => {
-						editUserGroupRoleFm.append(item);
+						if (typeof item === 'string') {
+							item = document
+								.createRange()
+								.createContextualFragment(item);
+						}
+
+						editUserGroupRoleFm.appendChild(item);
 					});
 
 					submitForm(

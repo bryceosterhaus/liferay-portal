@@ -70,8 +70,12 @@ class DynamicInlineScroll extends PortletBase {
 	addListItem_(listElement, pageIndex) {
 		const listItem = document.createElement('li');
 
-		listItem.append(
-			`<a href="${this.getHREF_(pageIndex)}">${pageIndex}</a>`
+		listItem.appendChild(
+			document
+				.createRange()
+				.createContextualFragment(
+					`<a href="${this.getHREF_(pageIndex)}">${pageIndex}</a>`
+				)
 		);
 
 		pageIndex++;

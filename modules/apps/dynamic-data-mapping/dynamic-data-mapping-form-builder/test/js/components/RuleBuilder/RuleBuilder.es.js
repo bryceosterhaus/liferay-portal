@@ -15,7 +15,6 @@
 import '../../__fixtures__/MockField.es';
 
 import userEvent from '@testing-library/user-event';
-import dom from 'metal-dom';
 
 import RuleBuilder from '../../../src/main/resources/META-INF/resources/js/components/RuleBuilder/RuleBuilder.es';
 
@@ -200,8 +199,12 @@ describe('RuleBuilder', () => {
 
 		fetch.mockResponse(JSON.stringify([]));
 
-		document.body.append(
-			'<button id="addFieldButton" class="hide"></button>'
+		document.body.appendChild(
+			document
+				.createRange()
+				.createContextualFragment(
+					'<button id="addFieldButton" class="hide"></button>'
+				)
 		);
 
 		fetch.mockResponse(JSON.stringify([]));

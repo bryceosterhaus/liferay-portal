@@ -92,12 +92,16 @@ renderResponse.setTitle(LanguageUtil.get(request, "merge-tags"));
 			var value = item.value;
 
 			if (value !== undefined) {
-				targetTagNameSelect.append(
-					Liferay.Util.sub(
-						'<option value="{0}">{1}</option>',
-						value,
-						value
-					)
+				targetTagNameSelect.appendChild(
+					document
+						.createRange()
+						.createContextualFragment(
+							Liferay.Util.sub(
+								'<option value="{0}">{1}</option>',
+								value,
+								value
+							)
+						)
 				);
 			}
 		};

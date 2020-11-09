@@ -58,7 +58,13 @@ class UserGroupsManagementToolbarDefaultEventHandler extends DefaultEventHandler
 					const fm = this.one('#fm');
 
 					selectedItem.forEach((item) => {
-						fm.append(item);
+						if (typeof item === 'string') {
+							item = document
+								.createRange()
+								.createContextualFragment(item);
+						}
+
+						fm.appendChild(item);
 					});
 
 					submitForm(fm, itemData.editUserGroupsRolesURL);
@@ -81,7 +87,13 @@ class UserGroupsManagementToolbarDefaultEventHandler extends DefaultEventHandler
 					);
 
 					selectedItem.forEach((item) => {
-						addGroupUserGroupsFm.append(item);
+						if (typeof item === 'string') {
+							item = document
+								.createRange()
+								.createContextualFragment(item);
+						}
+
+						addGroupUserGroupsFm.appendChild(item);
 					});
 
 					submitForm(addGroupUserGroupsFm);

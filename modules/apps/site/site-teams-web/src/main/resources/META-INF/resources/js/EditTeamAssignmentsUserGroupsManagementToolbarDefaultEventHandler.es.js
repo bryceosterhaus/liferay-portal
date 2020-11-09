@@ -25,7 +25,13 @@ class EditTeamAssignmentsUserGroupsManagementToolbarDefaultEventHandler extends 
 					);
 
 					selectedItem.forEach((item) => {
-						addTeamUserGroupsFm.append(item);
+						if (typeof item === 'string') {
+							item = document
+								.createRange()
+								.createContextualFragment(item);
+						}
+
+						addTeamUserGroupsFm.appendChild(item);
 					});
 
 					submitForm(addTeamUserGroupsFm);

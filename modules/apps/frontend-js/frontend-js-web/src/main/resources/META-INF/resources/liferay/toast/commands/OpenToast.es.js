@@ -56,7 +56,8 @@ const getRootElement = ({container, containerId}) => {
 	if (!alertFixed) {
 		alertFixed = document
 			.createRange()
-			.createContextualFragment(TPL_ALERT_CONTAINER).firstChild;
+			.createContextualFragment(TPL_ALERT_CONTAINER)
+			.querySelector('.alert-container.container');
 
 		alertFixed = document.body.appendChild(alertFixed);
 	}

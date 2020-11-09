@@ -78,7 +78,13 @@ class LiferayApp extends App {
 
 		this.addSurfaces(new LiferaySurface(body.id));
 
-		body.append('<div class="lfr-spa-loading-bar"></div>');
+		body.appendChild(
+			document
+				.createRange()
+				.createContextualFragment(
+					'<div class="lfr-spa-loading-bar"></div>'
+				)
+		);
 	}
 
 	/**

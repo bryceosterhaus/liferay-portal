@@ -395,7 +395,11 @@ List<AssetRendererFactory<?>> classTypesAssetRendererFactories = (List<AssetRend
 							];
 
 						if (optTextOrderByColumn1) {
-							orderByColumn1.append(optTextOrderByColumn1);
+							orderByColumn1.appendChild(
+								document
+									.createRange()
+									.createContextualFragment(optTextOrderByColumn1)
+							);
 						}
 
 						var optTextOrderByColumn2 =
@@ -406,7 +410,11 @@ List<AssetRendererFactory<?>> classTypesAssetRendererFactories = (List<AssetRend
 							];
 
 						if (optTextOrderByColumn2) {
-							orderByColumn2.append(optTextOrderByColumn2);
+							orderByColumn2.appendChild(
+								document
+									.createRange()
+									.createContextualFragment(optTextOrderByColumn2)
+							);
 						}
 
 						if (structureOptions) {

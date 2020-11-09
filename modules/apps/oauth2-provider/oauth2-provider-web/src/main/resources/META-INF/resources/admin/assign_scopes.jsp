@@ -159,7 +159,7 @@ AssignScopesDisplayContext assignScopesDisplayContext = (AssignScopesDisplayCont
 					);
 
 					if (navGlobalScopes && globalAccordion) {
-						navGlobalScopes.append(globalAccordion);
+						navGlobalScopes.appendChild(globalAccordion);
 					}
 				});
 
@@ -211,7 +211,7 @@ AssignScopesDisplayContext assignScopesDisplayContext = (AssignScopesDisplayCont
 				);
 
 				if (globalAccordion && modalBody) {
-					modalBody.append(globalAccordion);
+					modalBody.appendChild(globalAccordion);
 				}
 
 				event.preventDefault();

@@ -111,7 +111,7 @@ class Modal extends Component {
 		const willShowOverlay = overlay && this.visible;
 
 		if (willShowOverlay) {
-			document.body.append(this.overlayElement);
+			document.body.appendChild(this.overlayElement);
 		}
 		else {
 			this.overlayElement.remove();

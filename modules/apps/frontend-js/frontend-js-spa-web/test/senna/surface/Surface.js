@@ -13,6 +13,7 @@
  */
 
 import Surface from '../../../src/main/resources/META-INF/resources/senna/surface/Surface';
+import utils from '../../../src/main/resources/META-INF/resources/senna/utils/utils';
 
 describe('Surface', () => {
 	describe('Constructor', () => {
@@ -226,22 +227,9 @@ describe('Surface', () => {
 	});
 });
 
-function buildFragment(htmlString) {
-	const tempDiv = document.createElement('div');
-	tempDiv.innerHTML = `<br>${htmlString}`;
-	tempDiv.removeChild(tempDiv.firstChild);
-
-	const fragment = document.createDocumentFragment();
-	while (tempDiv.firstChild) {
-		fragment.appendChild(tempDiv.firstChild);
-	}
-
-	return fragment;
-}
-
 function enterDocumentSurfaceElement(surfaceId, opt_content) {
 	document.body.appendChild(
-		buildFragment(
+		utils.buildFragment(
 			`<div id="${surfaceId}">${opt_content ? opt_content : ''}</div>`
 		)
 	);

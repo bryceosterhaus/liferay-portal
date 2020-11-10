@@ -18,6 +18,7 @@ import Uri from 'metal-uri';
 import globals from '../../../src/main/resources/META-INF/resources/senna/globals/globals';
 import HtmlScreen from '../../../src/main/resources/META-INF/resources/senna/screen/HtmlScreen';
 import Surface from '../../../src/main/resources/META-INF/resources/senna/surface/Surface';
+import utils from '../../../src/main/resources/META-INF/resources/senna/utils/utils';
 
 describe('HtmlScreen', () => {
 	beforeEach(() => {
@@ -294,7 +295,7 @@ describe('HtmlScreen', () => {
 		);
 		screen.evaluateStyles({}).then(() => {
 			document.head.appendChild(
-				dom.buildFragment(
+				utils.buildFragment(
 					'<style id="mainStyle">body{background-color:rgb(255, 255, 255);}</style>'
 				)
 			);
@@ -351,7 +352,7 @@ describe('HtmlScreen', () => {
 	it('removes from document tracked pending styles on screen dispose', (done) => {
 		var screen = new HtmlScreen();
 		document.head.appendChild(
-			dom.buildFragment(
+			utils.buildFragment(
 				'<style id="mainStyle">body{background-color:rgb(255, 255, 255);}</style>'
 			)
 		);

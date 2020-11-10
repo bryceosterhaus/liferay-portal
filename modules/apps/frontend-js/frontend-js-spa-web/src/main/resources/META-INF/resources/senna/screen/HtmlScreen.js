@@ -12,7 +12,7 @@
  * details.
  */
 
-import {buildFragment, globalEval, globalEvalStyles, match} from 'metal-dom';
+import {globalEval, globalEvalStyles, match} from 'metal-dom';
 import CancellablePromise from 'metal-promise';
 import Uri from 'metal-uri';
 
@@ -234,7 +234,7 @@ class HtmlScreen extends RequestScreen {
 			}
 		});
 
-		var frag = buildFragment();
+		var frag = utils.buildFragment();
 		tracked.forEach((resource) => {
 			var resourceKey = this.getResourceKey_(resource);
 

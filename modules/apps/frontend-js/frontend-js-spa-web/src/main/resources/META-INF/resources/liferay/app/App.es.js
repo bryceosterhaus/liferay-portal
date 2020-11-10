@@ -13,7 +13,6 @@
  */
 
 import {openToast} from 'frontend-js-web';
-import dom from 'metal-dom';
 
 import {App} from '../../senna/senna';
 import {getUid} from '../../senna/utils/utils';
@@ -39,7 +38,6 @@ const PROPAGATED_PARAMS = ['bodyCssClass'];
  */
 
 class LiferayApp extends App {
-
 	/**
 	 * @inheritDoc
 	 */
@@ -221,8 +219,7 @@ class LiferayApp extends App {
 	onDataLayoutConfigReady_() {
 		if (Liferay.Layout) {
 			Liferay.Layout.init(Liferay.Data.layoutConfig);
-		}
-		else {
+		} else {
 			this.dataLayoutConfigReadyHandle_ = Liferay.once(
 				'dataLayoutConfigReady',
 				this.onDataLayoutConfigReady_
@@ -311,8 +308,7 @@ class LiferayApp extends App {
 	onNavigationError(event) {
 		if (event.error.requestPrematureTermination) {
 			window.location.href = event.path;
-		}
-		else if (
+		} else if (
 			event.error.invalidStatus ||
 			event.error.requestError ||
 			event.error.timeout

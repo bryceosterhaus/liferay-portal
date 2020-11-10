@@ -13,6 +13,7 @@
  */
 
 import Surface from '../../senna/surface/Surface';
+import utils from '../../senna/utils/utils';
 
 /**
  * LiferaySurface
@@ -29,7 +30,7 @@ class LiferaySurface extends Surface {
 
 	addContent(screenId, content) {
 		if (typeof content === 'string') {
-			content = document.createRange().createContextualFragment(content);
+			content = utils.buildFragment(content);
 		}
 
 		Liferay.DOMTaskRunner.runTasks(content);

@@ -15,6 +15,7 @@
 import AppDataAttributeHandler from '../../../src/main/resources/META-INF/resources/senna/app/AppDataAttributeHandler';
 import globals from '../../../src/main/resources/META-INF/resources/senna/globals/globals';
 import Screen from '../../../src/main/resources/META-INF/resources/senna/screen/Screen';
+import utils from '../../../src/main/resources/META-INF/resources/senna/utils/utils';
 
 describe('AppDataAttributeHandler', () => {
 	beforeAll(() => {
@@ -262,22 +263,9 @@ describe('AppDataAttributeHandler', () => {
 	});
 });
 
-function buildFragment(htmlString) {
-	const tempDiv = document.createElement('div');
-	tempDiv.innerHTML = `<br>${htmlString}`;
-	tempDiv.removeChild(tempDiv.firstChild);
-
-	const fragment = document.createDocumentFragment();
-	while (tempDiv.firstChild) {
-		fragment.appendChild(tempDiv.firstChild);
-	}
-
-	return fragment;
-}
-
 function enterDocumentRouteElement(path) {
 	document.body.appendChild(
-		buildFragment(
+		utils.buildFragment(
 			`<link href="${path}" rel="senna-route" type="senna.Screen"></link>`
 		)
 	);
@@ -287,7 +275,7 @@ function enterDocumentRouteElement(path) {
 
 function enterDocumentRouteElementMissingPath() {
 	document.body.appendChild(
-		buildFragment(
+		utils.buildFragment(
 			`<link id="routeElementMissingPath" rel="senna-route" type="senna.Screen"></link>`
 		)
 	);
@@ -297,7 +285,7 @@ function enterDocumentRouteElementMissingPath() {
 
 function enterDocumentRouteElementMissingScreenType(path) {
 	document.body.appendChild(
-		buildFragment(`<link href="${path}" rel="senna-route"></link>`)
+		utils.buildFragment(`<link href="${path}" rel="senna-route"></link>`)
 	);
 
 	return document.querySelector('link[href="' + path + '"]');
@@ -305,7 +293,7 @@ function enterDocumentRouteElementMissingScreenType(path) {
 
 function enterDocumentSurfaceElement(surfaceId) {
 	document.body.appendChild(
-		buildFragment(`<div id="${surfaceId}" data-senna-surface></div>`)
+		utils.buildFragment(`<div id="${surfaceId}" data-senna-surface></div>`)
 	);
 
 	return document.getElementById(surfaceId);
@@ -313,7 +301,9 @@ function enterDocumentSurfaceElement(surfaceId) {
 
 function enterDocumentSurfaceElementMissingId(surfaceId) {
 	document.body.appendChild(
-		buildFragment(`<div data-id="${surfaceId}" data-senna-surface></div>`)
+		utils.buildFragment(
+			`<div data-id="${surfaceId}" data-senna-surface></div>`
+		)
 	);
 
 	return document.getElementById(surfaceId);

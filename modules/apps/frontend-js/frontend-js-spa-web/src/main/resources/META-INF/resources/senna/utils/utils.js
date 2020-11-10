@@ -28,7 +28,6 @@ let uniqueIdCounter = 1;
  * @const
  */
 class utils {
-
 	/**
 	 * Gets the current browser path excluding hashbang.
 	 * @return {!string}
@@ -206,6 +205,29 @@ export function removePathTrailingSlash(path) {
 	}
 
 	return path;
+}
+
+/**
+ * This is from metal-dom. To preserve functionality, we want to use this
+ * temporarily until we migrate to use `.createContexualFragment()`. In order
+ * to use `.createContexualFragment()`, we need to re-evaluate how we execute
+ * script tags.
+ *
+ * Helper for converting a HTML string into a document fragment.
+ * @param {string} htmlString The HTML string to convert.
+ * @return {!Element} The resulting document fragment.
+ */
+export function buildFragment(htmlString) {
+	const tempDiv = document.createElement('div');
+	tempDiv.innerHTML = `<br>${htmlString}`;
+	tempDiv.removeChild(tempDiv.firstChild);
+
+	const fragment = document.createDocumentFragment();
+	while (tempDiv.firstChild) {
+		fragment.appendChild(tempDiv.firstChild);
+	}
+
+	return fragment;
 }
 
 /**

@@ -23,7 +23,6 @@ import {ClayPaginationBarWithBasicItems} from '@clayui/pagination-bar';
 import ClayTable from '@clayui/table';
 import {fetch} from 'frontend-js-web';
 import React from 'react';
-import {BrowserRouter as Router, Route} from 'react-router-dom';
 
 class ChangeTrackingChangesView extends React.Component {
 	constructor(props) {
@@ -36,7 +35,6 @@ class ChangeTrackingChangesView extends React.Component {
 			contextView,
 			ctCollectionId,
 			discardURL,
-			history,
 			models,
 			namespace,
 			pathParam,
@@ -55,7 +53,6 @@ class ChangeTrackingChangesView extends React.Component {
 		this.contextView = contextView;
 		this.ctCollectionId = ctCollectionId;
 		this.discardURL = discardURL;
-		this.history = history;
 		this.models = models;
 		this.namespace = namespace;
 		this.renderCTEntryURL = renderCTEntryURL;
@@ -66,7 +63,8 @@ class ChangeTrackingChangesView extends React.Component {
 		this.typeNames = typeNames;
 		this.userInfo = userInfo;
 
-		this.globalSiteName = Liferay.Language.get('global');
+		this.GLOBAL_SITE_NAME = Liferay.Language.get('global');
+		this.POP_STATE = 'popstate';
 
 		this._populateModelInfo();
 
@@ -96,12 +94,20 @@ class ChangeTrackingChangesView extends React.Component {
 
 			if (pathParam !== updatedPathParam) {
 				AUI().use('liferay-portlet-url', () => {
-					this.history.replace(
-						this.basePath +
-							'&' +
-							this.namespace +
-							'path=' +
-							updatedPathParam
+					const path = this._getPath(updatedPathParam);
+
+					history.replaceState(
+						{
+							form: false,
+							path,
+							redirectPath: path,
+							referrer: 'http://localhost:8080' + path,
+							scrollLeft: 0,
+							scrollTop: 0,
+							senna: true,
+						},
+						null,
+						path
 					);
 				});
 			}
@@ -129,83 +135,12 @@ class ChangeTrackingChangesView extends React.Component {
 			sortDirectionClass: 'order-arrow-down-active',
 			viewType,
 		};
+
+		this._handlePopState = this._handlePopState.bind(this);
 	}
 
 	componentDidMount() {
-		this.history.listen((location, action) => {
-			if (action !== 'POP') {
-				return;
-			}
-
-			const params = new URLSearchParams(location.search);
-
-			const pathState = this._getPathState(
-				params.get(this.namespace + 'path')
-			);
-
-			const filterClass = pathState.filterClass;
-			const nodeId = pathState.nodeId;
-			const viewType = pathState.viewType;
-
-			if (viewType === 'context' && this.contextView.errorMessage) {
-				this.setState({
-					renderInnerHTML: null,
-					viewType,
-				});
-
-				return;
-			}
-
-			const node = this._getNode(filterClass, nodeId, viewType);
-
-			const breadcrumbItems = this._getBreadcrumbItems(
-				node,
-				filterClass,
-				nodeId,
-				viewType
-			);
-
-			let showHideable = this.state.showHideable;
-
-			if (
-				node.hideable ||
-				(filterClass !== 'everything' &&
-					this.contextView[filterClass].hideable)
-			) {
-				showHideable = true;
-			}
-
-			this.setState(
-				{
-					breadcrumbItems,
-					children: this._filterHideableNodes(
-						node.children,
-						showHideable
-					),
-					filterClass,
-					node,
-					page: 1,
-					showHideable,
-					viewType,
-				},
-				() => {
-					this.history.replace(
-						this.basePath +
-							'&' +
-							this.namespace +
-							'path=' +
-							this._getPathParam(
-								breadcrumbItems,
-								filterClass,
-								showHideable,
-								viewType
-							)
-					);
-
-					this._updateRenderContent(node);
-				}
-			);
-		});
+		window.addEventListener(this.POP_STATE, this._handlePopState);
 
 		if (this.state.node.modelClassNameId) {
 			AUI().use('liferay-portlet-url', () => {
@@ -220,6 +155,10 @@ class ChangeTrackingChangesView extends React.Component {
 					});
 			});
 		}
+	}
+
+	componentWillUnmount() {
+		window.removeEventListener(this.POP_STATE, this._handlePopState);
 	}
 
 	_clone(json) {
@@ -281,8 +220,8 @@ class ChangeTrackingChangesView extends React.Component {
 			nodes.sort((a, b) => {
 				if (
 					a.siteName < b.siteName ||
-					(a.siteName === this.globalSiteName &&
-						b.siteName !== this.globalSiteName)
+					(a.siteName === this.GLOBAL_SITE_NAME &&
+						b.siteName !== this.GLOBAL_SITE_NAME)
 				) {
 					if (ascending) {
 						return -1;
@@ -293,8 +232,8 @@ class ChangeTrackingChangesView extends React.Component {
 
 				if (
 					a.siteName > b.siteName ||
-					(a.siteName !== this.globalSiteName &&
-						b.siteName === this.globalSiteName)
+					(a.siteName !== this.GLOBAL_SITE_NAME &&
+						b.siteName === this.GLOBAL_SITE_NAME)
 				) {
 					if (ascending) {
 						return 1;
@@ -785,6 +724,10 @@ class ChangeTrackingChangesView extends React.Component {
 		}
 
 		return null;
+	}
+
+	_getPath(pathParam) {
+		return this.basePath + '&' + this.namespace + 'path=' + pathParam;
 	}
 
 	_getPathParam(breadcrumbItems, filterClass, showHideable, viewType) {
@@ -1290,6 +1233,87 @@ class ChangeTrackingChangesView extends React.Component {
 		});
 	}
 
+	_handlePopState() {
+		const params = new URLSearchParams(document.location.search);
+
+		const pathState = this._getPathState(
+			params.get(this.namespace + 'path')
+		);
+
+		const filterClass = pathState.filterClass;
+		const nodeId = pathState.nodeId;
+		const viewType = pathState.viewType;
+
+		if (viewType === 'context' && this.contextView.errorMessage) {
+			this.setState({
+				renderInnerHTML: null,
+				viewType,
+			});
+
+			return;
+		}
+
+		const node = this._getNode(filterClass, nodeId, viewType);
+
+		const breadcrumbItems = this._getBreadcrumbItems(
+			node,
+			filterClass,
+			nodeId,
+			viewType
+		);
+
+		let showHideable = this.state.showHideable;
+
+		if (
+			node.hideable ||
+			(filterClass !== 'everything' &&
+				this.contextView[filterClass].hideable)
+		) {
+			showHideable = true;
+		}
+
+		this.setState(
+			{
+				breadcrumbItems,
+				children: this._filterHideableNodes(
+					node.children,
+					showHideable
+				),
+				filterClass,
+				node,
+				page: 1,
+				showHideable,
+				viewType,
+			},
+			() => {
+				const path = this._getPath(
+					this._getPathParam(
+						breadcrumbItems,
+						filterClass,
+						showHideable,
+						viewType
+					)
+				);
+
+				history.replaceState(
+					{
+						form: false,
+						path,
+						redirectPath: path,
+						referrer: 'http://localhost:8080' + path,
+						scrollLeft: 0,
+						scrollTop: 0,
+						senna: true,
+					},
+					null,
+					path
+				);
+
+				this._updateRenderContent(node);
+			}
+		);
+	}
+
 	_handleShowHideableToggle(showHideable) {
 		if (!showHideable) {
 			if (
@@ -1347,8 +1371,20 @@ class ChangeTrackingChangesView extends React.Component {
 			this.state.viewType
 		);
 
-		this.history.replace(
-			this.basePath + '&' + this.namespace + 'path=' + pathParam
+		const path = this._getPath(pathParam);
+
+		history.replaceState(
+			{
+				form: false,
+				path,
+				redirectPath: path,
+				referrer: 'http://localhost:8080' + path,
+				scrollLeft: 0,
+				scrollTop: 0,
+				senna: true,
+			},
+			null,
+			path
 		);
 	}
 
@@ -1384,7 +1420,7 @@ class ChangeTrackingChangesView extends React.Component {
 				model.siteName = this.siteNames[model.groupId.toString()];
 			}
 			else {
-				model.siteName = this.globalSiteName;
+				model.siteName = this.GLOBAL_SITE_NAME;
 			}
 
 			model.typeName = this.typeNames[model.modelClassNameId.toString()];
@@ -1403,7 +1439,7 @@ class ChangeTrackingChangesView extends React.Component {
 					model.userId.toString()
 				].userName;
 
-				if (model.siteName === this.globalSiteName) {
+				if (model.siteName === this.GLOBAL_SITE_NAME) {
 					let key = Liferay.Language.get('x-modified-a-x-x-ago');
 
 					if (model.changeType === 'added') {
@@ -1468,8 +1504,20 @@ class ChangeTrackingChangesView extends React.Component {
 			viewType
 		);
 
-		this.history.push(
-			this.basePath + '&' + this.namespace + 'path=' + pathParam
+		const path = this._getPath(pathParam);
+
+		history.pushState(
+			{
+				form: false,
+				path,
+				redirectPath: path,
+				referrer: 'http://localhost:8080' + path,
+				scrollLeft: 0,
+				scrollTop: 0,
+				senna: true,
+			},
+			null,
+			path
 		);
 	}
 
@@ -1809,13 +1857,6 @@ class ChangeTrackingChangesView extends React.Component {
 	}
 }
 
-export default (appProps) => (
-	<Router>
-		<Route
-			path="/"
-			render={(props) => (
-				<ChangeTrackingChangesView {...appProps} {...props} />
-			)}
-		/>
-	</Router>
-);
+export default function (props) {
+	return <ChangeTrackingChangesView {...props} />;
+}

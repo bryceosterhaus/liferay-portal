@@ -24,6 +24,18 @@ const getSearchParam = (key) => {
 	return urlParams.get(key);
 };
 
+const handleNewURL = (newPath) => {
+	if (Liferay.SPA && Liferay.SPA.app) {
+		Liferay.SPA.app.skipLoadPopstate = true;
+	}
+
+	window.history.pushState(
+		{senna: true, path: newPath},
+		document.title,
+		newPath
+	);
+};
+
 export default () => {
 	const [page, setPage] = React.useState(getSearchParam('page'));
 	const [delta, setDelta] = React.useState(getSearchParam('delta'));
@@ -36,11 +48,7 @@ export default () => {
 		const newPath =
 			window.location.pathname + `?page=${newPage}&delta=${delta}`;
 
-		window.history.pushState(
-			{senna: true, path: newPath},
-			document.title,
-			newPath
-		);
+		handleNewURL(newPath);
 	};
 
 	const handleDelta = () => {
@@ -51,11 +59,7 @@ export default () => {
 		const newPath =
 			window.location.pathname + `?page=${page}&delta=${newDelta}`;
 
-		window.history.pushState(
-			{senna: true, path: newPath},
-			document.title,
-			newPath
-		);
+		handleNewURL(newPath);
 	};
 
 	React.useEffect(() => {
@@ -66,7 +70,13 @@ export default () => {
 
 		window.addEventListener('popstate', listener);
 
-		return () => window.removeEventListener('popstate', listener);
+		return () => {
+			window.removeEventListener('popstate', listener);
+
+			if (Liferay.SPA && Liferay.SPA.app) {
+				Liferay.SPA.app.skipLoadPopstate = false;
+			}
+		};
 	}, []);
 
 	return (

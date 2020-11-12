@@ -94,21 +94,7 @@ class ChangeTrackingChangesView extends React.Component {
 
 			if (pathParam !== updatedPathParam) {
 				AUI().use('liferay-portlet-url', () => {
-					const path = this._getPath(updatedPathParam);
-
-					history.replaceState(
-						{
-							form: false,
-							path,
-							redirectPath: path,
-							referrer: 'http://localhost:8080' + path,
-							scrollLeft: 0,
-							scrollTop: 0,
-							senna: true,
-						},
-						null,
-						path
-					);
+					Liferay.SPA.app.navigate(this._getPath(updatedPathParam), true);
 				});
 			}
 		}
@@ -137,6 +123,8 @@ class ChangeTrackingChangesView extends React.Component {
 		};
 
 		this._handlePopState = this._handlePopState.bind(this);
+
+		console.log('refresh');
 	}
 
 	componentDidMount() {
@@ -1286,28 +1274,16 @@ class ChangeTrackingChangesView extends React.Component {
 				viewType,
 			},
 			() => {
-				const path = this._getPath(
-					this._getPathParam(
-						breadcrumbItems,
-						filterClass,
-						showHideable,
-						viewType
-					)
-				);
-
-				history.replaceState(
-					{
-						form: false,
-						path,
-						redirectPath: path,
-						referrer: 'http://localhost:8080' + path,
-						scrollLeft: 0,
-						scrollTop: 0,
-						senna: true,
-					},
-					null,
-					path
-				);
+				Liferay.SPA.app.navigate(
+					this._getPath(
+						this._getPathParam(
+							breadcrumbItems,
+							filterClass,
+							showHideable,
+							viewType
+						)
+					),
+					true);
 
 				this._updateRenderContent(node);
 			}
@@ -1371,21 +1347,7 @@ class ChangeTrackingChangesView extends React.Component {
 			this.state.viewType
 		);
 
-		const path = this._getPath(pathParam);
-
-		history.replaceState(
-			{
-				form: false,
-				path,
-				redirectPath: path,
-				referrer: 'http://localhost:8080' + path,
-				scrollLeft: 0,
-				scrollTop: 0,
-				senna: true,
-			},
-			null,
-			path
-		);
+		Liferay.SPA.app.navigate(this._getPath(pathParam), true);
 	}
 
 	_handleSortColumnChange(column) {
@@ -1504,21 +1466,7 @@ class ChangeTrackingChangesView extends React.Component {
 			viewType
 		);
 
-		const path = this._getPath(pathParam);
-
-		history.pushState(
-			{
-				form: false,
-				path,
-				redirectPath: path,
-				referrer: 'http://localhost:8080' + path,
-				scrollLeft: 0,
-				scrollTop: 0,
-				senna: true,
-			},
-			null,
-			path
-		);
+		Liferay.SPA.app.navigate(this._getPath(pathParam));
 	}
 
 	_renderEntry() {

@@ -28,6 +28,7 @@ let uniqueIdCounter = 1;
  * @const
  */
 class utils {
+
 	/**
 	 * Gets the current browser path excluding hashbang.
 	 * @return {!string}

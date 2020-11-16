@@ -18,7 +18,12 @@ import Uri from 'metal-uri';
 
 import globals from '../globals/globals';
 import Surface from '../surface/Surface';
-import {clearNodeAttributes, copyNodeAttributes, getUid} from '../utils/utils';
+import {
+	buildFragment,
+	clearNodeAttributes,
+	copyNodeAttributes,
+	getUid,
+} from '../utils/utils';
 import RequestScreen from './RequestScreen';
 
 class HtmlScreen extends RequestScreen {
@@ -234,7 +239,7 @@ class HtmlScreen extends RequestScreen {
 			}
 		});
 
-		var frag = utils.buildFragment();
+		var frag = buildFragment();
 		tracked.forEach((resource) => {
 			var resourceKey = this.getResourceKey_(resource);
 

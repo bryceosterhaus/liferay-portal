@@ -1,8 +1,4 @@
-buildCSS {
-	imports = [
-		new File(npmInstall.nodeModulesDir, "@clayui/css/src/scss")
-	]
-}
+
 
 dependencies {
 	compileInclude group: "org.apache.httpcomponents", name: "httpclient", version: "4.5.3"

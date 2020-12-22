@@ -1,8 +1,4 @@
-buildCSS {
-	imports = [
-		new File(npmInstall.nodeModulesDir, "@clayui/css/src/scss")
-	]
-}
+
 
 dependencies {
 	compileOnly group: "com.liferay.portal", name: "com.liferay.portal.impl", version: "default"

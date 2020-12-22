@@ -1,8 +1,4 @@
-buildCSS {
-	imports = [
-		new File(npmInstall.nodeModulesDir, "@clayui/css/src/scss")
-	]
-}
+
 
 dependencies {
 	compileOnly group: "biz.aQute.bnd", name: "biz.aQute.bndlib", version: "4.2.0"

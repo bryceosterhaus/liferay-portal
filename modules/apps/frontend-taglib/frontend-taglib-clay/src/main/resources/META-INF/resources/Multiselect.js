@@ -18,7 +18,7 @@ import React, {useState} from 'react';
 
 export default function Multiselect({
 	additionalProps: _additionalProps,
-	clearAllTitle,
+	clearAllTitle = Liferay.Language.get('clear-all'),
 	componentId: _componentId,
 	cssClass,
 	disabled,

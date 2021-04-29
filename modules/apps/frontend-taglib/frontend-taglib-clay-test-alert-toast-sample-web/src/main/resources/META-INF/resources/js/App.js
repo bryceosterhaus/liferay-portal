@@ -15,6 +15,7 @@
 import ClayAlert from '@clayui/alert';
 import ClayButton from '@clayui/button';
 import {openToast} from 'frontend-js-web';
+import useLiferayState from 'frontend-js-react-web/classes/META-INF/resources/js/hooks/useLiferayState'
 import React from 'react';
 
 import '../css/main.scss';
@@ -38,6 +39,12 @@ export default () => {
 		});
 	};
 
+	const [user, setUser] = useLiferayState(
+		'user',
+		{nickname: Liferay.themeDisplay.getUserName()},
+		true
+	);
+
 	return (
 		<div>
 			<ClayAlert title="Info">
@@ -58,6 +65,22 @@ export default () => {
 						{Liferay.Language.get('fail-submit')}
 					</ClayButton>
 				</ClayButton.Group>
+			</div>
+
+			<div>
+				<header>
+					<h1> Name Updater</h1>
+				</header>
+
+				<input
+					value={user.nickname}
+					onChange={(e) => {
+						setUser({
+							...user,
+							nickname: e.target.value,
+						});
+					}}
+				/>
 			</div>
 		</div>
 	);

@@ -16,8 +16,23 @@
 
 <%@ include file="/init.jsp" %>
 
-<div>
-	<react:component
-		module="js/App"
-	/>
+<div class="row">
+	<div class="col">
+		<react:component
+			module="js/App"
+		/>
+	</div>
+
+	<div class="col">
+
+		<h2>JSP!</h2>
+
+		<div id="jsp_age">Age:</div>
+
+		<input id="input_name" placeholder="Update Name" />
+
+		<aui:script>
+			console.log(1+1);
+		</aui:script>
+	</div>
 </div>

@@ -32,7 +32,7 @@
 		<input id="input_name" placeholder="Update Name" />
 
 		<aui:script>
-			console.log(1+1);
+			placeholder text
 		</aui:script>
 	</div>
 </div>

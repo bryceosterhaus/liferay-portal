@@ -12,76 +12,73 @@
  * details.
  */
 
-import ClayAlert from '@clayui/alert';
-import ClayButton from '@clayui/button';
-import {openToast} from 'frontend-js-web';
-import useLiferayState from 'frontend-js-react-web/classes/META-INF/resources/js/hooks/useLiferayState'
+import ClayCard from '@clayui/card';
+import ClayForm, {ClayInput} from '@clayui/form';
+import State from '@liferay/frontend-js-state-web/State';
+import {useLiferayState} from '@liferay/frontend-js-state-web';
 import React from 'react';
 
 import '../css/main.scss';
 
-export default () => {
-	const onClickSuccess = () => {
-		openToast({
-			message: Liferay.Language.get(
-				'your-request-completed-successfully'
-			),
-			title: Liferay.Language.get('success'),
-			type: 'success',
-		});
-	};
+// Shared state (atoms and selectors); normally these would be in a separate
+// file.
 
-	const onClickFail = () => {
-		openToast({
-			message: Liferay.Language.get('an-unexpected-error-occurred'),
-			title: Liferay.Language.get('error'),
-			type: 'danger',
-		});
-	};
+const userAtom = State.atom('clay-sample-atom', {
+	name: Liferay.ThemeDisplay.getUserName(),
+});
 
-	const [user, setUser] = useLiferayState(
-		'user',
-		{nickname: Liferay.themeDisplay.getUserName()},
-		true
-	);
+const userSelector = State.selector('clay-sample-selector', (get) => {
+	const user = get(userAtom);
+
+	return `${user.name} (${user.name.length})`;
+});
+
+// Components that access that shared state:
+
+function Name() {
+	const [userNameAndLength] = useLiferayState(userSelector);
 
 	return (
-		<div>
-			<ClayAlert title="Info">
-				This widget is used to test out Clay Toast Alert.
-			</ClayAlert>
+		<ClayCard>
+			<ClayCard.Body>
+				<ClayCard.Description displayType="title">
+					{Liferay.Language.get('name')}
+				</ClayCard.Description>
+				<ClayCard.Description displayType="text" truncate={false}>
+					{userNameAndLength}
+				</ClayCard.Description>
+			</ClayCard.Body>
+		</ClayCard>
+	);
+}
 
-			<div className="sheet-footer">
-				<ClayButton.Group spaced>
-					<ClayButton onClick={onClickSuccess} type="submit">
-						{Liferay.Language.get('success-submit')}
-					</ClayButton>
+function NameUpdater(portletId) {
+	const id = `${portletId}_form`;
+	const [user, setUser] = useLiferayState(userAtom);
 
-					<ClayButton
-						displayType="secondary"
-						onClick={onClickFail}
-						type="submit"
-					>
-						{Liferay.Language.get('fail-submit')}
-					</ClayButton>
-				</ClayButton.Group>
-			</div>
+	return (
+		<ClayForm.Group>
+			<label htmlFor={id}>Name</label>
+			<ClayInput
+				id={id}
+				onChange={(event) => {
+					setUser({
+						...user,
+						name: event.target.value,
+					});
+				}}
+				type="text"
+				value={user.name}
+			/>
+		</ClayForm.Group>
+	);
+}
 
-			<div>
-				<header>
-					<h1> Name Updater</h1>
-				</header>
-
-				<input
-					value={user.nickname}
-					onChange={(e) => {
-						setUser({
-							...user,
-							nickname: e.target.value,
-						});
-					}}
-				/>
-			</div>
+export default ({portletId}) => {
+	return (
+		<div className="col-md-6">
+			<NameUpdater portletId={portletId} />
+			<Name />
 		</div>
 	);
 };

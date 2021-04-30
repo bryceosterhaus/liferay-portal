@@ -17,7 +17,24 @@
 <%@ include file="/init.jsp" %>
 
 <div>
-	<react:component
-		module="js/App"
-	/>
+	<button id="test-button">Increment</button>
+
+	<h3>Counter<span id="test-counter">0</span></h3>
+	
+	<aui:script require="@liferay/frontend-js-state-web@1.0.3/index as StateModule">
+		const buttonElement = document.getElementById('test-button');
+		const counterElement = document.getElementById('test-counter');
+
+		const State = StateModule.State;
+
+		const counterAtom = State.atom('test-counter', 0);
+
+		State.subscribe(counterAtom, function(newVal) {
+			counterElement.innerText = newVal;
+		});
+
+		buttonElement.addEventListener('click', function() {
+			State.write(counterAtom, State.read(counterAtom) + 1);
+		});
+	</aui:script>
 </div>

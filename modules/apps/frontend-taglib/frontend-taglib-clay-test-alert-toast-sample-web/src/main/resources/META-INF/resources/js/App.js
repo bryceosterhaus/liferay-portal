@@ -14,8 +14,8 @@
 
 import ClayCard from '@clayui/card';
 import ClayForm, {ClayInput} from '@clayui/form';
-import State from '@liferay/frontend-js-state-web';
-import {useLiferayState} from '@liferay/frontend-js-state-web';
+import {State} from '@liferay/frontend-js-state-web';
+import {useLiferayState} from '@liferay/frontend-js-react-web';
 import React from 'react';
 
 import '../css/main.scss';

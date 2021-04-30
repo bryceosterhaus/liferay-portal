@@ -15,6 +15,8 @@
 --%>
 
 <%@ include file="/init.jsp" %>
+<%@ taglib uri="http://liferay.com/tld/aui" prefix="aui" %>
+<%@ taglib uri="http://liferay.com/tld/react" prefix="react" %>
 
 <div class="row">
 	<div class="col">
@@ -24,15 +26,25 @@
 	</div>
 
 	<div class="col">
+		<button id="test-button">Increment</button>
 
-		<h2>JSP!</h2>
+		<h3>Counter<span id="test-counter">0</span></h3>
 
-		<div id="jsp_age">Age:</div>
+		<aui:script require="@liferay/frontend-js-state-web@1.0.3/index as StateModule">
+			const buttonElement = document.getElementById('test-button');
+			const counterElement = document.getElementById('test-counter');
 
-		<input id="input_name" placeholder="Update Name" />
+			const State = StateModule.State;
 
-		<aui:script>
-			placeholder text
+			const counterAtom = State.atom('test-counter', 0);
+
+			State.subscribe(counterAtom, function(newVal) {
+				counterElement.innerText = newVal;
+			});
+
+			buttonElement.addEventListener('click', function() {
+				State.write(counterAtom, State.read(counterAtom) + 1);
+			});
 		</aui:script>
 	</div>
 </div>

@@ -14,7 +14,7 @@
 
 import {useResource} from '@clayui/data-provider';
 import ClayForm, {ClayInput} from '@clayui/form';
-import ClayMultiSelect from '@clayui/multi-select';
+import ClayMultiSelect, {itemLabelFilter} from '@clayui/multi-select';
 import React, {useState} from 'react';
 
 function formatAutocompleteValue(data) {
@@ -110,8 +110,11 @@ const Email = ({
 									)}
 									sourceItems={
 										resource
-											? formatAutocompleteUsersFromRequest(
-													resource
+											? itemLabelFilter(
+													formatAutocompleteUsersFromRequest(
+														resource
+													),
+													multiSelectValue
 											  )
 											: []
 									}

@@ -16,7 +16,7 @@ import ClayButton from '@clayui/button';
 import {useResource} from '@clayui/data-provider';
 import ClayForm, {ClayInput} from '@clayui/form';
 import ClayIcon from '@clayui/icon';
-import ClayMultiSelect from '@clayui/multi-select';
+import ClayMultiSelect, {itemLabelFilter} from '@clayui/multi-select';
 import {usePrevious} from '@liferay/frontend-js-react-web';
 import classNames from 'classnames';
 import {ItemSelectorDialog} from 'frontend-js-web';
@@ -219,13 +219,16 @@ function AssetVocabulariesCategoriesSelector({
 							onItemsChange={handleItemsChange}
 							sourceItems={
 								resource
-									? resource.map((category) => {
-											return {
-												label:
-													category.titleCurrentValue,
-												value: category.categoryId,
-											};
-									  })
+									? itemLabelFilter(
+											resource.map((category) => {
+												return {
+													label:
+														category.titleCurrentValue,
+													value: category.categoryId,
+												};
+											}),
+											inputValue
+									  )
 									: []
 							}
 						/>

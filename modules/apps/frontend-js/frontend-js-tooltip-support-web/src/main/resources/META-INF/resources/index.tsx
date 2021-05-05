@@ -57,7 +57,10 @@ const SELECTOR_TRIGGER = `
 	.source-editor__fixed-text__help[data-title],
 	.upper-tbar [data-title]:not(.lfr-portal-tooltip),
 	.upper-tbar [title]:not(.lfr-portal-tooltip),
-	.upper-tbar [data-restore-title]
+	.upper-tbar [data-restore-title],
+	.lfr-tooltip-scope [title],
+	.lfr-tooltip-scope [data-title],
+	.lfr-tooltip-scope [data-restore-title]
 `;
 
 const TRIGGER_HIDE_EVENTS = [
@@ -114,23 +117,15 @@ const TooltipProvider = () => {
 
 	const saveTitle = (element: HTMLElement) => {
 		if (element) {
-			const title = element.getAttribute('title');
+			const title =
+				element.getAttribute('title') ||
+				element.getAttribute('data-title');
 
 			if (title) {
 				element.setAttribute('data-restore-title', title);
+
+				element.removeAttribute('data-title');
 				element.removeAttribute('title');
-			}
-			else if (element.tagName === 'svg') {
-				const titleTag = element.querySelector('title');
-
-				if (titleTag) {
-					element.setAttribute(
-						'data-restore-title',
-						titleTag.innerHTML
-					);
-
-					titleTag.remove();
-				}
 			}
 		}
 	};
@@ -140,16 +135,7 @@ const TooltipProvider = () => {
 			const title = element.getAttribute('data-restore-title');
 
 			if (title) {
-				if (element.tagName === 'svg') {
-					const titleTag = document.createElement('title');
-
-					titleTag.innerHTML = title;
-
-					element.appendChild(titleTag);
-				}
-				else {
-					element.setAttribute('title', title);
-				}
+				element.setAttribute('title', title);
 
 				element.removeAttribute('data-restore-title');
 			}

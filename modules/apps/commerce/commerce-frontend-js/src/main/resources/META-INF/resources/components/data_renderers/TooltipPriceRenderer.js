@@ -13,7 +13,7 @@
  */
 
 import ClayIcon from '@clayui/icon';
-import {ClayTooltipProvider} from '@clayui/tooltip';
+import ReactDOMServer from 'react-dom/server';
 import Proptypes from 'prop-types';
 import React from 'react';
 
@@ -58,17 +58,15 @@ function TooltipPriceRenderer(props) {
 		<>
 			{props.value.final.value}
 			{props.value.details && (
-				<ClayTooltipProvider
-					contentRenderer={() => <TooltipTable {...props} />}
-					delay={0}
+				<span
+					className="tooltip-provider"
+					title={ReactDOMServer.renderToString(
+						<TooltipTable {...props} />
+					)}
+					data-tooltip-delay="0"
 				>
-					<span
-						className="tooltip-provider"
-						title={Liferay.Language.get('price-summary')}
-					>
-						<ClayIcon symbol="info-circle" />
-					</span>
-				</ClayTooltipProvider>
+					<ClayIcon symbol="info-circle" />
+				</span>
 			)}
 		</>
 	);

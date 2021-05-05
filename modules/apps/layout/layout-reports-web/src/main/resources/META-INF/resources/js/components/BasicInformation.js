@@ -13,7 +13,6 @@
  */
 
 import ClayLayout from '@clayui/layout';
-import {ClayTooltipProvider} from '@clayui/tooltip';
 import PropTypes from 'prop-types';
 import React, {useState} from 'react';
 
@@ -54,30 +53,26 @@ export default function BasicInformation({canonicalURLs, defaultLanguageId}) {
 			</ClayLayout.ContentCol>
 			<ClayLayout.ContentCol expand>
 				<ClayLayout.ContentRow>
-					<ClayTooltipProvider>
-						<span className="font-weight-semi-bold text-truncate-inline">
-							<span
-								className="text-truncate"
-								data-tooltip-align="bottom"
-								title={selectedCanonicalURL.title}
-							>
-								{selectedCanonicalURL.title}
-							</span>
+					<span className="font-weight-semi-bold text-truncate-inline">
+						<span
+							className="text-truncate"
+							data-tooltip-align="bottom"
+							title={selectedCanonicalURL.title}
+						>
+							{selectedCanonicalURL.title}
 						</span>
-					</ClayTooltipProvider>
+					</span>
 				</ClayLayout.ContentRow>
 				<ClayLayout.ContentRow>
-					<ClayTooltipProvider>
-						<span
-							className="text-truncate text-truncate-reverse"
-							data-tooltip-align="bottom"
-							title={selectedCanonicalURL.canonicalURL}
-						>
-							<bdi className="text-secondary">
-								{selectedCanonicalURL.canonicalURL}
-							</bdi>
-						</span>
-					</ClayTooltipProvider>
+					<span
+						className="text-truncate text-truncate-reverse"
+						data-tooltip-align="bottom"
+						title={selectedCanonicalURL.canonicalURL}
+					>
+						<bdi className="text-secondary">
+							{selectedCanonicalURL.canonicalURL}
+						</bdi>
+					</span>
 				</ClayLayout.ContentRow>
 			</ClayLayout.ContentCol>
 		</ClayLayout.ContentRow>

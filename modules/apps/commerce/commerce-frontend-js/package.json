@@ -20,11 +20,11 @@
 		"@clayui/shared": "3.5.1",
 		"@clayui/sticker": "3.3.0",
 		"@clayui/table": "3.1.0",
-		"@clayui/tooltip": "3.4.5",
 		"@liferay/frontend-js-react-web": "*",
 		"classnames": "2.2.6",
 		"frontend-js-web": "*",
-		"prop-types": "15.7.2"
+		"prop-types": "15.7.2",
+		"react-dom": "16.12.0"
 	},
 	"devDependencies": {
 		"clay-css": "^2.16.2",

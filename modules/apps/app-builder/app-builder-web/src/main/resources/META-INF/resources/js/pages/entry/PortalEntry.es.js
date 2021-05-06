@@ -15,7 +15,7 @@
 import {getItem} from 'data-engine-js-components-web/js/utils/client.es';
 import {TranslationManager} from 'data-engine-taglib';
 import React, {useContext, useEffect, useState} from 'react';
-import {createPortal} from 'react-dom';
+import {ReactPortal} from '@liferay/frontend-js-react-web';
 
 import {AppContext} from '../../AppContext.es';
 import usePermissions from '../../hooks/usePermissions.es';
@@ -139,27 +139,26 @@ const TranslationManagerPortal = ({
 
 	return (
 		<div>
-			{showAppName &&
-				standaloneNameContainer &&
-				createPortal(
-					getLocalizedUserPreferenceValue(
+			{showAppName && standaloneNameContainer && (
+				<ReactPortal container={standaloneNameContainer}>
+					{getLocalizedUserPreferenceValue(
 						app.name,
 						userLanguageId,
 						defaultLanguageId
-					),
-					standaloneNameContainer
-				)}
+					)}
+				</ReactPortal>
+			)}
 
-			{translationManagerContainer &&
-				createPortal(
+			{translationManagerContainer && (
+				<ReactPortal container={translationManagerContainer}>
 					<TranslationManager
 						availableLanguageIds={availableLanguageIds}
 						editingLanguageId={getEditingLanguageId()}
 						onEditingLanguageIdChange={onEditingLanguageIdChange}
 						showUserView
-					/>,
-					translationManagerContainer
-				)}
+					/>
+				</ReactPortal>
+			)}
 		</div>
 	);
 };
@@ -179,9 +178,8 @@ export default (props) => {
 
 	return (
 		<>
-			{appPersonalContainer &&
-				themeDisplay.isSignedIn() &&
-				createPortal(
+			{appPersonalContainer && themeDisplay.isSignedIn() && (
+				<ReactPortal container={appPersonalContainer}>
 					<PersonalMenu
 						items={[
 							{
@@ -199,9 +197,9 @@ export default (props) => {
 							},
 						]}
 						portraitURL={portraitURL}
-					/>,
-					appPersonalContainer
-				)}
+					/>
+				</ReactPortal>
+			)}
 			<TranslationManagerPortal appId={appId} {...props} />
 		</>
 	);

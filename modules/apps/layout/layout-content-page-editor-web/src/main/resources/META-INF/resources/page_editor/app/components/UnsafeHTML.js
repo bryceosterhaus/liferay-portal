@@ -14,7 +14,6 @@
 
 import PropTypes from 'prop-types';
 import React from 'react';
-import ReactDOM from 'react-dom';
 
 import RawDOM from '../../common/components/RawDOM';
 
@@ -152,9 +151,11 @@ export default class UnsafeHTML extends React.PureComponent {
 					elementRef={this._updateRef}
 				/>
 
-				{this.state.portals.map(({Component, element}) =>
-					ReactDOM.createPortal(<Component />, element)
-				)}
+				{this.state.portals.map(({Component, element}) => (
+					<ReactPortal container={element}>
+						<Component />
+					</ReactPortal>
+				))}
 			</>
 		);
 	}

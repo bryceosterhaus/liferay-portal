@@ -15,9 +15,8 @@
 import {ClayButtonWithIcon, default as ClayButton} from '@clayui/button';
 import ClayLayout from '@clayui/layout';
 import {useModal} from '@clayui/modal';
-import {useIsMounted} from '@liferay/frontend-js-react-web';
+import {useIsMounted, ReactPortal} from '@liferay/frontend-js-react-web';
 import React, {useEffect, useState} from 'react';
-import ReactDOM from 'react-dom';
 
 import useLazy from '../../core/hooks/useLazy';
 import useLoad from '../../core/hooks/useLoad';
@@ -374,5 +373,9 @@ export default function Toolbar() {
 		}
 	}
 
-	return ReactDOM.createPortal(<ToolbarBody />, container);
+	return (
+		<ReactPortal container={container}>
+			<ToolbarBody />
+		</ReactPortal>
+	);
 }

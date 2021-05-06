@@ -10,7 +10,6 @@
  */
 
 import React, {useEffect, useMemo} from 'react';
-import ReactDOM from 'react-dom';
 
 const Portal = ({
 	children,
@@ -53,7 +52,7 @@ const Portal = ({
 		return null;
 	}
 
-	return <>{ReactDOM.createPortal(children, portalElement)}</>;
+	return <ReactPortal container={portalElement}>children</ReactPortal>;
 };
 
 export default Portal;

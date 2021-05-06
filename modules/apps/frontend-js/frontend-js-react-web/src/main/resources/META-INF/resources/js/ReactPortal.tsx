@@ -20,16 +20,16 @@ const ReactPortal: React.FunctionComponent<
 	React.HTMLAttributes<HTMLDivElement> & {
 
 		/**
-		 * Ref of element to render portal into.
+		 * Element to render portal into.
 		 */
-		containerRef?: React.RefObject<Element>;
+		container?: Element;
 
 		/**
 		 * Ref of element to render nested portals into.
 		 */
 		subPortalRef?: React.RefObject<Element>;
 	}
-> = ({children, containerRef, subPortalRef}) => {
+> = ({children, container, subPortalRef}) => {
 	const parentPortalRef = React.useContext(ReactPortalContext);
 	const portalRef = React.useRef(
 		typeof document !== 'undefined' ? rootPortalElement : null
@@ -41,10 +41,7 @@ const ReactPortal: React.FunctionComponent<
 				? parentPortalRef.current
 				: document.body;
 
-		const elToMountTo =
-			containerRef && containerRef.current
-				? containerRef.current
-				: closestParent;
+		const elToMountTo = container || closestParent;
 
 		if (elToMountTo && portalRef.current) {
 			elToMountTo.appendChild(portalRef.current);
@@ -60,7 +57,7 @@ const ReactPortal: React.FunctionComponent<
 				}
 			}
 		};
-	}, [containerRef, parentPortalRef]);
+	}, [container, parentPortalRef]);
 
 	const content = (
 		<ReactPortalContext.Provider

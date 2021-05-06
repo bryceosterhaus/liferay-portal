@@ -15,7 +15,7 @@
 import ClayIcon from '@clayui/icon';
 import classNames from 'classnames';
 import React, {useContext, useEffect, useState} from 'react';
-import {createPortal} from 'react-dom';
+import {ReactPortal} from '@liferay/frontend-js-react-web';
 import {Link as InternalLink, withRouter} from 'react-router-dom';
 
 import {AppContext} from '../../AppContext.es';
@@ -47,19 +47,20 @@ const BackButton = ({backURL}) => {
 		return <></>;
 	}
 
-	return createPortal(
-		<li className="control-menu-nav-item">
-			<Link
-				className="control-menu-icon lfr-icon-item"
-				tabIndex={1}
-				to={backURL}
-			>
-				<span className="icon-monospaced">
-					<ClayIcon symbol="angle-left" />
-				</span>
-			</Link>
-		</li>,
-		backButtonContainer
+	return (
+		<ReactPortal container={backButtonContainer}>
+			<li className="control-menu-nav-item">
+				<Link
+					className="control-menu-icon lfr-icon-item"
+					tabIndex={1}
+					to={backURL}
+				>
+					<span className="icon-monospaced">
+						<ClayIcon symbol="angle-left" />
+					</span>
+				</Link>
+			</li>
+		</ReactPortal>
 	);
 };
 
@@ -135,7 +136,9 @@ export const InlineControlMenu = ({backURL, title, url}) => {
 	);
 
 	return controlMenuContainer ? (
-		createPortal(<ControlMenu />, controlMenuContainer)
+		<ReactPortal container={controlMenuContainer}>
+			<ControlMenu />
+		</ReactPortal>
 	) : (
 		<ControlMenu />
 	);

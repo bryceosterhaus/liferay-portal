@@ -10,7 +10,7 @@
  */
 
 import ClayButton, {ClayButtonWithIcon} from '@clayui/button';
-import {useTimeout} from '@liferay/frontend-js-react-web';
+import {useTimeout, ReactPortal} from '@liferay/frontend-js-react-web';
 import {AppContext} from 'app-builder-web/js/AppContext.es';
 import {ControlMenuBase} from 'app-builder-web/js/components/control-menu/ControlMenu.es';
 import useDataDefinition from 'app-builder-web/js/hooks/useDataDefinition.es';
@@ -29,7 +29,6 @@ import React, {
 	useMemo,
 	useState,
 } from 'react';
-import {createPortal} from 'react-dom';
 
 import WorkflowInfoBar from '../../components/workflow-info-bar/WorkflowInfoBar.es';
 import useAppWorkflow from '../../hooks/useAppWorkflow.es';
@@ -63,7 +62,7 @@ const WorkflowInfoPortal = ({children}) => {
 
 	portalContainer.insertBefore(portalElement, targetElement);
 
-	return createPortal(children, portalElement);
+	return <ReactPortal container={portalElement}>{children}</ReactPortal>;
 };
 
 export default function EditEntry({

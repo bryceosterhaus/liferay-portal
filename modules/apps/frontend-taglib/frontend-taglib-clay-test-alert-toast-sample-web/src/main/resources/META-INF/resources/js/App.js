@@ -14,24 +14,11 @@
 
 import ClayCard from '@clayui/card';
 import ClayForm, {ClayInput} from '@clayui/form';
-import {State} from '@liferay/frontend-js-state-web';
 import {useLiferayState} from '@liferay/frontend-js-react-web';
 import React from 'react';
+import {userAtom, userSelector} from './atoms';
 
 import '../css/main.scss';
-
-// Shared state (atoms and selectors); normally these would be in a separate
-// file.
-
-const userAtom = State.atom('clay-sample-atom', {
-	name: Liferay.ThemeDisplay.getUserName(),
-});
-
-const userSelector = State.selector('clay-sample-selector', (get) => {
-	const user = get(userAtom);
-
-	return `${user.name} (${user.name.length})`;
-});
 
 // Components that access that shared state:
 

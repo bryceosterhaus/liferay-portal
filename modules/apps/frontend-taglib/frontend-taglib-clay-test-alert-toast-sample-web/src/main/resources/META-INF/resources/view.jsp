@@ -32,7 +32,7 @@
 
 		<h3>Name: <span id="test-name">Initial Name</span></h3>
 
-		<aui:script require="@liferay/frontend-js-state-web@1.0.3/index as StateModule">
+		<aui:script require="@liferay/frontend-js-state-web@1.0.3/index as StateModule, frontend-taglib-clay-test-alert-toast-sample-web@1.0.0/js/atoms as Atoms">
 			const buttonElement = document.getElementById('test-button');
 			const counterElement = document.getElementById('test-counter');
 			const nameElement = document.getElementById('test-name');
@@ -45,7 +45,7 @@
 				counterElement.innerText = newVal;
 			});
 
-			State.subscribe('clay-sample-atom', function(event) {
+			State.subscribe(Atoms.userAtom, function(event) {
 				nameElement.innerText = event.name;
 			});
 

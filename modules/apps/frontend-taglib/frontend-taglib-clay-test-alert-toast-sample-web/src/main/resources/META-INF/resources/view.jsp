@@ -30,9 +30,12 @@
 
 		<h3>Counter<span id="test-counter">0</span></h3>
 
+		<h3>Name: <span id="test-name">Initial Name</span></h3>
+
 		<aui:script require="@liferay/frontend-js-state-web@1.0.3/index as StateModule">
 			const buttonElement = document.getElementById('test-button');
 			const counterElement = document.getElementById('test-counter');
+			const nameElement = document.getElementById('test-name');
 
 			const State = StateModule.State;
 
@@ -40,6 +43,10 @@
 
 			State.subscribe(counterAtom, function(newVal) {
 				counterElement.innerText = newVal;
+			});
+
+			State.subscribe('clay-sample-atom', function(event) {
+				nameElement.innerText = event.name;
 			});
 
 			buttonElement.addEventListener('click', function() {

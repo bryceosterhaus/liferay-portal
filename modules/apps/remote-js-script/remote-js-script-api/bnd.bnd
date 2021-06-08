@@ -1,0 +1,8 @@
+Bundle-Name: Liferay Remote JS Script API
+Bundle-SymbolicName: com.liferay.remote.js.script.api
+Bundle-Version: 2.1.1
+Export-Package:\
+	com.liferay.remote.js.script.exception,\
+	com.liferay.remote.js.script.model,\
+	com.liferay.remote.js.script.service,\
+	com.liferay.remote.js.script.service.persistence

@@ -8,5 +8,6 @@ create table RemoteJsScriptEntry (
 	createDate DATE null,
 	modifiedDate DATE null,
 	name STRING null,
-	url VARCHAR(75) null
+	url VARCHAR(75) null,
+	customElementName STRING null
 );

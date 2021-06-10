@@ -36,12 +36,12 @@ public class RemoteJsScriptEntryLocalServiceWrapper
 	@Override
 	public com.liferay.remote.js.script.model.RemoteJsScriptEntry addRemoteJsScriptEntry(
 			long userId, java.util.Map<java.util.Locale, String> nameMap,
-			String url,
+			String url, String customElementName,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _remoteJsScriptEntryLocalService.addRemoteJsScriptEntry(
-			userId, nameMap, url, serviceContext);
+			userId, nameMap, url, customElementName, serviceContext);
 	}
 
 	/**

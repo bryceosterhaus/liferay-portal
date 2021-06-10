@@ -54,6 +54,8 @@ public class RemoteJsScriptEntryTable extends BaseTable<RemoteJsScriptEntryTable
 		"name", String.class, Types.VARCHAR, Column.FLAG_DEFAULT);
 	public final Column<RemoteJsScriptEntryTable, String> url = createColumn(
 		"url", String.class, Types.VARCHAR, Column.FLAG_DEFAULT);
+	public final Column<RemoteJsScriptEntryTable, String> customElementName = createColumn(
+		"customElementName", String.class, Types.VARCHAR, Column.FLAG_DEFAULT);
 
 	private RemoteJsScriptEntryTable() {
 		super("RemoteJsScriptEntry", RemoteJsScriptEntryTable::new);

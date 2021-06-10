@@ -99,6 +99,8 @@ public class RemoteJsScriptEntryCacheModel
 		sb.append(name);
 		sb.append(", url=");
 		sb.append(url);
+		sb.append(", customElementName=");
+		sb.append(customElementName);
 		sb.append("}");
 
 		return sb.toString();
@@ -156,6 +158,13 @@ public class RemoteJsScriptEntryCacheModel
 			remoteJsScriptEntryImpl.setUrl(url);
 		}
 
+		if (customElementName == null) {
+			remoteJsScriptEntryImpl.setCustomElementName("");
+		}
+		else {
+			remoteJsScriptEntryImpl.setCustomElementName(customElementName);
+		}
+
 		remoteJsScriptEntryImpl.resetOriginalValues();
 
 		return remoteJsScriptEntryImpl;
@@ -176,6 +185,7 @@ public class RemoteJsScriptEntryCacheModel
 		modifiedDate = objectInput.readLong();
 		name = objectInput.readUTF();
 		url = objectInput.readUTF();
+		customElementName = objectInput.readUTF();
 	}
 
 	@Override
@@ -218,6 +228,13 @@ public class RemoteJsScriptEntryCacheModel
 		else {
 			objectOutput.writeUTF(url);
 		}
+
+		if (customElementName == null) {
+			objectOutput.writeUTF("");
+		}
+		else {
+			objectOutput.writeUTF(customElementName);
+		}
 	}
 
 	public long mvccVersion;
@@ -230,5 +247,6 @@ public class RemoteJsScriptEntryCacheModel
 	public long modifiedDate;
 	public String name;
 	public String url;
+	public String customElementName;
 
 }

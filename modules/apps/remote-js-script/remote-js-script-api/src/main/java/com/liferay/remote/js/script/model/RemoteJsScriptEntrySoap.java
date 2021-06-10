@@ -43,6 +43,7 @@ public class RemoteJsScriptEntrySoap implements Serializable {
 		soapModel.setModifiedDate(model.getModifiedDate());
 		soapModel.setName(model.getName());
 		soapModel.setUrl(model.getUrl());
+		soapModel.setCustomElementName(model.getCustomElementName());
 
 		return soapModel;
 	}
@@ -181,6 +182,14 @@ public class RemoteJsScriptEntrySoap implements Serializable {
 		_url = url;
 	}
 
+	public String getCustomElementName() {
+		return _customElementName;
+	}
+
+	public void setCustomElementName(String customElementName) {
+		_customElementName = customElementName;
+	}
+
 	private long _mvccVersion;
 	private String _uuid;
 	private long _remoteJsScriptEntryId;
@@ -191,5 +200,6 @@ public class RemoteJsScriptEntrySoap implements Serializable {
 	private Date _modifiedDate;
 	private String _name;
 	private String _url;
+	private String _customElementName;
 
 }

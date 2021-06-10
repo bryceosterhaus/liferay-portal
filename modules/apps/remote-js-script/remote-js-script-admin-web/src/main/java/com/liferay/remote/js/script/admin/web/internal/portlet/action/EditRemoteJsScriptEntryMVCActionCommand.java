@@ -65,6 +65,7 @@ public class EditRemoteJsScriptEntryMVCActionCommand extends BaseMVCActionComman
 		Map<Locale, String> nameMap = LocalizationUtil.getLocalizationMap(
 			actionRequest, "name");
 		String url = ParamUtil.getString(actionRequest, "url");
+		String customElementName = ParamUtil.getString(actionRequest, "customElementName");
 
 		ServiceContext serviceContext = ServiceContextFactory.getInstance(
 			RemoteJsScriptEntry.class.getName(), actionRequest);
@@ -73,7 +74,7 @@ public class EditRemoteJsScriptEntryMVCActionCommand extends BaseMVCActionComman
 			if (cmd.equals(Constants.ADD)) {
 				RemoteJsScriptEntry remoteJsScriptEntry =
 					_remoteJsScriptEntryLocalService.addRemoteJsScriptEntry(
-						serviceContext.getUserId(), nameMap, url,
+						serviceContext.getUserId(), nameMap, url, customElementName,
 						serviceContext);
 
 				_remoteJsScriptPortletRegistrar.registerPortlet(remoteJsScriptEntry);

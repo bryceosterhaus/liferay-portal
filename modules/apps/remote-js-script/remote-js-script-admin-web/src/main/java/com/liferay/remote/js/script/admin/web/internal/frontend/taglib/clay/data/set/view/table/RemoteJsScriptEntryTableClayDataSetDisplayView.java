@@ -44,6 +44,7 @@ public class RemoteJsScriptEntryTableClayDataSetDisplayView
 		_addClayTableSchemaField(
 			clayTableSchemaBuilder, "name", "name", "actionLink");
 		_addClayTableSchemaField(clayTableSchemaBuilder, "url", "url");
+		_addClayTableSchemaField(clayTableSchemaBuilder, "customElementName", "custom-element-name");
 
 		return clayTableSchemaBuilder.build();
 	}

@@ -18,6 +18,8 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 import com.liferay.portal.kernel.resource.bundle.ResourceBundleLoader;
+import com.liferay.portal.kernel.servlet.taglib.BaseDynamicInclude;
+import com.liferay.portal.kernel.servlet.taglib.DynamicInclude;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.remote.js.script.model.RemoteJsScriptEntry;
 
@@ -35,12 +37,14 @@ import java.util.ResourceBundle;
 import javax.portlet.Portlet;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 
 /**
- * @author Iván Zaera Avellón
+ * @author Bryce Osterhaus
  */
 public class RemoteJsScriptPortlet extends MVCPortlet {
 
@@ -57,36 +61,67 @@ public class RemoteJsScriptPortlet extends MVCPortlet {
 	}
 
 	public synchronized void register(BundleContext bundleContext) {
-		if (_serviceRegistration != null) {
-			throw new IllegalStateException("Portlet is already registered");
+		String customElementName = _remoteJsScriptEntry.getCustomElementName();
+
+		if (customElementName != null) {
+			if (_dynamicIncludeServiceRegistration != null) {
+				throw new IllegalStateException("DynamicInclude is already registered");
+			}
+
+			_dynamicIncludeServiceRegistration = bundleContext.registerService(
+				DynamicInclude.class,
+				new DynamicInclude() {
+					@Override
+					public void include(
+						HttpServletRequest httpServletRequest,
+						HttpServletResponse httpServletResponse, String key)
+						throws IOException {
+						PrintWriter printWriter = httpServletResponse.getWriter();
+
+						printWriter.println(
+							"<script data-senna-track=\"permanent\" src=\"" + _getJsUrl() + "\" type=\"text/javascript\"></script>");
+					}
+
+					@Override
+					public void register(
+						DynamicIncludeRegistry dynamicIncludeRegistry) {
+						dynamicIncludeRegistry.register("/html/common/themes/top_head.jsp#pre");
+					}
+				},
+				new Hashtable<>()
+			);
 		}
+		else {
+			if (_portletServiceRegistration != null) {
+				throw new IllegalStateException("Portlet is already registered");
+			}
+			Dictionary<String, Object> properties = new Hashtable<>();
 
-		Dictionary<String, Object> properties = new Hashtable<>();
+			properties.put(
+				"com.liferay.portlet.css-class-wrapper", "portlet-remote-js-script");
+			properties.put(
+				"com.liferay.portlet.display-category", "category.sample");
+			properties.put(
+				"com.liferay.portlet.header-portlet-css", "/display/css/main.css");
+			properties.put("com.liferay.portlet.instanceable", true);
+			properties.put("javax.portlet.name", _getPortletName());
+			properties.put("javax.portlet.security-role-ref", "power-user,user");
+			properties.put(
+				"javax.portlet.resource-bundle", _getResourceBundleName());
 
-		properties.put(
-			"com.liferay.portlet.css-class-wrapper", "portlet-remote-js-script");
-		properties.put(
-			"com.liferay.portlet.display-category", "category.sample");
-		properties.put(
-			"com.liferay.portlet.header-portlet-css", "/display/css/main.css");
-		properties.put("com.liferay.portlet.instanceable", true);
-		properties.put("javax.portlet.name", _getPortletName());
-		properties.put("javax.portlet.security-role-ref", "power-user,user");
-		properties.put(
-			"javax.portlet.resource-bundle", _getResourceBundleName());
+			_portletServiceRegistration = bundleContext.registerService(
+				Portlet.class, this, properties);
 
-		_serviceRegistration = bundleContext.registerService(
-			Portlet.class, this, properties);
+			properties = new Hashtable<>();
 
-		properties = new Hashtable<>();
+			properties.put("resource.bundle.base.name", _getResourceBundleName());
+			properties.put("servlet.context.name", "remote-js-script-admin-web");
 
-		properties.put("resource.bundle.base.name", _getResourceBundleName());
-		properties.put("servlet.context.name", "remote-js-script-admin-web");
-
-		_resourceBundleLoaderServiceRegistration =
-			bundleContext.registerService(
-				ResourceBundleLoader.class,
-				locale -> _getResourceBundle(locale), properties);
+			_resourceBundleLoaderServiceRegistration =
+				bundleContext.registerService(
+					ResourceBundleLoader.class,
+					locale -> _getResourceBundle(locale), properties);
+		}
 	}
 
 	@Override
@@ -96,8 +131,10 @@ public class RemoteJsScriptPortlet extends MVCPortlet {
 		try {
 			PrintWriter printWriter = renderResponse.getWriter();
 
+			String customElementName = _remoteJsScriptEntry.getCustomElementName();
 			printWriter.print(
-				"<iframe src=\"" + _remoteJsScriptEntry.getUrl() + "\"></iframe>");
+				"<" + customElementName + "></"+ customElementName + ">"
+			);
 
 			printWriter.flush();
 		}
@@ -107,15 +144,24 @@ public class RemoteJsScriptPortlet extends MVCPortlet {
 	}
 
 	public synchronized void unregister() {
-		if (_serviceRegistration == null) {
-			throw new IllegalStateException("Portlet is not registered");
+		if (_portletServiceRegistration != null) {
+			_portletServiceRegistration.unregister();
+			_portletServiceRegistration = null;
 		}
 
-		_resourceBundleLoaderServiceRegistration.unregister();
-		_serviceRegistration.unregister();
+		if (_dynamicIncludeServiceRegistration != null) {
+			_dynamicIncludeServiceRegistration.unregister();
+			_dynamicIncludeServiceRegistration = null;
+		}
 
-		_resourceBundleLoaderServiceRegistration = null;
-		_serviceRegistration = null;
+		if (_resourceBundleLoaderServiceRegistration != null) {
+			_resourceBundleLoaderServiceRegistration.unregister();
+			_resourceBundleLoaderServiceRegistration = null;
+		}
+	}
+
+	private String _getJsUrl() {
+		return _remoteJsScriptEntry.getUrl();
 	}
 
 	private String _getPortletName() {
@@ -153,6 +199,6 @@ public class RemoteJsScriptPortlet extends MVCPortlet {
 	private final RemoteJsScriptEntry _remoteJsScriptEntry;
 	private ServiceRegistration<ResourceBundleLoader>
 		_resourceBundleLoaderServiceRegistration;
-	private ServiceRegistration<Portlet> _serviceRegistration;
-
+	private ServiceRegistration<Portlet> _portletServiceRegistration;
+	private ServiceRegistration<DynamicInclude> _dynamicIncludeServiceRegistration;
 }

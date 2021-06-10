@@ -53,6 +53,7 @@ public class RemoteJsScriptEntryWrapper
 		attributes.put("modifiedDate", getModifiedDate());
 		attributes.put("name", getName());
 		attributes.put("url", getUrl());
+		attributes.put("customElementName", getCustomElementName());
 
 		return attributes;
 	}
@@ -117,6 +118,12 @@ public class RemoteJsScriptEntryWrapper
 
 		if (url != null) {
 			setUrl(url);
+		}
+
+		String customElementName = (String)attributes.get("customElementName");
+
+		if (customElementName != null) {
+			setCustomElementName(customElementName);
 		}
 	}
 
@@ -304,6 +311,16 @@ public class RemoteJsScriptEntryWrapper
 	@Override
 	public String getUrl() {
 		return model.getUrl();
+	}
+
+	/**
+	 * Returns the customElementName of this remote js script entry.
+	 *
+	 * @return the customElementName of this remote js script entry
+	 */
+	@Override
+	public String getCustomElementName() {
+		return model.getCustomElementName();
 	}
 
 	/**
@@ -517,6 +534,16 @@ public class RemoteJsScriptEntryWrapper
 	@Override
 	public void setUrl(String url) {
 		model.setUrl(url);
+	}
+
+	/**
+	 * Sets the customElementName of this remote js script entry.
+	 *
+	 * @param customElementName the customElementName of this remote js script entry
+	 */
+	@Override
+	public void setCustomElementName(String customElementName) {
+		model.setCustomElementName(customElementName);
 	}
 
 	/**

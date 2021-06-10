@@ -82,7 +82,7 @@ public class RemoteJsScriptEntryModelImpl
 		{"remoteJsScriptEntryId", Types.BIGINT}, {"companyId", Types.BIGINT},
 		{"userId", Types.BIGINT}, {"userName", Types.VARCHAR},
 		{"createDate", Types.TIMESTAMP}, {"modifiedDate", Types.TIMESTAMP},
-		{"name", Types.VARCHAR}, {"url", Types.VARCHAR}
+		{"name", Types.VARCHAR}, {"url", Types.VARCHAR}, {"customElementName", Types.VARCHAR}
 	};
 
 	public static final Map<String, Integer> TABLE_COLUMNS_MAP =
@@ -99,10 +99,11 @@ public class RemoteJsScriptEntryModelImpl
 		TABLE_COLUMNS_MAP.put("modifiedDate", Types.TIMESTAMP);
 		TABLE_COLUMNS_MAP.put("name", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("url", Types.VARCHAR);
+		TABLE_COLUMNS_MAP.put("customElementName", Types.VARCHAR);
 	}
 
 	public static final String TABLE_SQL_CREATE =
-		"create table RemoteJsScriptEntry (mvccVersion LONG default 0 not null,uuid_ VARCHAR(75) null,remoteJsScriptEntryId LONG not null primary key,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,name STRING null,url VARCHAR(75) null)";
+		"create table RemoteJsScriptEntry (mvccVersion LONG default 0 not null,uuid_ VARCHAR(75) null,remoteJsScriptEntryId LONG not null primary key,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,name STRING null,url VARCHAR(75) null, customElementName STRING null)";
 
 	public static final String TABLE_SQL_DROP = "drop table RemoteJsScriptEntry";
 
@@ -325,6 +326,9 @@ public class RemoteJsScriptEntryModelImpl
 		attributeGetterFunctions.put("url", RemoteJsScriptEntry::getUrl);
 		attributeSetterBiConsumers.put(
 			"url", (BiConsumer<RemoteJsScriptEntry, String>)RemoteJsScriptEntry::setUrl);
+		attributeGetterFunctions.put("customElementName", RemoteJsScriptEntry::getCustomElementName);
+		attributeSetterBiConsumers.put(
+			"customElementName", (BiConsumer<RemoteJsScriptEntry, String>)RemoteJsScriptEntry::setCustomElementName);
 
 		_attributeGetterFunctions = Collections.unmodifiableMap(
 			attributeGetterFunctions);
@@ -620,6 +624,25 @@ public class RemoteJsScriptEntryModelImpl
 		_url = url;
 	}
 
+	@Override
+	public String getCustomElementName() {
+		if (_customElementName == null) {
+			return "";
+		}
+		else {
+			return _customElementName;
+		}
+	}
+
+	@Override
+	public void setCustomElementName(String customElementName) {
+		if (_columnOriginalValues == Collections.EMPTY_MAP) {
+			_setColumnOriginalValues();
+		}
+
+		_customElementName = customElementName;
+	}
+
 	/**
 	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
 	 *             #getColumnOriginalValue(String)}
@@ -791,6 +814,7 @@ public class RemoteJsScriptEntryModelImpl
 		remoteJsScriptEntryImpl.setModifiedDate(getModifiedDate());
 		remoteJsScriptEntryImpl.setName(getName());
 		remoteJsScriptEntryImpl.setUrl(getUrl());
+		remoteJsScriptEntryImpl.setCustomElementName(getCustomElementName());
 
 		remoteJsScriptEntryImpl.resetOriginalValues();
 
@@ -927,6 +951,14 @@ public class RemoteJsScriptEntryModelImpl
 			remoteJsScriptEntryCacheModel.url = null;
 		}
 
+		remoteJsScriptEntryCacheModel.customElementName = getCustomElementName();
+
+		String customElementName = remoteJsScriptEntryCacheModel.customElementName;
+
+		if ((customElementName != null) && (customElementName.length() == 0)) {
+			remoteJsScriptEntryCacheModel.customElementName = null;
+		}
+
 		return remoteJsScriptEntryCacheModel;
 	}
 
@@ -1012,6 +1044,7 @@ public class RemoteJsScriptEntryModelImpl
 	private String _name;
 	private String _nameCurrentLanguageId;
 	private String _url;
+	private String _customElementName;
 
 	public <T> T getColumnValue(String columnName) {
 		columnName = _attributeNames.getOrDefault(columnName, columnName);
@@ -1052,6 +1085,7 @@ public class RemoteJsScriptEntryModelImpl
 		_columnOriginalValues.put("modifiedDate", _modifiedDate);
 		_columnOriginalValues.put("name", _name);
 		_columnOriginalValues.put("url", _url);
+		_columnOriginalValues.put("customElementName", _customElementName);
 	}
 
 	private static final Map<String, String> _attributeNames;
@@ -1094,6 +1128,8 @@ public class RemoteJsScriptEntryModelImpl
 		columnBitmasks.put("name", 256L);
 
 		columnBitmasks.put("url", 512L);
+
+		columnBitmasks.put("customElementName", 256L);
 
 		_columnBitmasks = Collections.unmodifiableMap(columnBitmasks);
 	}

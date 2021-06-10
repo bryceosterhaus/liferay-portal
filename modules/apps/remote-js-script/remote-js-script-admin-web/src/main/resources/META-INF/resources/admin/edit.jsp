@@ -54,6 +54,10 @@ renderResponse.setTitle((remoteJsScriptEntry == null) ? LanguageUtil.get(request
 				<aui:input name="url">
 					<aui:validator name="url" />
 				</aui:input>
+
+				<aui:input name="customElementName">
+					<aui:validator name="customElementName" />
+				</aui:input>
 			</aui:fieldset>
 		</aui:fieldset-group>
 

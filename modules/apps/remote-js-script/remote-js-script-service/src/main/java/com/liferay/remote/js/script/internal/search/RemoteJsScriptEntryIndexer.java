@@ -63,6 +63,7 @@ public class RemoteJsScriptEntryIndexer extends BaseIndexer<RemoteJsScriptEntry>
 		addSearchTerm(searchQuery, searchContext, Field.ENTRY_CLASS_PK, false);
 		addSearchTerm(searchQuery, searchContext, Field.NAME, true);
 		addSearchTerm(searchQuery, searchContext, Field.URL, true);
+		addSearchTerm(searchQuery, searchContext, Field.URL, true);
 	}
 
 	@Override

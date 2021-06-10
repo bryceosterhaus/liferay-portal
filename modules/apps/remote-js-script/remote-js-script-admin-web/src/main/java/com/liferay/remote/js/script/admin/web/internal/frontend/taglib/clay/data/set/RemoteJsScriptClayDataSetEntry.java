@@ -42,6 +42,10 @@ public class RemoteJsScriptClayDataSetEntry {
 		return _remoteJsScriptEntry.getUrl();
 	}
 
+	public String getCustomElementName() {
+		return _remoteJsScriptEntry.getCustomElementName();
+	}
+
 	private final Locale _locale;
 	private final RemoteJsScriptEntry _remoteJsScriptEntry;
 

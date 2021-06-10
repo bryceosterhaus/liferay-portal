@@ -59,7 +59,7 @@ public class RemoteJsScriptEntryLocalServiceImpl
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
 	public RemoteJsScriptEntry addRemoteJsScriptEntry(
-			long userId, Map<Locale, String> nameMap, String url,
+			long userId, Map<Locale, String> nameMap, String url, String customElementName,
 			ServiceContext serviceContext)
 		throws PortalException {
 
@@ -80,6 +80,7 @@ public class RemoteJsScriptEntryLocalServiceImpl
 		remoteJsScriptEntry.setUserName(user.getFullName());
 		remoteJsScriptEntry.setNameMap(nameMap);
 		remoteJsScriptEntry.setUrl(url);
+		remoteJsScriptEntry.setCustomElementName(customElementName);
 
 		return remoteJsScriptEntryPersistence.update(remoteJsScriptEntry);
 	}

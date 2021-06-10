@@ -46,12 +46,12 @@ public class RemoteJsScriptEntryLocalServiceUtil {
 	 * Never modify this class directly. Add custom service methods to <code>com.liferay.remote.js.script.service.impl.RemoteJsScriptEntryLocalServiceImpl</code> and rerun ServiceBuilder to regenerate this class.
 	 */
 	public static RemoteJsScriptEntry addRemoteJsScriptEntry(
-			long userId, Map<java.util.Locale, String> nameMap, String url,
+			long userId, Map<java.util.Locale, String> nameMap, String url, String customElementName,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws PortalException {
 
 		return getService().addRemoteJsScriptEntry(
-			userId, nameMap, url, serviceContext);
+			userId, nameMap, url, customElementName, serviceContext);
 	}
 
 	/**

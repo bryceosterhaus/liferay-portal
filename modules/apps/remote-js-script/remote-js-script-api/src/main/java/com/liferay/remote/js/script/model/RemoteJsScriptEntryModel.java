@@ -324,6 +324,20 @@ public interface RemoteJsScriptEntryModel
 	public void setUrl(String url);
 
 	/**
+	 * Returns the custom element name of this remote js script entry.
+	 *
+	 * @return the custom element name of this remote js script entry
+	 */
+	public String getCustomElementName();
+
+	/**
+	 * Sets the custom element name of this remote js script entry.
+	 *
+	 * @param customElementName the custom element name of this remote js script entry
+	 */
+	public void setCustomElementName(String customElementName);
+
+	/**
 	 * Returns the container model ID of this remote js script entry.
 	 *
 	 * @return the container model ID of this remote js script entry

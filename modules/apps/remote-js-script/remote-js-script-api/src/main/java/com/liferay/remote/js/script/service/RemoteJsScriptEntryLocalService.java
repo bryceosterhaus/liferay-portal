@@ -69,7 +69,7 @@ public interface RemoteJsScriptEntryLocalService
 	 */
 	@Indexable(type = IndexableType.REINDEX)
 	public RemoteJsScriptEntry addRemoteJsScriptEntry(
-			long userId, Map<Locale, String> nameMap, String url,
+			long userId, Map<Locale, String> nameMap, String url, String customElementName,
 			ServiceContext serviceContext)
 		throws PortalException;
 

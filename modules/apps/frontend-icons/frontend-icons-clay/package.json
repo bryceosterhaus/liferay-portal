@@ -1,0 +1,12 @@
+{
+	"dependencies": {
+		"@clayui/css": "3.32.1"
+	},
+	"main": "images/icons.svg",
+	"name": "liferay-frontend-icons-clay",
+	"scripts": {
+		"checkFormat": "liferay-npm-scripts check",
+		"format": "liferay-npm-scripts fix"
+	},
+	"version": "1.0.0"
+}

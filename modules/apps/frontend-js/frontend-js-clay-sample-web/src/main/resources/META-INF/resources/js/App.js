@@ -12,20 +12,32 @@
  * details.
  */
 
-import ClayAlert from '@clayui/alert';
+import ClayIcon from '@clayui/icon';
 import React from 'react';
 
 import '../css/main.scss';
 
+/**
+ * Liferay.Icons
+ *
+ * This would be a util that maps to any available "icons" module available in DXP by a friendly name such as "Clay"
+ *
+ * Liferay.Icons.Clay => returns the publically available spitemap such as "/o/frontend-icons-clay/images/icons.svg"
+ * Liferay.Icons.Clay['add-cell'] => returns the publically available svg such as "/o/frontend-icons-clay/images/add-cell.svg"
+ */
+
 export default () => {
 	return (
 		<div>
-			<ClayAlert title="Info">
-				This widget is used to test out Clay components. Simply add
-				whatever JS you want to App.js and redeploy.
-			</ClayAlert>
+			<ClayIcon
+				spritemap={Liferay.Icons.Github} // This points to the github-icons module's "main" file that is served by the backend
+				symbol="octocat"
+			/>
 
-			<div className="clay-test-class">This is where your code goes.</div>
+			<ClayIcon
+				spritemap={Liferay.Icons.Clay} // This points to the frontend-icons-clay module's "main" file that is served by the backend
+				symbol="octocat"
+			/>
 		</div>
 	);
 };

@@ -17,7 +17,16 @@
 <%@ include file="/init.jsp" %>
 
 <div>
+	<svg>
+		<use href="#clay_user"></use>
+	</svg>
+
+	<svg>
+		<use href="#clay_add-cell"></use>
+	</svg>
+<div>
 	<react:component
 		module="js/App"
 	/>
+	</div>
 </div>

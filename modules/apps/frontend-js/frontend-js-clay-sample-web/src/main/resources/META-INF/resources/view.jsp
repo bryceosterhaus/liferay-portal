@@ -28,6 +28,10 @@
 	<svg>
 		<use href="#github_octocat"></use>
 	</svg>
+
+	<svg>
+		<use href="#sample_adidas"></use>
+	</svg>
 <div>
 	<react:component
 		module="js/App"

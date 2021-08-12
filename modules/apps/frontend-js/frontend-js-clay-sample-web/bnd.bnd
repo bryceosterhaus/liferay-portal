@@ -1,4 +1,6 @@
 Bundle-Name: Liferay Frontend JS Clay Sample Web
 Bundle-SymbolicName: com.liferay.frontend.js.clay.sample.web
 Bundle-Version: 2.0.5
+Liferay-Icons-Path: images
+Liferay-Icons-Namespace: sample
 Web-ContextPath: /frontend-js-clay-sample-web

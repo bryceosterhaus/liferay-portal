@@ -24,6 +24,10 @@
 	<svg>
 		<use href="#clay_add-cell"></use>
 	</svg>
+
+	<svg>
+		<use href="#github_octocat"></use>
+	</svg>
 <div>
 	<react:component
 		module="js/App"

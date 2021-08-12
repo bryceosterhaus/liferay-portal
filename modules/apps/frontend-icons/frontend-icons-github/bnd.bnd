@@ -1,0 +1,6 @@
+Bundle-Name: Github Icons
+Bundle-SymbolicName: com.liferay.frontend.icons.github
+Bundle-Version: 1.0.0
+Liferay-Icons-Path: images
+Liferay-Icons-Namespace: github
+Web-ContextPath: /frontend-icons-github

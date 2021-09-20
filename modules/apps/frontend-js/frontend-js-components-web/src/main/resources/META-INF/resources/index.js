@@ -12,6 +12,8 @@
  * details.
  */
 
+export {default as Autocomplete} from './autocomplete/Autocomplete';
+
 export {default as Treeview} from './treeview/Treeview';
 
 export {activeLanguageIdsAtom} from './translation_manager/state';

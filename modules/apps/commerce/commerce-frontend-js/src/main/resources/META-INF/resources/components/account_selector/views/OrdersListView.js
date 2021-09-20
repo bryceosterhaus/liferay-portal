@@ -14,7 +14,7 @@
 
 import ClayButton, {ClayButtonWithIcon} from '@clayui/button';
 import ClayDropDown from '@clayui/drop-down';
-import React, {useMemo, useRef} from 'react';
+import React, {useMemo} from 'react';
 
 import ServiceProvider from '../../../ServiceProvider/index';
 import {OPEN_MODAL} from '../../../utilities/eventsDefinitions';
@@ -39,8 +39,6 @@ function OrdersListView({
 		[]
 	);
 
-	const ordersListRef = useRef();
-
 	return (
 		<ClayDropDown.ItemList className="orders-list-container">
 			<ClayDropDown.Section className="item-list-head">
@@ -63,7 +61,6 @@ function OrdersListView({
 						currentAccount.id,
 						commerceChannelId
 					)}
-					contentWrapperRef={ordersListRef}
 					customView={({items, loading}) => {
 						if (!items || !items.length) {
 							return (
@@ -89,10 +86,6 @@ function OrdersListView({
 			</ClayDropDown.Section>
 
 			<ClayDropDown.Divider />
-
-			<li>
-				<div ref={ordersListRef} />
-			</li>
 
 			<ClayDropDown.Section>
 				<ClayButton

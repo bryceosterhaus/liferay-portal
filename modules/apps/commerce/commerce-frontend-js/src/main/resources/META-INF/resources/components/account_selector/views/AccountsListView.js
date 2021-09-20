@@ -14,7 +14,7 @@
 
 import {ClayButtonWithIcon} from '@clayui/button';
 import ClayDropDown from '@clayui/drop-down';
-import React, {useRef} from 'react';
+import React from 'react';
 
 import ServiceProvider from '../../../ServiceProvider/index';
 import Sticker from '../Sticker';
@@ -32,8 +32,6 @@ function AccountsListView({
 	disabled,
 	setCurrentView,
 }) {
-	const accountsListRef = useRef();
-
 	return (
 		<ClayDropDown.ItemList className="accounts-list-container">
 			<ClayDropDown.Section className="item-list-head">
@@ -57,7 +55,6 @@ function AccountsListView({
 			<ClayDropDown.Section>
 				<ListView
 					apiUrl={ACCOUNTS_RESOURCE_ENDPOINT}
-					contentWrapperRef={accountsListRef}
 					customView={({items, loading}) => {
 						if (!items || !items.length) {
 							return (
@@ -96,12 +93,6 @@ function AccountsListView({
 					placeholder={Liferay.Language.get('search')}
 				/>
 			</ClayDropDown.Section>
-
-			<ClayDropDown.Divider />
-
-			<li>
-				<div ref={accountsListRef} />
-			</li>
 		</ClayDropDown.ItemList>
 	);
 }

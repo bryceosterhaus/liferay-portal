@@ -68,11 +68,11 @@ public class ObjectRelationshipDDMFormFieldTemplateContextContributor
 			).put(
 				"inputName", ddmFormField.getName()
 			).put(
-				"itemsKey", "id"
-			).put(
-				"itemsLabel", "id"
+				"labelKey", "id"
 			).put(
 				"value", ddmFormFieldRenderingContext.getValue()
+			).put(
+				"valueKey", "id"
 			).build();
 		}
 		catch (PortalException portalException) {

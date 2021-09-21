@@ -14,6 +14,7 @@
 
 import ClayButton, {ClayButtonWithIcon} from '@clayui/button';
 import ClayDropDown from '@clayui/drop-down';
+import {ClayInput} from '@clayui/form';
 import React, {useMemo} from 'react';
 
 import ServiceProvider from '../../../ServiceProvider/index';
@@ -34,6 +35,8 @@ function OrdersListView({
 	setCurrentView,
 	showOrderTypeModal,
 }) {
+	const [inputValue, setInputValue] = React.useState('');
+
 	const CartResource = useMemo(
 		() => ServiceProvider.DeliveryCartAPI('v1'),
 		[]
@@ -55,7 +58,18 @@ function OrdersListView({
 
 			<ClayDropDown.Divider />
 
-			<ClayDropDown.Section className="item-list-body">
+			<ClayDropDown.Section>
+				<ClayInput
+					value={inputValue}
+					onChange={(event) => setInputValue(event.target.value)}
+					disabled={disabled}
+					placeholder={Liferay.Language.get('search-order')}
+				/>
+			</ClayDropDown.Section>
+
+			<ClayDropDown.Divider />
+
+			<li>
 				<ListView
 					apiUrl={CartResource.cartsByAccountIdAndChannelIdURL(
 						currentAccount.id,
@@ -81,9 +95,9 @@ function OrdersListView({
 						);
 					}}
 					disabled={disabled}
-					placeholder={Liferay.Language.get('search-order')}
+					query={inputValue}
 				/>
-			</ClayDropDown.Section>
+			</li>
 
 			<ClayDropDown.Divider />
 

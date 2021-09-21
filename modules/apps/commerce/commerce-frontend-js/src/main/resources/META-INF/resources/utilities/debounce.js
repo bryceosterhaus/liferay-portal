@@ -15,9 +15,8 @@
 export default function debounce(func, wait, immediate) {
 	let timeout;
 
-	return () => {
+	return (...args) => {
 		const context = this;
-		const args = arguments;
 
 		function later() {
 			timeout = null;

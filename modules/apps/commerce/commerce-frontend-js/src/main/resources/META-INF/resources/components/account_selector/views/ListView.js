@@ -12,22 +12,66 @@
  * details.
  */
 
-import React from 'react';
+import {useIsMounted} from '@liferay/frontend-js-react-web';
+import React, {useState, useEffect} from 'react';
 
-import Autocomplete from '../../autocomplete/Autocomplete';
+import debounce from '../../../utilities/debounce';
+import {getData} from '../../../utilities/index';
+import {showErrorNotification} from '../../../utilities/notifications';
+import InfiniteScroller from '../../infinite_scroller/InfiniteScroller';
 
-function ListView({apiUrl, customView, disabled, placeholder}) {
+function ListView({apiUrl, customView: CustomView, query, pageSize = 10}) {
+	const [items, setItems] = useState(null);
+	const [loading, setLoading] = useState(false);
+	const [totalCount, setTotalCount] = useState(null);
+	const [lastPage, setLastPage] = useState(null);
+	const [page, setPage] = useState(1);
+	const isMounted = useIsMounted();
+
+	const fetchData = debounce((queryVal) => {
+		if (queryVal && isMounted()) {
+			setLoading(true);
+
+			getData(apiUrl, queryVal, page, pageSize)
+				.then((jsonResponse) => {
+					setItems((prevItems) => {
+						if (prevItems?.length && page > 1) {
+							return [...prevItems, ...jsonResponse.items];
+						}
+
+						return jsonResponse.items;
+					});
+
+					setTotalCount(jsonResponse.totalCount);
+					setLastPage(jsonResponse.lastPage);
+					setLoading(false);
+				})
+				.catch(() => {
+					showErrorNotification();
+					setLoading(false);
+				});
+		}
+	}, 200);
+
+	useEffect(() => {
+		fetchData(query);
+	}, [query]);
+
 	return (
-		<Autocomplete
-			apiUrl={apiUrl}
-			customView={customView}
-			disabled={disabled}
-			inputName={placeholder}
-			inputPlaceholder={Liferay.Language.get(placeholder)}
-			labelKey="name"
-			pageSize={10}
-			valueKey="id"
-		/>
+		<InfiniteScroller
+			onBottomTouched={() => {
+				if (!loading) {
+					if (page !== lastPage) {
+						setPage((currentPage) => currentPage + 1);
+
+						fetchData(query);
+					}
+				}
+			}}
+			scrollCompleted={!items || items.length >= totalCount}
+		>
+			<CustomView items={items} loading={loading} />
+		</InfiniteScroller>
 	);
 }
 

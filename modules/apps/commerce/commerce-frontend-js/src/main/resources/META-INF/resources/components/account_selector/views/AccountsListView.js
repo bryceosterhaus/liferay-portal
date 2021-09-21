@@ -14,6 +14,7 @@
 
 import {ClayButtonWithIcon} from '@clayui/button';
 import ClayDropDown from '@clayui/drop-down';
+import {ClayInput} from '@clayui/form';
 import React from 'react';
 
 import ServiceProvider from '../../../ServiceProvider/index';
@@ -32,6 +33,8 @@ function AccountsListView({
 	disabled,
 	setCurrentView,
 }) {
+	const [inputValue, setInputValue] = React.useState('');
+
 	return (
 		<ClayDropDown.ItemList className="accounts-list-container">
 			<ClayDropDown.Section className="item-list-head">
@@ -53,6 +56,17 @@ function AccountsListView({
 			<ClayDropDown.Divider />
 
 			<ClayDropDown.Section>
+				<ClayInput
+					value={inputValue}
+					onChange={(event) => setInputValue(event.target.value)}
+					disabled={disabled}
+					placeholder={Liferay.Language.get('search')}
+				/>
+			</ClayDropDown.Section>
+
+			<ClayDropDown.Divider />
+
+			<li>
 				<ListView
 					apiUrl={ACCOUNTS_RESOURCE_ENDPOINT}
 					customView={({items, loading}) => {
@@ -90,9 +104,9 @@ function AccountsListView({
 						);
 					}}
 					disabled={disabled}
-					placeholder={Liferay.Language.get('search')}
+					query={inputValue}
 				/>
-			</ClayDropDown.Section>
+			</li>
 		</ClayDropDown.ItemList>
 	);
 }

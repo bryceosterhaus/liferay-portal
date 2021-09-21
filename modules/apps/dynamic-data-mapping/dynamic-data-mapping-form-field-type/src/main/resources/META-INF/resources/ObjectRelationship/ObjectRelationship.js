@@ -18,11 +18,11 @@ import {Autocomplete as BaseAutocomplete} from 'frontend-js-components-web';
 import {debounce, fetch} from 'frontend-js-web';
 import React, {useState} from 'react';
 
-function getData(apiUrl, query, page, pageSize) {
+function getData(apiUrl, inputValue, page, pageSize) {
 	const url = new URL(apiUrl, themeDisplay.getPortalURL());
 
-	if (query) {
-		url.searchParams.set('search', query);
+	if (inputValue) {
+		url.searchParams.set('search', inputValue);
 	}
 
 	if (page) {
@@ -53,14 +53,14 @@ export function ObjectRelationship({
 	valueKey,
 	...otherProps
 }) {
-	const [query, setQuery] = useState(initialLabel || '');
+	const [inputValue, setInputValue] = useState(initialLabel || '');
 	const [selectedItem, setSelectedItem] = useState(initialValue || value);
 	const [items, setItems] = useState(null);
 	const [loading, setLoading] = useState(false);
 	const isMounted = useIsMounted();
 
-	const fetchData = debounce(() => {
-		if (isMounted()) {
+	const fetchData = debounce((query) => {
+		if (query && isMounted()) {
 			setLoading(true);
 
 			getData(apiURL, query, 1, 10)
@@ -91,15 +91,15 @@ export function ObjectRelationship({
 		<FieldBase name={name} {...otherProps}>
 			<BaseAutocomplete
 				inputName={inputName}
-				inputValue={query}
+				inputValue={inputValue}
 				items={items}
 				labelKey={labelKey}
 				loading={loading}
 				name={name}
 				onInputChange={(val) => {
-					setQuery(val);
+					setInputValue(val);
 					setSelectedItem(null);
-					fetchData();
+					fetchData(val);
 				}}
 				onSelectedItemChange={setSelectedItem}
 				selectedItem={selectedItem}

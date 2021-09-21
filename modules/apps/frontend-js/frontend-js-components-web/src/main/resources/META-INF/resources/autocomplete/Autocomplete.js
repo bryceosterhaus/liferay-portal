@@ -109,13 +109,20 @@ function Autocomplete({
 						onChange={(event) => {
 							onSelectedItemChange(null);
 							onInputChange(event.target.value);
+							setActive(true);
 						}}
 						onFocus={() => {
-							setActive(true);
+							if (items?.length) {
+								setActive(true);
+							}
 
 							onFocus();
 						}}
-						onKeyUp={(event) => setActive(event.key !== 'Escape')}
+						onKeyUp={(event) => {
+							if (event.key === 'Escape') {
+								setActive(false);
+							}
+						}}
 						placeholder={inputPlaceholder}
 						ref={inputRef}
 						required={required || false}
@@ -130,7 +137,10 @@ function Autocomplete({
 								{itemsWrapperRenderer({
 									items,
 									labelKey,
-									onItemClick: onSelectedItemChange,
+									onItemClick: (item) => {
+										setActive(false);
+										onSelectedItemChange(item);
+									},
 									valueKey,
 								})}
 							</div>

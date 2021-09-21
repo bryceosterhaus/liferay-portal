@@ -31,7 +31,7 @@ function Autocomplete({
 	labelKey,
 	pageSize = 10,
 }) {
-	const [query, setQuery] = useState('');
+	const [inputValue, setInputValue] = useState('');
 	const [selectedItem, setSelectedItem] = useState(null);
 	const [items, setItems] = useState(null);
 	const [loading, setLoading] = useState(false);
@@ -41,8 +41,8 @@ function Autocomplete({
 	const [internalPageSize, setInternalPageSize] = useState(pageSize);
 	const isMounted = useIsMounted();
 
-	const fetchData = debounce(() => {
-		if (isMounted() && !disabled) {
+	const fetchData = debounce((query) => {
+		if (query && isMounted() && !disabled) {
 			setLoading(true);
 
 			getData(apiUrl, query, page, internalPageSize)
@@ -82,12 +82,14 @@ function Autocomplete({
 		<InfiniteScroller
 			onBottomTouched={() => {
 				if (!loading) {
-					setPage((currentPage) =>
-						currentPage < lastPage ? currentPage + 1 : currentPage
-					);
+					if (page !== lastPage) {
+						setPage((currentPage) => currentPage + 1);
+
+						fetchData(inputValue);
+					}
 				}
 			}}
-			scrollCompleted={!items || items.length === totalCount}
+			scrollCompleted={!items || items.length >= totalCount}
 		>
 			{CustomView ? (
 				<CustomView
@@ -118,7 +120,7 @@ function Autocomplete({
 				disabled={disabled}
 				inputName={inputName}
 				inputPlaceholder={inputPlaceholder}
-				inputValue={query}
+				inputValue={inputValue}
 				items={items}
 				itemsWrapperRenderer={itemsWrapperRenderer}
 				labelKey={labelKey}
@@ -126,7 +128,7 @@ function Autocomplete({
 				onInputChange={(val) => {
 					setSelectedItem(null);
 					setPage(1);
-					setQuery(val);
+					setInputValue(val);
 					fetchData(val);
 				}}
 				onSelectedItemChange={setSelectedItem}

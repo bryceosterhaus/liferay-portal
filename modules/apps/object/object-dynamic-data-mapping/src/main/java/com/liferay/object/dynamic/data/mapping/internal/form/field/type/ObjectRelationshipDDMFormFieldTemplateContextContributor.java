@@ -70,8 +70,6 @@ public class ObjectRelationshipDDMFormFieldTemplateContextContributor
 			).put(
 				"labelKey", "id"
 			).put(
-				"value", ddmFormFieldRenderingContext.getValue()
-			).put(
 				"valueKey", "id"
 			).build();
 		}

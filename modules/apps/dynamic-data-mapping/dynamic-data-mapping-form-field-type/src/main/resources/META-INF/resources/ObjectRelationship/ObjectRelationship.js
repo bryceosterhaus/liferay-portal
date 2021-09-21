@@ -12,13 +12,13 @@
  * details.
  */
 
-import {useResource} from '@clayui/data-provider';
-import {FieldBase} from 'dynamic-data-mapping-form-field-type/FieldBase/ReactFieldBase.es';
-import {useDebounce} from '@clayui/shared';
-import React from 'react';
 import ClayAutocomplete from '@clayui/autocomplete';
+import {useResource} from '@clayui/data-provider';
 import ClayDropDown from '@clayui/drop-down';
+import {useDebounce} from '@clayui/shared';
+import {FieldBase} from 'dynamic-data-mapping-form-field-type/FieldBase/ReactFieldBase.es';
 import {fetch} from 'frontend-js-web';
+import React from 'react';
 
 const LoadingWithDebounce = ({loading, networkStatus, render}) => {
 	const debouncedLoadingChange = useDebounce(loading, 500);
@@ -36,8 +36,8 @@ const LoadingWithDebounce = ({loading, networkStatus, render}) => {
 
 export function ObjectRelationship({
 	apiURL,
-	initialValue = '',
 	initialLabel = '',
+	initialValue = '',
 	inputName,
 	labelKey = 'label',
 	name,

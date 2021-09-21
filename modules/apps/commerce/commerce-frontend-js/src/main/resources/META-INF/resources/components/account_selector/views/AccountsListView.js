@@ -57,10 +57,10 @@ function AccountsListView({
 
 			<ClayDropDown.Section>
 				<ClayInput
-					value={inputValue}
-					onChange={(event) => setInputValue(event.target.value)}
 					disabled={disabled}
+					onChange={(event) => setInputValue(event.target.value)}
 					placeholder={Liferay.Language.get('search')}
+					value={inputValue}
 				/>
 			</ClayDropDown.Section>
 

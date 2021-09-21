@@ -13,14 +13,14 @@
  */
 
 import {useIsMounted} from '@liferay/frontend-js-react-web';
-import React, {useState, useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 
 import debounce from '../../../utilities/debounce';
 import {getData} from '../../../utilities/index';
 import {showErrorNotification} from '../../../utilities/notifications';
 import InfiniteScroller from '../../infinite_scroller/InfiniteScroller';
 
-function ListView({apiUrl, customView: CustomView, query, pageSize = 10}) {
+function ListView({apiUrl, customView: CustomView, pageSize = 10, query}) {
 	const [items, setItems] = useState(null);
 	const [loading, setLoading] = useState(false);
 	const [totalCount, setTotalCount] = useState(null);
@@ -55,7 +55,7 @@ function ListView({apiUrl, customView: CustomView, query, pageSize = 10}) {
 
 	useEffect(() => {
 		fetchData(query);
-	}, [query]);
+	}, [fetchData, query]);
 
 	return (
 		<InfiniteScroller

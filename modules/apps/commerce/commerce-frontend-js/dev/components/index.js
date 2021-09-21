@@ -24,11 +24,6 @@ module.exports = [
 		page: 'add-to-wish-list.html',
 	},
 	{
-		entry: 'Autocomplete',
-		name: 'Autocomplete',
-		page: 'autocomplete.html',
-	},
-	{
 		entry: 'DatasetDisplay',
 		name: 'Dataset display',
 		page: 'dataset-display.html',

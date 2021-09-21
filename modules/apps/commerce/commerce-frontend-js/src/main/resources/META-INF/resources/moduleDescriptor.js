@@ -16,8 +16,6 @@ export default {
 	CommerceComponents: [
 		'AddToCart',
 		'AddToWishList',
-		'Autocomplete',
-		'AutocompletePureComponent',
 		'DropdownMenu',
 		'Gallery',
 		'ItemFinder',

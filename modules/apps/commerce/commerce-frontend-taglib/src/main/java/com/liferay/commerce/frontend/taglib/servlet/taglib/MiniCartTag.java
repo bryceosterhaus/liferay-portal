@@ -22,6 +22,7 @@ import com.liferay.commerce.frontend.taglib.internal.servlet.ServletContextUtil;
 import com.liferay.commerce.model.CommerceOrder;
 import com.liferay.commerce.model.CommerceOrderItem;
 import com.liferay.commerce.order.CommerceOrderHttpHelper;
+import com.liferay.frontend.icons.util.IconsUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
@@ -67,7 +68,7 @@ public class MiniCartTag extends IncludeTag {
 		_siteDefaultURL = _getSiteDefaultURL(themeDisplay);
 
 		if (Validator.isNull(_spritemap)) {
-			_spritemap = themeDisplay.getPathThemeImages() + "/clay/icons.svg";
+			_spritemap = IconsUtil.getSpritemapPath("clay");
 		}
 
 		try {

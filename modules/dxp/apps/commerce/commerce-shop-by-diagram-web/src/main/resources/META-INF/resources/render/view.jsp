@@ -49,7 +49,7 @@ CSDiagramCPTypeDisplayContext csDiagramCPTypeDisplayContext = (CSDiagramCPTypeDi
 		).put(
 			"productId", cpCatalogEntry.getCProductId()
 		).put(
-			"spritemap", themeDisplay.getPathThemeImages() + "/clay/icons.svg"
+			"spritemap", IconsUtil.getSpritemapPath("clay")
 		).build()
 	%>'
 />

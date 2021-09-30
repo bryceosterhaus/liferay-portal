@@ -1,5 +1,6 @@
 {
 	"devDependencies": {
+		"@liferay/eslint-plugin": "^1.0.0-alpha.2",
 		"@liferay/npm-scripts": "46.1.0",
 		"acorn": "7.1.0",
 		"alloy-ui": "^3.1.0-deprecated.40",

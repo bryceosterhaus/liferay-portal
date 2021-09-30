@@ -31,10 +31,12 @@ catch (error) {
 
 config = {
 	...config,
+	extends: ['plugin:@liferay/portal'],
 	globals: {
 		...config.globals,
 		MODULE_PATH: true,
 	},
+	plugins: ['@liferay'],
 	rules: {
 		'no-empty': ['error', {allowEmptyCatch: true}],
 		'notice/notice': [

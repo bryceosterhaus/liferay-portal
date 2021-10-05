@@ -45,7 +45,6 @@ config = {
 		'@liferay/aui/no-modal': 'off',
 		'@liferay/aui/no-node': 'off',
 		'@liferay/aui/no-object': 'off',
-		'@liferay/aui/no-one': 'off',
 		'@liferay/empty-line-between-elements': 'off',
 		'no-empty': ['error', {allowEmptyCatch: true}],
 		'notice/notice': [

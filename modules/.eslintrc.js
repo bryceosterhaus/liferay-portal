@@ -56,6 +56,7 @@ config = {
 				templateFile: path.join(__dirname, 'copyright.js'),
 			},
 		],
+		'quote-props': 'off',
 	},
 };
 

@@ -61,7 +61,5 @@ export function submitEmailContent({
 						message: response.errorMessage,
 				  });
 		})
-		.catch((error) => {
-			throw new Error(error);
-		});
+		.catch(() => {});
 }

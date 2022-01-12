@@ -29,7 +29,22 @@ module.exports = {
 		bundler: {
 			config: {
 				imports: {
+					'@liferay/data-engine-taglib': {
+						'/': '*',
+					},
 					'@liferay/document-library-preview-css': {
+						'/': '*',
+					},
+					'@liferay/dynamic-data-mapping-form-builder': {
+						'/': '*',
+					},
+					'@liferay/dynamic-data-mapping-form-field-type': {
+						'/': '*',
+					},
+					'@liferay/dynamic-data-mapping-form-renderer': {
+						'/': '*',
+					},
+					'@liferay/dynamic-data-mapping-form-web': {
 						'/': '*',
 					},
 					'@liferay/fragment-renderer-collection-filter-impl': {
@@ -38,68 +53,16 @@ module.exports = {
 					'@liferay/frontend-data-set-web': {
 						'/': '*',
 					},
+					'@liferay/frontend-editor-ckeditor-web': {
+						'/': '*',
+					},
 					'@liferay/frontend-js-a11y-web': {
 						'/': '*',
 					},
-					'@liferay/frontend-js-react-web': {
-						'/': '*',
-						'classnames': '*',
-						'formik': '*',
-						'prop-types': '*',
-						'react': '*',
-						'react-dnd': '*',
-						'react-dnd-html5-backend': '*',
-						'react-dom': '*',
-					},
-					'@liferay/frontend-js-state-web': {
+					'@liferay/frontend-js-components-web': {
 						'/': '*',
 					},
-					'@liferay/frontend-taglib': {
-						'/': '*',
-					},
-					'@liferay/layout-content-page-editor-web': {
-						'/': '*',
-					},
-					'@liferay/map-common': {
-						'/': '*',
-					},
-					'@liferay/map-google-maps': {
-						'/': '*',
-					},
-					'@liferay/map-openstreetmap': {
-						'/': '*',
-					},
-					'asset-taglib': {
-						'/': '*',
-					},
-					'commerce-frontend-js': {
-						'/': '*',
-					},
-					'data-engine-js-components-web': {
-						'/': '*',
-					},
-					'data-engine-taglib': {
-						'/': '*',
-					},
-					'dynamic-data-mapping-form-builder': {
-						'/': '*',
-					},
-					'dynamic-data-mapping-form-field-type': {
-						'/': '*',
-					},
-					'dynamic-data-mapping-form-renderer': {
-						'/': '*',
-					},
-					'dynamic-data-mapping-form-web': {
-						'/': '*',
-					},
-					'frontend-editor-ckeditor-web': {
-						'/': '*',
-					},
-					'frontend-js-components-web': {
-						'/': '*',
-					},
-					'frontend-js-metal-web': {
+					'@liferay/frontend-js-metal-web': {
 						'incremental-dom': '*',
 						'incremental-dom-string': '*',
 						'metal': '*',
@@ -138,29 +101,29 @@ module.exports = {
 						'querystring': '*',
 						'xss-filters': '*',
 					},
-					'frontend-js-node-shims': {
-						assert: '*',
-						buffer: '*',
-						domain: '*',
-						events: '*',
-						os: '*',
-						path: '*',
-						process: '*',
-						string_decoder: '*',
-						timers: '*',
-						url: '*',
-						util: '*',
+					'@liferay/frontend-js-react-web': {
+						'/': '*',
+						'classnames': '*',
+						'formik': '*',
+						'prop-types': '*',
+						'react': '*',
+						'react-dnd': '*',
+						'react-dnd-html5-backend': '*',
+						'react-dom': '*',
 					},
-					'frontend-js-recharts': {
+					'@liferay/frontend-js-recharts': {
 						recharts: '*',
 					},
-					'frontend-js-spa-web': {
+					'@liferay/frontend-js-spa-web': {
 						senna: '*',
 					},
-					'frontend-js-web': {
+					'@liferay/frontend-js-state-web': {
 						'/': '*',
 					},
-					'frontend-taglib-chart': {
+					'@liferay/frontend-taglib': {
+						'/': '*',
+					},
+					'@liferay/frontend-taglib-chart': {
 						'billboard.js': '*',
 						'clay-charts': '*',
 						'd3': '*',
@@ -196,7 +159,7 @@ module.exports = {
 						'd3-voronoi': '*',
 						'd3-zoom': '*',
 					},
-					'frontend-taglib-clay': {
+					'@liferay/frontend-taglib-clay': {
 						'/': '*',
 						'@clayui/alert': '*',
 						'@clayui/autocomplete': '*',
@@ -269,7 +232,44 @@ module.exports = {
 						'clay-table': '*',
 						'clay-tooltip': '*',
 					},
-					'item-selector-taglib': {
+					'@liferay/item-selector-taglib': {
+						'/': '*',
+					},
+					'@liferay/layout-content-page-editor-web': {
+						'/': '*',
+					},
+					'@liferay/map-common': {
+						'/': '*',
+					},
+					'@liferay/map-google-maps': {
+						'/': '*',
+					},
+					'@liferay/map-openstreetmap': {
+						'/': '*',
+					},
+					'asset-taglib': {
+						'/': '*',
+					},
+					'commerce-frontend-js': {
+						'/': '*',
+					},
+					'data-engine-js-components-web': {
+						'/': '*',
+					},
+					'frontend-js-node-shims': {
+						assert: '*',
+						buffer: '*',
+						domain: '*',
+						events: '*',
+						os: '*',
+						path: '*',
+						process: '*',
+						string_decoder: '*',
+						timers: '*',
+						url: '*',
+						util: '*',
+					},
+					'frontend-js-web': {
 						'/': '*',
 					},
 				},
@@ -358,12 +358,12 @@ module.exports = {
 		},
 		dependencies: [
 			'asset-taglib',
-			'commerce-frontend-taglib',
-			'commerce-product-options-web',
-			'data-engine-taglib',
-			'dynamic-data-mapping-form-builder',
-			'dynamic-data-mapping-form-field-type',
-			'dynamic-data-mapping-form-renderer',
+			'@liferay/commerce-frontend-taglib',
+			'@liferay/commerce-product-options-web',
+			'@liferay/data-engine-taglib',
+			'@liferay/dynamic-data-mapping-form-builder',
+			'@liferay/dynamic-data-mapping-form-field-type',
+			'@liferay/dynamic-data-mapping-form-renderer',
 		],
 	},
 	federation: {

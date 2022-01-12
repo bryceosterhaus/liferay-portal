@@ -49,7 +49,7 @@
 		]
 	},
 	"main": "data_layout_builder/js/index.es.js",
-	"name": "data-engine-taglib",
+	"name": "@liferay/data-engine-taglib",
 	"private": true,
 	"scripts": {
 		"build": "liferay-npm-scripts build",

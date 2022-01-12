@@ -12,13 +12,13 @@
  * details.
  */
 
+import {EmptyState, FieldType, SearchUtils} from '@liferay/data-engine-taglib';
 import {
 	elementSetAdded,
 	useConfig,
 	useForm,
 	useFormState,
 } from 'data-engine-js-components-web';
-import {EmptyState, FieldType, SearchUtils} from 'data-engine-taglib';
 import React from 'react';
 
 const EmptyPanel = ({searchTerm}) => (

@@ -30,7 +30,7 @@ module.exports = {
 		],
 	},
 	output: {
-		filename: 'remote-app-client-js.js',
+		filename: '@liferay/remote-app-client-js.js',
 		libraryTarget: 'window',
 		path: path.resolve('./build/node/packageRunBuild/resources/'),
 		publicPath: PUBLIC_PATH,

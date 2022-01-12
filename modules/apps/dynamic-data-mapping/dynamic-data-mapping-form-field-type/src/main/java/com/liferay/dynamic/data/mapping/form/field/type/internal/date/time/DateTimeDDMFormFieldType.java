@@ -47,7 +47,8 @@ public class DateTimeDDMFormFieldType extends BaseDDMFormFieldType {
 
 	@Override
 	public String getModuleName() {
-		return "dynamic-data-mapping-form-field-type/DatePicker/DatePicker.es";
+		return "@liferay/dynamic-data-mapping-form-field-type/DatePicker" +
+			"/DatePicker.es";
 	}
 
 	@Override

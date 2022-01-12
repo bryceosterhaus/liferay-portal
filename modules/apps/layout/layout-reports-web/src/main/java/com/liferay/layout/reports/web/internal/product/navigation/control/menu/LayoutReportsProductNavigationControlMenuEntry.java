@@ -414,10 +414,11 @@ public class LayoutReportsProductNavigationControlMenuEntry
 		jspWriter.write(sb.toString());
 
 		try {
+			String moduleName = _npmResolver.resolveModuleName(
+				"@liferay/layout-reports-web");
+
 			_reactRenderer.renderReact(
-				new ComponentDescriptor(
-					_npmResolver.resolveModuleName("layout-reports-web") +
-						"/js/App"),
+				new ComponentDescriptor(moduleName + "/js/App"),
 				HashMapBuilder.<String, Object>put(
 					"isPanelStateOpen", isPanelStateOpen(httpServletRequest)
 				).put(

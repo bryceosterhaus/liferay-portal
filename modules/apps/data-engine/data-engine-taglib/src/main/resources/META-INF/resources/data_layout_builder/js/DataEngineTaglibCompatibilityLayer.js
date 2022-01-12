@@ -12,6 +12,7 @@
  * details.
  */
 
+import {activeLanguageIdsAtom} from '@liferay/frontend-js-components-web';
 import {State} from '@liferay/frontend-js-state-web';
 import {
 	EVENT_TYPES,
@@ -19,7 +20,6 @@ import {
 	useForm,
 	useFormState,
 } from 'data-engine-js-components-web';
-import {activeLanguageIdsAtom} from 'frontend-js-components-web';
 import {useEffect, useRef} from 'react';
 
 const SYMBOL_INTERNAL = Symbol('data.engine.internal');

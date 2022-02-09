@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`document-library-preview-document renders a document previewer with nineteen pages and the fifth page rendered 1`] = `
+exports[`@liferay/document-library-preview-document renders a document previewer with nineteen pages and the fifth page rendered 1`] = `
 <DocumentFragment>
   <div
     class="preview-file"
@@ -83,7 +83,7 @@ exports[`document-library-preview-document renders a document previewer with nin
 </DocumentFragment>
 `;
 
-exports[`document-library-preview-document renders a document previewer with ten pages and the first page rendered 1`] = `
+exports[`@liferay/document-library-preview-document renders a document previewer with ten pages and the first page rendered 1`] = `
 <DocumentFragment>
   <div
     class="preview-file"

@@ -19,12 +19,12 @@ module.exports = {
 		recharts_lib_index: 'recharts/lib/index.js',
 	},
 	'imports': {
+		'@liferay/frontend-js-node-shims': {
+			events: '^1.0.0',
+		},
 		'@liferay/frontend-js-react-web': {
 			'react': '^16.0.0',
 			'react-dom': '^16.0.0',
-		},
-		'@liferay/frontend-js-node-shims': {
-			events: '^1.0.0',
 		},
 	},
 	'output': 'build/node/packageRunBuild/resources',

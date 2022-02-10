@@ -38,62 +38,10 @@ module.exports = {
 					'@liferay/frontend-data-set-web': {
 						'/': '*',
 					},
-					'@liferay/frontend-js-a11y-web': {
-						'/': '*',
-					},
-					'@liferay/frontend-js-react-web': {
-						'/': '*',
-						'classnames': '*',
-						'formik': '*',
-						'prop-types': '*',
-						'react': '*',
-						'react-dnd': '*',
-						'react-dnd-html5-backend': '*',
-						'react-dom': '*',
-					},
-					'@liferay/frontend-js-state-web': {
-						'/': '*',
-					},
-					'@liferay/frontend-taglib': {
-						'/': '*',
-					},
-					'@liferay/layout-content-page-editor-web': {
-						'/': '*',
-					},
-					'@liferay/map-common': {
-						'/': '*',
-					},
-					'@liferay/map-google-maps': {
-						'/': '*',
-					},
-					'@liferay/map-openstreetmap': {
-						'/': '*',
-					},
-					'asset-taglib': {
-						'/': '*',
-					},
-					'commerce-frontend-js': {
-						'/': '*',
-					},
-					'data-engine-js-components-web': {
-						'/': '*',
-					},
-					'data-engine-taglib': {
-						'/': '*',
-					},
-					'dynamic-data-mapping-form-builder': {
-						'/': '*',
-					},
-					'dynamic-data-mapping-form-field-type': {
-						'/': '*',
-					},
-					'dynamic-data-mapping-form-renderer': {
-						'/': '*',
-					},
-					'dynamic-data-mapping-form-web': {
-						'/': '*',
-					},
 					'@liferay/frontend-editor-ckeditor-web': {
+						'/': '*',
+					},
+					'@liferay/frontend-js-a11y-web': {
 						'/': '*',
 					},
 					'@liferay/frontend-js-components-web': {
@@ -151,13 +99,26 @@ module.exports = {
 						url: '*',
 						util: '*',
 					},
+					'@liferay/frontend-js-react-web': {
+						'/': '*',
+						'classnames': '*',
+						'formik': '*',
+						'prop-types': '*',
+						'react': '*',
+						'react-dnd': '*',
+						'react-dnd-html5-backend': '*',
+						'react-dom': '*',
+					},
 					'@liferay/frontend-js-recharts': {
 						recharts: '*',
 					},
 					'@liferay/frontend-js-spa-web': {
 						senna: '*',
 					},
-					'frontend-js-web': {
+					'@liferay/frontend-js-state-web': {
+						'/': '*',
+					},
+					'@liferay/frontend-taglib': {
 						'/': '*',
 					},
 					'@liferay/frontend-taglib-chart': {
@@ -268,6 +229,45 @@ module.exports = {
 						'clay-sticker': '*',
 						'clay-table': '*',
 						'clay-tooltip': '*',
+					},
+					'@liferay/layout-content-page-editor-web': {
+						'/': '*',
+					},
+					'@liferay/map-common': {
+						'/': '*',
+					},
+					'@liferay/map-google-maps': {
+						'/': '*',
+					},
+					'@liferay/map-openstreetmap': {
+						'/': '*',
+					},
+					'asset-taglib': {
+						'/': '*',
+					},
+					'commerce-frontend-js': {
+						'/': '*',
+					},
+					'data-engine-js-components-web': {
+						'/': '*',
+					},
+					'data-engine-taglib': {
+						'/': '*',
+					},
+					'dynamic-data-mapping-form-builder': {
+						'/': '*',
+					},
+					'dynamic-data-mapping-form-field-type': {
+						'/': '*',
+					},
+					'dynamic-data-mapping-form-renderer': {
+						'/': '*',
+					},
+					'dynamic-data-mapping-form-web': {
+						'/': '*',
+					},
+					'frontend-js-web': {
+						'/': '*',
 					},
 					'item-selector-taglib': {
 						'/': '*',

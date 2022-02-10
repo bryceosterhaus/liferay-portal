@@ -23,7 +23,7 @@ module.exports = {
 			'react': '^16.0.0',
 			'react-dom': '^16.0.0',
 		},
-		'frontend-js-node-shims': {
+		'@liferay/frontend-js-node-shims': {
 			events: '^1.0.0',
 		},
 	},

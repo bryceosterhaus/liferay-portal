@@ -93,13 +93,13 @@ module.exports = {
 					'dynamic-data-mapping-form-web': {
 						'/': '*',
 					},
-					'frontend-editor-ckeditor-web': {
+					'@liferay/frontend-editor-ckeditor-web': {
 						'/': '*',
 					},
-					'frontend-js-components-web': {
+					'@liferay/frontend-js-components-web': {
 						'/': '*',
 					},
-					'frontend-js-metal-web': {
+					'@liferay/frontend-js-metal-web': {
 						'incremental-dom': '*',
 						'incremental-dom-string': '*',
 						'metal': '*',
@@ -138,7 +138,7 @@ module.exports = {
 						'querystring': '*',
 						'xss-filters': '*',
 					},
-					'frontend-js-node-shims': {
+					'@liferay/frontend-js-node-shims': {
 						assert: '*',
 						buffer: '*',
 						domain: '*',
@@ -151,16 +151,16 @@ module.exports = {
 						url: '*',
 						util: '*',
 					},
-					'frontend-js-recharts': {
+					'@liferay/frontend-js-recharts': {
 						recharts: '*',
 					},
-					'frontend-js-spa-web': {
+					'@liferay/frontend-js-spa-web': {
 						senna: '*',
 					},
 					'frontend-js-web': {
 						'/': '*',
 					},
-					'frontend-taglib-chart': {
+					'@liferay/frontend-taglib-chart': {
 						'billboard.js': '*',
 						'clay-charts': '*',
 						'd3': '*',
@@ -196,7 +196,7 @@ module.exports = {
 						'd3-voronoi': '*',
 						'd3-zoom': '*',
 					},
-					'frontend-taglib-clay': {
+					'@liferay/frontend-taglib-clay': {
 						'/': '*',
 						'@clayui/alert': '*',
 						'@clayui/autocomplete': '*',

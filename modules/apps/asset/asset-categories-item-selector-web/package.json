@@ -1,6 +1,6 @@
 {
 	"dependencies": {
-		"frontend-js-components-web": "*",
+		"@liferay/frontend-js-components-web": "*",
 		"frontend-js-web": "*"
 	},
 	"name": "asset-categories-item-selector-web",

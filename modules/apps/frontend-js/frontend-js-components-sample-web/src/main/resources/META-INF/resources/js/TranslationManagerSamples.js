@@ -13,11 +13,11 @@
  */
 
 import ClayLayout from '@clayui/layout';
-import {State} from '@liferay/frontend-js-state-web';
 import {
 	TranslationAdminSelector,
 	activeLanguageIdsAtom,
-} from 'frontend-js-components-web';
+} from '@liferay/frontend-js-components-web';
+import {State} from '@liferay/frontend-js-state-web';
 import React, {useEffect, useState} from 'react';
 
 export default function TranslationManagerSamples({

@@ -3,7 +3,7 @@
 		"@clayui/button": "3.40.0",
 		"@clayui/form": "3.45.0",
 		"@clayui/layout": "3.40.0",
-		"frontend-js-components-web": "*",
+		"@liferay/frontend-js-components-web": "*",
 		"frontend-js-web": "*",
 		"react": "16.12.0"
 	},

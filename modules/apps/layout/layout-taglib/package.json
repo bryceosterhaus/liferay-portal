@@ -6,7 +6,7 @@
 		"@clayui/management-toolbar": "3.40.0",
 		"@clayui/pagination": "3.45.0",
 		"@clayui/pagination-bar": "3.45.0",
-		"frontend-js-components-web": "*",
+		"@liferay/frontend-js-components-web": "*",
 		"prop-types": "15.7.2",
 		"react": "16.12.0"
 	},

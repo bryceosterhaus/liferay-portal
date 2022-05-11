@@ -1270,6 +1270,17 @@ AUI.add(
 
 					var trigger = instance.get('templateNode').one('input');
 
+					let template = A.CalendarBase.HEADER_TEMPLATE;
+
+					template = template.replace('aria-role="heading"', '');
+					template = template.replace(
+						'<div class="yui3-u',
+						'<h1 class="yui3-u'
+					);
+					template = template.replace(/div></, 'h1><');
+
+					A.CalendarBase.HEADER_TEMPLATE = template;
+
 					if (trigger) {
 						instance.datePicker = new A.DatePickerDeprecated({
 							calendar: {
@@ -1814,6 +1825,7 @@ AUI.add(
 			'aui-base',
 			'aui-color-picker-popover',
 			'aui-url',
+			'calendar',
 			'liferay-item-selector-dialog',
 			'liferay-portlet-dynamic-data-mapping',
 		],

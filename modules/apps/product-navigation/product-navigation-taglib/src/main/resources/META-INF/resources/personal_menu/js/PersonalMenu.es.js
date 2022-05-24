@@ -20,33 +20,30 @@ import {fetch} from 'frontend-js-web';
 import PropTypes from 'prop-types';
 import React, {useRef, useState} from 'react';
 
-function mapItemsOnClick(items) {
-	return items.map((item) => {
-		if (item.items) {
-			item.items = [...mapItemsOnClick(item.items)];
-		}
+function mapItemOnClick(item) {
+	if (item.items) {
+		item.items = item.items.map(mapItemOnClick);
+	}
 
-		const {jsOnClickConfig, ...otherKeys} = item;
+	const jsOnClickConfig = item.jsOnClickConfig;
 
-		return {
-			onClick: jsOnClickConfig
-				? () => {
-						const {selectEventName, title, url} = jsOnClickConfig;
+	if (jsOnClickConfig) {
+		item.onClick = () => {
+			const {selectEventName, title, url} = jsOnClickConfig;
 
-						Liferay.Util.openSelectionModal({
-							id: selectEventName,
-							onSelect(selectedItem) {
-								Liferay.Util.navigate(selectedItem.url);
-							},
-							selectEventName,
-							title,
-							url,
-						});
-				  }
-				: undefined,
-			...otherKeys,
+			Liferay.Util.openSelectionModal({
+				id: selectEventName,
+				onSelect(selectedItem) {
+					Liferay.Util.navigate(selectedItem.url);
+				},
+				selectEventName,
+				title,
+				url,
+			});
 		};
-	});
+	}
+
+	return {...item};
 }
 
 function PersonalMenu({
@@ -64,13 +61,13 @@ function PersonalMenu({
 		if (!preloadPromiseRef.current) {
 			preloadPromiseRef.current = fetch(itemsURL)
 				.then((response) => response.json())
-				.then((items) => setItems(items));
+				.then((items) => setItems(items.map(mapItemOnClick)));
 		}
 	}
 
 	return (
 		<ClayDropDownWithItems
-			items={mapItemsOnClick([...items])}
+			items={items}
 			menuElementAttrs={{className: 'dropdown-menu-personal-menu'}}
 			trigger={
 				label ? (

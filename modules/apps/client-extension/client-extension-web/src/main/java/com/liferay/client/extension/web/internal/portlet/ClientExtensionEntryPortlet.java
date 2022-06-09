@@ -30,6 +30,7 @@ import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
 import com.liferay.portal.kernel.servlet.taglib.aui.ScriptData;
 import com.liferay.portal.kernel.servlet.taglib.util.OutputData;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.HttpComponentsUtil;
 import com.liferay.portal.kernel.util.PropertiesUtil;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -194,7 +195,7 @@ public class ClientExtensionEntryPortlet extends MVCPortlet {
 				iFrameURL, (String)entry.getKey(), (String)entry.getValue());
 		}
 
-		printWriter.print(iFrameURL);
+		printWriter.print(HtmlUtil.escapeHREF(iFrameURL));
 
 		printWriter.print("\"></iframe>");
 

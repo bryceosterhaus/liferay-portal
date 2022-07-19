@@ -36,7 +36,21 @@ if (layoutTypePortlet != null) {
 if (layout != null) {
 	String ppid = ParamUtil.getString(request, "p_p_id");
 
-	if ((layout.isTypeEmbedded() || layout.isTypePortlet()) && (themeDisplay.isStateMaximized() || themeDisplay.isStatePopUp() || (layout.isSystem() && Objects.equals(layout.getFriendlyURL(), PropsValues.CONTROL_PANEL_LAYOUT_FRIENDLY_URL)))) {
+	if (layout.isTypeContent()) {
+		List<com.liferay.portal.kernel.model.PortletPreferences> portletPreferencesList = PortletPreferencesLocalServiceUtil.getPortletPreferencesByPlid(layout.getPlid());
+
+		for (com.liferay.portal.kernel.model.PortletPreferences
+			portletPreferences : portletPreferencesList) {
+
+			Portlet portlet = PortletLocalServiceUtil.getPortletById(
+				layout.getCompanyId(), portletPreferences.getPortletId());
+
+			if (portlet != null) {
+				portlets.add(portlet);
+			}
+		}
+	}
+	else if ((layout.isTypeEmbedded() || layout.isTypePortlet()) && (themeDisplay.isStateMaximized() || themeDisplay.isStatePopUp() || (layout.isSystem() && Objects.equals(layout.getFriendlyURL(), PropsValues.CONTROL_PANEL_LAYOUT_FRIENDLY_URL)))) {
 		if (Validator.isNotNull(ppid)) {
 			Portlet portlet = PortletLocalServiceUtil.getPortletById(company.getCompanyId(), ppid);
 

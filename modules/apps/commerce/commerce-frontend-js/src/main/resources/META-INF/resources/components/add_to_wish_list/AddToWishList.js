@@ -17,6 +17,7 @@ import ClayIcon from '@clayui/icon';
 import PropTypes from 'prop-types';
 import React, {useState} from 'react';
 
+import './add_to_wish_list.scss';
 import {showErrorNotification} from '../../utilities/notifications';
 import LegacyWishListResource from './util/LegacyWishListResource';
 

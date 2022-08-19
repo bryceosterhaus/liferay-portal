@@ -16,6 +16,7 @@ import ClayDropDown from '@clayui/drop-down';
 import PropTypes from 'prop-types';
 import React, {useCallback, useEffect, useState} from 'react';
 
+import './account_selector.scss';
 import {
 	CURRENT_ACCOUNT_UPDATED,
 	CURRENT_ORDER_UPDATED,

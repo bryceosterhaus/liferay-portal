@@ -16,6 +16,7 @@ import classnames from 'classnames';
 import PropTypes from 'prop-types';
 import React, {useCallback, useEffect, useState} from 'react';
 
+import './mini_cart.scss';
 import ServiceProvider from '../../ServiceProvider/index';
 import {
 	CURRENT_ACCOUNT_UPDATED,

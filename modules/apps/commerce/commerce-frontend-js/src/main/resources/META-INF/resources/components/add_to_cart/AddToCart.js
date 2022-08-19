@@ -16,6 +16,7 @@ import classnames from 'classnames';
 import PropTypes from 'prop-types';
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 
+import './add_to_cart.scss';
 import ServiceProvider from '../../ServiceProvider/index';
 import {
 	CART_PRODUCT_QUANTITY_CHANGED,

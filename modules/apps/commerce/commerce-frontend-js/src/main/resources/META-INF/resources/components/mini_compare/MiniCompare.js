@@ -18,6 +18,7 @@ import classnames from 'classnames';
 import PropTypes from 'prop-types';
 import React, {useEffect, useState} from 'react';
 
+import './mini_compare.scss';
 import CommerceCookie from '../../utilities/cookies';
 import {
 	ITEM_REMOVED_FROM_COMPARE,

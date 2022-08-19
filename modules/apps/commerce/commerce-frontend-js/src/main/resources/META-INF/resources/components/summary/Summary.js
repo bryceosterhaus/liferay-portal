@@ -16,6 +16,7 @@ import ClayLoadingIndicator from '@clayui/loading-indicator';
 import PropTypes from 'prop-types';
 import React, {useCallback, useEffect, useState} from 'react';
 
+import './summary.scss';
 import AJAX from '../../utilities/AJAX/index';
 import {DATASET_DISPLAY_UPDATED} from '../../utilities/eventsDefinitions';
 

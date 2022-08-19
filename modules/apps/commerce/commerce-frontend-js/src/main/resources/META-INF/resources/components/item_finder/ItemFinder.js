@@ -16,6 +16,7 @@ import {fetch} from 'frontend-js-web';
 import PropTypes from 'prop-types';
 import React, {useEffect, useState} from 'react';
 
+import './item_finder.scss';
 import {DATASET_ACTION_PERFORMED} from '../../utilities/eventsDefinitions';
 import {fetchParams} from '../../utilities/index';
 import {

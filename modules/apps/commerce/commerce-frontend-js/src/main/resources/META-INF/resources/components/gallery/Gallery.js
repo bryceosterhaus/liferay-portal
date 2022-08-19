@@ -15,6 +15,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import './gallery.scss';
 import {CP_INSTANCE_CHANGED} from '../../utilities/eventsDefinitions';
 import MainImage from './MainImage';
 import Overlay from './Overlay';

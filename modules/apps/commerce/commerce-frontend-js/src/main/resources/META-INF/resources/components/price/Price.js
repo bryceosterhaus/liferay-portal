@@ -16,6 +16,7 @@ import classnames from 'classnames';
 import PropTypes from 'prop-types';
 import React, {useEffect, useState} from 'react';
 
+import './price.scss';
 import {CP_INSTANCE_CHANGED} from '../../utilities/eventsDefinitions';
 import {
 	adaptLegacyPriceModel,

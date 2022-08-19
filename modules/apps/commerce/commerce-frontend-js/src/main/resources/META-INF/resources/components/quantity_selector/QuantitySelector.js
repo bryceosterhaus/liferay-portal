@@ -16,6 +16,7 @@ import classnames from 'classnames';
 import PropTypes from 'prop-types';
 import React, {forwardRef, useRef} from 'react';
 
+import './quantity_selector.scss';
 import InputQuantitySelector from './InputQuantitySelector';
 import ListQuantitySelector from './ListQuantitySelector';
 

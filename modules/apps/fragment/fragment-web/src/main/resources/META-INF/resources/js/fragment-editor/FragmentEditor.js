@@ -21,6 +21,7 @@ import {
 	debounce,
 	fetch,
 	navigate,
+	ns,
 	objectToFormData,
 	openToast,
 	sub,
@@ -163,7 +164,7 @@ const FragmentEditor = ({
 			};
 
 			fetch(urls.edit, {
-				body: objectToFormData(Liferay.Util.ns(namespace, data)),
+				body: objectToFormData(ns(namespace, data)),
 				method: 'POST',
 			})
 				.then((response) => response.json())

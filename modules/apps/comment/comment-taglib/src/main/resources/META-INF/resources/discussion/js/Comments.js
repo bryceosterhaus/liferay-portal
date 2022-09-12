@@ -14,6 +14,7 @@
 
 import {
 	fetch,
+	ns,
 	openToast,
 	openWindow,
 	runScriptsInElement,
@@ -61,7 +62,7 @@ export default function Comments({
 
 	if (moreCommentsTrigger && indexElement && rootIndexPageElement) {
 		moreCommentsTrigger.addEventListener('click', () => {
-			const data = Util.ns(namespace, {
+			const data = ns(namespace, {
 				className: Util.getFormElement(form, 'className').value,
 				classPK: Util.getFormElement(form, 'classPK').value,
 				hideControls,
@@ -165,7 +166,7 @@ export default function Comments({
 			window.location.reload();
 		}
 		else {
-			const data = Liferay.Util.ns(namespace, {
+			const data = ns(namespace, {
 				className,
 				classPK,
 				skipEditorLoading: false,
@@ -283,7 +284,7 @@ export default function Comments({
 
 		if (!editorWrapper || !editorWrapper.childNodes.length) {
 			fetch(editorURL, {
-				body: Util.objectToFormData(Util.ns(namespace, options)),
+				body: Util.objectToFormData(ns(namespace, options)),
 				method: 'POST',
 			})
 				.then((response) => {

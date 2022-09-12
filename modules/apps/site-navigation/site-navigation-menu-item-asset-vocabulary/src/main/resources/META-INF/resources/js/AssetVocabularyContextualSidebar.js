@@ -19,7 +19,7 @@ import ClayIcon from '@clayui/icon';
 import ClayLabel from '@clayui/label';
 import classNames from 'classnames';
 import {TranslationAdminSelector} from 'frontend-js-components-web';
-import {fetch, objectToFormData, openSelectionModal} from 'frontend-js-web';
+import {fetch, ns, objectToFormData, openSelectionModal} from 'frontend-js-web';
 import PropTypes from 'prop-types';
 import React, {useEffect, useState} from 'react';
 
@@ -111,7 +111,7 @@ function AssetVocabularyContextualSidebar({
 						classPK: item.assetVocabularyId,
 					});
 
-					const namespacedItem = Liferay.Util.ns(namespace, item);
+					const namespacedItem = ns(namespace, item);
 
 					fetch(getAssetVocabularyDetailsURL, {
 						body: objectToFormData(namespacedItem),

@@ -19,6 +19,7 @@ import ClayLoadingIndicator from '@clayui/loading-indicator';
 import {useIsMounted} from '@liferay/frontend-js-react-web';
 import {
 	fetch,
+	ns,
 	objectToFormData,
 	openConfirmModal,
 	runScriptsInElement,
@@ -60,7 +61,7 @@ export function SidebarPanelContent({contentRequestBody, contentUrl, title}) {
 
 		fetch(contentUrl, {
 			body: objectToFormData(
-				Liferay.Util.ns(namespace, {redirect, ...contentRequestBody})
+				ns(namespace, {redirect, ...contentRequestBody})
 			),
 			method: 'POST',
 		})

@@ -21,7 +21,7 @@ import ClayLoadingIndicator from '@clayui/loading-indicator';
 import ClaySticker from '@clayui/sticker';
 import {useTimeout} from '@liferay/frontend-js-react-web';
 import classNames from 'classnames';
-import {fetch, getOpener, objectToFormData, sub} from 'frontend-js-web';
+import {fetch, getOpener, ns, objectToFormData, sub} from 'frontend-js-web';
 import PropTypes from 'prop-types';
 import React, {useEffect, useState} from 'react';
 
@@ -247,7 +247,7 @@ const ManageCollaborators = ({
 
 		setLoadingResponse(true);
 
-		const data = Liferay.Util.ns(portletNamespace, {
+		const data = ns(portletNamespace, {
 			deleteSharingEntryIds,
 			sharingEntryIdActionIdPairs: objectToPairArray(
 				sharingEntryIdsAndPermissions

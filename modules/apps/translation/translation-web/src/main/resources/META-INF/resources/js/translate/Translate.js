@@ -15,7 +15,7 @@
 import ClayAlert from '@clayui/alert';
 import ClayLayout from '@clayui/layout';
 import {useIsMounted} from '@liferay/frontend-js-react-web';
-import {fetch, navigate, openConfirmModal} from 'frontend-js-web';
+import {fetch, navigate, ns, openConfirmModal} from 'frontend-js-web';
 import PropTypes from 'prop-types';
 import React, {useMemo, useReducer, useState} from 'react';
 
@@ -127,7 +127,7 @@ const Translate = ({
 
 	const confirmChangesBeforeReload = (parameters = {}) => {
 		const url = setURLParameters(
-			Liferay.Util.ns(portletNamespace, parameters),
+			ns(portletNamespace, parameters),
 			currentUrl
 		);
 

@@ -15,12 +15,14 @@
 import {
 	delegate,
 	fetch,
+	ns,
 	openSelectionModal,
 	openToast,
 	toggleRadio,
 } from 'frontend-js-web';
 
 export default function ({actionURL, namespace, portletNamespace, portletURL}) {
+	alert('JournalTemplate.js');
 	const form = document.getElementById(`${namespace}fm`);
 	const templateKeyInput = document.getElementById(
 		`${namespace}ddmTemplateKey`
@@ -54,7 +56,7 @@ export default function ({actionURL, namespace, portletNamespace, portletURL}) {
 				});
 
 				const data = new URLSearchParams(
-					Liferay.Util.ns(portletNamespace, {
+					ns(portletNamespace, {
 						ddmTemplateKey: itemValue.ddmtemplatekey,
 					})
 				);

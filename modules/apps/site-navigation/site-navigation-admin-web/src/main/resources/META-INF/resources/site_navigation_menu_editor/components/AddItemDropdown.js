@@ -13,7 +13,7 @@
  */
 
 import ClayDropDown from '@clayui/drop-down';
-import {fetch, objectToFormData, openSelectionModal} from 'frontend-js-web';
+import {fetch, ns, objectToFormData, openSelectionModal} from 'frontend-js-web';
 import PropTypes from 'prop-types';
 import React, {useState} from 'react';
 
@@ -51,7 +51,7 @@ function getNamespacedInfoItem(
 
 	infoItem.siteNavigationMenuId = siteNavigationMenuId;
 
-	return Liferay.Util.ns(portletNamespace, infoItem);
+	return ns(portletNamespace, infoItem);
 }
 
 function getNamespacedInfoItems(
@@ -80,7 +80,7 @@ function getNamespacedInfoItems(
 		siteNavigationMenuId,
 	};
 
-	return Liferay.Util.ns(portletNamespace, infoItems);
+	return ns(portletNamespace, infoItems);
 }
 
 export function AddItemDropDown({trigger}) {

@@ -47,7 +47,7 @@ JournalArticle article = journalContentDisplayContext.getArticle();
 		</c:if>
 	</div>
 </clay:sheet-section>
-
+<h1>journal_resources.jsp</h1>
 <c:if test="<%= article != null %>">
 	<liferay-util:include page="/journal_template.jsp" servletContext="<%= application %>" />
 

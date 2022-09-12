@@ -19,7 +19,7 @@
 <%
 String refererPortletName = ParamUtil.getString(request, "refererPortletName");
 %>
-
+<h1>journal_template.jsp</h1>
 <clay:sheet-section>
 	<div class="sheet-subtitle">
 		<liferay-ui:message key="template" />

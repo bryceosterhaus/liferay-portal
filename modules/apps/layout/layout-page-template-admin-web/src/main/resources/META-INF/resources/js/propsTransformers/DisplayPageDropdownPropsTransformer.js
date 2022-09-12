@@ -13,6 +13,7 @@
  */
 
 import {
+	ns,
 	openConfirmModal,
 	openModal,
 	openSelectionModal,
@@ -129,7 +130,7 @@ const ACTIONS = {
 					);
 				}
 			},
-			selectEventName: Liferay.Util.ns(namespace, 'changePreview'),
+			selectEventName: ns(namespace, 'changePreview'),
 			title: Liferay.Language.get('page-template-thumbnail'),
 			url: itemSelectorURL,
 		});

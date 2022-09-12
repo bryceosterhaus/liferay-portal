@@ -225,6 +225,8 @@ export function openConfirmModal({
 
 export function openModal(props: Object): void;
 
+export function ns(namespace: string, object?: Object): string | Object;
+
 export function openSelectionModal<T>(init: {
 	buttonAddLabel?: string;
 	buttonCancelLabel?: string;

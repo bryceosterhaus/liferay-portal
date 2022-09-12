@@ -2,7 +2,7 @@
 	"dependencies": {
 		"pkce-challenge": "^3.0.0"
 	},
-	"main": "js/liferay.js",
+	"main": "js/index.js",
 	"name": "oauth2-provider-web",
 	"private": true,
 	"scripts": {

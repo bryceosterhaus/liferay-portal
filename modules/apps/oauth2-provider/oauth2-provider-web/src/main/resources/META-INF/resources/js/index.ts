@@ -11,5 +11,13 @@
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
  * details.
  */
+
 import OAuth2Client from './OAuth2Client';
+
+window.Liferay = window.Liferay || {};
+
+// The global defintions for this are defined in ./index.d.ts
+//@ts-ignore
+window.Liferay.OAuth2Client = OAuth2Client;
+
 export default OAuth2Client;

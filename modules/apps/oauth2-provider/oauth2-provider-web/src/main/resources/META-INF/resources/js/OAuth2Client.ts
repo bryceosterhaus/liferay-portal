@@ -14,37 +14,12 @@
 
 import pkceChallenge from 'pkce-challenge';
 
-interface IOAuth2 {
-	getAuthorizeURL(): string;
-	getBuiltInRedirectURL(): string;
-	getTokenURL(): string;
-	getUserAgentApplication(
-		externalReferenceCode: string
-	): {
-		clientId: string;
-		homePageURL: string;
-		redirectURIs: Array<string>;
-	};
-}
-
 interface IOAuth2ClientFromParametersOptions {
 	authorizeURL?: string;
 	clientId: string;
 	homePageURL: string;
 	redirectURIs?: Array<string>;
 	tokenURL?: string;
-}
-
-interface ILiferay {
-	OAuth2: IOAuth2;
-	OAuth2Client: OAuth2Client;
-	authToken: string;
-}
-
-declare global {
-	interface Window {
-		Liferay: ILiferay;
-	}
 }
 
 class OAuth2Client {
@@ -59,24 +34,24 @@ class OAuth2Client {
 		const webClient = new OAuth2Client();
 
 		webClient.authorizeURL =
-			options.authorizeURL || window.Liferay.OAuth2.getAuthorizeURL();
+			options.authorizeURL || Liferay.OAuth2.getAuthorizeURL();
 		webClient.clientId = options.clientId;
 		webClient.encodedRedirectURL = encodeURIComponent(
 			(options.redirectURIs && options.redirectURIs[0]) ||
-				window.Liferay.OAuth2.getBuiltInRedirectURL()
+				Liferay.OAuth2.getBuiltInRedirectURL()
 		);
 		webClient.homePageURL = options.homePageURL;
 		webClient.redirectURIs = options.redirectURIs || [
-			window.Liferay.OAuth2.getBuiltInRedirectURL(),
+			Liferay.OAuth2.getBuiltInRedirectURL(),
 		];
 		webClient.tokenURL =
-			options.tokenURL || window.Liferay.OAuth2.getTokenURL();
+			options.tokenURL || Liferay.OAuth2.getTokenURL();
 
 		return webClient;
 	}
 
 	static FromUserAgentApplication(userAgentApplicationName: string) {
-		const userAgentApplication = window.Liferay.OAuth2.getUserAgentApplication(
+		const userAgentApplication = Liferay.OAuth2.getUserAgentApplication(
 			userAgentApplicationName
 		);
 
@@ -88,14 +63,14 @@ class OAuth2Client {
 
 		const webClient = new OAuth2Client();
 
-		webClient.authorizeURL = window.Liferay.OAuth2.getAuthorizeURL();
+		webClient.authorizeURL = Liferay.OAuth2.getAuthorizeURL();
 		webClient.clientId = userAgentApplication.clientId;
 		webClient.encodedRedirectURL = encodeURIComponent(
 			userAgentApplication.redirectURIs[0]
 		);
 		webClient.homePageURL = userAgentApplication.homePageURL;
 		webClient.redirectURIs = userAgentApplication.redirectURIs;
-		webClient.tokenURL = window.Liferay.OAuth2.getTokenURL();
+		webClient.tokenURL = Liferay.OAuth2.getTokenURL();
 
 		return webClient;
 	}
@@ -172,7 +147,7 @@ class OAuth2Client {
 
 	_getOrRequestToken(): Promise<any> {
 		const oauth2Client = this;
-		const sessionKey = `${oauth2Client.clientId}-${window.Liferay.authToken}-token`;
+		const sessionKey = `${oauth2Client.clientId}-${Liferay.authToken}-token`;
 
 		return new Promise((resolve) => {
 			const cachedTokenData = sessionStorage.getItem(sessionKey);

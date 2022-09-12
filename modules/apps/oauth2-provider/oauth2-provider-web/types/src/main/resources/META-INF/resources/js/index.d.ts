@@ -13,8 +13,4 @@
  */
 
 import OAuth2Client from './OAuth2Client';
-
-window.Liferay = Liferay || {};
-window.Liferay.OAuth2Client = OAuth2Client;
-
 export default OAuth2Client;

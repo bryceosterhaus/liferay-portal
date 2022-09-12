@@ -12,12 +12,37 @@
  * details.
  */
 
+const path = require('path');
+
+const PUBLIC_PATH = '/o/oauth2-provider-web/';
+
 module.exports = {
-	build: {
-		bundler: {
-			ignore: [
-				'**/global.js',
-			],
-		},
+	context: path.resolve(__dirname),
+	devtool: 'source-map',
+	entry: './src/main/resources/META-INF/resources/js/global.js',
+	mode: 'production',
+	module: {
+		rules: [
+			{
+				exclude: /node_modules/,
+				test: /\.js$/,
+				use: {
+					loader: 'babel-loader',
+				},
+			},
+			{
+				test: /\.ts$/,
+				use: 'ts-loader',
+			},
+		],
+	},
+	output: {
+		filename: 'global.js',
+		libraryTarget: 'window',
+		path: path.resolve('./build/node/packageRunBuild/resources/js'),
+		publicPath: PUBLIC_PATH,
+	},
+	resolve: {
+		extensions: ['.js', '.ts'],
 	},
 };

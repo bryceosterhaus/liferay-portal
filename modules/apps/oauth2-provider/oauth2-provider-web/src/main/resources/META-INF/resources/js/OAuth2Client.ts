@@ -22,60 +22,33 @@ interface IOAuth2ClientFromParametersOptions {
 	tokenURL?: string;
 }
 
+interface IOAuth2ClientOptions {
+	authorizeURL: string;
+	clientId: string;
+	encodedRedirectURL: string;
+	homePageURL: string;
+	redirectURIs: Array<string>;
+	tokenURL: string;
+}
+
 class OAuth2Client {
-	private authorizeURL!: string;
-	private clientId!: string;
-	private encodedRedirectURL!: string;
-	private homePageURL!: string;
-	private redirectURIs!: Array<string>;
-	private tokenURL!: string;
+	private authorizeURL: string;
+	private clientId: string;
+	private encodedRedirectURL: string;
+	private homePageURL: string;
+	private redirectURIs: Array<string>;
+	private tokenURL: string;
 
-	static FromParameters(options: IOAuth2ClientFromParametersOptions) {
-		const webClient = new OAuth2Client();
-
-		webClient.authorizeURL =
-			options.authorizeURL || Liferay.OAuth2.getAuthorizeURL();
-		webClient.clientId = options.clientId;
-		webClient.encodedRedirectURL = encodeURIComponent(
-			(options.redirectURIs && options.redirectURIs[0]) ||
-				Liferay.OAuth2.getBuiltInRedirectURL()
-		);
-		webClient.homePageURL = options.homePageURL;
-		webClient.redirectURIs = options.redirectURIs || [
-			Liferay.OAuth2.getBuiltInRedirectURL(),
-		];
-		webClient.tokenURL =
-			options.tokenURL || Liferay.OAuth2.getTokenURL();
-
-		return webClient;
+	constructor(options: IOAuth2ClientOptions) {
+		this.authorizeURL = options.authorizeURL;
+		this.clientId = options.clientId;
+		this.encodedRedirectURL = options.encodedRedirectURL;
+		this.homePageURL = options.homePageURL;
+		this.redirectURIs = options.redirectURIs;
+		this.tokenURL = options.tokenURL;
 	}
 
-	static FromUserAgentApplication(userAgentApplicationName: string) {
-		const userAgentApplication = Liferay.OAuth2.getUserAgentApplication(
-			userAgentApplicationName
-		);
-
-		if (!userAgentApplication) {
-			throw new Error(
-				`No Application User Agent profile found for ${userAgentApplicationName}`
-			);
-		}
-
-		const webClient = new OAuth2Client();
-
-		webClient.authorizeURL = Liferay.OAuth2.getAuthorizeURL();
-		webClient.clientId = userAgentApplication.clientId;
-		webClient.encodedRedirectURL = encodeURIComponent(
-			userAgentApplication.redirectURIs[0]
-		);
-		webClient.homePageURL = userAgentApplication.homePageURL;
-		webClient.redirectURIs = userAgentApplication.redirectURIs;
-		webClient.tokenURL = Liferay.OAuth2.getTokenURL();
-
-		return webClient;
-	}
-
-	async fetch(url: RequestInfo, options: any = {}): Promise<any> {
+	public async fetch(url: RequestInfo, options: any = {}): Promise<any> {
 		const oauth2Client = this;
 
 		return oauth2Client._fetch(url, options).then((response) => {
@@ -96,7 +69,7 @@ class OAuth2Client {
 		});
 	}
 
-	_createIframe(): HTMLIFrameElement {
+	private _createIframe(): HTMLIFrameElement {
 		const ifrm = document.createElement('iframe');
 		ifrm.style.display = 'none';
 		document.body.appendChild(ifrm);
@@ -104,7 +77,7 @@ class OAuth2Client {
 		return ifrm;
 	}
 
-	async _fetch(resource: RequestInfo | URL, options: any = {}): Promise<any> {
+	private async _fetch(resource: RequestInfo | URL, options: any = {}): Promise<any> {
 		const oauth2Client = this;
 
 		let resourceUrl: string =
@@ -145,7 +118,7 @@ class OAuth2Client {
 		});
 	}
 
-	_getOrRequestToken(): Promise<any> {
+	private _getOrRequestToken(): Promise<any> {
 		const oauth2Client = this;
 		const sessionKey = `${oauth2Client.clientId}-${Liferay.authToken}-token`;
 
@@ -162,7 +135,7 @@ class OAuth2Client {
 		});
 	}
 
-	_requestTokenSilently(sessionKey: string): Promise<any> {
+	private _requestTokenSilently(sessionKey: string): Promise<any> {
 		const oauth2Client = this;
 		const challenge = pkceChallenge(128);
 		const ifrm = oauth2Client._createIframe();
@@ -219,7 +192,7 @@ class OAuth2Client {
 		return promise;
 	}
 
-	async _requestToken(codeVerifier: string, code: string): Promise<any> {
+	private async _requestToken(codeVerifier: string, code: string): Promise<any> {
 		const oauth2Client = this;
 
 		// This client must avoid using @liferay/portal/no-global-fetch in order
@@ -249,4 +222,41 @@ class OAuth2Client {
 	}
 }
 
-export default OAuth2Client;
+export function FromParameters(options: IOAuth2ClientFromParametersOptions) {
+	return new OAuth2Client({
+		authorizeURL: options.authorizeURL || Liferay.OAuth2.getAuthorizeURL(),
+		clientId: options.clientId,
+		encodedRedirectURL: encodeURIComponent(
+			(options.redirectURIs && options.redirectURIs[0]) ||
+				Liferay.OAuth2.getBuiltInRedirectURL()
+		),
+		homePageURL: options.homePageURL,
+		redirectURIs: options.redirectURIs || [
+			Liferay.OAuth2.getBuiltInRedirectURL(),
+		],
+		tokenURL:options.tokenURL || Liferay.OAuth2.getTokenURL()
+	});
+}
+
+export function FromUserAgentApplication(userAgentApplicationName: string) {
+	const userAgentApplication = Liferay.OAuth2.getUserAgentApplication(
+		userAgentApplicationName
+	);
+
+	if (!userAgentApplication) {
+		throw new Error(
+			`No Application User Agent profile found for ${userAgentApplicationName}`
+		);
+	}
+
+	return new OAuth2Client({
+		authorizeURL: Liferay.OAuth2.getAuthorizeURL(),
+		clientId: userAgentApplication.clientId,
+		encodedRedirectURL: encodeURIComponent(
+			userAgentApplication.redirectURIs[0]
+		),
+		homePageURL: userAgentApplication.homePageURL,
+		redirectURIs: userAgentApplication.redirectURIs,
+		tokenURL: Liferay.OAuth2.getTokenURL(),
+	});
+}

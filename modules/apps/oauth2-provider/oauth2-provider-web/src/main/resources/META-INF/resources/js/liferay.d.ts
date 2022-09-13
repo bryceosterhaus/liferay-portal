@@ -12,13 +12,6 @@
  * details.
  */
 
-interface IOAuth2ClientFromParametersOptions {
-	authorizeURL?: string;
-	clientId: string;
-	homePageURL: string;
-	redirectURIs?: Array<string>;
-	tokenURL?: string;
-}
 
 declare module Liferay {
 	const authToken: string;
@@ -35,25 +28,12 @@ declare module Liferay {
 			redirectURIs: Array<string>;
 		};
 	}
-	
-	class OAuth2Client {
-		private authorizeURL;
-		private clientId;
-		private encodedRedirectURL;
-		private homePageURL;
-		private redirectURIs;
-		private tokenURL;
-		static FromParameters(
-			options: IOAuth2ClientFromParametersOptions
-		): OAuth2Client;
-		static FromUserAgentApplication(
-			userAgentApplicationName: string
-		): OAuth2Client;
-		fetch(url: RequestInfo, options?: any): Promise<any>;
-		_createIframe(): HTMLIFrameElement;
-		_fetch(resource: RequestInfo | URL, options?: any): Promise<any>;
-		_getOrRequestToken(): Promise<any>;
-		_requestTokenSilently(sessionKey: string): Promise<any>;
-		_requestToken(codeVerifier: string, code: string): Promise<any>;
+
+	namespace OAuth2Client {
+		type TFromParameters = typeof import('./OAuth2Client').FromParameters;
+		type TFromUserAgentApplication = typeof import('./OAuth2Client').FromUserAgentApplication;
+
+		const FromParameters: TFromParameters;
+		const FromUserAgentApplication: TFromUserAgentApplication;
 	}
 }

@@ -19,17 +19,10 @@ const PUBLIC_PATH = '/o/oauth2-provider-web/';
 module.exports = {
 	context: path.resolve(__dirname),
 	devtool: 'source-map',
-	entry: './src/main/resources/META-INF/resources/js/global.js',
+	entry: './src/main/resources/META-INF/resources/js/index.ts',
 	mode: 'production',
 	module: {
 		rules: [
-			{
-				exclude: /node_modules/,
-				test: /\.js$/,
-				use: {
-					loader: 'babel-loader',
-				},
-			},
 			{
 				test: /\.ts$/,
 				use: 'ts-loader',
@@ -37,12 +30,12 @@ module.exports = {
 		],
 	},
 	output: {
-		filename: 'global.js',
+		filename: 'index.js',
 		libraryTarget: 'window',
 		path: path.resolve('./build/node/packageRunBuild/resources/js'),
 		publicPath: PUBLIC_PATH,
 	},
 	resolve: {
-		extensions: ['.js', '.ts'],
+		extensions: ['.js','.ts'],
 	},
 };

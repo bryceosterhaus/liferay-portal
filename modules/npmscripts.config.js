@@ -87,10 +87,6 @@ module.exports = {
 					'@liferay/map-openstreetmap': {
 						'/': '*',
 					},
-					'@liferay/oauth2-provider-web': {
-						'/': '*',
-						'pkce-challenge': '*'
-					},
 					'@liferay/object-js-components-web': {
 						'/': '*',
 					},

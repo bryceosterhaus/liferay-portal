@@ -2,11 +2,11 @@
 	"dependencies": {
 		"pkce-challenge": "^3.0.0"
 	},
-	"main": "js/OAuth2Client.js",
+	"main": "js/index.js",
 	"name": "@liferay/oauth2-provider-web",
 	"private": true,
 	"scripts": {
-		"build": "liferay-npm-scripts build",
+		"build": "liferay-npm-scripts webpack",
 		"checkFormat": "liferay-npm-scripts check",
 		"format": "liferay-npm-scripts fix"
 	},

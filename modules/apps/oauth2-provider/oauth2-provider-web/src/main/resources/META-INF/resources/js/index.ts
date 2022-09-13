@@ -18,5 +18,5 @@ window.Liferay = window.Liferay || {};
 
 window.Liferay.OAuth2Client = {
 	FromParameters,
-	FromUserAgentApplication
+	FromUserAgentApplication,
 };

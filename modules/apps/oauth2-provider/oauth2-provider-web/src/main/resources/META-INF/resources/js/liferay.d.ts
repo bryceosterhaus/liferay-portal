@@ -12,7 +12,6 @@
  * details.
  */
 
-
 declare module Liferay {
 	const authToken: string;
 

@@ -77,7 +77,10 @@ class OAuth2Client {
 		return ifrm;
 	}
 
-	private async _fetch(resource: RequestInfo | URL, options: any = {}): Promise<any> {
+	private async _fetch(
+		resource: RequestInfo | URL,
+		options: any = {}
+	): Promise<any> {
 		const oauth2Client = this;
 
 		let resourceUrl: string =
@@ -192,7 +195,10 @@ class OAuth2Client {
 		return promise;
 	}
 
-	private async _requestToken(codeVerifier: string, code: string): Promise<any> {
+	private async _requestToken(
+		codeVerifier: string,
+		code: string
+	): Promise<any> {
 		const oauth2Client = this;
 
 		// This client must avoid using @liferay/portal/no-global-fetch in order
@@ -234,7 +240,7 @@ export function FromParameters(options: IOAuth2ClientFromParametersOptions) {
 		redirectURIs: options.redirectURIs || [
 			Liferay.OAuth2.getBuiltInRedirectURL(),
 		],
-		tokenURL:options.tokenURL || Liferay.OAuth2.getTokenURL()
+		tokenURL: options.tokenURL || Liferay.OAuth2.getTokenURL(),
 	});
 }
 

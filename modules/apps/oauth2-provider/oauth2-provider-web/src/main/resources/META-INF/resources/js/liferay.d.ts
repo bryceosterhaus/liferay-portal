@@ -44,7 +44,7 @@ declare module Liferay {
 			redirectURIs: Array<string>;
 			tokenURL: string;
 		}
-		
+
 		class OAuth2Client {
 			private authorizeURL;
 			private clientId;
@@ -61,7 +61,11 @@ declare module Liferay {
 			private _requestToken;
 		}
 
-		function FromParameters(options: IOAuth2ClientFromParametersOptions): OAuth2Client;
-		function FromUserAgentApplication(userAgentApplicationName: string): OAuth2Client;
+		function FromParameters(
+			options: IOAuth2ClientFromParametersOptions
+		): OAuth2Client;
+		function FromUserAgentApplication(
+			userAgentApplicationName: string
+		): OAuth2Client;
 	}
 }

@@ -17,10 +17,14 @@ import {FromParameters, FromUserAgentApplication} from './OAuth2Client';
 window.Liferay = window.Liferay || {};
 
 window.Liferay.OAuth2Client = {
+
 	// Definitions are declared in liferay.d.ts
 	// @ts-ignore
+
 	FromParameters,
+
 	// Definitions are declared in liferay.d.ts
 	// @ts-ignore
+
 	FromUserAgentApplication,
 };

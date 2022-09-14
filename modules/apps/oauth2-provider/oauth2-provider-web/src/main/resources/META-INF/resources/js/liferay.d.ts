@@ -29,10 +29,39 @@ declare module Liferay {
 	}
 
 	namespace OAuth2Client {
-		type TFromParameters = typeof import('./OAuth2Client').FromParameters;
-		type TFromUserAgentApplication = typeof import('./OAuth2Client').FromUserAgentApplication;
+		interface IOAuth2ClientFromParametersOptions {
+			authorizeURL?: string;
+			clientId: string;
+			homePageURL: string;
+			redirectURIs?: Array<string>;
+			tokenURL?: string;
+		}
+		interface IOAuth2ClientOptions {
+			authorizeURL: string;
+			clientId: string;
+			encodedRedirectURL: string;
+			homePageURL: string;
+			redirectURIs: Array<string>;
+			tokenURL: string;
+		}
+		
+		class OAuth2Client {
+			private authorizeURL;
+			private clientId;
+			private encodedRedirectURL;
+			private homePageURL;
+			private redirectURIs;
+			private tokenURL;
+			constructor(options: IOAuth2ClientOptions);
+			fetch(url: RequestInfo, options?: any): Promise<any>;
+			private _createIframe;
+			private _fetch;
+			private _getOrRequestToken;
+			private _requestTokenSilently;
+			private _requestToken;
+		}
 
-		const FromParameters: TFromParameters;
-		const FromUserAgentApplication: TFromUserAgentApplication;
+		function FromParameters(options: IOAuth2ClientFromParametersOptions): OAuth2Client;
+		function FromUserAgentApplication(userAgentApplicationName: string): OAuth2Client;
 	}
 }

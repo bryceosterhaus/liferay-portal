@@ -12,20 +12,5 @@
  * details.
  */
 
-/// <reference types="react" />
-
-import './PredefinedValueFDS.scss';
-export default function PredefinedValueFDS({
-	currentObjectDefinitionFields,
-	objectFieldsMap,
-	setValues,
-	values,
-}: IProps): JSX.Element;
-interface IProps {
-	currentObjectDefinitionFields: ObjectField[];
-	predefinedValues?: PredefinedValue[];
-	setValues: (params: Partial<ObjectAction>) => void;
-	values: Partial<ObjectAction>;
-	objectFieldsMap: Map<string, ObjectField>;
-}
-export {};
+declare const _default: {};
+export default _default;

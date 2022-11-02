@@ -57,6 +57,22 @@ module.exports = {
 						'/': '*',
 						"axe-core": "*"
 					},
+					'@liferay/frontend-js-dependencies-bundle-web': {
+						'/': '*',
+						"clipboard" : "*",
+						"codemirror" : "*",
+						"dagre" : "*",
+						"date-fns" : "*",
+						"dom-align" : "*",
+						"fuzzy" : "*",
+						"moment" : "*",
+						"qrcode" : "*",
+						"react-flow-renderer" : "*",
+						"react-router-dom": "*",
+						"react-transition-group" : "*",
+						"text-mask-core" : "*",
+						"uuid" : "*"
+					},
 					'@liferay/frontend-js-react-web': {
 						'/': '*',
 						'classnames': '*',
@@ -399,6 +415,21 @@ module.exports = {
 		imports: {
 			'@liferay/frontend-js-a11y-web': [
 				"axe-core"
+			],
+			'@liferay/frontend-js-dependencies-bundle-web': [
+				"clipboard",
+				"codemirror",
+				"dagre",
+				"date-fns",
+				"dom-align",
+				"fuzzy",
+				"moment",
+				"qrcode",
+				"react-flow-renderer",
+				"react-router-dom",
+				"react-transition-group",
+				"text-mask-core",
+				"uuid"
 			],
 			'@liferay/frontend-js-react-web': [
 				'classnames',

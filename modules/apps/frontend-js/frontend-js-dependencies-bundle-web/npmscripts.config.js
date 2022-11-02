@@ -19,7 +19,14 @@ module.exports = {
 			"codemirror",
 			"dagre",
 			"date-fns",
-			"dom-align",
+			{
+				format: 'esm',
+				name: "dom-align",
+				symbols: [
+					'alignElement',
+					'alignPoint'
+				]
+			},
 			"fuzzy",
 			"moment",
 			"qrcode",

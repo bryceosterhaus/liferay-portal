@@ -55,6 +55,7 @@ module.exports = {
 					},
 					'@liferay/frontend-js-a11y-web': {
 						'/': '*',
+						"axe-core": "*"
 					},
 					'@liferay/frontend-js-react-web': {
 						'/': '*',
@@ -396,6 +397,9 @@ module.exports = {
 			'dynamic-data-mapping-form-renderer',
 		],
 		imports: {
+			'@liferay/frontend-js-a11y-web': [
+				"axe-core"
+			],
 			'@liferay/frontend-js-react-web': [
 				'classnames',
 				'formik',

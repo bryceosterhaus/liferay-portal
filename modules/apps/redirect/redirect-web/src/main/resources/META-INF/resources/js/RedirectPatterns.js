@@ -18,7 +18,7 @@ import ClayIcon from '@clayui/icon';
 import ClayLayout from '@clayui/layout';
 import PropTypes from 'prop-types';
 import React, {useState} from 'react';
-import uuidv4 from 'uuid/v4';
+import uuid from 'uuid';
 
 import '../css/redirect_pattern.scss';
 
@@ -105,7 +105,7 @@ const RedirectPattern = ({
 	patterns: initialPatternsList,
 	portletNamespace,
 }) => {
-	const emptyRow = () => ({destinationURL: '', id: uuidv4(), pattern: ''});
+	const emptyRow = () => ({destinationURL: '', id: uuid.v4(), pattern: ''});
 
 	const addRow = (index) => {
 		const tempList = [...patterns];
@@ -121,7 +121,7 @@ const RedirectPattern = ({
 
 	const [patterns, setPatterns] = useState(
 		initialPatternsList && !!initialPatternsList.length
-			? initialPatternsList.map((item) => ({...item, id: uuidv4()}))
+			? initialPatternsList.map((item) => ({...item, id: uuid.v4()}))
 			: [emptyRow()]
 	);
 

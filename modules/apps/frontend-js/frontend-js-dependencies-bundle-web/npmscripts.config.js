@@ -16,7 +16,35 @@ module.exports = {
 	build: {
 		exports: [
 			"clipboard",
-			"codemirror",
+			{
+				includeInternalPaths: [
+					'/addon/display/placeholder',
+					'/addon/display/autorefresh',
+					'/addon/edit/closebrackets',
+					'/addon/edit/closetag',
+					'/addon/edit/matchbrackets',
+					'/addon/fold/brace-fold',
+					'/addon/fold/comment-fold',
+					'/addon/fold/foldcode',
+					'/addon/fold/foldgutter.css',
+					'/addon/fold/foldgutter',
+					'/addon/fold/indent-fold',
+					'/addon/fold/xml-fold',
+					'/addon/hint/css-hint',
+					'/addon/hint/html-hint',
+					'/addon/hint/javascript-hint',
+					'/addon/hint/show-hint.css',
+					'/addon/hint/show-hint',
+					'/addon/hint/xml-hint',
+					'/mode/groovy/groovy',
+					'/lib/codemirror.css',
+					'/mode/css/css',
+					'/mode/htmlmixed/htmlmixed',
+					'/mode/javascript/javascript',
+					'/mode/xml/xml',
+				],
+				name: "codemirror"
+			},
 			"dagre",
 			"date-fns",
 			{
@@ -34,7 +62,7 @@ module.exports = {
 			"react-flow-renderer",
 			"react-transition-group",
 			"text-mask-core",
-			"uuid"
+			{name: "uuid", symbols: 'auto'}
 		],
 		main: 'src/main/resources/META-INF/resources/js/index.ts',
 	},

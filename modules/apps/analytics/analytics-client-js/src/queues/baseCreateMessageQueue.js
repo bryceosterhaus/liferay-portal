@@ -12,7 +12,7 @@
  * details.
  */
 
-import uuidv4 from 'uuid/v4';
+import uuid from 'uuid';
 
 import {getContexts} from '../utils/contexts';
 import {removeDups} from '../utils/events';
@@ -83,7 +83,7 @@ class BaseCreateMessageQueue extends BaseQueue {
 			context,
 			dataSourceId,
 			events,
-			id: uuidv4(),
+			id: uuid.v4(),
 			userId,
 		};
 	}

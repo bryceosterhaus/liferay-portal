@@ -13,9 +13,9 @@
  */
 
 import {useMemo} from 'react';
-import uuidv4 from 'uuid/v4';
+import uuid from 'uuid';
 
-const PREFIX = uuidv4();
+const PREFIX = uuid.v4();
 
 let nextId = 0;
 

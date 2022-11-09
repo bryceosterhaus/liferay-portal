@@ -18,7 +18,7 @@ import ClayIcon from '@clayui/icon';
 import ClayLayout from '@clayui/layout';
 import PropTypes from 'prop-types';
 import React, {useState} from 'react';
-import uuidv4 from 'uuid/v4';
+import uuid from 'uuid';
 
 import '../../css/file_size_mimetypes.scss';
 
@@ -131,7 +131,7 @@ const FileSizePerMimeType = ({
 	portletNamespace,
 	sizeList: initialSizeList,
 }) => {
-	const emptyRow = () => ({id: uuidv4(), mimeType: '', size: ''});
+	const emptyRow = () => ({id: uuid.v4(), mimeType: '', size: ''});
 
 	const addRow = (index) => {
 		const tempList = [...sizesList];
@@ -147,7 +147,7 @@ const FileSizePerMimeType = ({
 
 	const [sizesList, setSizesList] = useState(
 		initialSizeList && !!initialSizeList.length
-			? initialSizeList.map((item) => ({...item, id: uuidv4()}))
+			? initialSizeList.map((item) => ({...item, id: uuid.v4()}))
 			: [emptyRow()]
 	);
 

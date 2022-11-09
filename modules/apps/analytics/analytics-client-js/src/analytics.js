@@ -12,7 +12,7 @@
  * details.
  */
 
-import uuidv4 from 'uuid/v4';
+import uuid from 'uuid';
 
 import middlewares from './middlewares/defaults';
 import defaultPlugins from './plugins/defaults';
@@ -384,7 +384,7 @@ class Analytics {
 	 * @returns {string} The generated id
 	 */
 	_generateUserId() {
-		const userId = uuidv4();
+		const userId = uuid.v4();
 
 		setItem(STORAGE_KEY_USER_ID, userId);
 		this._setCookie(STORAGE_KEY_USER_ID, userId);

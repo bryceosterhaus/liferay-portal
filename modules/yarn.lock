@@ -1864,10 +1864,10 @@
     xml-js "^1.6.8"
     yargs "^14.0.0"
 
-"@liferay/npm-scripts@47.10.0":
-  version "47.10.0"
-  resolved "https://registry.yarnpkg.com/@liferay/npm-scripts/-/npm-scripts-47.10.0.tgz#f442f863ba8e0ca6258c08260896674aae638ddb"
-  integrity sha512-ui9inLqV/nr2W4Y6bhCyULT8Q+Mrud5gRpLW7QGi+BuPwHzRpvEiD6d0Xgtfmoh+yfvdgVuz/g1ZO2acrZo1rQ==
+"@liferay/npm-scripts@47.11.0-alpha.0":
+  version "47.11.0-alpha.0"
+  resolved "https://registry.yarnpkg.com/@liferay/npm-scripts/-/npm-scripts-47.11.0-alpha.0.tgz#6f88a2b60d1f3300f485729b26aa615a23044123"
+  integrity sha512-3yK3GFMBLlfmKzmqcN0N4o11uR9MQPhCgZhpUWYds4kBMy6iJ6ZzuWYPeQUZUPJBoMzskuwFKumSJG1jgqQPxQ==
   dependencies:
     "@babel/cli" "^7.2.3"
     "@babel/core" "^7.8.3"
@@ -4685,7 +4685,7 @@ codemirror@5.59.0:
   resolved "https://registry.yarnpkg.com/codemirror/-/codemirror-5.59.0.tgz#6d8132055459aabf21d04cae5cf5c430e5c57bb9"
   integrity sha512-UGzSkCacY9z0rSpQ3wnTWRN2nvRE6foDXnJltWW8pazInR/R+3gXHrao4IFQMv/bSBvFBxt8/HPpkpKAS54x5Q==
 
-codemirror@^5.58.2, codemirror@^5.59.0:
+codemirror@^5.58.2:
   version "5.65.2"
   resolved "https://registry.yarnpkg.com/codemirror/-/codemirror-5.65.2.tgz#5799a70cb3d706e10f60e267245e3a75205d3dd9"
   integrity sha512-SZM4Zq7XEC8Fhroqe3LxbEEX1zUPWH1wMr5zxiBuiUF64iYOUH/JI88v4tBag8MiBS8B8gRv8O1pPXGYXQ4ErA==

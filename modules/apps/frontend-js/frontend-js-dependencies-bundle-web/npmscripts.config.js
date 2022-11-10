@@ -56,7 +56,9 @@ module.exports = {
 				]
 			},
 			"fuzzy",
-			"moment",
+			{includeInternalPaths: [
+				'/min/moment-with-locales'
+			], name: "moment"},
 			"qrcode",
 			'react-router-dom',
 			"react-flow-renderer",

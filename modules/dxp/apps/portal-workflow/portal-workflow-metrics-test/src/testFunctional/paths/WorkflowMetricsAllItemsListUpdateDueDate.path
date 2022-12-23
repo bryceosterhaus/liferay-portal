@@ -62,7 +62,7 @@
 </tr>
 <tr>
 	<td>NEW_DUE_DATE_INPUT_ALL_ITEMS_LIST_TIME</td>
-	<td>//input[contains(@placeholder, 'HH:mm am/pm')]</td>
+	<td>//input[contains(@placeholder, 'hh:mm am/pm')]</td>
 	<td></td>
 </tr>
 </tbody>

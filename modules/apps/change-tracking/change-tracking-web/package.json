@@ -1,6 +1,6 @@
 {
 	"dependencies": {
-		"moment": "2.29.4",
+		"date-fns": "2.29.3",
 		"react-transition-group": "4.4.1"
 	},
 	"name": "change-tracking-web",

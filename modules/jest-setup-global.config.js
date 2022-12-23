@@ -12,30 +12,7 @@
  * details.
  */
 
-import {formatRelative} from 'date-fns';
+import {setDefaultOptions} from 'date-fns';
+import {enUS} from 'date-fns/locale';
 
-const getLanguage = () => {
-	const language = Liferay.ThemeDisplay.getBCP47LanguageId();
-
-	const languages = {
-		'zh-Hans-CN': 'zh-CN',
-	};
-
-	return languages[language] || language;
-};
-
-const getDateFormatted = (date, language = getLanguage()) => {
-	try {
-		return new Intl.DateTimeFormat(language, {
-			dateStyle: 'short',
-			timeStyle: 'short',
-		}).format(new Date(date));
-	}
-	catch (error) {
-		return date;
-	}
-};
-
-const fromNow = (date) => formatRelative(date, new Date());
-
-export {fromNow, getDateFormatted};
+setDefaultOptions({locale: enUS});

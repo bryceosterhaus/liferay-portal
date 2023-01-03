@@ -12,6 +12,6 @@
  * details.
  */
 
-import tr from 'date-fns/locale/tr/index.js';
 import {setDefaultOptions} from 'date-fns';
+import tr from 'date-fns/locale/tr/index.js';
 setDefaultOptions({locale: tr});

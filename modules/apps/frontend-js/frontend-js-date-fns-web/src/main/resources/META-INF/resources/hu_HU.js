@@ -12,6 +12,6 @@
  * details.
  */
 
-import hu from 'date-fns/locale/hu/index.js';
 import {setDefaultOptions} from 'date-fns';
+import hu from 'date-fns/locale/hu/index.js';
 setDefaultOptions({locale: hu});

@@ -12,6 +12,6 @@
  * details.
  */
 
-import eu from 'date-fns/locale/eu/index.js';
 import {setDefaultOptions} from 'date-fns';
+import eu from 'date-fns/locale/eu/index.js';
 setDefaultOptions({locale: eu});

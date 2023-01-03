@@ -14,15 +14,13 @@
 
 import ClayAlert from '@clayui/alert';
 import ClayDatePicker from '@clayui/date-picker';
-import {format, getDefaultOptions} from 'date-fns';
+import {format} from 'date-fns';
 import React from 'react';
 
 import '../css/main.scss';
 
 export default function App() {
 	const [value, setValue] = React.useState('');
-
-	console.log(getDefaultOptions());
 
 	return (
 		<div>

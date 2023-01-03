@@ -12,6 +12,6 @@
  * details.
  */
 
-import ja from 'date-fns/locale/ja/index.js';
 import {setDefaultOptions} from 'date-fns';
+import ja from 'date-fns/locale/ja/index.js';
 setDefaultOptions({locale: ja});

@@ -56,6 +56,10 @@ module.exports = {
 					'@liferay/frontend-js-a11y-web': {
 						'/': '*',
 					},
+					'@liferay/frontend-js-date-fns-web': {
+						'/': '*',
+						'date-fns': '*',
+					},
 					'@liferay/frontend-js-react-web': {
 						'/': '*',
 						'classnames': '*',
@@ -119,10 +123,6 @@ module.exports = {
 					},
 					'frontend-js-components-web': {
 						'/': '*',
-					},
-					'frontend-js-date-fns-web': {
-						'/': '*',
-						'date-fns': '*',
 					},
 					'frontend-js-metal-web': {
 						'incremental-dom': '*',
@@ -400,6 +400,7 @@ module.exports = {
 			'dynamic-data-mapping-form-renderer',
 		],
 		imports: {
+			'@liferay/frontend-js-date-fns-web': ['date-fns'],
 			'@liferay/frontend-js-react-web': [
 				'classnames',
 				'formik',
@@ -411,7 +412,6 @@ module.exports = {
 			],
 			'@liferay/frontend-js-state-web': [],
 			'frontend-js-components-web': [],
-			'frontend-js-date-fns-web': ['date-fns'],
 			'frontend-js-metal-web': [
 				'incremental-dom',
 				'incremental-dom-string',

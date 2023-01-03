@@ -12,6 +12,6 @@
  * details.
  */
 
-import nb from 'date-fns/locale/nb/index.js';
 import {setDefaultOptions} from 'date-fns';
+import nb from 'date-fns/locale/nb/index.js';
 setDefaultOptions({locale: nb});

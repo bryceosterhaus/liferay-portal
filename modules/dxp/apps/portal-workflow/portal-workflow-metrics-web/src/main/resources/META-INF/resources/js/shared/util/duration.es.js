@@ -10,8 +10,6 @@
  */
 
 import {
-	format,
-	formatDuration as formatDurationDateFns,
 	hoursToMilliseconds,
 	intervalToDuration,
 	minutesToMilliseconds,

@@ -2,7 +2,7 @@
 	"dependencies": {
 		"date-fns": "2.29.3"
 	},
-	"name": "frontend-js-date-fns-web",
+	"name": "@liferay/frontend-js-date-fns-web",
 	"private": true,
 	"scripts": {
 		"build": "liferay-npm-scripts build",

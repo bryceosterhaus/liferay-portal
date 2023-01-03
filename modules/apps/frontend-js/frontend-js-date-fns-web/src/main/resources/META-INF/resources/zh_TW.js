@@ -12,6 +12,6 @@
  * details.
  */
 
-import zh_TW from 'date-fns/locale/zh-TW/index.js';
 import {setDefaultOptions} from 'date-fns';
+import zh_TW from 'date-fns/locale/zh-TW/index.js';
 setDefaultOptions({locale: zh_TW});

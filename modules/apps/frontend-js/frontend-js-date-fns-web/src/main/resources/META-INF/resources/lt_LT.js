@@ -12,6 +12,6 @@
  * details.
  */
 
-import lt from 'date-fns/locale/lt/index.js';
 import {setDefaultOptions} from 'date-fns';
+import lt from 'date-fns/locale/lt/index.js';
 setDefaultOptions({locale: lt});

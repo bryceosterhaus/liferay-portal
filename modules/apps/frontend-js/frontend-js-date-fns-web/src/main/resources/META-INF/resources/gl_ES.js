@@ -12,6 +12,6 @@
  * details.
  */
 
-import gl from 'date-fns/locale/gl/index.js';
 import {setDefaultOptions} from 'date-fns';
+import gl from 'date-fns/locale/gl/index.js';
 setDefaultOptions({locale: gl});

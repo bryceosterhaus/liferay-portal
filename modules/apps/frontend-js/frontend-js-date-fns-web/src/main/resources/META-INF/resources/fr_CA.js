@@ -12,6 +12,6 @@
  * details.
  */
 
-import fr_CA from 'date-fns/locale/fr-CA/index.js';
 import {setDefaultOptions} from 'date-fns';
+import fr_CA from 'date-fns/locale/fr-CA/index.js';
 setDefaultOptions({locale: fr_CA});

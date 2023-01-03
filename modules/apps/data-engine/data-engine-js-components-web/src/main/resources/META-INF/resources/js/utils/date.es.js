@@ -14,7 +14,7 @@
 
 import {format, parse} from 'date-fns';
 
-export function formatDate(date, locale) {
+export function formatDate(date) {
 	return format(new Date(date), 'PPP');
 }
 

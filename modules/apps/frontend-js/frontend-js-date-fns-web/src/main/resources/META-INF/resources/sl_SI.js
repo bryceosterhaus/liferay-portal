@@ -12,6 +12,6 @@
  * details.
  */
 
-import sl from 'date-fns/locale/sl/index.js';
 import {setDefaultOptions} from 'date-fns';
+import sl from 'date-fns/locale/sl/index.js';
 setDefaultOptions({locale: sl});

@@ -12,6 +12,6 @@
  * details.
  */
 
-import hi from 'date-fns/locale/hi/index.js';
 import {setDefaultOptions} from 'date-fns';
+import hi from 'date-fns/locale/hi/index.js';
 setDefaultOptions({locale: hi});

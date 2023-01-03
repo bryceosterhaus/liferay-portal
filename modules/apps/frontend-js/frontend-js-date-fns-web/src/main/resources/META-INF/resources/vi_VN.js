@@ -12,6 +12,6 @@
  * details.
  */
 
-import vi from 'date-fns/locale/vi/index.js';
 import {setDefaultOptions} from 'date-fns';
+import vi from 'date-fns/locale/vi/index.js';
 setDefaultOptions({locale: vi});

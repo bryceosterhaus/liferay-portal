@@ -12,6 +12,6 @@
  * details.
  */
 
-import ko from 'date-fns/locale/ko/index.js';
 import {setDefaultOptions} from 'date-fns';
+import ko from 'date-fns/locale/ko/index.js';
 setDefaultOptions({locale: ko});

@@ -12,6 +12,6 @@
  * details.
  */
 
-import ca from 'date-fns/locale/ca/index.js';
 import {setDefaultOptions} from 'date-fns';
+import ca from 'date-fns/locale/ca/index.js';
 setDefaultOptions({locale: ca});

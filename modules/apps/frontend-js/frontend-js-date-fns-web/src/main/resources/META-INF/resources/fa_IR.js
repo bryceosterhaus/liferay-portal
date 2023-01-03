@@ -12,6 +12,6 @@
  * details.
  */
 
-import fa_IR from 'date-fns/locale/fa-IR/index.js';
 import {setDefaultOptions} from 'date-fns';
+import fa_IR from 'date-fns/locale/fa-IR/index.js';
 setDefaultOptions({locale: fa_IR});

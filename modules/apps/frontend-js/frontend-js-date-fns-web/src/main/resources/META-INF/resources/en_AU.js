@@ -12,6 +12,6 @@
  * details.
  */
 
-import en_AU from 'date-fns/locale/en-AU/index.js';
 import {setDefaultOptions} from 'date-fns';
+import en_AU from 'date-fns/locale/en-AU/index.js';
 setDefaultOptions({locale: en_AU});

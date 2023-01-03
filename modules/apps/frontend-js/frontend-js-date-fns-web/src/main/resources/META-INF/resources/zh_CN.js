@@ -12,6 +12,6 @@
  * details.
  */
 
-import zh_CN from 'date-fns/locale/zh-CN/index.js';
 import {setDefaultOptions} from 'date-fns';
+import zh_CN from 'date-fns/locale/zh-CN/index.js';
 setDefaultOptions({locale: zh_CN});

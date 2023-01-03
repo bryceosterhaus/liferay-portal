@@ -12,6 +12,6 @@
  * details.
  */
 
-import sr from 'date-fns/locale/sr/index.js';
 import {setDefaultOptions} from 'date-fns';
+import sr from 'date-fns/locale/sr/index.js';
 setDefaultOptions({locale: sr});

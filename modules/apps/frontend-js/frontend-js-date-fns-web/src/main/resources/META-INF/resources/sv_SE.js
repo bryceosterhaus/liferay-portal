@@ -12,6 +12,6 @@
  * details.
  */
 
-import sv from 'date-fns/locale/sv/index.js';
 import {setDefaultOptions} from 'date-fns';
+import sv from 'date-fns/locale/sv/index.js';
 setDefaultOptions({locale: sv});

@@ -12,6 +12,6 @@
  * details.
  */
 
-import ta from 'date-fns/locale/ta/index.js';
 import {setDefaultOptions} from 'date-fns';
+import ta from 'date-fns/locale/ta/index.js';
 setDefaultOptions({locale: ta});

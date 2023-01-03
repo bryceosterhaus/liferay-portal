@@ -12,6 +12,8 @@
  * details.
  */
 
-import el from 'date-fns/locale/el/index.js';
 import {setDefaultOptions} from 'date-fns';
+
+// eslint-disable-next-line @liferay/no-abbreviations
+import el from 'date-fns/locale/el/index.js';
 setDefaultOptions({locale: el});

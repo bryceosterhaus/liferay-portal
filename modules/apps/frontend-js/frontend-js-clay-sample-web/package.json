@@ -1,6 +1,6 @@
 {
 	"dependencies": {
-		"@clayui/date-picker": "*",
+		"@clayui/date-picker": "3.84.0",
 		"date-fns": "*"
 	},
 	"main": "js/App.es",

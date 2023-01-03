@@ -12,6 +12,6 @@
  * details.
  */
 
-import th from 'date-fns/locale/th/index.js';
 import {setDefaultOptions} from 'date-fns';
+import th from 'date-fns/locale/th/index.js';
 setDefaultOptions({locale: th});

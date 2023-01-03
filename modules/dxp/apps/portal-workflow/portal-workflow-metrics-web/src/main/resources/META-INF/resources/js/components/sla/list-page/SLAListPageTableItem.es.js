@@ -13,7 +13,6 @@ import ClayIcon from '@clayui/icon';
 import ClayLayout from '@clayui/layout';
 import ClayTable from '@clayui/table';
 import {format} from 'date-fns';
-
 import React, {useCallback, useContext} from 'react';
 
 import QuickActionKebab from '../../../shared/components/quick-action-kebab/QuickActionKebab.es';

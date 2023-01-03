@@ -12,6 +12,6 @@
  * details.
  */
 
-import nl_BE from 'date-fns/locale/nl-BE/index.js';
 import {setDefaultOptions} from 'date-fns';
+import nl_BE from 'date-fns/locale/nl-BE/index.js';
 setDefaultOptions({locale: nl_BE});

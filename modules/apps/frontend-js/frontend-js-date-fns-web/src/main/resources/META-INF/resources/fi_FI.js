@@ -12,6 +12,6 @@
  * details.
  */
 
-import fi from 'date-fns/locale/fi/index.js';
 import {setDefaultOptions} from 'date-fns';
+import fi from 'date-fns/locale/fi/index.js';
 setDefaultOptions({locale: fi});

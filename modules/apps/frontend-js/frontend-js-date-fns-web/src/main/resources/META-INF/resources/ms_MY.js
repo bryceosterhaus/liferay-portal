@@ -12,6 +12,6 @@
  * details.
  */
 
-import ms from 'date-fns/locale/ms/index.js';
 import {setDefaultOptions} from 'date-fns';
+import ms from 'date-fns/locale/ms/index.js';
 setDefaultOptions({locale: ms});

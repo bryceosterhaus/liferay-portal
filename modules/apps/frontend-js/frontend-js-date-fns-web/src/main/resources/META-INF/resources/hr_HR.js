@@ -12,6 +12,6 @@
  * details.
  */
 
-import hr from 'date-fns/locale/hr/index.js';
 import {setDefaultOptions} from 'date-fns';
+import hr from 'date-fns/locale/hr/index.js';
 setDefaultOptions({locale: hr});

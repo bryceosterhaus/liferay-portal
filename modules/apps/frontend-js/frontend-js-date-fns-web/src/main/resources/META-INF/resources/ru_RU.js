@@ -12,6 +12,6 @@
  * details.
  */
 
-import ru from 'date-fns/locale/ru/index.js';
 import {setDefaultOptions} from 'date-fns';
+import ru from 'date-fns/locale/ru/index.js';
 setDefaultOptions({locale: ru});

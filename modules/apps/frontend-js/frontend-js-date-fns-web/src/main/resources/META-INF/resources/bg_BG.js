@@ -12,6 +12,6 @@
  * details.
  */
 
-import bg from 'date-fns/locale/bg/index.js';
 import {setDefaultOptions} from 'date-fns';
+import bg from 'date-fns/locale/bg/index.js';
 setDefaultOptions({locale: bg});

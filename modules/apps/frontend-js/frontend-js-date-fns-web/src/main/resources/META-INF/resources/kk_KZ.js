@@ -12,6 +12,6 @@
  * details.
  */
 
-import kk from 'date-fns/locale/kk/index.js';
 import {setDefaultOptions} from 'date-fns';
+import kk from 'date-fns/locale/kk/index.js';
 setDefaultOptions({locale: kk});

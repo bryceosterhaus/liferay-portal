@@ -3,10 +3,10 @@
 		"@liferay/layout-content-page-editor-web": "*",
 		"@types/codemirror": "^5.60.5",
 		"codemirror": "^5.59.0",
+		"date-fns": "2.29.3",
 		"frontend-editor-ckeditor-web": "*",
 		"frontend-js-components-web": "*",
 		"frontend-js-web": "*",
-		"date-fns": "2.29.3",
 		"text-mask-core": "^5.1.2"
 	},
 	"main": "index.js",

@@ -12,6 +12,6 @@
  * details.
  */
 
-import uk from 'date-fns/locale/uk/index.js';
 import {setDefaultOptions} from 'date-fns';
+import uk from 'date-fns/locale/uk/index.js';
 setDefaultOptions({locale: uk});

@@ -12,6 +12,6 @@
  * details.
  */
 
-import sk from 'date-fns/locale/sk/index.js';
 import {setDefaultOptions} from 'date-fns';
+import sk from 'date-fns/locale/sk/index.js';
 setDefaultOptions({locale: sk});

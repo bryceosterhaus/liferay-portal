@@ -14,20 +14,16 @@
 
 package com.liferay.frontend.js.date.fns.web.internal.servlet.taglib;
 
-import com.liferay.frontend.js.loader.modules.extender.npm.NPMResolver;
-import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.servlet.taglib.BaseDynamicInclude;
 import com.liferay.portal.kernel.servlet.taglib.DynamicInclude;
-import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.WebKeys;
-import java.util.Locale;
-import com.liferay.portal.kernel.servlet.taglib.aui.ScriptData;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+
+import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -63,8 +59,11 @@ public class DateFnsTopHeadDynamicInclude extends BaseDynamicInclude {
 
 		System.out.println(locale);
 
-		printWriter.println("<script data-senna-track=\"permanent\" type=\"module\">");
-		printWriter.println("import '/o/frontend-js-date-fns-web/__liferay__/" + locale + ".js';");
+		printWriter.println(
+			"<script data-senna-track=\"permanent\" type=\"module\">");
+		printWriter.println(
+			"import '/o/frontend-js-date-fns-web/__liferay__/" + locale +
+				".js';");
 		printWriter.println("</script>");
 	}
 
@@ -79,11 +78,7 @@ public class DateFnsTopHeadDynamicInclude extends BaseDynamicInclude {
 		_bundleContext = bundleContext;
 	}
 
-	private static final Log _log = LogFactoryUtil.getLog(
-		DateFnsTopHeadDynamicInclude.class);
-
 	private volatile BundleContext _bundleContext;
-
 
 	@Reference
 	private Portal _portal;

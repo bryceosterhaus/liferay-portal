@@ -12,6 +12,6 @@
  * details.
  */
 
-import ro from 'date-fns/locale/ro/index.js';
 import {setDefaultOptions} from 'date-fns';
+import ro from 'date-fns/locale/ro/index.js';
 setDefaultOptions({locale: ro});

@@ -59,6 +59,10 @@ module.exports = {
 					'@liferay/frontend-js-a11y-web': {
 						'/': '*',
 					},
+					'@liferay/frontend-js-dependencies-web': {
+						'/': '*',
+						'uuid': '*',
+					},
 					'@liferay/frontend-js-react-web': {
 						'/': '*',
 						'classnames': '*',
@@ -399,6 +403,7 @@ module.exports = {
 			'dynamic-data-mapping-form-renderer',
 		],
 		imports: {
+			'@liferay/frontend-js-dependencies-web': ['uuid'],
 			'@liferay/frontend-js-react-web': [
 				'classnames',
 				'formik',

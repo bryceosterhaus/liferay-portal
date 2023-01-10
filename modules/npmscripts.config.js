@@ -103,6 +103,10 @@ module.exports = {
 					'@liferay/map-openstreetmap': {
 						'/': '*',
 					},
+					'@liferay/multi-factor-authentication-fido2-web': {
+						'/': '*',
+						'base64-js': '*',
+					},
 					'@liferay/object-js-components-web': {
 						'/': '*',
 					},

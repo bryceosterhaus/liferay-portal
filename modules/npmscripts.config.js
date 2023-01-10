@@ -140,6 +140,7 @@ module.exports = {
 					},
 					'frontend-editor-ckeditor-web': {
 						'/': '*',
+						'ckeditor4-react': '*',
 					},
 					'frontend-js-components-web': {
 						'/': '*',

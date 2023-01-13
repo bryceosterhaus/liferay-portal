@@ -65,7 +65,6 @@ module.exports = {
 					'@liferay/frontend-js-dependencies-web': {
 						'/': '*',
 						'clipboard': '*',
-						'cropperjs': '*',
 						'dagre': '*',
 						'date-fns': '*',
 						'dom-align': '*',
@@ -442,7 +441,6 @@ module.exports = {
 		imports: {
 			'@liferay/frontend-js-dependencies-web': [
 				'clipboard',
-				'cropperjs',
 				'dagre',
 				'date-fns',
 				'dom-align',

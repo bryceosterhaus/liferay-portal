@@ -62,9 +62,12 @@ module.exports = {
 					'@liferay/frontend-js-a11y-web': {
 						'/': '*',
 					},
+
 					'@liferay/frontend-js-dependencies-web': {
 						'/': '*',
+
 						'clipboard': '*',
+
 						'dagre': '*',
 						'date-fns': '*',
 						'dom-align': '*',
@@ -76,13 +79,13 @@ module.exports = {
 						'qrcode': '*',
 						'qs': '*',
 						'react-flow-renderer': '*',
-						'react-router-dom': '*',
 						'react-text-mask': '*',
 						'react-transition-group': '*',
 						'text-mask-addons': '*',
 						'text-mask-core': '*',
 						'uuid': '*',
 					},
+
 					'@liferay/frontend-js-react-web': {
 						'/': '*',
 						'classnames': '*',
@@ -453,7 +456,6 @@ module.exports = {
 				'qrcode',
 				'qs',
 				'react-flow-renderer',
-				'react-router-dom',
 				'react-transition-group',
 				'text-mask-addons',
 				'text-mask-core',

@@ -441,19 +441,12 @@ public class ComboServlet extends HttpServlet {
 						stringFileContent);
 				}
 				else if (minifierType.equals("js")) {
-					Matcher matcher = _esModulePattern.matcher(
+					Matcher matcher = _importModulePattern.matcher(
 						stringFileContent);
 
 					if (matcher.matches()) {
 						stringFileContent =
 							matcher.group(1) + "../o/" + matcher.group(3);
-
-						String identifier =
-							StringPool.UNDERLINE +
-								DigesterUtil.digestHex(modulePath);
-
-						stringFileContent = stringFileContent.replaceAll(
-							"esModule", identifier);
 					}
 					else {
 						stringFileContent = MinifierUtil.minifyJavaScript(
@@ -599,8 +592,8 @@ public class ComboServlet extends HttpServlet {
 	private static final PortalCache<String, byte[][]> _bytesArrayPortalCache =
 		PortalCacheHelperUtil.getPortalCache(
 			PortalCacheManagerNames.SINGLE_VM, ComboServlet.class.getName());
-	private static final Pattern _esModulePattern = Pattern.compile(
-		"(import\\s*\\*\\s*as\\s*esModule\\s*from\\s*[\"'])((?:\\.\\./)+)(.*)",
+	private static final Pattern _importModulePattern = Pattern.compile(
+		"(import\\s*\\*\\s*as\\s*\\w*\\s*from\\s*[\"'])((?:\\.\\./)+)(.*)",
 		Pattern.DOTALL);
 	private static final PortalCache<String, FileContentBag>
 		_fileContentBagPortalCache = PortalCacheHelperUtil.getPortalCache(

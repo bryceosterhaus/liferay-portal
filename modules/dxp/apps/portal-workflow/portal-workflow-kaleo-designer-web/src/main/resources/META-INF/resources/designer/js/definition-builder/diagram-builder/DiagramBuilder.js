@@ -396,7 +396,7 @@ export default function DiagramBuilder() {
 		<DiagramBuilderContextProvider {...contextProps}>
 			<div className="diagram-builder">
 				<div className="diagram-area" ref={reactFlowWrapperRef}>
-					<ReactFlow.default
+					<ReactFlow
 						connectionLineComponent={FloatingConnectionLine}
 						edgeTypes={edgeTypes}
 						elements={elements}

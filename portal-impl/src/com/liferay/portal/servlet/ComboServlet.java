@@ -33,7 +33,6 @@ import com.liferay.portal.kernel.servlet.HttpHeaders;
 import com.liferay.portal.kernel.servlet.RequestDispatcherUtil;
 import com.liferay.portal.kernel.servlet.ServletResponseUtil;
 import com.liferay.portal.kernel.util.ContentTypes;
-import com.liferay.portal.kernel.util.DigesterUtil;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HttpComponentsUtil;
@@ -592,12 +591,12 @@ public class ComboServlet extends HttpServlet {
 	private static final PortalCache<String, byte[][]> _bytesArrayPortalCache =
 		PortalCacheHelperUtil.getPortalCache(
 			PortalCacheManagerNames.SINGLE_VM, ComboServlet.class.getName());
-	private static final Pattern _importModulePattern = Pattern.compile(
-		"(import\\s*\\*\\s*as\\s*\\w*\\s*from\\s*[\"'])((?:\\.\\./)+)(.*)",
-		Pattern.DOTALL);
 	private static final PortalCache<String, FileContentBag>
 		_fileContentBagPortalCache = PortalCacheHelperUtil.getPortalCache(
 			PortalCacheManagerNames.SINGLE_VM, FileContentBag.class.getName());
+	private static final Pattern _importModulePattern = Pattern.compile(
+		"(import\\s*\\*\\s*as\\s*\\w*\\s*from\\s*[\"'])((?:\\.\\./)+)(.*)",
+		Pattern.DOTALL);
 
 	private final Set<String> _protectedParameters = SetUtil.fromArray(
 		"browserId", "minifierType", "languageId", "t", "themeId", "zx");

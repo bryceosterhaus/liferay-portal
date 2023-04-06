@@ -18,6 +18,7 @@ import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import com.liferay.gradle.util.Validator;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.petra.string.StringUtil;
@@ -46,7 +47,10 @@ public class ClientExtension {
 
 		Map<String, Object> configMap = new HashMap<>();
 
-		configMap.put("baseURL", "${portalURL}/o/" + projectName);
+		configMap.put(
+			"baseURL",
+			Validator.isNotNull(baseURL) ? baseURL :
+				"${portalURL}/o/" + projectName);
 		configMap.put("description", description);
 		configMap.put("dxp.lxc.liferay.com.virtualInstanceId", "default");
 		configMap.put("name", name);
@@ -80,6 +84,7 @@ public class ClientExtension {
 		return jsonMap;
 	}
 
+	public String baseURL = "";
 	public String classification = "static";
 	public String description = "";
 	public String id;

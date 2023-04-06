@@ -1,0 +1,34 @@
+{
+  "compilerOptions": {
+    "paths": {
+      "shared-utils": [
+        "./src/shared-utils"
+      ]
+    },
+    "noImplicitThis": true,
+    "allowJs": false,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "module": "ES6",
+    "noImplicitAny": true,
+    "alwaysStrict": true,
+    "strictFunctionTypes": true,
+    "noFallthroughCasesInSwitch": true,
+    "strictBindCallApply": true,
+    "noUncheckedIndexedAccess": true,
+    "skipDefaultLibCheck": true,
+    "target": "es6",
+    "jsx": "react",
+    "noPropertyAccessFromIndexSignature": true,
+    "strictNullChecks": true,
+    "noImplicitReturns": true,
+    "outDir": "./dist/",
+    "strictPropertyInitialization": true,
+    "moduleResolution": "Node",
+    "strict": true,
+    "useUnknownInCatchVariables": true,
+    "exactOptionalPropertyTypes": true,
+    "noImplicitOverride": true
+  }
+}

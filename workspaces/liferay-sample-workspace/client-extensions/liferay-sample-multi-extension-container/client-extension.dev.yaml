@@ -1,0 +1,17 @@
+header-liferay-sample-multi-extension-container:
+    cssURLs:
+        - http://localhost:3000/Header.css
+    urls:
+        - http://localhost:3000/Header.js
+
+sidebar-liferay-sample-multi-extension-container:
+    cssURLs:
+        - http://localhost:3000/Sidebar.css
+    urls:
+        - http://localhost:3000/Sidebar.js
+
+liferay-sample-fds-cell-renderer:
+    url: http://localhost:3000/FDSIconCell.js
+
+spritemap-liferay-sample-multi-extension-container:
+    url: http://localhost:3000/spritemap.svg

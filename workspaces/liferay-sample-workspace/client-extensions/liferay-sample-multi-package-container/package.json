@@ -1,0 +1,9 @@
+{
+	"name": "liferay-sample-multi-package-container",
+	"scripts": {
+		"build": true
+	},
+	"workspaces": [
+		"packages/**"
+	]
+}

@@ -1,0 +1,6 @@
+{
+	"name": "liferay-sample-fds-cell-renderer",
+	"scripts": {
+		"build": true
+	}
+}

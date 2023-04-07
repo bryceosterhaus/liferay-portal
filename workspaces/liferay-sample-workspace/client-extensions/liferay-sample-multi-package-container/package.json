@@ -1,0 +1,17 @@
+{
+	"type": "module",
+	"private": true,
+	"name": "liferay-sample-multi-package-container",
+	"scripts": {
+		"build": "webpack --config webpack.sharedDeps.js && yarn workspaces run build"
+	},
+	"workspaces": [
+		"packages/*"
+	],
+	"version": "1.0.0",
+	"dependencies": {
+		"underscore": "^1.13.6",
+		"webpack": "^5.78.0",
+		"webpack-cli": "^5.0.1"
+	}
+}

@@ -1,0 +1,44 @@
+assemble:
+    # Copies shared dependencies found in webpack.sharedDeps.js
+  - from: dist
+    into: static
+
+    # Copies custom-element-cra
+  - from: packages/custom-element-cra/build/static
+    into: static/custom-element-cra
+
+    # Copies global-css
+  - from: packages/global-css
+    into: static
+
+    # Copies fds-cell
+  - from: packages/fds-cell/dist/FDSCell.js
+    into: static
+
+    # Copies shared-utils
+  - from: packages/shared-utils/dist/index.js
+    into: static/shared-utils
+    
+
+custom-element-cra:
+    cssURLs:
+        - custom-element-cra/css/main.*.css
+    friendlyURLMapping:
+    htmlElementName: custom-element-cra
+    instanceable: false
+    name: Header Liferay Sample Multi Extension Container
+    portletCategoryName: category.client-extensions
+    type: customElement
+    urls:
+        - custom-element-cra/js/main.*.js
+    useESM: true
+
+liferay-sample-fds-cell-renderer:
+    name: Liferay Sample Frontend Data Set Cell Renderer
+    type: fdsCellRenderer
+    url: FDSCell.js
+
+liferay-sample-multi-package-container-global-css:
+    name: Liferay Sample Multi Package Container Global CSS
+    type: globalCSS
+    url: global.css

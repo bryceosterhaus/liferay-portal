@@ -1,0 +1,19 @@
+{
+	"compilerOptions": {
+		"paths": {
+			"shared-utils": [
+				"../shared-utils/src/index.ts"
+			]
+		},
+		"allowSyntheticDefaultImports": true,
+		"jsx": "react",
+		"module": "ES6",
+		"moduleResolution": "Node",
+		"target": "es6",
+		"outDir": "dist",
+		"skipLibCheck": true
+	},
+	"include": [
+		"./src/**/*"
+	]
+}

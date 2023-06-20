@@ -31,9 +31,7 @@ function Comic() {
 	const [comicData, setComicData] = React.useState(null);
 
 	React.useEffect(() => {
-		oAuth2Client
-			?.fetch('/comic')
-			.then((comic) => {
+		oAuth2Client?.fetch('/comic').then((comic) => {
 			setComicData({
 				alt: comic.alt,
 				img: comic.img,

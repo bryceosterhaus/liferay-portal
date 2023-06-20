@@ -17,7 +17,7 @@
 import {getBye, getHello} from 'my-utils';
 
 class CustomElement extends HTMLElement {
-	constructor() {
+    constructor() {
 		super();
 
 		const root = document.createElement('pre');

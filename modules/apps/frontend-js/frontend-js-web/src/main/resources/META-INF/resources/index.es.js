@@ -151,3 +151,6 @@ export {
 	getCheckedCheckboxes,
 	getUncheckedCheckboxes,
 } from './liferay/util/get_checkboxes';
+
+// eslint-disable-next-line no-console
+console.log('hi');

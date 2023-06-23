@@ -15,6 +15,8 @@ class HeaderWebComponent extends HTMLElement {
 	constructor() {
 		super();
 
+		const foo;
+
 		const root = document.createElement('div');
 
 		root.innerHTML = '<div class="cx-header">Header</div>';

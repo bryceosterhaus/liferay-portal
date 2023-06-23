@@ -15,10 +15,9 @@
 import {Provider} from '@clayui/core';
 import {ClayIconSpriteContext} from '@clayui/icon';
 import {accessibilityMenuAtom} from '@liferay/accessibility-menu-web';
+import {useLiferayState} from '@liferay/frontend-js-state-web';
 import React, {useMemo} from 'react';
 import ReactDOM from 'react-dom';
-
-import useLiferayState from './hooks/useLiferayState';
 
 let counter = 0;
 

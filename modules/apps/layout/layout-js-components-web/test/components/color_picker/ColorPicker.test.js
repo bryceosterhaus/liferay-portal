@@ -4,13 +4,14 @@
  */
 
 import '@testing-library/jest-dom/extend-expect';
-import {
-	ColorPicker,
-	StyleErrorsContextProvider,
-} from '@liferay/layout-js-components-web';
 import {fireEvent, render} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
+
+import {
+	ColorPicker,
+	StyleErrorsContextProvider,
+} from '../../../src/main/resources/META-INF/resources/js';
 
 const COLOR_PICKER_CLASS = '.layout__color-picker';
 const INPUT_NAME = 'Color Picker';

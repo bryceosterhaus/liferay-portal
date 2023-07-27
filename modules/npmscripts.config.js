@@ -905,6 +905,17 @@ module.exports = {
 			'youtube-web',
 		],
 		'allowed-non-global-dependencies': [
+			'history',
+			'jest-fetch-mock',
+			'fetch-mock',
+			'gulp',
+			'liferay-theme-tasks',
+			'ckeditor4',
+			'alloy-ui',
+			'resize-observer-polyfill',
+			'webpack',
+			'react-dnd-test-utils',
+			'fs',
 
 			// Dependencies not expected to be shared
 

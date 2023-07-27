@@ -15,7 +15,6 @@
 		"@clayui/sticker": "3.65.0",
 		"@clayui/tabs": "3.100.0",
 		"@liferay/frontend-js-react-web": "*",
-		"@liferay/npm-scripts": "*",
 		"classnames": "2.3.1",
 		"frontend-js-components-web": "*",
 		"frontend-js-web": "*",

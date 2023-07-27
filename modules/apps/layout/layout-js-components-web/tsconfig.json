@@ -1,5 +1,5 @@
 {
-	"@generated": "5b2f8a495f457c5e630bb18f3e2c4fa3d9e33227",
+	"@generated": "45e40a8544aeb6d79f28e33c41eb1caed24afe07",
 	"@overrides": {
 	},
 	"@readonly": "** AUTO-GENERATED: DO NOT EDIT OUTSIDE @overrides **",
@@ -15,12 +15,6 @@
 		"paths": {
 			"@liferay/frontend-js-react-web": [
 				"../../frontend-js/frontend-js-react-web/src/main/resources/META-INF/resources/js/index.ts"
-			],
-			"@liferay/layout-content-page-editor-web": [
-				"../layout-content-page-editor-web/src/main/resources/META-INF/resources/js/index.d.ts"
-			],
-			"@liferay/layout-js-components-web": [
-				"src/main/resources/META-INF/resources/js/index.d.ts"
 			],
 			"frontend-js-web": [
 				"../../frontend-js/frontend-js-web/src/main/resources/META-INF/resources/index.d.ts"
@@ -46,12 +40,6 @@
 	"references": [
 		{
 			"path": "../../frontend-js/frontend-js-react-web"
-		},
-		{
-			"path": "../layout-content-page-editor-web"
-		},
-		{
-			"path": ""
 		},
 		{
 			"path": "../../frontend-js/frontend-js-web"

@@ -30,6 +30,7 @@ config = {
 		'@liferay/no-extraneous-dependencies': [
 			'error',
 			[
+				'@liferay/npm-scripts',
 				'@testing-library/dom',
 				'@testing-library/jest-dom',
 				'@testing-library/react-hooks',

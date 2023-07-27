@@ -13,6 +13,9 @@
 		"moduleResolution": "node",
 		"outDir": "./types",
 		"paths": {
+			"@liferay/frontend-js-react-web": [
+				"../frontend-js-react-web/src/main/resources/META-INF/resources/js/index.ts"
+			],
 			"@liferay/frontend-js-state-web": [
 				"../frontend-js-state-web/src/main/resources/META-INF/resources/index.ts"
 			],
@@ -38,6 +41,9 @@
 		"../../../global.d.ts"
 	],
 	"references": [
+		{
+			"path": "../frontend-js-react-web"
+		},
 		{
 			"path": "../frontend-js-state-web"
 		},

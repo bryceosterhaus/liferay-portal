@@ -142,6 +142,9 @@ module.exports = {
 					'@liferay/object-js-components-web': {
 						'/': '*',
 					},
+					'@liferay/portal-workflow-instance-tracker-web': {
+						'/': '*',
+					},
 					'@liferay/template-web': {
 						'/': '*',
 					},
@@ -934,6 +937,19 @@ module.exports = {
 			'browser-tabs-lock',
 			'hash.js',
 			'core-js',
+
+			'jest-fetch-mock',
+			'fetch-mock',
+			'gulp',
+			'liferay-theme-tasks',
+			'history',
+			'resize-observer-polyfill',
+			'ckeditor4',
+			'fetch-mock',
+			'@liferay/npm-scripts',
+			'webpack',
+			'alloy-ui',
+			'react-dnd-test-utils',
 		],
 	},
 };

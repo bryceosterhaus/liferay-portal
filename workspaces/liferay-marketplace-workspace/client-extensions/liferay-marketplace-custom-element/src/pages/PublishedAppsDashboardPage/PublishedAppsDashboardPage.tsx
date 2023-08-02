@@ -464,8 +464,7 @@ export function PublishedAppsDashboardPage() {
 					listOfRoles={publisherRoles}
 					rolesPermissionDescription={{
 						appPermissions: publisherAppPermissionDescriptions,
-						dashboardPermissions:
-							publisherDashboardPermissionDescriptions,
+						dashboardPermissions: publisherDashboardPermissionDescriptions,
 					}}
 					selectedAccount={selectedAccount}
 					setShowDashboardNavigation={setShowDashboardNavigation}

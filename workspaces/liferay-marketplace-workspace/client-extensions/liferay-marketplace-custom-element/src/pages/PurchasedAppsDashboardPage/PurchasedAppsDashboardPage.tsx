@@ -474,8 +474,7 @@ export function PurchasedAppsDashboardPage() {
 					listOfRoles={customerRoles}
 					rolesPermissionDescription={{
 						appPermissions: customerAppPermissionDescriptions,
-						dashboardPermissions:
-							customerDashboardPermissionDescriptions,
+						dashboardPermissions: customerDashboardPermissionDescriptions,
 					}}
 					selectedAccount={selectedAccount}
 				/>

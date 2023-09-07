@@ -4,9 +4,9 @@
  */
 
 import ClayCard from '@clayui/card';
-import ClayLayout from '@clayui/layout';
-import ClayPanel from "@clayui/panel";
 import {Heading} from '@clayui/core';
+import ClayLayout from '@clayui/layout';
+import ClayPanel from '@clayui/panel';
 import {useEffect, useState} from 'react';
 import {useParams} from 'react-router-dom';
 
@@ -37,7 +37,7 @@ function ProjectPage() {
 			})
 			// eslint-disable-next-line no-console
 			.catch((error) => console.log(error));
-	}, []);
+	}, [id]);
 
 	let projectBuilds = [];
 	let projectName = 'Project #' + id;
@@ -57,7 +57,9 @@ function ProjectPage() {
 		<ClayLayout.Container>
 			<ClayCard className="jethr0-card">
 				<Breadcrumbs breadcrumbs={breadcrumbs} />
-				<Heading level={3} weight="lighter">{projectName}</Heading>
+				<Heading level={3} weight="lighter">
+					{projectName}
+				</Heading>
 				<ProjectInformation project={project} />
 				<BuildTable builds={projectBuilds} />
 			</ClayCard>
@@ -66,20 +68,22 @@ function ProjectPage() {
 }
 
 function ProjectInformation({project}) {
-	let projectInformation = (<div>Loading...</div>);
+	let projectInformation = <div>Loading...</div>;
 
 	if (project) {
-		projectInformation = (<ClayPanel.Body>
-			Project ID: {project.id}
-			<br />
-			Create Date: {project.dateCreated}
-			<br />
-			Modified Date: {project.dateModified}
-			<br />
-			Project State: {project.state.name}
-			<br />
-			Project Type: {project.type.name}
-		</ClayPanel.Body>);
+		projectInformation = (
+			<ClayPanel.Body>
+				Project ID: {project.id}
+				<br />
+				Create Date: {project.dateCreated}
+				<br />
+				Modified Date: {project.dateModified}
+				<br />
+				Project State: {project.state.name}
+				<br />
+				Project Type: {project.type.name}
+			</ClayPanel.Body>
+		);
 	}
 
 	return (

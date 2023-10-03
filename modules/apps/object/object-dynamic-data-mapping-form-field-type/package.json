@@ -10,7 +10,7 @@
 		"data-engine-js-components-web": "*",
 		"dynamic-data-mapping-form-field-type": "*",
 		"frontend-js-web": "*",
-		"react": "16.12.0"
+		"react": "17.0.2"
 	},
 	"name": "@liferay/object-dynamic-data-mapping-form-field-type",
 	"private": true,

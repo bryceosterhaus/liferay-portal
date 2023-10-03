@@ -11,8 +11,8 @@ module.exports = {
 	},
 	'imports': {
 		'@liferay/frontend-js-react-web': {
-			'react': '^16.0.0',
-			'react-dom': '^16.0.0',
+			'react': '^17.0.0',
+			'react-dom': '^17.0.0',
 		},
 		'frontend-js-node-shims': {
 			events: '^1.0.0',

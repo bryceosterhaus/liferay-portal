@@ -9,7 +9,7 @@
 		"frontend-js-web": "*",
 		"metal-component": "2.16.8",
 		"metal-soy": "2.16.9",
-		"react": "16.12.0"
+		"react": "17.0.2"
 	},
 	"name": "commerce-frontend-taglib",
 	"scripts": {

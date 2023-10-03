@@ -3,7 +3,7 @@
 		"@clayui/charts": "3.65.0",
 		"@liferay/frontend-js-react-web": "*",
 		"frontend-js-web": "*",
-		"react": "16.12.0"
+		"react": "17.0.2"
 	},
 	"name": "commerce-dashboard-web",
 	"private": true,

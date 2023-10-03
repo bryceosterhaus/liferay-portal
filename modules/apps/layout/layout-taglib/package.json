@@ -11,7 +11,7 @@
 		"@clayui/table": "3.56.0",
 		"frontend-js-web": "*",
 		"prop-types": "15.7.2",
-		"react": "16.12.0"
+		"react": "17.0.2"
 	},
 	"name": "layout-taglib",
 	"scripts": {

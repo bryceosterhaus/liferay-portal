@@ -10,7 +10,7 @@
 		"@clayui/tooltip": "3.104.0",
 		"@liferay/frontend-icons-web": "*",
 		"frontend-js-web": "*",
-		"react": "16.12.0"
+		"react": "17.0.2"
 	},
 	"name": "frontend-taglib-clay-sample-web",
 	"private": true,

@@ -7,7 +7,7 @@
 		"@clayui/multi-select": "3.106.1",
 		"@liferay/address-web": "*",
 		"frontend-js-web": "*",
-		"react": "16.12.0"
+		"react": "18.2.0"
 	},
 	"name": "account-admin-web",
 	"scripts": {

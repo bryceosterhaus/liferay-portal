@@ -4,10 +4,10 @@
  */
 
 import {ClayButtonWithIcon} from '@clayui/button';
-import React, {KeyboardEventHandler, ReactNode, Ref} from 'react';
+import React, {KeyboardEventHandler, Ref} from 'react';
 
 interface RuleBuilderItemProps {
-	children: ReactNode;
+	children: React.ReactNode;
 	onDeleteButtonClick: () => void;
 	showDeleteButton: boolean;
 	type: 'action' | 'condition';

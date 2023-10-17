@@ -1,5 +1,5 @@
 {
-	"@generated": "109e0c993736e731aa262b77a67d3150df8056fc",
+	"@generated": "474984f366b2f9597639c299c1784830dd4a23fe",
 	"@overrides": {
 		"compilerOptions": {
 			"lib": [
@@ -45,6 +45,7 @@
 				"../../item-selector/item-selector-taglib/src/main/resources/META-INF/resources/index.d.ts"
 			]
 		},
+		"skipLibCheck": true,
 		"sourceMap": false,
 		"strict": true,
 		"target": "es6",

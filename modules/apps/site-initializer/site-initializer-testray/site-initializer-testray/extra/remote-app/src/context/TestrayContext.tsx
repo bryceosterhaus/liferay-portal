@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-import {ReactNode, createContext, useEffect, useMemo, useReducer} from 'react';
+import {createContext, useEffect, useMemo, useReducer} from 'react';
 import {KeyedMutator} from 'swr';
 import {STORAGE_KEYS} from '~/core/Storage';
 
@@ -100,9 +100,11 @@ const reducer = (state: InitialState, action: AppActions) => {
 	}
 };
 
-const TestrayContextProvider: React.FC<{
-	children: ReactNode;
-}> = ({children}) => {
+const TestrayContextProvider: React.FC<
+	{children?: React.ReactNode | undefined} & {
+		children: React.ReactNode;
+	}
+> = ({children}) => {
 	const [storageValue, setStorageValue] = useStorage<{
 		compareRuns: CompareRuns;
 	}>(STORAGE_KEYS.COMPARE_RUNS, {

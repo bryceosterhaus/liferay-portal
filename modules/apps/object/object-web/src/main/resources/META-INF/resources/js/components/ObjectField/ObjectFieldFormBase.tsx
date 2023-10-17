@@ -12,13 +12,7 @@ import {
 	SingleSelect,
 	Toggle,
 } from '@liferay/object-js-components-web';
-import React, {
-	ChangeEventHandler,
-	ReactNode,
-	useEffect,
-	useMemo,
-	useState,
-} from 'react';
+import React, {ChangeEventHandler, useEffect, useMemo, useState} from 'react';
 
 import {defaultLanguageId} from '../../utils/constants';
 import {
@@ -37,7 +31,7 @@ import {FORMULA_OUTPUT_OPTIONS, FormulaOutput} from './formulaFieldUtil';
 import './ObjectFieldFormBase.scss';
 
 interface ObjectFieldFormBaseProps {
-	children?: ReactNode;
+	children?: React.ReactNode;
 	creationLanguageId2?: Liferay.Language.Locale;
 	disabled?: boolean;
 	editingObjectField?: boolean;

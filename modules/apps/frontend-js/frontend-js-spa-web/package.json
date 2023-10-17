@@ -8,7 +8,7 @@
 		"build": "liferay-npm-scripts build",
 		"checkFormat": "liferay-npm-scripts check",
 		"format": "liferay-npm-scripts fix",
-		"test": "liferay-npm-scripts test"
+		"test": "USE_REACT_16=true liferay-npm-scripts test"
 	},
 	"version": "5.0.44"
 }

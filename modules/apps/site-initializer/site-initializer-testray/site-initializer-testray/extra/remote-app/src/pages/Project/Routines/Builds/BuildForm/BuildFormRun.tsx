@@ -34,7 +34,9 @@ type BuildFormRunProps = {
 	register: UseFormRegister<BuildFormType>;
 };
 
-const BuildFormRun: React.FC<BuildFormRunProps> = ({control, register}) => {
+const BuildFormRun: React.FC<
+	{children?: React.ReactNode | undefined} & BuildFormRunProps
+> = ({control, register}) => {
 	const {modal: optionModal} = useFormModal();
 	const {routineId} = useParams();
 

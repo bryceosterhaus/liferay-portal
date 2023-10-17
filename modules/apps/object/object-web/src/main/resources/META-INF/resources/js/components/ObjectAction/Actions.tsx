@@ -102,7 +102,7 @@ export default function Actions({
 		return (
 			<div className="table-list-title">
 				<a href="#" onClick={handleEditAction}>
-					{value}
+					{value as string}
 				</a>
 			</div>
 		);

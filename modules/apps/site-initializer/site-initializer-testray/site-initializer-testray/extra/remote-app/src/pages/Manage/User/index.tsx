@@ -26,13 +26,9 @@ type UserListViewProps = {
 	tableProps?: Partial<TableProps>;
 };
 
-const UserListView: React.FC<UserListViewProps> = ({
-	actions,
-	formModal,
-	listViewProps,
-	tableProps,
-	variables,
-}) => {
+const UserListView: React.FC<
+	{children?: React.ReactNode | undefined} & UserListViewProps
+> = ({actions, formModal, listViewProps, tableProps, variables}) => {
 	const navigate = useNavigate();
 
 	return (

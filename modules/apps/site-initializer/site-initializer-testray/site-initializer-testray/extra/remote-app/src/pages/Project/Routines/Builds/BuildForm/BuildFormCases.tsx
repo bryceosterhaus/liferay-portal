@@ -28,11 +28,9 @@ type ModalType = {
 	type: 'select-cases' | 'select-suites';
 };
 
-const BuildFormCases: React.FC<BuildFormCasesProps> = ({
-	caseIds,
-	setCaseIds,
-	title,
-}) => {
+const BuildFormCases: React.FC<
+	{children?: React.ReactNode | undefined} & BuildFormCasesProps
+> = ({caseIds, setCaseIds, title}) => {
 	const {projectId} = useParams();
 
 	const {data: casesResponse} = useFetch<APIResponse<TestrayCase>>('/cases', {

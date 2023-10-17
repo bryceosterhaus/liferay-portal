@@ -20,10 +20,9 @@ type ColumnsState = {
 	[key: string]: boolean;
 };
 
-const ManagementToolbarColumns: React.FC<ManagementToolbarColumnsProps> = ({
-	columns,
-	onClose,
-}) => {
+const ManagementToolbarColumns: React.FC<
+	{children?: React.ReactNode | undefined} & ManagementToolbarColumnsProps
+> = ({columns, onClose}) => {
 	const [{columns: contextColumns, columnsFixed}, dispatch] = useContext(
 		ListViewContext
 	);

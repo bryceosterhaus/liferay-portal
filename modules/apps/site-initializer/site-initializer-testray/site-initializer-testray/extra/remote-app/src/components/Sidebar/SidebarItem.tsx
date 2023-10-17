@@ -19,13 +19,9 @@ type SidebarItemProps = {
 	path?: string;
 };
 
-const SidebarItem: React.FC<SidebarItemProps> = ({
-	active,
-	expanded,
-	icon,
-	label,
-	path,
-}) => {
+const SidebarItem: React.FC<
+	{children?: React.ReactNode | undefined} & SidebarItemProps
+> = ({active, expanded, icon, label, path}) => {
 	const LinkComponent = path
 		? Link
 		: ({children, ...props}: any) => <div {...props}>{children}</div>;

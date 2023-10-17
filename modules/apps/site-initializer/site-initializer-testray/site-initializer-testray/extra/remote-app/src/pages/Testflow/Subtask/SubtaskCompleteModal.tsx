@@ -33,7 +33,9 @@ type SubTaskCompleteModalProps = {
 	subtask: TestraySubTask;
 };
 
-const SubtaskCompleteModal: React.FC<SubTaskCompleteModalProps> = ({
+const SubtaskCompleteModal: React.FC<
+	{children?: React.ReactNode | undefined} & SubTaskCompleteModalProps
+> = ({
 	modal: {observer, onClose, onError, onSave},
 	revalidateSubtask,
 	subtask,

@@ -32,13 +32,9 @@ type RequirementListViewProps = {
 	tableProps?: Partial<TableProps>;
 };
 
-const RequirementListView: React.FC<RequirementListViewProps> = ({
-	actions,
-	formModal,
-	listViewProps,
-	tableProps,
-	variables,
-}) => {
+const RequirementListView: React.FC<
+	{children?: React.ReactNode | undefined} & RequirementListViewProps
+> = ({actions, formModal, listViewProps, tableProps, variables}) => {
 	const navigate = useNavigate();
 
 	return (

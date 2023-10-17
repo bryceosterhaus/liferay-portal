@@ -1,5 +1,5 @@
 {
-	"@generated": "0d1613c3538b201f4f06caf5a550a3f4c746d256",
+	"@generated": "6b92a39e223ea26eb660280ab2950d019c10d7eb",
 	"@overrides": {
 		"compilerOptions": {
 			"target": "es2020"
@@ -23,6 +23,7 @@
 				"../../../../apps/frontend-js/frontend-js-web/src/main/resources/META-INF/resources/index.d.ts"
 			]
 		},
+		"skipLibCheck": true,
 		"sourceMap": false,
 		"strict": true,
 		"target": "es2020",

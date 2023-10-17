@@ -4,7 +4,7 @@
  */
 
 import CodeMirror from 'codemirror';
-import React, {ReactNode, RefObject} from 'react';
+import React, {RefObject} from 'react';
 
 import {Collapsible} from './Collapsible';
 import {Element} from './Element';
@@ -23,7 +23,7 @@ export interface SidebarCategory {
 	label: string;
 }
 interface IProps {
-	CustomSidebarContent?: ReactNode;
+	CustomSidebarContent?: React.ReactNode;
 	editorRef: RefObject<CodeMirror.Editor>;
 	elements: SidebarCategory[];
 	elementsDisabled?: boolean;

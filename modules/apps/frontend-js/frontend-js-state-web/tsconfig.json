@@ -1,5 +1,5 @@
 {
-	"@generated": "d8040a45557ab265b8f60f4099e72408f21f87e4",
+	"@generated": "dcf2d136d2840aad9c50a35c03c8e802bbbe993d",
 	"@overrides": {
 	},
 	"@readonly": "** AUTO-GENERATED: DO NOT EDIT OUTSIDE @overrides **",
@@ -14,6 +14,7 @@
 		"outDir": "./types",
 		"paths": {
 		},
+		"skipLibCheck": true,
 		"sourceMap": false,
 		"strict": true,
 		"target": "es6",

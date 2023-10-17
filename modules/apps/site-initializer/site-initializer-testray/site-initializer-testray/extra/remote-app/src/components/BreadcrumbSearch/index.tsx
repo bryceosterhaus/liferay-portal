@@ -17,10 +17,9 @@ type BreadccrumbSearchProps = {
 	onBreadcrumbChange: (value: any) => void;
 };
 
-const BreadcrumbSearch: React.FC<BreadccrumbSearchProps> = ({
-	onBreadcrumbChange,
-	maxEntitiesToSearch = defaultEntities.length,
-}) => {
+const BreadcrumbSearch: React.FC<
+	{children?: React.ReactNode | undefined} & BreadccrumbSearchProps
+> = ({onBreadcrumbChange, maxEntitiesToSearch = defaultEntities.length}) => {
 	const [active, setActive] = useState(false);
 
 	const {

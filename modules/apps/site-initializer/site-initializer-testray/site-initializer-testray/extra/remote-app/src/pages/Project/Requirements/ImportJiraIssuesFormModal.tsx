@@ -33,9 +33,9 @@ type ImportJiraIssuesFormModalProps = {
 	mutate?: KeyedMutator<any> | undefined;
 };
 
-const ImportJiraIssuesFormModal: React.FC<ImportJiraIssuesFormModalProps> = ({
-	modal,
-}) => {
+const ImportJiraIssuesFormModal: React.FC<
+	{children?: React.ReactNode | undefined} & ImportJiraIssuesFormModalProps
+> = ({modal}) => {
 	const [{myUserAccount}] = useContext(TestrayContext);
 	const {
 		formState: {errors, isSubmitting},

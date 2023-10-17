@@ -10,12 +10,9 @@ import StackList, {StackListProps} from './StackList';
 
 type StackProps = {} & StackListProps;
 
-const Stack: React.FC<StackProps> = ({
-	append,
-	fields,
-	remove,
-	...stackProps
-}) => {
+const Stack: React.FC<
+	{children?: React.ReactNode | undefined} & StackProps
+> = ({append, fields, remove, ...stackProps}) => {
 	const [fieldsHistory, setFieldsHistory] = useState<{id: number}[]>([]);
 
 	const onRemove = (index: number) => {

@@ -16,9 +16,9 @@ type ManagementToolbarResultsBarProps = {
 	totalItems: number;
 };
 
-const ManagementToolbarResultsBar: React.FC<ManagementToolbarResultsBarProps> = ({
-	totalItems,
-}) => {
+const ManagementToolbarResultsBar: React.FC<
+	{children?: React.ReactNode | undefined} & ManagementToolbarResultsBarProps
+> = ({totalItems}) => {
 	const [
 		{
 			filters: {entries},

@@ -14,11 +14,9 @@ type ProgressBarProps = {
 	legend?: boolean;
 };
 
-const ProgressBar: React.FC<ProgressBarProps> = ({
-	displayTotalCompleted = true,
-	items,
-	legend,
-}) => {
+const ProgressBar: React.FC<
+	{children?: React.ReactNode | undefined} & ProgressBarProps
+> = ({displayTotalCompleted = true, items, legend}) => {
 	const sortedItems = Object.entries(items).sort(
 		([, valueA], [, valueB]) => valueB - valueA
 	);

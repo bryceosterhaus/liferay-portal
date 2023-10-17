@@ -14,11 +14,9 @@ type StackHistoryProps = {
 	setFieldsHistory: (fieldHistory: any[]) => void;
 };
 
-const StackHistory: React.FC<StackHistoryProps> = ({
-	append,
-	fieldsHistory,
-	setFieldsHistory,
-}) => {
+const StackHistory: React.FC<
+	{children?: React.ReactNode | undefined} & StackHistoryProps
+> = ({append, fieldsHistory, setFieldsHistory}) => {
 	const onClearHistory = () => {
 		setFieldsHistory([]);
 	};

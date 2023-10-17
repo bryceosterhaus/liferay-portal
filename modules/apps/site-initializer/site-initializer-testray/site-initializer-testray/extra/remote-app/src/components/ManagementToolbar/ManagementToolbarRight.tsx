@@ -43,7 +43,7 @@ export type IItem = {
 type ManagementToolbarRightProps = {
 	actions: any;
 	addButton?: () => void;
-	buttons?: ReactNode | ((actions: any) => ReactNode);
+	buttons?: React.ReactNode | ((actions: any) => ReactNode);
 	columns: Column[];
 	disabled: boolean;
 	display?: {
@@ -52,7 +52,9 @@ type ManagementToolbarRightProps = {
 	filterSchema?: FilterSchema;
 };
 
-const ManagementToolbarRight: React.FC<ManagementToolbarRightProps> = ({
+const ManagementToolbarRight: React.FC<
+	{children?: React.ReactNode | undefined} & ManagementToolbarRightProps
+> = ({
 	actions,
 	addButton,
 	buttons,

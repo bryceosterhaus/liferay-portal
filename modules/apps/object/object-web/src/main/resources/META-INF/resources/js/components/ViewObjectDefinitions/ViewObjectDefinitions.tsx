@@ -147,7 +147,7 @@ export default function ViewObjectDefinitions({
 		return (
 			<div className="table-list-title">
 				<a href="#" onClick={handleEditObjectDefinition}>
-					{value}
+					{value as string}
 				</a>
 			</div>
 		);

@@ -24,12 +24,9 @@ type CompareRunsPopoverProps = {
 	visible: boolean;
 };
 
-const CompareRunsPopover: React.FC<CompareRunsPopoverProps> = ({
-	expanded = false,
-	setVisible,
-	triggedRef,
-	visible,
-}) => {
+const CompareRunsPopover: React.FC<
+	{children?: React.ReactNode | undefined} & CompareRunsPopoverProps
+> = ({expanded = false, setVisible, triggedRef, visible}) => {
 	const ref = useRef<HTMLDivElement>(null);
 
 	const {compareRuns, setRunA, setRunB} = useRuns();

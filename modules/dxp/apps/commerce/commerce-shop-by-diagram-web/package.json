@@ -22,7 +22,7 @@
 		"frontend-js-web": "*",
 		"item-selector-taglib": "*",
 		"prop-types": "15.7.2",
-		"react": "16.12.0"
+		"react": "18.2.0"
 	},
 	"jest": {
 		"testPathIgnorePatterns": [
@@ -37,7 +37,7 @@
 		"checkFormat": "liferay-npm-scripts check",
 		"coverage": "liferay-npm-scripts test --coverage --silent --verbose",
 		"format": "liferay-npm-scripts fix",
-		"test": "liferay-npm-scripts test --passWithNoTests"
+		"test": "USE_REACT_16=true liferay-npm-scripts test --passWithNoTests"
 	},
 	"version": "1.0.80"
 }

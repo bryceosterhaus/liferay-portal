@@ -37,11 +37,9 @@ searchParams.set(
 );
 searchParams.set('nestedFieldsDepth', '2');
 
-const RunStatus: React.FC<RunStatusProps> = ({
-	caseResults,
-	dueStatusApplied,
-	run,
-}) => {
+const RunStatus: React.FC<
+	{children?: React.ReactNode | undefined} & RunStatusProps
+> = ({caseResults, dueStatusApplied, run}) => {
 	let caseResult = caseResults.find(
 		(caseResult) =>
 			caseResult?.runId === run.id &&

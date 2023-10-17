@@ -38,10 +38,8 @@ export default function LazyRoute({
 		[importPath]
 	);
 
-	return (
-		<Route
-			{...otherProps}
-			render={(props: any) => <Component {...props} />}
-		/>
-	);
+	// prettier-ignore
+	// @ts-ignore
+
+	return <Route {...otherProps} render={(props: any) => <Component {...props} />} />;
 }

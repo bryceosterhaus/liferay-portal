@@ -24,13 +24,9 @@ type StackActionsProps = {
 	remove: (index: number) => void;
 };
 
-const StackActions: React.FC<StackActionsProps> = ({
-	append,
-	defaultItem,
-	field,
-	index,
-	remove,
-}) => (
+const StackActions: React.FC<
+	{children?: React.ReactNode | undefined} & StackActionsProps
+> = ({append, defaultItem, field, index, remove}) => (
 	<ClayLayout.Col className="d-flex justify-content-end">
 		{!field.disabled && (
 			<ClayButtonWithIcon

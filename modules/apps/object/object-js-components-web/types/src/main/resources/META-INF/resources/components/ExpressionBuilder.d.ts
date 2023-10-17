@@ -24,10 +24,10 @@ export declare function ExpressionBuilder({
 	type,
 	value,
 	...otherProps
-}: IProps): JSX.Element;
+}: IProps): React.JSX.Element;
 export declare function ExpressionBuilderModal({
 	sidebarElements,
-}: IModalProps): JSX.Element | null;
+}: IModalProps): React.JSX.Element | null;
 interface IModalProps {
 	sidebarElements: SidebarCategory[];
 }

@@ -18,5 +18,5 @@ export declare function ModalBasicWithFieldName({
 	label,
 	observer,
 	onClose,
-}: IProps): JSX.Element;
+}: IProps): React.JSX.Element;
 export default ModalBasicWithFieldName;

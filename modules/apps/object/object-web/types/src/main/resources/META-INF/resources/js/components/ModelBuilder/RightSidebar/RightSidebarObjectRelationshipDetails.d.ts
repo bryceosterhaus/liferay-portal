@@ -3,13 +3,12 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-/// <reference types="react" />
-
+import React from 'react';
 import './RightSidebarObjectRelationshipDetails.scss';
 interface RightSidebarObjectRelationshipDetailsProps {
 	objectRelationshipDeletionTypes: LabelValueObject[];
 }
 export declare function RightSidebarObjectRelationshipDetails({
 	objectRelationshipDeletionTypes,
-}: RightSidebarObjectRelationshipDetailsProps): JSX.Element;
+}: RightSidebarObjectRelationshipDetailsProps): React.JSX.Element;
 export {};

@@ -4,7 +4,7 @@
  */
 
 import CodeMirror from '@liferay/frontend-js-codemirror-web';
-import {ReactNode, RefObject} from 'react';
+import React, {ReactNode, RefObject} from 'react';
 import './Sidebar.scss';
 interface SidebarElement {
 	content: string;
@@ -30,5 +30,5 @@ export declare function Sidebar({
 	editorRef,
 	elements,
 	elementsDisabled,
-}: SidebarProps): JSX.Element;
+}: SidebarProps): React.JSX.Element;
 export {};

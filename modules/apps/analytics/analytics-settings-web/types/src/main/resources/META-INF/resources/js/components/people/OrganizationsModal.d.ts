@@ -5,5 +5,9 @@
 
 import React from 'react';
 import {ICommonModalProps} from './Modal';
-declare const ModalOrganizations: React.FC<ICommonModalProps>;
+declare const ModalOrganizations: React.FC<
+	{
+		children?: React.ReactNode | undefined;
+	} & ICommonModalProps
+>;
 export default ModalOrganizations;

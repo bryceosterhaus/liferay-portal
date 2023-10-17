@@ -3,9 +3,8 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-/// <reference types="react" />
-
 import {IActionsDropdown} from '..';
+import React from 'react';
 declare function ActionsDropdown({
 	actions,
 	itemData,
@@ -15,5 +14,5 @@ declare function ActionsDropdown({
 	onClick,
 	onMenuActiveChange,
 	setLoading,
-}: IActionsDropdown): JSX.Element | null;
+}: IActionsDropdown): React.JSX.Element | null;
 export default ActionsDropdown;

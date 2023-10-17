@@ -216,13 +216,16 @@ const ListView: React.FC<ListViewProps> = ({
 		]
 	);
 
-	const {data: response, error, isValidating, loading, mutate} = useFetch(
-		resource,
-		{
-			params: getURLSearchParams(),
-			transformData,
-		}
-	);
+	const {
+		data: response,
+		error,
+		isValidating,
+		loading,
+		mutate,
+	} = useFetch(resource, {
+		params: getURLSearchParams(),
+		transformData,
+	});
 
 	const {
 		actions = {},
@@ -285,7 +288,9 @@ const ListView: React.FC<ListViewProps> = ({
 	);
 
 	const onSelectAllRows = useCallback(() => {
-		onSelectRow(itemsMemoized.map((item) => onSelectRowNormalizer(item)));
+		onSelectRow(
+			itemsMemoized.map((item: any) => onSelectRowNormalizer(item))
+		);
 	}, [itemsMemoized, onSelectRow, onSelectRowNormalizer]);
 
 	useEffect(() => {
@@ -318,7 +323,7 @@ const ListView: React.FC<ListViewProps> = ({
 
 		if (tableProps.rowSelectable) {
 			dispatch({
-				payload: itemsMemoized.every((item) =>
+				payload: itemsMemoized.every((item: any) =>
 					selectedRows.includes(onSelectRowNormalizer(item))
 				),
 				type: ListViewTypes.SET_CHECKED_ALL_ROWS,
@@ -348,14 +353,14 @@ const ListView: React.FC<ListViewProps> = ({
 				perPageItems: i18n.translate('x-items'),
 				selectPerPageItems: i18n.translate('x-items'),
 			}}
-			onDeltaChange={(delta) => {
+			onDeltaChange={(delta: any) => {
 				if (managementToolbarProps.applyFilters) {
 					updateUrlParams({pageSize: delta});
 				}
 
 				dispatch({payload: delta, type: ListViewTypes.SET_PAGE_SIZE});
 			}}
-			onPageChange={(page) => {
+			onPageChange={(page: any) => {
 				if (managementToolbarProps.applyFilters) {
 					updateUrlParams({page});
 				}
@@ -453,9 +458,9 @@ const ListView: React.FC<ListViewProps> = ({
 const ListViewMemoized = memo(ListView);
 
 const ListViewWithContext: React.FC<
-	ListViewProps & {
-		initialContext?: ListViewContextProviderProps;
-	}
+	{children?: React.ReactNode | undefined} & ListViewProps & {
+			initialContext?: ListViewContextProviderProps;
+		}
 > = ({initialContext, ...otherProps}) => (
 	<ListViewContextProvider {...initialContext} id={otherProps.resource}>
 		<ListViewMemoized {...otherProps} />

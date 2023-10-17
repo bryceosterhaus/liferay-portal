@@ -3,8 +3,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-/// <reference types="react" />
-
+import React from 'react';
 import {IFDSTableProps} from '../../utils/fds';
 import {ModalImportKeys} from '../ModalImport/ModalImport';
 import './ViewObjectDefinitions.scss';
@@ -47,5 +46,5 @@ export default function ViewObjectDefinitions({
 	objectDefinitionsStorageTypes,
 	objectFolderPermissionsURL,
 	portletNamespace,
-}: ViewObjectDefinitionsProps): JSX.Element;
+}: ViewObjectDefinitionsProps): React.JSX.Element;
 export {};

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-import {FocusEvent} from 'react';
+import React, {FocusEvent} from 'react';
 import './Toggle.scss';
 interface ToggleProps {
 	disabled?: boolean;
@@ -24,5 +24,5 @@ export declare function Toggle({
 	toggled,
 	tooltip,
 	tooltipAlign,
-}: ToggleProps): JSX.Element;
+}: ToggleProps): React.JSX.Element;
 export {};

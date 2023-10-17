@@ -3,8 +3,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-/// <reference types="react" />
-
+import React from 'react';
 export declare function EditClientOAuth2ModalContent({
 	alertText,
 	baseResourceURL,
@@ -27,4 +26,4 @@ export declare function EditClientOAuth2ModalContent({
 	label: string;
 	title: string;
 	tooltip: string;
-}): JSX.Element;
+}): React.JSX.Element;

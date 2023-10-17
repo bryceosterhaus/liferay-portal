@@ -3,6 +3,5 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-/// <reference types="react" />
-
-export default function BasicInfoScreen(): JSX.Element;
+import React from 'react';
+export default function BasicInfoScreen(): React.JSX.Element;

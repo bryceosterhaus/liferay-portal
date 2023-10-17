@@ -111,7 +111,7 @@ function PageContentSelectors({
 	}, [selectedSegmentEntry, simulateSegmentsEntriesURL]);
 
 	const simulateSegmentsExperiment = useCallback(
-		(experience) => {
+		(experience: any) => {
 			const iframe = document.querySelector('iframe');
 
 			if (iframe) {

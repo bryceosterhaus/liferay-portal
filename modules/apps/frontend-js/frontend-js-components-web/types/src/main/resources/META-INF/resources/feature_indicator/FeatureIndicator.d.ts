@@ -3,9 +3,8 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-/// <reference types="react" />
-
 import {ALIGN_POSITIONS} from '@clayui/popover';
+import React from 'react';
 export declare type Type = 'beta' | 'deprecated';
 declare type featureIndicatorNoninteractiveProps = {
 	interactive?: false;
@@ -29,5 +28,5 @@ export default function FeatureIndicator({
 	learnResourceContext,
 	tooltipAlign,
 	type,
-}: featureIndicatorProps): JSX.Element;
+}: featureIndicatorProps): React.JSX.Element;
 export {};

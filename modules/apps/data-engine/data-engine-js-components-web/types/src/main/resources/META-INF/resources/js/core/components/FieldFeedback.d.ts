@@ -11,7 +11,7 @@ export declare function FieldFeedback({
 	name,
 	warningMessage,
 	...otherProps
-}: IProps): JSX.Element;
+}: IProps): React.JSX.Element;
 interface IProps extends React.HTMLAttributes<HTMLDivElement> {
 	errorMessage?: string;
 	helpMessage?: string;

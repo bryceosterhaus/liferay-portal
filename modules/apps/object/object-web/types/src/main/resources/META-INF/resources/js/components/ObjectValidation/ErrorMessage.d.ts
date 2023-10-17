@@ -18,5 +18,5 @@ export declare function ErrorMessage({
 	errors,
 	setValues,
 	values,
-}: ErrorMessageProps): JSX.Element;
+}: ErrorMessageProps): React.JSX.Element;
 export {};

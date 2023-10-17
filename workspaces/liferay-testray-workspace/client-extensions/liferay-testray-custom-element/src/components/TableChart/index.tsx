@@ -156,12 +156,10 @@ const TableChart: React.FC<TableChartProps> = ({matrixData, title}) => {
 									horizontalColumnIndex
 								);
 
-								const verticalName = formattedColumnName(
-									verticalColumnName
-								);
-								const horizontalName = formattedColumnName(
-									horizontalColumnName
-								);
+								const verticalName =
+									formattedColumnName(verticalColumnName);
+								const horizontalName =
+									formattedColumnName(horizontalColumnName);
 
 								const value =
 									matrixData && matrixData[verticalName]

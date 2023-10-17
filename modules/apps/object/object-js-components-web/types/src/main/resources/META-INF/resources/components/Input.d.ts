@@ -40,5 +40,5 @@ export declare function Input({
 	type,
 	value,
 	...otherProps
-}: InputProps): JSX.Element;
+}: InputProps): React.JSX.Element;
 export {};

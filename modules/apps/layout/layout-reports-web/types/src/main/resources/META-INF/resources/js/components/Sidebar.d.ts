@@ -7,7 +7,7 @@ import React, {MouseEventHandler} from 'react';
 interface Props {
 	children: React.ReactNode;
 }
-export declare function SidebarBody({children}: Props): JSX.Element;
+export declare function SidebarBody({children}: Props): React.JSX.Element;
 interface HeaderProps {
 	onBackButtonClick?: MouseEventHandler;
 	title: string;
@@ -15,5 +15,5 @@ interface HeaderProps {
 export declare function SidebarHeader({
 	onBackButtonClick,
 	title,
-}: HeaderProps): JSX.Element;
+}: HeaderProps): React.JSX.Element;
 export {};

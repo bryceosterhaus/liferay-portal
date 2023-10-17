@@ -5,7 +5,11 @@
 
 import React from 'react';
 import './CustomDate.scss';
-declare const CustomDate: React.FC<IProps>;
+declare const CustomDate: React.FC<
+	{
+		children?: React.ReactNode | undefined;
+	} & IProps
+>;
 export default CustomDate;
 interface IProps {
 	dateFieldOptions: IDateFieldOption[];

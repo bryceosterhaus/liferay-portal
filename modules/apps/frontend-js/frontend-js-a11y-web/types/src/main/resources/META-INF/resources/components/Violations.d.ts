@@ -3,9 +3,8 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-/// <reference types="react" />
-
 import './Violations.scss';
+import React from 'react';
 import {TYPES} from '../hooks/useFilterViolations';
 import type {RuleRaw, Violations} from '../hooks/useA11y';
 declare type TViolationNext = {
@@ -29,5 +28,5 @@ export default function ViolationsPanel({
 	next,
 	onFilterChange,
 	violations,
-}: ViolationsPanelProps): JSX.Element;
+}: ViolationsPanelProps): React.JSX.Element;
 export {};

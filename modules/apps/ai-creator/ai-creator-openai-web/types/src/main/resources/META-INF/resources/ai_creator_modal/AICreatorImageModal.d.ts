@@ -3,8 +3,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-/// <reference types="react" />
-
+import React from 'react';
 interface Props {
 	eventName?: string;
 	getGenerationsURL: string;
@@ -28,5 +27,5 @@ export default function AICreatorImageModal({
 	learnResources,
 	portletNamespace,
 	uploadGenerationsURL,
-}: Props): JSX.Element;
+}: Props): React.JSX.Element;
 export {};

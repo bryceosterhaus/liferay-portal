@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-import {Dispatch, SetStateAction} from 'react';
+import React, {Dispatch, SetStateAction} from 'react';
 import {Action} from './Action';
 import {Condition} from './Condition';
 declare type RuleBuilderActionProps = {
@@ -18,7 +18,7 @@ export declare function RuleBuilderActionSection({
 	actions,
 	layoutDataItems,
 	setActions,
-}: RuleBuilderActionProps): JSX.Element;
+}: RuleBuilderActionProps): React.JSX.Element;
 export declare type ConditionType = 'all' | 'any';
 declare type RuleBuilderConditionProps = {
 	conditionType: ConditionType;
@@ -31,5 +31,5 @@ export declare function RuleBuilderConditionSection({
 	conditions,
 	setConditionType,
 	setConditions,
-}: RuleBuilderConditionProps): JSX.Element;
+}: RuleBuilderConditionProps): React.JSX.Element;
 export {};

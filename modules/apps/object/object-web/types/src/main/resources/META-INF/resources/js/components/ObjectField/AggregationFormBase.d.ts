@@ -3,8 +3,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-/// <reference types="react" />
-
+import React from 'react';
 import {ObjectFieldErrors} from './ObjectFieldFormBase';
 interface AggregationFormBaseProps {
 	creationLanguageId2: Liferay.Language.Locale;
@@ -33,5 +32,5 @@ export declare function AggregationFormBase({
 	objectFieldSettings,
 	setValues,
 	values,
-}: AggregationFormBaseProps): JSX.Element;
+}: AggregationFormBaseProps): React.JSX.Element;
 export {};

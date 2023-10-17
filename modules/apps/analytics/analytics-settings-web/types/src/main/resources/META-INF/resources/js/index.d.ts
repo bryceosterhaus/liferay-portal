@@ -39,6 +39,14 @@ interface IAppProps extends React.HTMLAttributes<HTMLElement> {
 	token: string;
 	wizardMode: boolean;
 }
-declare const AppContextProvider: React.FC<IAppProps>;
-declare const App: React.FC<IAppProps>;
+declare const AppContextProvider: React.FC<
+	{
+		children?: React.ReactNode | undefined;
+	} & IAppProps
+>;
+declare const App: React.FC<
+	{
+		children?: React.ReactNode | undefined;
+	} & IAppProps
+>;
 export {App, AppContextProvider, useData, useDispatch};

@@ -147,6 +147,6 @@ interface IViewContextProviderProps extends React.HTMLAttributes<HTMLElement> {
 export declare function ViewContextProvider({
 	children,
 	value,
-}: IViewContextProviderProps): JSX.Element;
+}: IViewContextProviderProps): React.JSX.Element;
 export declare function useViewContext(): IViewContextProps;
 export {};

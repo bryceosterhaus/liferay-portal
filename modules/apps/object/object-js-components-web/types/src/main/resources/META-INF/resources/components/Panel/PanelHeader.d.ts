@@ -18,5 +18,5 @@ export declare function PanelHeader({
 	disabled,
 	title,
 	type,
-}: IPanelHeaderProps): JSX.Element;
+}: IPanelHeaderProps): React.JSX.Element;
 export {};

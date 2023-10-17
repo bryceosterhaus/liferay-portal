@@ -27,5 +27,5 @@ export declare function ManyObjectRelationshipEdge({
 	labelStyle,
 	objectRelationshipEdgeStyle,
 	setActivePopover,
-}: ManyObjectRelationshipEdgeProps): JSX.Element;
+}: ManyObjectRelationshipEdgeProps): React.JSX.Element;
 export {};

@@ -42,5 +42,5 @@ export declare function BasicInfoContainer({
 	setObjectDefinitionExternalReferenceCode2,
 	setValues,
 	values,
-}: BasicInfoContainerProps): JSX.Element;
+}: BasicInfoContainerProps): React.JSX.Element;
 export {};

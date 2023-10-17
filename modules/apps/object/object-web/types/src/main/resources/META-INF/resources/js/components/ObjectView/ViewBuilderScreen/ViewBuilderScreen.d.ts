@@ -4,5 +4,9 @@
  */
 
 import React from 'react';
-declare const ViewBuilderScreen: React.FC<{}>;
+declare const ViewBuilderScreen: React.FC<
+	{
+		children?: React.ReactNode | undefined;
+	} & {}
+>;
 export default ViewBuilderScreen;

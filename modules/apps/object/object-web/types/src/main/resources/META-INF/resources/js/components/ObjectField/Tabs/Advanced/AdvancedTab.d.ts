@@ -5,7 +5,7 @@
 
 import {SidebarCategory} from '@liferay/object-js-components-web';
 import {ILearnResourceContext} from 'frontend-js-components-web';
-import {ElementType} from 'react';
+import React, {ElementType} from 'react';
 import {ObjectFieldErrors} from '../../ObjectFieldFormBase';
 interface AdvancedTabProps {
 	containerWrapper: ElementType;
@@ -34,5 +34,5 @@ export declare function AdvancedTab({
 	setValues,
 	sidebarElements,
 	values,
-}: AdvancedTabProps): JSX.Element;
+}: AdvancedTabProps): React.JSX.Element;
 export {};

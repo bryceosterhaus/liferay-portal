@@ -6,7 +6,11 @@
 import {FieldTypeName} from 'data-engine-js-components-web';
 import React from 'react';
 import './SidebarFieldSettings.scss';
-declare const SidebarFieldSettings: React.FC<IProps>;
+declare const SidebarFieldSettings: React.FC<
+	{
+		children?: React.ReactNode | undefined;
+	} & IProps
+>;
 export default SidebarFieldSettings;
 interface Field {
 	name: string;

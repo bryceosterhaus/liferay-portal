@@ -33,15 +33,6 @@ export declare function normalizeFieldSettings(
 		| ObjectFieldPicklistSetting
 		| ObjectFieldFilterSetting[]
 		| undefined;
-	maxLength?:
-		| string
-		| number
-		| boolean
-		| Partial<Liferay.Language.FullyLocalizedValue<string>>
-		| NameValueObject[]
-		| ObjectFieldPicklistSetting
-		| ObjectFieldFilterSetting[]
-		| undefined;
 	defaultValue?:
 		| string
 		| number
@@ -60,7 +51,7 @@ export declare function normalizeFieldSettings(
 		| ObjectFieldPicklistSetting
 		| ObjectFieldFilterSetting[]
 		| undefined;
-	filters?:
+	maxLength?:
 		| string
 		| number
 		| boolean
@@ -88,6 +79,15 @@ export declare function normalizeFieldSettings(
 		| ObjectFieldFilterSetting[]
 		| undefined;
 	fileSource?:
+		| string
+		| number
+		| boolean
+		| Partial<Liferay.Language.FullyLocalizedValue<string>>
+		| NameValueObject[]
+		| ObjectFieldPicklistSetting
+		| ObjectFieldFilterSetting[]
+		| undefined;
+	filters?:
 		| string
 		| number
 		| boolean

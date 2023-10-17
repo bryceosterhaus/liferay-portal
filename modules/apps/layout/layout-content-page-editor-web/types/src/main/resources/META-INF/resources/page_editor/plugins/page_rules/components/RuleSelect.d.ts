@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-import {MutableRefObject} from 'react';
+import React, {MutableRefObject} from 'react';
 interface RuleSelectProps<T> {
 	'aria-label'?: string;
 	'items': ReadonlyArray<{
@@ -20,5 +20,5 @@ export default function RuleSelect<T extends string>({
 	selectedKey,
 	triggerRef,
 	...otherProps
-}: RuleSelectProps<T>): JSX.Element;
+}: RuleSelectProps<T>): React.JSX.Element;
 export {};

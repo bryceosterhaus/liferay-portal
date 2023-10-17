@@ -29,13 +29,9 @@ type CaseListViewProps = {
 	tableProps?: Partial<TableProps>;
 };
 
-const CaseListView: React.FC<CaseListViewProps> = ({
-	actions,
-	formModal,
-	listViewProps,
-	tableProps,
-	variables,
-}) => {
+const CaseListView: React.FC<
+	{children?: React.ReactNode | undefined} & CaseListViewProps
+> = ({actions, formModal, listViewProps, tableProps, variables}) => {
 	const {pathname} = useLocation();
 	const navigate = useNavigate();
 

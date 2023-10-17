@@ -27,7 +27,7 @@ export declare function StoreAPIContextProvider({
 	children: React.ReactNode;
 	dispatch: Dispatch;
 	getState: GetState;
-}): JSX.Element;
+}): React.JSX.Element;
 
 /**
  * StoreContext is a black box for components: they should
@@ -45,7 +45,7 @@ export declare function StoreContextProvider({
 	children: React.ReactNode;
 	initialState: State;
 	reducer: Reducer;
-}): JSX.Element;
+}): React.JSX.Element;
 
 /**
  * @see https://react-redux.js.org/api/hooks#usedispatch

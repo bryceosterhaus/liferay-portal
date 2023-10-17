@@ -3,8 +3,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-/// <reference types="react" />
-
+import React from 'react';
 import {CategoryRule} from './CategorySelector';
 import {TagRule} from './TagSelector';
 export declare type RuleType = 'assetCategories' | 'assetTags';
@@ -51,4 +50,4 @@ export declare function Rule<T extends RuleType>({
 	rule,
 	tagSelectorURL,
 	vocabularyIds,
-}: RuleProps<T>): JSX.Element;
+}: RuleProps<T>): React.JSX.Element;

@@ -39,10 +39,8 @@ const Picklist = ({
 	value: keyAsValue,
 }: TGenericFieldProps) => {
 	const [key] = useState<string | null>(keyAsValue);
-	const [
-		selectedOption,
-		setSelectedOption,
-	] = useState<TPicklistOption | null>(null);
+	const [selectedOption, setSelectedOption] =
+		useState<TPicklistOption | null>(null);
 	const [options, setOptions] = useState<TPicklistOption[]>([]);
 	const [error, setError] = useState<string | null>(null);
 
@@ -65,7 +63,7 @@ const Picklist = ({
 	}, [listTypeDefinitionId]);
 
 	const onSelection = useCallback(
-		({target}) => {
+		({target}: any) => {
 			const option = options.find(({label}) => target?.value === label);
 
 			if (option) {
@@ -82,8 +80,7 @@ const Picklist = ({
 			if (selectedOption) {
 				setSelectedOption(selectedOption || DEFAULT_OPTION);
 			}
-		}
-		else {
+		} else {
 			fetchSourceItems();
 		}
 	}, [fetchSourceItems, options, key]);

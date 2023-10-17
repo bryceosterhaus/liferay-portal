@@ -56,7 +56,9 @@ type ManagementToolbarRightProps = {
 	filterSchema?: FilterSchema;
 };
 
-const ManagementToolbarRight: React.FC<ManagementToolbarRightProps> = ({
+const ManagementToolbarRight: React.FC<
+	{children?: React.ReactNode | undefined} & ManagementToolbarRightProps
+> = ({
 	actions,
 	addButton,
 	applyFilters = true,

@@ -10,5 +10,9 @@ interface IProps extends React.HTMLAttributes<HTMLElement> {
 	observer: Observer;
 	onClose: () => void;
 }
-declare const ModalWithProvider: React.FC<IProps>;
+declare const ModalWithProvider: React.FC<
+	{
+		children?: React.ReactNode | undefined;
+	} & IProps
+>;
 export default ModalWithProvider;

@@ -19,5 +19,5 @@ declare const Cell: ({
 	defaultWidth?: string | number | undefined;
 	heading?: boolean | undefined;
 	resizable?: boolean | undefined;
-}) => JSX.Element;
+}) => React.JSX.Element;
 export default Cell;

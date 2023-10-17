@@ -8,4 +8,4 @@ export default function Item({
 	children,
 	className,
 	...otherProps
-}: React.LiHTMLAttributes<HTMLLIElement>): JSX.Element;
+}: React.LiHTMLAttributes<HTMLLIElement>): React.JSX.Element;

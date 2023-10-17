@@ -3,9 +3,8 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-/// <reference types="react" />
-
 import './Violation.scss';
+import React from 'react';
 import type {Violations} from '../hooks/useA11y';
 declare type Params = {
 	name: string;
@@ -23,5 +22,5 @@ declare function Violation({
 	params,
 	previous,
 	violations,
-}: ViolationProps): JSX.Element | null;
+}: ViolationProps): React.JSX.Element | null;
 export default Violation;

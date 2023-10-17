@@ -3,8 +3,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-/// <reference types="react" />
-
+import {default as React} from 'react';
 interface Props {
 	disabled?: boolean;
 	onChange: (payload: {type: string; value: string}) => void;
@@ -18,5 +17,5 @@ declare function DateTimeInput({
 	propertyLabel,
 	propertyType,
 	value,
-}: Props): JSX.Element;
+}: Props): React.JSX.Element;
 export default DateTimeInput;

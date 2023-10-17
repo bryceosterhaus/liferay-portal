@@ -3,8 +3,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-/// <reference types="react" />
-
+import React from 'react';
 import '../../../../css/CardsVisualizationMode.scss';
 import {IFDSViewSectionProps} from '../../../FDSView';
-export default function Cards(props: IFDSViewSectionProps): JSX.Element;
+export default function Cards(props: IFDSViewSectionProps): React.JSX.Element;

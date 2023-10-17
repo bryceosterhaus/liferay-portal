@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-import {ReactNode, Ref} from 'react';
+import React, {ReactNode, Ref} from 'react';
 interface RuleBuilderItemProps {
 	'aria-label': string;
 	'children': ReactNode;
@@ -23,5 +23,5 @@ export default function RuleBuilderItem({
 	type,
 	wrapperRef,
 	...otherProps
-}: RuleBuilderItemProps): JSX.Element;
+}: RuleBuilderItemProps): React.JSX.Element;
 export {};

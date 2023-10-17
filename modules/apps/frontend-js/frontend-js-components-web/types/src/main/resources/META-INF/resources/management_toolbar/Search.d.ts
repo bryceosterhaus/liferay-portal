@@ -9,7 +9,7 @@ export default function Search({
 	onlySearch,
 	showMobile,
 	...otherProps
-}: IProps): JSX.Element;
+}: IProps): React.JSX.Element;
 interface IProps extends React.FormHTMLAttributes<HTMLFormElement> {
 	onlySearch?: boolean;
 	showMobile?: boolean;

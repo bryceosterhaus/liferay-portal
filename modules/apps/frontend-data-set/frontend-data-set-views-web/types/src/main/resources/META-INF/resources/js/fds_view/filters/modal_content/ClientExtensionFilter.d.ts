@@ -3,10 +3,9 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-/// <reference types="react" />
-
 import {IClientExtensionRenderer} from '@liferay/frontend-data-set-web';
-declare function Header(): JSX.Element;
+import React from 'react';
+declare function Header(): React.JSX.Element;
 interface IBodyProps {
 	fdsFilterClientExtensions: IClientExtensionRenderer[];
 	namespace: string;
@@ -18,7 +17,7 @@ declare function Body({
 	namespace,
 	onSelectedClientExtensionChange,
 	selectedClientExtension,
-}: IBodyProps): JSX.Element;
+}: IBodyProps): React.JSX.Element;
 declare const _default: {
 	Body: typeof Body;
 	Header: typeof Header;

@@ -18,11 +18,9 @@ interface IContentProps {
 	showCheckbox: boolean;
 }
 
-const Content: React.FC<IContentProps> = ({
-	columns: headerColumns,
-	disabled,
-	showCheckbox,
-}) => {
+const Content: React.FC<
+	{children?: React.ReactNode | undefined} & IContentProps
+> = ({columns: headerColumns, disabled, showCheckbox}) => {
 	const {filter, formattedItems, rows} = useData();
 	const dispatch = useDispatch();
 

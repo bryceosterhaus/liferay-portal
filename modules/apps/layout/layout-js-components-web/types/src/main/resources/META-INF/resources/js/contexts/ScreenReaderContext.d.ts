@@ -12,7 +12,7 @@ declare function ScreenReaderAnnouncerContextProvider({
 	children,
 }: {
 	children: ReactNode;
-}): JSX.Element;
+}): React.JSX.Element;
 export {
 	ScreenReaderAnnouncerContext,
 	ScreenReaderAnnouncerContextProvider,

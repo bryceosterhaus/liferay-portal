@@ -3,13 +3,12 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-/// <reference types="react" />
-
+import React from 'react';
 export declare const manyMarkerId = 'manyMarker';
 interface ManyMarkerProps {
 	objectRelationshipId: string;
 }
 export default function ManyMarker({
 	objectRelationshipId,
-}: ManyMarkerProps): JSX.Element;
+}: ManyMarkerProps): React.JSX.Element;
 export {};

@@ -8,5 +8,9 @@ interface IConnectProps {
 	onConnect?: () => void;
 	title: string;
 }
-declare const Connect: React.FC<IConnectProps>;
+declare const Connect: React.FC<
+	{
+		children?: React.ReactNode | undefined;
+	} & IConnectProps
+>;
 export default Connect;

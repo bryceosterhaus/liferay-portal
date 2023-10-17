@@ -85,11 +85,8 @@ const Table: React.FC<TableProps> = ({
 
 	const displayActionColumn = !!filteredActions.length;
 
-	const {
-		contextMenuState,
-		handleContext,
-		setContextMenuState,
-	} = useContextMenu(displayActionColumn);
+	const {contextMenuState, handleContext, setContextMenuState} =
+		useContextMenu(displayActionColumn);
 
 	const [sorted, setSorted] = useState<SortDirection>(SortOption.ASC);
 
@@ -213,8 +210,9 @@ const Table: React.FC<TableProps> = ({
 															value
 														)
 													) {
-														return (value?.props as any)
-															?.children;
+														return (
+															value?.props as any
+														)?.children;
 													}
 
 													return value;
@@ -259,7 +257,8 @@ const Table: React.FC<TableProps> = ({
 									<ClayTable.Cell
 										className={classNames('text-dark', {
 											'cursor-pointer': column.clickable,
-											[`table-cell-minw-${column.width}`]: column.width,
+											[`table-cell-minw-${column.width}`]:
+												column.width,
 											'table-cell-expand':
 												column.size === 'sm',
 											'table-cell-expand-small':

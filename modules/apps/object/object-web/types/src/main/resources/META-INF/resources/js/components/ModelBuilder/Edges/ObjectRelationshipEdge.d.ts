@@ -30,5 +30,5 @@ export default function ObjectRelationshipEdge({
 	id: edgeId,
 	reverseEdgePath,
 	style,
-}: ObjectRelationshipEdge): JSX.Element;
+}: ObjectRelationshipEdge): React.JSX.Element;
 export {};

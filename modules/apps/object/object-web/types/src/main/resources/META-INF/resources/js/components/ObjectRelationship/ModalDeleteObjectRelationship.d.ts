@@ -3,8 +3,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-/// <reference types="react" />
-
+import React from 'react';
 interface ModalDeleteObjectRelationshipProps {
 	handleOnClose: () => void;
 	objectRelationship: ObjectRelationship;
@@ -18,5 +17,5 @@ export declare function ModalDeleteObjectRelationship({
 	onAfterSubmit,
 	reload,
 	setObjectRelationship,
-}: ModalDeleteObjectRelationshipProps): JSX.Element;
+}: ModalDeleteObjectRelationshipProps): React.JSX.Element;
 export {};

@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-import {ReactNode, createContext, useEffect, useMemo, useReducer} from 'react';
+import {createContext, useEffect, useMemo, useReducer} from 'react';
 import {KeyedMutator} from 'swr';
 import {STORAGE_KEYS} from '~/core/Storage';
 
@@ -183,9 +183,10 @@ const TestrayContextProvider: React.FC<{
 
 	const compareRuns = useMemo(() => state.compareRuns, [state.compareRuns]);
 
-	const autoFillBuild = useMemo(() => state.autoFillBuild, [
-		state.autoFillBuild,
-	]);
+	const autoFillBuild = useMemo(
+		() => state.autoFillBuild,
+		[state.autoFillBuild]
+	);
 
 	useEffect(() => {
 		if (compareRuns) {
@@ -218,9 +219,8 @@ const TestrayContextProvider: React.FC<{
 			value={[
 				{
 					...state,
-					testrayDispatchTriggers: testrayDispatchTriggers as APIResponse<
-						TestrayDispatchTrigger
-					>,
+					testrayDispatchTriggers:
+						testrayDispatchTriggers as APIResponse<TestrayDispatchTrigger>,
 				},
 				dispatch,
 				mutate,

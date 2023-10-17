@@ -26,5 +26,5 @@ export default function ExperienceSelector({
 	segmentsExperiences,
 	selectedSegmentsExperience,
 	...otherProps
-}: ExperienceSelectorProps): JSX.Element;
+}: ExperienceSelectorProps): React.JSX.Element;
 export {};

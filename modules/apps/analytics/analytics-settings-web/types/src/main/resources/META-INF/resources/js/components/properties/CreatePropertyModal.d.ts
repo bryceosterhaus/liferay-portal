@@ -9,5 +9,9 @@ interface IModalProps {
 	onCancel: () => void;
 	onSubmit: () => void;
 }
-declare const CreatePropertyModal: React.FC<IModalProps>;
+declare const CreatePropertyModal: React.FC<
+	{
+		children?: React.ReactNode | undefined;
+	} & IModalProps
+>;
 export default CreatePropertyModal;

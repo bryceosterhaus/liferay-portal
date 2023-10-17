@@ -3,8 +3,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-/// <reference types="react" />
-
+import React from 'react';
 import {ObjectFieldErrors} from './ObjectFieldFormBase';
 import './AutoIncrementFormBase.scss';
 interface AutoIncrementFormBaseProps {
@@ -22,5 +21,5 @@ export declare function AutoIncrementFormBase({
 	onSubmit,
 	setValues,
 	values,
-}: AutoIncrementFormBaseProps): JSX.Element;
+}: AutoIncrementFormBaseProps): React.JSX.Element;
 export {};

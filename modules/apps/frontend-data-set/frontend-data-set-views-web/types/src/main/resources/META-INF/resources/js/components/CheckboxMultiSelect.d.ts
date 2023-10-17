@@ -30,5 +30,5 @@ declare function CheckboxMultiSelect({
 	sourceItems,
 	value,
 	...otherProps
-}: IProps): JSX.Element;
+}: IProps): React.JSX.Element;
 export default CheckboxMultiSelect;

@@ -3,8 +3,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-/// <reference types="react" />
-
+import React from 'react';
 import {Scope} from '../ObjectDetails/EditObjectDetails';
 import './EditObjectFolder.scss';
 interface EditObjectFolder {
@@ -18,5 +17,5 @@ export default function EditObjectFolder({
 	objectRelationshipDeletionTypes,
 	sites,
 	viewObjectDefinitionsURL,
-}: EditObjectFolder): JSX.Element;
+}: EditObjectFolder): React.JSX.Element;
 export {};

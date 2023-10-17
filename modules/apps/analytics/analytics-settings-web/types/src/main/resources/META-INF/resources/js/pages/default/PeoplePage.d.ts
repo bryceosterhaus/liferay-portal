@@ -5,5 +5,9 @@
 
 import React from 'react';
 import {IGenericPageProps} from './DefaultPage';
-declare const PeoplePage: React.FC<IGenericPageProps>;
+declare const PeoplePage: React.FC<
+	{
+		children?: React.ReactNode | undefined;
+	} & IGenericPageProps
+>;
 export default PeoplePage;

@@ -3,8 +3,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-/// <reference types="react" />
-
+import React from 'react';
 import {Translations} from './TranslationAdminContent';
 declare const DISPLAY_TYPE: {
 	readonly DEFAULT: 'DEFAULT';
@@ -43,5 +42,5 @@ export default function TranslationAdminSelector({
 	small,
 	translationProgress,
 	translations,
-}: IProps): JSX.Element;
+}: IProps): React.JSX.Element;
 export {};

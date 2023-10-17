@@ -10,5 +10,5 @@ declare function TableContextProvider({
 }: {
 	children: React.ReactNode;
 	columnNames: Array<string>;
-}): JSX.Element;
+}): React.JSX.Element;
 export default TableContextProvider;

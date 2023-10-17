@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-import {ReactNode} from 'react';
+import React from 'react';
 import './CustomVerticalBar.scss';
 interface CustomVerticalBarProps {
-	children: ReactNode;
+	children: React.ReactNode;
 	defaultActive: string;
 	panelWidth?: number;
 	panelWidthMax?: number;
@@ -28,5 +28,5 @@ export declare function CustomVerticalBar({
 	resize,
 	triggerSideBarAnimation,
 	verticalBarItems,
-}: CustomVerticalBarProps): JSX.Element;
+}: CustomVerticalBarProps): React.JSX.Element;
 export {};

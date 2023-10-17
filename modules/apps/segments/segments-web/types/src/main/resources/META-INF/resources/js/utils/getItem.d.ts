@@ -8,4 +8,4 @@ export default function getItem(
 	criteria: Criteria,
 	groupId: Criteria['groupId'],
 	index: number
-): import('../../types/Criteria').CriteriaItem | Criteria;
+): Criteria | import('../../types/Criteria').CriteriaItem;

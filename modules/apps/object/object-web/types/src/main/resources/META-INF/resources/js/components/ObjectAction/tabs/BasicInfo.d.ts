@@ -25,5 +25,5 @@ export default function BasicInfo({
 	scriptManagementConfigurationPortletURL,
 	setValues,
 	values,
-}: BasicInfoProps): JSX.Element;
+}: BasicInfoProps): React.JSX.Element;
 export {};

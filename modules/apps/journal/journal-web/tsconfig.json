@@ -1,5 +1,5 @@
 {
-	"@generated": "eafdaa32eaaaa1ea2d06f922bcd722233127d870",
+	"@generated": "d504ac5865399b8ca6bd0e0ce7f7316c51ed4b62",
 	"@overrides": {
 		"compilerOptions": {
 			"lib": [
@@ -36,6 +36,7 @@
 				"../../frontend-js/frontend-js-web/src/main/resources/META-INF/resources/index.d.ts"
 			]
 		},
+		"skipLibCheck": true,
 		"sourceMap": false,
 		"strict": true,
 		"target": "es6",

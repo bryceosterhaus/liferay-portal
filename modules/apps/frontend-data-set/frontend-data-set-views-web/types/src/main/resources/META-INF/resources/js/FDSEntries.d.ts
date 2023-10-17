@@ -3,8 +3,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-/// <reference types="react" />
-
+import React from 'react';
 import '../css/FDSEntries.scss';
 import {FDSViewType} from './FDSViews';
 import {OBJECT_RELATIONSHIP} from './utils/constants';
@@ -38,6 +37,6 @@ declare const FDSEntries: ({
 	namespace,
 	permissionsURL,
 	restApplications,
-}: IFDSEntriesInterface) => JSX.Element;
+}: IFDSEntriesInterface) => React.JSX.Element;
 export {FDSEntryType};
 export default FDSEntries;

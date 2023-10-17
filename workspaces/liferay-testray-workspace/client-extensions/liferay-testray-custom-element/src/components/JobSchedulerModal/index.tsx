@@ -16,9 +16,9 @@ type NotificationPopoverProps = {
 	testrayDispatchTriggers: APIResponse<TestrayDispatchTrigger>;
 };
 
-const JobSchedulerModal: React.FC<NotificationPopoverProps> = ({
-	testrayDispatchTriggers,
-}) => {
+const JobSchedulerModal: React.FC<
+	{children?: React.ReactNode | undefined} & NotificationPopoverProps
+> = ({testrayDispatchTriggers}) => {
 	const notifications = testrayDispatchTriggers?.items ?? [];
 
 	return (

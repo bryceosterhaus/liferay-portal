@@ -4,5 +4,9 @@
  */
 
 import React from 'react';
-declare const ObjectLayoutTabs: React.FC<React.HTMLAttributes<HTMLElement>>;
+declare const ObjectLayoutTabs: React.FC<
+	{
+		children?: React.ReactNode | undefined;
+	} & React.HTMLAttributes<HTMLElement>
+>;
 export default ObjectLayoutTabs;

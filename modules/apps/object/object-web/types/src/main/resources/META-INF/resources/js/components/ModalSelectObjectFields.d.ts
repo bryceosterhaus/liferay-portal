@@ -3,9 +3,8 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-/// <reference types="react" />
-
 import {IClayAlertProps} from '@clayui/alert';
+import React from 'react';
 import './ModalSelectObjectFields.scss';
 export declare type Alert = {
 	content: string;
@@ -13,7 +12,7 @@ export declare type Alert = {
 };
 declare function ModalSelectObjectFields<
 	T extends ModalItem
->(): JSX.Element | null;
+>(): React.JSX.Element | null;
 export default ModalSelectObjectFields;
 interface ModalItem extends ObjectField {
 	checked?: boolean;

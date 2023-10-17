@@ -7,7 +7,7 @@ import React from 'react';
 export declare function GlobalCETOptionsDropDown({
 	dropdownItems,
 	dropdownTriggerId,
-}: IProps): JSX.Element;
+}: IProps): React.JSX.Element;
 interface IProps {
 	dropdownItems: Array<{
 		label: string;

@@ -10,5 +10,9 @@ interface IContentProps {
 	disabled: boolean;
 	showCheckbox: boolean;
 }
-declare const Content: React.FC<IContentProps>;
+declare const Content: React.FC<
+	{
+		children?: React.ReactNode | undefined;
+	} & IContentProps
+>;
 export default Content;

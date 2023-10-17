@@ -16,7 +16,7 @@ declare function Treeview({
 	multiSelection,
 	nodes: initialNodes,
 	onSelectedNodesChange,
-}: IProps): JSX.Element;
+}: IProps): React.JSX.Element;
 declare namespace Treeview {
 	var defaultProps: {
 		NodeComponent: typeof TreeviewLabel;

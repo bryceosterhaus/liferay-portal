@@ -4,7 +4,7 @@
  */
 
 import {TreeView} from '@clayui/core';
-import {ComponentProps} from 'react';
+import React, {ComponentProps} from 'react';
 import {FDSViewType} from '../FDSViews';
 import {IField} from '../utils/types';
 interface IFieldTreeItem extends IField {
@@ -32,5 +32,5 @@ declare const FieldSelectModalContent: ({
 	saveButtonDisabled: boolean;
 	selectedFields: Array<IField>;
 	selectionMode?: ComponentProps<typeof TreeView>['selectionMode'];
-}) => JSX.Element;
+}) => React.JSX.Element;
 export default FieldSelectModalContent;

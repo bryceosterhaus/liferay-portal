@@ -66,5 +66,5 @@ export default function LearnMessage({
 	resource,
 	resourceKey,
 	...otherProps
-}: IProps): JSX.Element;
+}: IProps): React.JSX.Element;
 export {};

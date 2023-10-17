@@ -31,7 +31,7 @@ declare type Props = {
 };
 declare function KeyboardMovementContextProvider({
 	children,
-}: Props): JSX.Element;
+}: Props): React.JSX.Element;
 declare function useDisableKeyboardMovement(): () => void;
 declare function useMovementSource(): Source | null;
 declare function useMovementTarget(): Target | null;

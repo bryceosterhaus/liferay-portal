@@ -3,8 +3,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-/// <reference types="react" />
-
+import React from 'react';
 import {Locale} from './TranslationAdminContent';
 import {TranslationProgress} from './TranslationAdminSelector';
 interface Props {
@@ -26,5 +25,5 @@ export default function TranslationAdminItem({
 	localeValue,
 	showOnlyFlags,
 	translationProgress,
-}: Props): JSX.Element;
+}: Props): React.JSX.Element;
 export {};

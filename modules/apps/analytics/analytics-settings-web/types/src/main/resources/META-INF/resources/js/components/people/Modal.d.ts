@@ -30,5 +30,9 @@ interface IModalProps {
 	};
 	title: string;
 }
-declare const Modal: React.FC<IModalProps>;
+declare const Modal: React.FC<
+	{
+		children?: React.ReactNode | undefined;
+	} & IModalProps
+>;
 export default Modal;

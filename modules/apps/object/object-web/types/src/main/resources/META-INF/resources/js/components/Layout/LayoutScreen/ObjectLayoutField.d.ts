@@ -17,5 +17,5 @@ export declare function ObjectLayoutField({
 	objectFieldName,
 	rowIndex,
 	tabIndex,
-}: ObjectLayoutFieldProps): JSX.Element;
+}: ObjectLayoutFieldProps): React.JSX.Element;
 export {};

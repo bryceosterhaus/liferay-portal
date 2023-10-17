@@ -14,7 +14,9 @@ type ProjectsProps = {
 	PageContainer?: React.FC;
 };
 
-const Projects: React.FC<ProjectsProps> = ({PageContainer = Container}) => {
+const Projects: React.FC<
+	{children?: React.ReactNode | undefined} & ProjectsProps
+> = ({PageContainer = Container}) => {
 	const {actions, navigate} = useProjectActions();
 
 	useHeader({

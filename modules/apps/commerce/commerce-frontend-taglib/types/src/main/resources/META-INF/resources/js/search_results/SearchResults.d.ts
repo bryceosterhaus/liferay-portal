@@ -3,8 +3,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-/// <reference types="react" />
-
+import React from 'react';
 interface SearchResultsProps {
 	commerceAccountId: string;
 	groupId: string;
@@ -16,5 +15,5 @@ export default function SearchResults({
 	groupId,
 	plid,
 	searchURL,
-}: SearchResultsProps): JSX.Element | null;
+}: SearchResultsProps): React.JSX.Element | null;
 export {};

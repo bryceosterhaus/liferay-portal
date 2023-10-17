@@ -22,7 +22,9 @@ import {ModalAddObjectLayoutBox} from './ModalAddObjectLayoutBox';
 import {ObjectLayoutBox} from './ObjectLayoutBox';
 import {ObjectLayoutRelationship} from './ObjectLayoutRelationship';
 
-const ObjectLayoutTabs: React.FC<React.HTMLAttributes<HTMLElement>> = () => {
+const ObjectLayoutTabs: React.FC<
+	{children?: React.ReactNode | undefined} & React.HTMLAttributes<HTMLElement>
+> = () => {
 	const [
 		{creationLanguageId, isViewOnly, objectLayout},
 		dispatch,

@@ -3,8 +3,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-/// <reference types="react" />
-
+import React from 'react';
 declare type Errors = {
 	errorMessage?: string;
 	fields?: Record<string, string>;
@@ -24,11 +23,11 @@ export default function SeparatorFields({
 	errors,
 	fields,
 	url,
-}: FieldsProps): JSX.Element;
+}: FieldsProps): React.JSX.Element;
 declare type FieldProps = {
 	errors: Errors;
 	field: Field;
 	url: string;
 };
-declare function Field({errors, field, url}: FieldProps): JSX.Element;
+declare function Field({errors, field, url}: FieldProps): React.JSX.Element;
 export {};

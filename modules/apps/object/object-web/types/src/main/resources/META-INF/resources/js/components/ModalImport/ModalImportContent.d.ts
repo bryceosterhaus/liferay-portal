@@ -4,7 +4,7 @@
  */
 
 import {API} from '@liferay/object-js-components-web';
-import {FormEvent} from 'react';
+import React, {FormEvent} from 'react';
 import {ModalImportProperties} from '../ViewObjectDefinitions/ViewObjectDefinitions';
 import {ModalImportKeys, TFile} from './ModalImport';
 import './ModalImportContent.scss';
@@ -46,5 +46,5 @@ export declare function ModalImportContent({
 	setFile,
 	setImportedObjectDefinitions,
 	setName,
-}: ModalImportContentProps): JSX.Element;
+}: ModalImportContentProps): React.JSX.Element;
 export {};

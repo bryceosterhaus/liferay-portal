@@ -33,10 +33,9 @@ const onMapAvailable = (factor: FactorCategoryForm) => ({
 
 export type State = Boxes<[]>;
 
-const EnvironmentFactorsModal: React.FC<EnvironmentFactorsModalProps> = ({
-	onCloseModal,
-	routineId,
-}) => {
+const EnvironmentFactorsModal: React.FC<
+	{children?: React.ReactNode | undefined} & EnvironmentFactorsModalProps
+> = ({onCloseModal, routineId}) => {
 	const [shouldRequestCategories, setShouldRequestCategories] = useState(
 		false
 	);

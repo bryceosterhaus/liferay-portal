@@ -4,7 +4,7 @@
  */
 
 import {FormError} from '@liferay/object-js-components-web';
-import {ChangeEventHandler, ReactNode} from 'react';
+import React, {ChangeEventHandler, ReactNode} from 'react';
 import './ObjectFieldFormBase.scss';
 interface ObjectFieldFormBaseProps {
 	baseResourceURL: string;
@@ -55,5 +55,5 @@ export default function ObjectFieldFormBase({
 	onSubmit,
 	setDbObjectFieldRequired,
 	setValues,
-}: ObjectFieldFormBaseProps): JSX.Element;
+}: ObjectFieldFormBaseProps): React.JSX.Element;
 export {};

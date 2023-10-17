@@ -3,9 +3,8 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-/// <reference types="react" />
-
 import './Occurrence.scss';
+import React from 'react';
 import type {Violations} from '../hooks/useA11y';
 declare type Params = {
 	name: string;
@@ -21,5 +20,5 @@ declare function Occurrence({
 	params,
 	previous,
 	violations,
-}: OccurrenceProps): JSX.Element | null;
+}: OccurrenceProps): React.JSX.Element | null;
 export default Occurrence;

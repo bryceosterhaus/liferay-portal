@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-import {ReactElement} from 'react';
+import React, {ReactElement} from 'react';
 export interface FilterImplementation<
 	T extends FilterImplementationArgs<unknown>
 > {
@@ -43,6 +43,6 @@ declare const Filter: ({
 	moduleURL,
 	type,
 	...otherProps
-}: FilterComponentArgs) => JSX.Element;
+}: FilterComponentArgs) => React.JSX.Element;
 export {FILTER_IMPLEMENTATIONS};
 export default Filter;

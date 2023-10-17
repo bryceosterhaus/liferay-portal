@@ -3,9 +3,8 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-/// <reference types="react" />
-
-declare const ErrorMessage: ({error}: TErrorMessageProps) => JSX.Element;
+import React from 'react';
+declare const ErrorMessage: ({error}: TErrorMessageProps) => React.JSX.Element;
 declare type TErrorMessageProps = {
 	error: string | null;
 };

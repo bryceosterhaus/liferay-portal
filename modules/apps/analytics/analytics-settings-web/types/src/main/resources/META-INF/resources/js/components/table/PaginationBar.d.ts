@@ -7,5 +7,9 @@ import React from 'react';
 interface IPaginationBarProps {
 	disabled: boolean;
 }
-declare const PaginationBar: React.FC<IPaginationBarProps>;
+declare const PaginationBar: React.FC<
+	{
+		children?: React.ReactNode | undefined;
+	} & IPaginationBarProps
+>;
 export default PaginationBar;

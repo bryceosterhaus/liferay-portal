@@ -1,5 +1,5 @@
 {
-	"@generated": "59d34bace24c2c536c7869c23ec5f872546d3a35",
+	"@generated": "8821bcfc1b9125c5e3b07f7168f8f94c04b8b782",
 	"@overrides": {
 	},
 	"@readonly": "** AUTO-GENERATED: DO NOT EDIT OUTSIDE @overrides **",
@@ -32,6 +32,7 @@
 				"../../frontend-js/frontend-js-web/src/main/resources/META-INF/resources/index.d.ts"
 			]
 		},
+		"skipLibCheck": true,
 		"sourceMap": false,
 		"strict": true,
 		"target": "es6",

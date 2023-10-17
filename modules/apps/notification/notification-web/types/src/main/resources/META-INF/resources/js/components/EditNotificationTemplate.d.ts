@@ -3,9 +3,8 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-/// <reference types="react" />
-
 import {ILearnResourceContext} from 'frontend-js-components-web';
+import React from 'react';
 import './EditNotificationTemplate.scss';
 export declare type NotificationTemplateError = {
 	bcc?: string;
@@ -38,5 +37,5 @@ export default function EditNotificationTemplate({
 	notificationTemplateId,
 	notificationTemplateType,
 	portletNamespace,
-}: EditNotificationTemplateProps): JSX.Element;
+}: EditNotificationTemplateProps): React.JSX.Element;
 export {};

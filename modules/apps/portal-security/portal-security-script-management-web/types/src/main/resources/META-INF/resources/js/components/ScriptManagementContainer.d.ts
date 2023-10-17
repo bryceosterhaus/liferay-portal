@@ -3,8 +3,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-/// <reference types="react" />
-
+import React from 'react';
 import './ScriptManagementContainer.scss';
 export declare type GroovyScriptUseItem = {
 	companyWebId: string;
@@ -20,5 +19,5 @@ export default function ScriptManagementContainer({
 	allowScriptContentToBeExecutedOrIncluded,
 	baseResourceURL,
 	scriptManagementConfigurationDefined,
-}: ScriptManagementContainerProps): JSX.Element;
+}: ScriptManagementContainerProps): React.JSX.Element;
 export {};

@@ -16,9 +16,9 @@ type ManagementToolbarResultsBarProps = {
 	totalItems: number;
 };
 
-const ManagementToolbarResultsBar: React.FC<ManagementToolbarResultsBarProps> = ({
-	totalItems,
-}) => {
+const ManagementToolbarResultsBar: React.FC<
+	ManagementToolbarResultsBarProps
+> = ({totalItems}) => {
 	const location = useLocation();
 	const navigate = useNavigate();
 
@@ -43,8 +43,7 @@ const ManagementToolbarResultsBar: React.FC<ManagementToolbarResultsBarProps> = 
 				searchParams.delete('filter');
 				searchParams.delete('filterSchema');
 				searchParams.delete('page');
-			}
-			else {
+			} else {
 				searchParams.set('filter', JSON.stringify(filterJSON));
 			}
 

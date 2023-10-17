@@ -8,4 +8,4 @@ export declare function onDiscardDraft(
 	event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
 	form?: HTMLFormElement
 ): void;
-export default function DiscardDraftButton(): JSX.Element;
+export default function DiscardDraftButton(): React.JSX.Element;

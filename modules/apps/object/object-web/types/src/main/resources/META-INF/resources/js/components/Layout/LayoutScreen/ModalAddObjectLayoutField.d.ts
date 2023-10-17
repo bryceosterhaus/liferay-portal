@@ -17,5 +17,5 @@ export default function ModalAddObjectLayoutField({
 	observer,
 	onClose,
 	tabIndex,
-}: IProps): JSX.Element;
+}: IProps): React.JSX.Element;
 export {};

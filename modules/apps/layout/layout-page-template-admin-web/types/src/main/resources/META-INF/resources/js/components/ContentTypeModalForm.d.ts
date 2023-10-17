@@ -28,5 +28,5 @@ export default function ContentTypeModalForm({
 	selectedSubtype,
 	selectedType,
 	type,
-}: Props): JSX.Element;
+}: Props): React.JSX.Element;
 export {};

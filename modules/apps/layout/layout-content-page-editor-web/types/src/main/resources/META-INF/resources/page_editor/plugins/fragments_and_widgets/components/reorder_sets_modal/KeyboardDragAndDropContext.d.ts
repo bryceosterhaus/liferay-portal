@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-import {PropsWithChildren} from 'react';
+import React, {PropsWithChildren} from 'react';
 import {DragOverPosition} from '../../config/constants/dragOverPositions';
 import {Item} from './Item';
 export declare function KeyboardDragAndDropContextProvider({
@@ -11,7 +11,7 @@ export declare function KeyboardDragAndDropContextProvider({
 	itemList,
 }: PropsWithChildren<{
 	itemList: Item[];
-}>): JSX.Element;
+}>): React.JSX.Element;
 export declare function useKeyboardDragItem(
 	item: Item,
 	onDropItem: (

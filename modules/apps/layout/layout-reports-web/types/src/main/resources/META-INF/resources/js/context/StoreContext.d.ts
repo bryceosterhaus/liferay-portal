@@ -24,5 +24,5 @@ export declare function StoreContextProvider({
 }: {
 	children: React.ReactNode;
 	value: State;
-}): JSX.Element;
+}): React.JSX.Element;
 export {};

@@ -20,11 +20,9 @@ type UserGroupsListViewProps = {
 	variables?: any;
 } & {listViewProps?: Partial<ListViewProps>; tableProps?: Partial<TableProps>};
 
-const UserGroupsListView: React.FC<UserGroupsListViewProps> = ({
-	listViewProps,
-	tableProps,
-	variables,
-}) => {
+const UserGroupsListView: React.FC<
+	{children?: React.ReactNode | undefined} & UserGroupsListViewProps
+> = ({listViewProps, tableProps, variables}) => {
 	return (
 		<ListView
 			resource="/user-groups"
@@ -51,7 +49,9 @@ type UserGroupProps = {
 	state: any;
 };
 
-const UserGroups: React.FC<UserGroupProps> = ({setState}) => {
+const UserGroups: React.FC<
+	{children?: React.ReactNode | undefined} & UserGroupProps
+> = ({setState}) => {
 	const [users, setUsers] = useState<any>([]);
 
 	useEffect(() => {

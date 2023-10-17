@@ -277,10 +277,10 @@ function DiagramBuilder() {
 				connectionLineStyle={{stroke: '#0B5FFF'}}
 				connectionLineType={ConnectionLineType.SmoothStep}
 				connectionMode={ConnectionMode.Loose}
-				edgeTypes={EDGE_TYPES}
+				edgeTypes={EDGE_TYPES as any}
 				elements={elements}
 				minZoom={0.1}
-				nodeTypes={NODE_TYPES}
+				nodeTypes={NODE_TYPES as any}
 				onConnect={onConnect}
 				onConnectStart={() => setNodeHandleConnection(true)}
 				onConnectStop={() => setNodeHandleConnection(false)}

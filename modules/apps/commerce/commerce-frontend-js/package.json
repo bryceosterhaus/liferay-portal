@@ -59,7 +59,7 @@
 		"checkFormat": "liferay-npm-scripts check",
 		"coverage": "liferay-npm-scripts test --coverage --silent --verbose",
 		"format": "liferay-npm-scripts format",
-		"test": "liferay-npm-scripts test"
+		"test": "USE_REACT_16=true liferay-npm-scripts test"
 	},
 	"version": "4.0.100"
 }

@@ -37,7 +37,7 @@
 		"checkFormat": "liferay-npm-scripts check",
 		"coverage": "liferay-npm-scripts test --coverage --silent --verbose",
 		"format": "liferay-npm-scripts fix",
-		"test": "liferay-npm-scripts test --passWithNoTests"
+		"test": "USE_REACT_16=true liferay-npm-scripts test --passWithNoTests"
 	},
 	"version": "1.0.78"
 }

@@ -44,7 +44,7 @@
 		"checkFormat": "liferay-npm-scripts check",
 		"format": "liferay-npm-scripts fix",
 		"storybook": "liferay-npm-scripts storybook",
-		"test": "liferay-npm-scripts test"
+		"test": "USE_REACT_16=true liferay-npm-scripts test"
 	},
 	"version": "3.0.73"
 }

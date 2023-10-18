@@ -29,9 +29,6 @@
 	"jest": {
 		"setupFiles": [
 			"<rootDir>/jest-setup.config.js"
-		],
-		"testMatch": [
-			"<rootDir>/src/main/resources/META-INF/resources/js/tests/*.tsx"
 		]
 	},
 	"main": "index.js",

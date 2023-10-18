@@ -9,7 +9,7 @@
 		"clay-icon": "2.24.1",
 		"commerce-frontend-js": "*",
 		"frontend-js-web": "*",
-		"react": "16.12.0"
+		"react": "18.2.0"
 	},
 	"name": "commerce-frontend-taglib",
 	"scripts": {

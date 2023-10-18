@@ -29,6 +29,6 @@ interface IPanelContextProps extends Array<TState | TDispatch> {
 export declare const PanelContext: React.Context<IPanelContextProps>;
 export declare function PanelContextProvider({
 	children,
-}: React.HTMLAttributes<HTMLElement>): JSX.Element;
+}: React.HTMLAttributes<HTMLElement>): React.JSX.Element;
 export declare function usePanelContext(): IPanelContextProps;
 export {};

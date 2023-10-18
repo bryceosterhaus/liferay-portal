@@ -19,7 +19,7 @@ declare function SizeSelector({
 	open,
 	previewRef,
 	setActiveSize,
-}: ISizeSelectorProps): JSX.Element;
+}: ISizeSelectorProps): React.JSX.Element;
 declare namespace SizeSelector {
 	var propTypes: {
 		activeSize: PropTypes.Validator<object>;

@@ -9,7 +9,7 @@ export default function Container({
 	children,
 	className,
 	...otherProps
-}: IProps): JSX.Element;
+}: IProps): React.JSX.Element;
 interface IProps extends React.HTMLAttributes<HTMLElement> {
 	active?: boolean;
 }

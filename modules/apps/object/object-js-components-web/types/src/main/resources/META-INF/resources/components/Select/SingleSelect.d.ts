@@ -3,12 +3,12 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-import {ReactNode} from 'react';
+import React from 'react';
 import {CustomItem, SelectProps} from './BaseSelect';
 import './index.scss';
 interface SingleSelectProps<T> extends SelectProps {
-	children?: ReactNode;
-	contentRight?: ReactNode;
+	children?: React.ReactNode;
+	contentRight?: React.ReactNode;
 	onChange?: (selected: T) => void;
 	options: T[];
 }
@@ -21,5 +21,5 @@ export declare function SingleSelect<
 	onChange,
 	options,
 	...otherProps
-}: SingleSelectProps<T>): JSX.Element;
+}: SingleSelectProps<T>): React.JSX.Element;
 export {};

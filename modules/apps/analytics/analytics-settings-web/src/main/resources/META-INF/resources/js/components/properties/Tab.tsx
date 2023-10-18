@@ -32,7 +32,7 @@ interface ITabProps {
 	requestFn: (params: TTableRequestParams) => Promise<any>;
 }
 
-const Tab: React.FC<ITabProps> = ({
+const Tab: React.FC<{children?: React.ReactNode | undefined} & ITabProps> = ({
 	columns,
 	description,
 	emptyState,

@@ -52,14 +52,9 @@ type RendererProps = {
 	setFieldOptions: Dispatch<FieldOptions>;
 };
 
-const Renderer: React.FC<RendererProps> = ({
-	fieldOptions,
-	fields,
-	filter,
-	form,
-	onChange,
-	setFieldOptions,
-}) => {
+const Renderer: React.FC<
+	{children?: React.ReactNode | undefined} & RendererProps
+> = ({fieldOptions, fields, filter, form, onChange, setFieldOptions}) => {
 	const params = useParams();
 
 	const [fieldDisabled, setFieldDisabled] = useState({});

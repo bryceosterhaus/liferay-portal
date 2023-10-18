@@ -4,7 +4,7 @@
  */
 
 import {FormError} from '@liferay/object-js-components-web';
-import {ChangeEventHandler} from 'react';
+import React, {ChangeEventHandler} from 'react';
 interface ObjectDataContainerProps {
 	dbTableName: string;
 	errors: FormError<ObjectDefinition>;
@@ -26,5 +26,5 @@ export declare function ObjectDataContainer({
 	onSubmit,
 	setValues,
 	values,
-}: ObjectDataContainerProps): JSX.Element;
+}: ObjectDataContainerProps): React.JSX.Element;
 export {};

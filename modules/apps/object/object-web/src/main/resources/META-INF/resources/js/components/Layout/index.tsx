@@ -99,7 +99,9 @@ const normalizeObjectRelationships: TNormalizeObjectRelationships = ({
 	return normalizedObjectRelationships;
 };
 
-const Layout: React.FC<React.HTMLAttributes<HTMLElement>> = () => {
+const Layout: React.FC<
+	{children?: React.ReactNode | undefined} & React.HTMLAttributes<HTMLElement>
+> = () => {
 	const [
 		{isViewOnly, objectFields, objectLayout, objectLayoutId},
 		dispatch,

@@ -3,9 +3,8 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-/// <reference types="react" />
-
 import './ViolationPopover.scss';
+import React from 'react';
 import type {RuleRaw} from '../hooks/useA11y';
 declare type ViolationProps = {
 	onClick: (target: string, id: string) => void;
@@ -18,5 +17,5 @@ export declare function ViolationPopover({
 	rules,
 	target,
 	violations,
-}: ViolationProps): JSX.Element | null;
+}: ViolationProps): React.JSX.Element | null;
 export {};

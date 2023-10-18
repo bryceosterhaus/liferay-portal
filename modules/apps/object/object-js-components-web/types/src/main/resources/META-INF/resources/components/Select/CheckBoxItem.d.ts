@@ -13,5 +13,5 @@ export declare function CheckboxItem({
 	checked,
 	label,
 	onChange,
-}: IProps): JSX.Element;
+}: IProps): React.JSX.Element;
 export {};

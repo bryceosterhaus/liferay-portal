@@ -18,5 +18,5 @@ export declare function ModalAddDefaultSortColumn({
 	isEditingSort,
 	observer,
 	onClose,
-}: IProps): JSX.Element;
+}: IProps): React.JSX.Element;
 export {};

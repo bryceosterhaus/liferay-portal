@@ -5,7 +5,11 @@
 
 import React from 'react';
 import './ShowPartialResultsAlert.scss';
-declare const ShowPartialResultsAlert: React.FC<IProps>;
+declare const ShowPartialResultsAlert: React.FC<
+	{
+		children?: React.ReactNode | undefined;
+	} & IProps
+>;
 export default ShowPartialResultsAlert;
 interface IProps {
 	dismissible?: boolean;

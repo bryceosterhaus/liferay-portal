@@ -57,5 +57,5 @@ export declare function ObjectRelationshipFormBase({
 	readonly,
 	setValues,
 	values,
-}: ObjectRelationshipFormBaseProps): JSX.Element;
+}: ObjectRelationshipFormBaseProps): React.JSX.Element;
 export {};

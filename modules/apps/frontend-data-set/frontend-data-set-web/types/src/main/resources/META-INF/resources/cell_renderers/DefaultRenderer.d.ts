@@ -20,8 +20,12 @@ declare type DefaultRendererValue =
 			label_i18n?: string;
 			text?: string;
 	  };
-declare const DefaultRenderer: React.FC<{
-	options: DefaultRendererOptions;
-	value: DefaultRendererValue;
-}>;
+declare const DefaultRenderer: React.FC<
+	{
+		children?: React.ReactNode | undefined;
+	} & {
+		options: DefaultRendererOptions;
+		value: DefaultRendererValue;
+	}
+>;
 export default DefaultRenderer;

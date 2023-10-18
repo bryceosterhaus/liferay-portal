@@ -19,5 +19,5 @@ declare function PanelNavigator({
 	onBack,
 	tags,
 	title,
-}: PanelNavigatorProps): JSX.Element;
+}: PanelNavigatorProps): React.JSX.Element;
 export default PanelNavigator;

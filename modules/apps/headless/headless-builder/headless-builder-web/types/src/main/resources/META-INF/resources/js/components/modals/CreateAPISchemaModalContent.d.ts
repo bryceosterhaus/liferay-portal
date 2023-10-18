@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-import {Dispatch, SetStateAction} from 'react';
+import React, {Dispatch, SetStateAction} from 'react';
 interface CreateAPISchemaModalProps {
 	apiSchemasURLPath: string;
 	closeModal: voidReturn;
@@ -17,5 +17,5 @@ export declare function CreateAPISchemaModalContent({
 	currentAPIApplicationId,
 	loadData,
 	setMainSchemaNav,
-}: CreateAPISchemaModalProps): JSX.Element;
+}: CreateAPISchemaModalProps): React.JSX.Element;
 export {};

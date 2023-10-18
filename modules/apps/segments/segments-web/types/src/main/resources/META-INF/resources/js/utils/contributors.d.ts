@@ -36,8 +36,8 @@ export declare function initialContributorsToContributors(
 	conjunctionId: Conjunction;
 	conjunctionInputId: string;
 	criteriaMap:
-		| import('../../types/Criteria').CriteriaItem
 		| import('../../types/Criteria').Criteria
+		| import('../../types/Criteria').CriteriaItem
 		| null;
 	entityName: string | undefined;
 	inputId: string;
@@ -61,8 +61,8 @@ export declare function applyCriteriaChangeToContributors(
 	| Contributor
 	| {
 			criteriaMap:
-				| import('../../types/Criteria').CriteriaItem
 				| import('../../types/Criteria').Criteria
+				| import('../../types/Criteria').CriteriaItem
 				| null
 				| undefined;
 			query: string;
@@ -70,8 +70,8 @@ export declare function applyCriteriaChangeToContributors(
 			conjunctionInputId: string;
 			entityName: string;
 			initialQuery?:
-				| import('../../types/Criteria').CriteriaItem
 				| import('../../types/Criteria').Criteria
+				| import('../../types/Criteria').CriteriaItem
 				| null
 				| undefined;
 			inputId: string;

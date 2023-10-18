@@ -3,8 +3,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-/// <reference types="react" />
-
+import React from 'react';
 import {DragOverPosition} from '../../config/constants/dragOverPositions';
 export interface Item {
 	id: string;
@@ -25,11 +24,11 @@ export declare function Item({
 	item,
 	numberOfItems,
 	onDropItem,
-}: ItemProps): JSX.Element;
+}: ItemProps): React.JSX.Element;
 export declare function ReorderDropdown({
 	index,
 	item,
 	numberOfItems,
 	onDropItem,
-}: ItemProps): JSX.Element;
+}: ItemProps): React.JSX.Element;
 export {};

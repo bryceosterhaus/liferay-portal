@@ -14,14 +14,9 @@ type MultiSelectProps = {
 	options: Option[];
 } & InputHTMLAttributes<HTMLSelectElement>;
 
-const MultiSelect: React.FC<MultiSelectProps> = ({
-	disabled,
-	label,
-	name = '',
-	onChange,
-	options,
-	value,
-}) => (
+const MultiSelect: React.FC<
+	{children?: React.ReactNode | undefined} & MultiSelectProps
+> = ({disabled, label, name = '', onChange, options, value}) => (
 	<Form.BaseWrapper label={label}>
 		<ReactSelect
 			classNamePrefix="testray-multi-select"

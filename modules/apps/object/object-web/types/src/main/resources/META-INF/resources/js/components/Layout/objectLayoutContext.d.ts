@@ -143,6 +143,6 @@ interface ILayoutContextProviderProps
 export declare function LayoutContextProvider({
 	children,
 	value,
-}: ILayoutContextProviderProps): JSX.Element;
+}: ILayoutContextProviderProps): React.JSX.Element;
 export declare function useLayoutContext(): ILayoutContextProps;
 export {};

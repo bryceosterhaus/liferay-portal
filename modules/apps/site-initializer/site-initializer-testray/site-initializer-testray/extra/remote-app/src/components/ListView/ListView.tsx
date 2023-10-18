@@ -69,7 +69,9 @@ export type ListViewProps<T = any> = {
 	variables?: any;
 };
 
-const ListView: React.FC<ListViewProps> = ({
+const ListView: React.FC<
+	{children?: React.ReactNode | undefined} & ListViewProps
+> = ({
 	children,
 	forceRefetch,
 	managementToolbarProps: {
@@ -302,9 +304,9 @@ const ListView: React.FC<ListViewProps> = ({
 const ListViewMemoized = memo(ListView);
 
 const ListViewWithContext: React.FC<
-	ListViewProps & {
-		initialContext?: ListViewContextProviderProps;
-	}
+	{children?: React.ReactNode | undefined} & ListViewProps & {
+			initialContext?: ListViewContextProviderProps;
+		}
 > = ({initialContext, ...otherProps}) => (
 	<ListViewContextProvider {...initialContext} id={otherProps.resource}>
 		<ListViewMemoized {...otherProps} />

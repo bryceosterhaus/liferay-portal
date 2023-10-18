@@ -9,5 +9,5 @@ declare function DiagramBuilder({
 	setShowModal,
 }: {
 	setShowModal: (value: React.SetStateAction<ModelBuilderModals>) => void;
-}): JSX.Element;
+}): React.JSX.Element;
 export default DiagramBuilder;

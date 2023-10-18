@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-import {ReactNode, createContext, useReducer} from 'react';
+import {createContext, useReducer} from 'react';
 import TestrayStorage, {STORAGE_KEYS} from '~/core/Storage';
 import useStorage from '~/hooks/useStorage';
 import {ActionMap, SortDirection, SortOption} from '~/types';
@@ -264,7 +264,10 @@ const reducer = (state: InitialState, action: AppActions) => {
 export type ListViewContextProviderProps = Partial<InitialState>;
 
 const ListViewContextProvider: React.FC<
-	ListViewContextProviderProps & {children: ReactNode; id: string}
+	{children?: React.ReactNode | undefined} & ListViewContextProviderProps & {
+			children: React.ReactNode;
+			id: string;
+		}
 > = ({children, id, ...initialStateProps}) => {
 	const [columnsStorage] = useStorage<ListViewColumns>(
 		(STORAGE_KEYS.LIST_VIEW_COLUMNS + id) as STORAGE_KEYS,

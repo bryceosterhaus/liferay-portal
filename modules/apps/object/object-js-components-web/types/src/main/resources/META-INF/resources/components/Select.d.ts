@@ -30,5 +30,5 @@ export declare function Select({
 	tooltip,
 	value,
 	...otherProps
-}: ISelectProps): JSX.Element;
+}: ISelectProps): React.JSX.Element;
 export {};

@@ -118,18 +118,23 @@ const RestApplicationDropdownMenu = ({
 			/>
 
 			<ClayDropDown.ItemList items={restApplications} role="listbox">
-				{(item: string) => (
-					<ClayDropDown.Item
-						key={item}
-						onClick={() => onItemClick(item)}
-						roleItem="option"
-					>
-						<RESTApplicationItem
-							query={query}
-							restApplication={item}
-						/>
-					</ClayDropDown.Item>
-				)}
+				{
+
+					// @ts-ignore
+
+					(item: string) => (
+						<ClayDropDown.Item
+							key={item}
+							onClick={() => onItemClick(item)}
+							roleItem="option"
+						>
+							<RESTApplicationItem
+								query={query}
+								restApplication={item}
+							/>
+						</ClayDropDown.Item>
+					)
+				}
 			</ClayDropDown.ItemList>
 		</>
 	);
@@ -170,27 +175,36 @@ const RestSchemaDropdownMenu = ({
 			/>
 
 			<ClayDropDown.ItemList items={restSchemas} role="listbox">
-				{(item: string) => {
-					const fuzzymatch = fuzzy.match(query, item, FUZZY_OPTIONS);
+				{
 
-					return (
-						<ClayDropDown.Item
-							key={item}
-							onClick={() => onItemClick(item)}
-							roleItem="option"
-						>
-							{fuzzymatch ? (
-								<span
-									dangerouslySetInnerHTML={{
-										__html: fuzzymatch.rendered,
-									}}
-								/>
-							) : (
-								item
-							)}
-						</ClayDropDown.Item>
-					);
-				}}
+					// @ts-ignore
+
+					(item: string) => {
+						const fuzzymatch = fuzzy.match(
+							query,
+							item,
+							FUZZY_OPTIONS
+						);
+
+						return (
+							<ClayDropDown.Item
+								key={item}
+								onClick={() => onItemClick(item)}
+								roleItem="option"
+							>
+								{fuzzymatch ? (
+									<span
+										dangerouslySetInnerHTML={{
+											__html: fuzzymatch.rendered,
+										}}
+									/>
+								) : (
+									item
+								)}
+							</ClayDropDown.Item>
+						);
+					}
+				}
 			</ClayDropDown.ItemList>
 		</>
 	);
@@ -231,27 +245,36 @@ const RestEndpointDropdownMenu = ({
 			/>
 
 			<ClayDropDown.ItemList items={restEndpoints} role="listbox">
-				{(item: string) => {
-					const fuzzymatch = fuzzy.match(query, item, FUZZY_OPTIONS);
+				{
 
-					return (
-						<ClayDropDown.Item
-							key={item}
-							onClick={() => onItemClick(item)}
-							roleItem="option"
-						>
-							{fuzzymatch ? (
-								<span
-									dangerouslySetInnerHTML={{
-										__html: fuzzymatch.rendered,
-									}}
-								/>
-							) : (
-								item
-							)}
-						</ClayDropDown.Item>
-					);
-				}}
+					// @ts-ignore
+
+					(item: string) => {
+						const fuzzymatch = fuzzy.match(
+							query,
+							item,
+							FUZZY_OPTIONS
+						);
+
+						return (
+							<ClayDropDown.Item
+								key={item}
+								onClick={() => onItemClick(item)}
+								roleItem="option"
+							>
+								{fuzzymatch ? (
+									<span
+										dangerouslySetInnerHTML={{
+											__html: fuzzymatch.rendered,
+										}}
+									/>
+								) : (
+									item
+								)}
+							</ClayDropDown.Item>
+						);
+					}
+				}
 			</ClayDropDown.ItemList>
 		</>
 	);

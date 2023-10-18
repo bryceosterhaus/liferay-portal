@@ -35,12 +35,9 @@ type FilterBodyProps = {
 	setVisible: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-const FilterBody: React.FC<FilterBodyProps> = ({
-	buttonRef,
-	filterSchema,
-	setPosition,
-	setVisible,
-}) => {
+const FilterBody: React.FC<
+	{children?: React.ReactNode | undefined} & FilterBodyProps
+> = ({buttonRef, filterSchema, setPosition, setVisible}) => {
 	const [filter, setFilter] = useState('');
 
 	const fields = useMemo(() => filterSchema?.fields as RendererFields[], [
@@ -185,9 +182,9 @@ const FilterBody: React.FC<FilterBodyProps> = ({
 
 const MENU_POPOVER_HEIGHT = 580;
 
-const ManagementToolbarFilter: React.FC<ManagementToolbarFilterProps> = ({
-	filterSchema,
-}) => {
+const ManagementToolbarFilter: React.FC<
+	{children?: React.ReactNode | undefined} & ManagementToolbarFilterProps
+> = ({filterSchema}) => {
 	const [visible, setVisible] = useState(false);
 	const ref = useRef<HTMLButtonElement>(null);
 

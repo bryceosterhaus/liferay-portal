@@ -36,5 +36,5 @@ export declare function SelectWithOption({
 	required,
 	tooltip,
 	value,
-}: SelectWithOptionProps): JSX.Element;
+}: SelectWithOptionProps): React.JSX.Element;
 export {};

@@ -23,5 +23,9 @@ declare type TThirdColumnValues = {
 	label: string;
 	value: string;
 };
-declare const BuilderListItem: React.FC<IProps>;
+declare const BuilderListItem: React.FC<
+	{
+		children?: React.ReactNode | undefined;
+	} & IProps
+>;
 export default BuilderListItem;

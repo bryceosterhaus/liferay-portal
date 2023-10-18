@@ -3,10 +3,9 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-/// <reference types="react" />
-
 import {CONSTANTS} from '@liferay/accessibility-settings-state-web';
 import PropTypes from 'prop-types';
+import React from 'react';
 declare type KEYS = keyof typeof CONSTANTS;
 declare type Setting = {
 	className: string;
@@ -20,7 +19,7 @@ declare type Props = {
 	settings: Array<Setting>;
 };
 declare const AccessibilityMenu: {
-	(props: Props): JSX.Element;
+	(props: Props): React.JSX.Element;
 	propTypes: {
 		settings: PropTypes.Validator<
 			(PropTypes.InferProps<{

@@ -14,5 +14,5 @@ export default function EditObjectFolderHeader({
 	hasDraftObjectDefinitions,
 	selectedObjectFolder,
 	setShowModal,
-}: EditObjectFolderHeaderProps): JSX.Element;
+}: EditObjectFolderHeaderProps): React.JSX.Element;
 export {};

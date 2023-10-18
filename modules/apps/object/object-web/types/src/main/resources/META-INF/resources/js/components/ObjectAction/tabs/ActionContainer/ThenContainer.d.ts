@@ -3,9 +3,8 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-/// <reference types="react" />
-
 import {CustomItem} from '@liferay/object-js-components-web';
+import React from 'react';
 import './ThenContainer.scss';
 import {ActionError} from '../..';
 interface ThenContainerProps {
@@ -40,5 +39,5 @@ export declare function ThenContainer({
 	systemObject,
 	updateParameters,
 	values,
-}: ThenContainerProps): JSX.Element;
+}: ThenContainerProps): React.JSX.Element;
 export {};

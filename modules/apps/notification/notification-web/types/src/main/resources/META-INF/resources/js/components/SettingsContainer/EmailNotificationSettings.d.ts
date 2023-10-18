@@ -3,9 +3,8 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-/// <reference types="react" />
-
 import {FormError} from '@liferay/object-js-components-web';
+import React from 'react';
 import {NotificationTemplateError} from '../EditNotificationTemplate';
 interface EmailNotificationSettingsProps {
 	errors: FormError<NotificationTemplate & NotificationTemplateError>;
@@ -18,5 +17,5 @@ export declare function EmailNotificationSettings({
 	selectedLocale,
 	setValues,
 	values,
-}: EmailNotificationSettingsProps): JSX.Element;
+}: EmailNotificationSettingsProps): React.JSX.Element;
 export {};

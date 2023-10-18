@@ -13,5 +13,5 @@ export default function LayoutWrapper({
 	isViewOnly,
 	objectFieldTypes,
 	objectLayoutId,
-}: ILayoutWrapperProps): JSX.Element;
+}: ILayoutWrapperProps): React.JSX.Element;
 export {};

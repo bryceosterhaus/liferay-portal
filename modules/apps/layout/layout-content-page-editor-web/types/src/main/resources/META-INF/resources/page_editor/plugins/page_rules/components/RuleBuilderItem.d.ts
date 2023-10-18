@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-import {ReactNode} from 'react';
+import React from 'react';
 interface RuleBuilderItemProps {
-	children: ReactNode;
+	children: React.ReactNode;
 	onDeleteButtonClick: () => void;
 	type: 'action' | 'condition';
 }
@@ -13,5 +13,5 @@ export default function RuleBuilderItem({
 	children,
 	onDeleteButtonClick,
 	type,
-}: RuleBuilderItemProps): JSX.Element;
+}: RuleBuilderItemProps): React.JSX.Element;
 export {};

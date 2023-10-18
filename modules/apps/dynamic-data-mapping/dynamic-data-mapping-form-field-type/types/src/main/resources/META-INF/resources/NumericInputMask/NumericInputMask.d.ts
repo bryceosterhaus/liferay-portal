@@ -42,5 +42,9 @@ interface ISelectProps<T> {
 	reference: string;
 	value: T;
 }
-declare const NumericInputMask: React.FC<IProps>;
+declare const NumericInputMask: React.FC<
+	{
+		children?: React.ReactNode | undefined;
+	} & IProps
+>;
 export default NumericInputMask;

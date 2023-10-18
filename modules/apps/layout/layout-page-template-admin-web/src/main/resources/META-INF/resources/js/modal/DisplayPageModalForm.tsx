@@ -105,7 +105,7 @@ function MappingTypeSelector({
 	const [subtypes, setSubtypes] = useState<MappingSubtype[]>([]);
 
 	const onChange = useCallback(
-		(event) => {
+		(event: any) => {
 			setError({...error, classNameId: '', classTypeId: ''});
 
 			const select = event.target;

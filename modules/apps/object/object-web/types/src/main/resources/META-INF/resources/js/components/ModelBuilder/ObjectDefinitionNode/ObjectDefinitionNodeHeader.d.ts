@@ -3,8 +3,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-/// <reference types="react" />
-
+import React from 'react';
 import './ObjectDefinitionNodeHeader.scss';
 import {DropDownItems} from '../types';
 interface ObjectDefinitionNodeHeaderProps {
@@ -26,5 +25,5 @@ export default function ObjectDefinitionNodeHeader({
 	objectDefinitionLabel,
 	status,
 	system,
-}: ObjectDefinitionNodeHeaderProps): JSX.Element;
+}: ObjectDefinitionNodeHeaderProps): React.JSX.Element;
 export {};

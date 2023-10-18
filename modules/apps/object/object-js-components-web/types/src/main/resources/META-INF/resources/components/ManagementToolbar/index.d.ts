@@ -3,8 +3,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-/// <reference types="react" />
-
+import React from 'react';
 import './index.scss';
 import {NotificationTemplate} from '../../utils/api';
 export declare type Entity = NotificationTemplate | ObjectDefinition;
@@ -51,5 +50,5 @@ export declare function ManagementToolbar({
 	portletNamespace,
 	screenNavigationCategoryKey,
 	showEntityDetails,
-}: ManagementToolbarProps): JSX.Element;
+}: ManagementToolbarProps): React.JSX.Element;
 export {};

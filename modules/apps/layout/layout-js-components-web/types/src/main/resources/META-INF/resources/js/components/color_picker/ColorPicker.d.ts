@@ -3,8 +3,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-/// <reference types="react" />
-
+import React from 'react';
 import './ColorPicker.scss';
 export declare const DEFAULT_TOKEN_LABEL: string;
 export interface Token {
@@ -55,5 +54,5 @@ export default function ColorPicker({
 	tokenValues,
 	restoreButtonLabel,
 	value,
-}: Props): JSX.Element;
+}: Props): React.JSX.Element;
 export {};

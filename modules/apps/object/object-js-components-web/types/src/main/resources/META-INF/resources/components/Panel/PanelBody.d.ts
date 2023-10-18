@@ -12,10 +12,10 @@ interface IPanelSimpleBodyProps extends React.HTMLAttributes<HTMLElement> {
 export declare function PanelBody({
 	children,
 	className,
-}: React.HTMLAttributes<HTMLElement>): JSX.Element;
+}: React.HTMLAttributes<HTMLElement>): React.JSX.Element;
 export declare function PanelSimpleBody({
 	children,
 	contentRight,
 	title,
-}: IPanelSimpleBodyProps): JSX.Element;
+}: IPanelSimpleBodyProps): React.JSX.Element;
 export {};

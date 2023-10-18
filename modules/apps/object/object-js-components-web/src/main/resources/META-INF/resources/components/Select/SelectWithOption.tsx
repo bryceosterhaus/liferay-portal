@@ -89,25 +89,33 @@ export function SelectWithOption({
 				triggerRef={inputRef}
 			>
 				<DropDown.ItemList items={items}>
-					{(item: Item) => (
-						<DropDown.Group
-							header={item.label}
-							items={item.options}
-							key={item.label}
-						>
-							{(item) => (
-								<DropDown.Item
-									key={item.value}
-									onClick={() => {
-										onSelectChange(item.label, item.value);
-										setDropdownActive(false);
-									}}
-								>
-									{item.label}
-								</DropDown.Item>
-							)}
-						</DropDown.Group>
-					)}
+					{
+
+						// @ts-ignore
+
+						(item: Item) => (
+							<DropDown.Group
+								header={item.label}
+								items={item.options}
+								key={item.label}
+							>
+								{(item) => (
+									<DropDown.Item
+										key={item.value}
+										onClick={() => {
+											onSelectChange(
+												item.label,
+												item.value
+											);
+											setDropdownActive(false);
+										}}
+									>
+										{item.label}
+									</DropDown.Item>
+								)}
+							</DropDown.Group>
+						)
+					}
 				</DropDown.ItemList>
 			</DropDown.Menu>
 		</FieldBase>

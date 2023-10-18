@@ -18,5 +18,5 @@ export declare function ModalPublishObjectDefinitions({
 	dispatch,
 	elements,
 	handleOnClose,
-}: ModalPublishObjectDefinitionsProps): JSX.Element;
+}: ModalPublishObjectDefinitionsProps): React.JSX.Element;
 export {};

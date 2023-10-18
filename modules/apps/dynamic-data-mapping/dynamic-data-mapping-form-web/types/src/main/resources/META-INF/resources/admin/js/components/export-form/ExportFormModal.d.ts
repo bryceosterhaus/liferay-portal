@@ -4,7 +4,11 @@
  */
 
 import React from 'react';
-declare const ExportFormModal: React.FC<IProps>;
+declare const ExportFormModal: React.FC<
+	{
+		children?: React.ReactNode | undefined;
+	} & IProps
+>;
 interface IProps {
 	csvExport: string;
 	exportFormURL: string;

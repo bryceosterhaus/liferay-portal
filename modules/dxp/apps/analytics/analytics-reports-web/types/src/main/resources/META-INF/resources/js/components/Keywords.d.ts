@@ -3,9 +3,8 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-/// <reference types="react" />
-
 import PropTypes from 'prop-types';
+import React from 'react';
 declare type CountryKeyworks = {
 	countryCode: string;
 	countryName: string;
@@ -29,7 +28,7 @@ interface Props {
 		view: string;
 	};
 }
-declare function Keywords({currentPage}: Props): JSX.Element;
+declare function Keywords({currentPage}: Props): React.JSX.Element;
 declare namespace Keywords {
 	var propTypes: {
 		currentPage: PropTypes.Validator<object>;

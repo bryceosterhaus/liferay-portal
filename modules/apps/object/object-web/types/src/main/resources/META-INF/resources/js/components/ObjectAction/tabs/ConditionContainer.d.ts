@@ -3,9 +3,8 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-/// <reference types="react" />
-
 import {ActionError} from '..';
+import React from 'react';
 interface ConditionContainerProps {
 	errors: ActionError;
 	setValues: (values: Partial<ObjectAction>) => void;
@@ -17,5 +16,5 @@ export declare function ConditionContainer({
 	setValues,
 	validateExpressionURL,
 	values,
-}: ConditionContainerProps): JSX.Element;
+}: ConditionContainerProps): React.JSX.Element;
 export {};

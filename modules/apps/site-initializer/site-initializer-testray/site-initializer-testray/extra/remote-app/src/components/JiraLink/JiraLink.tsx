@@ -18,10 +18,9 @@ type JiraLinkProps = {
 
 const splitIssueName = (name: string) => name.split(testrayIssueImpl.DELIMITER);
 
-const JiraLink: React.FC<JiraLinkProps> = ({
-	displayViewInJira = true,
-	issue,
-}) => {
+const JiraLink: React.FC<
+	{children?: React.ReactNode | undefined} & JiraLinkProps
+> = ({displayViewInJira = true, issue}) => {
 	const {jiraBaseURL} = useContext(ApplicationPropertiesContext);
 
 	const isArray = Array.isArray(issue);

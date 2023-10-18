@@ -24,10 +24,9 @@ type CaseResultHistoryProps = {
 	tableProps?: Partial<TableProps>;
 };
 
-const CaseResultHistory: React.FC<CaseResultHistoryProps> = ({
-	listViewProps,
-	tableProps,
-}) => {
+const CaseResultHistory: React.FC<
+	{children?: React.ReactNode | undefined} & CaseResultHistoryProps
+> = ({listViewProps, tableProps}) => {
 	const {caseResultId} = useParams();
 
 	return (

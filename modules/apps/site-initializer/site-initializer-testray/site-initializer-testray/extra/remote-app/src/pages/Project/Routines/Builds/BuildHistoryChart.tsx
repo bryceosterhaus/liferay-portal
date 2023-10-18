@@ -12,7 +12,9 @@ type BuildHistoryChartProps = {
 	builds: TestrayBuild[];
 };
 
-const BuildHistoryChart: React.FC<BuildHistoryChartProps> = ({builds}) => (
+const BuildHistoryChart: React.FC<
+	{children?: React.ReactNode | undefined} & BuildHistoryChartProps
+> = ({builds}) => (
 	<div className="graph-container graph-container-sm">
 		<ClayChart
 			axis={{

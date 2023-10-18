@@ -5,15 +5,15 @@
 
 import ClayDropDown from '@clayui/drop-down';
 import ClayPopover from '@clayui/popover';
-import React, {Children, Fragment, ReactNode, useEffect, useState} from 'react';
+import React, {Children, Fragment, useEffect, useState} from 'react';
 
 import {BaseSelect, CustomItem, SelectProps} from './BaseSelect';
 
 import './index.scss';
 
 interface SingleSelectProps<T> extends SelectProps {
-	children?: ReactNode;
-	contentRight?: ReactNode;
+	children?: React.ReactNode;
+	contentRight?: React.ReactNode;
 	onChange?: (selected: T) => void;
 	options: T[];
 }

@@ -3,15 +3,14 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-/// <reference types="react" />
-
+import React from 'react';
 export default function GlobalJSCETsConfiguration({
 	globalJSCETSelectorURL,
 	globalJSCETs: initialGlobalJSCETs,
 	isReadOnly,
 	portletNamespace,
 	selectGlobalJSCETsEventName,
-}: IProps): JSX.Element;
+}: IProps): React.JSX.Element;
 declare type ILoadTypeOptions = 'default' | 'async' | 'defer';
 declare type IScriptLocationOptions = 'head' | 'bottom';
 interface IGlobalJSCET {

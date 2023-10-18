@@ -14,5 +14,5 @@ export declare function ObjectLayoutRows({
 	boxIndex,
 	objectLayoutRows,
 	tabIndex,
-}: ObjectLayoutRowsProps): JSX.Element;
+}: ObjectLayoutRowsProps): React.JSX.Element;
 export {};

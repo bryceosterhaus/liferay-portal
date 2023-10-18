@@ -24,5 +24,5 @@ export default function DisplayPageModalForm({
 	namespace,
 	onSubmit,
 	type,
-}: Props): JSX.Element;
+}: Props): React.JSX.Element;
 export {};

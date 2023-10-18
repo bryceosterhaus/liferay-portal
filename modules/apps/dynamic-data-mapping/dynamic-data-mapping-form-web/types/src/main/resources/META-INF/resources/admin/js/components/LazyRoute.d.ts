@@ -3,8 +3,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-/// <reference types="react" />
-
+import React from 'react';
 export default function LazyRoute({
 	importPath,
 	...otherProps
@@ -12,4 +11,4 @@ export default function LazyRoute({
 	exact?: boolean;
 	importPath: string;
 	path: string;
-}): JSX.Element;
+}): React.JSX.Element;

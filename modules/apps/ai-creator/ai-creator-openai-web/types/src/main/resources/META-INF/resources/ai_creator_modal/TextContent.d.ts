@@ -3,8 +3,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-/// <reference types="react" />
-
+import React from 'react';
 interface Props {
 	content: string;
 	portletNamespace: string;
@@ -12,5 +11,5 @@ interface Props {
 export declare function TextContent({
 	content,
 	portletNamespace,
-}: Props): JSX.Element;
+}: Props): React.JSX.Element;
 export {};

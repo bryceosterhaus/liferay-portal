@@ -12,5 +12,5 @@ interface EmptyNodeProps {
 }
 export declare function EmptyNode({
 	data: {setShowModal},
-}: NodeProps<EmptyNodeProps>): JSX.Element;
+}: NodeProps<EmptyNodeProps>): React.JSX.Element;
 export {};

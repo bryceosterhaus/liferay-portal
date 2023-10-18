@@ -50,7 +50,9 @@ export type StackListProps = {
 const COLUMN_SIZE_MEDIUM = 6;
 const COLUMN_SIZE_SMALL = 3;
 
-const StackList: React.FC<StackListProps> = ({
+const StackList: React.FC<
+	{children?: React.ReactNode | undefined} & StackListProps
+> = ({
 	append,
 	displayVertical,
 	factorItems,

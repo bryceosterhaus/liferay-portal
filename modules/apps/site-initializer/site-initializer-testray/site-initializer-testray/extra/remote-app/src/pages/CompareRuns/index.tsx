@@ -16,10 +16,9 @@ type CompareRunsDetailsProps = {
 	runs: TestrayRun[];
 };
 
-const CompareRunDetails: React.FC<CompareRunsDetailsProps> = ({
-	matrixData,
-	runs = [],
-}) => {
+const CompareRunDetails: React.FC<
+	{children?: React.ReactNode | undefined} & CompareRunsDetailsProps
+> = ({matrixData, runs = []}) => {
 	document.title = i18n.sub('compare-x', 'cases');
 
 	const [runA, runB] = runs;

@@ -16,7 +16,9 @@ import React from 'react';
 import {defaultLanguageId} from '../../../utils/constants';
 import {TYPES, useLayoutContext} from '../objectLayoutContext';
 
-const InfoScreen: React.FC<React.HTMLAttributes<HTMLElement>> = () => {
+const InfoScreen: React.FC<
+	{children?: React.ReactNode | undefined} & React.HTMLAttributes<HTMLElement>
+> = () => {
 	const [
 		{creationLanguageId, isViewOnly, objectLayout},
 		dispatch,

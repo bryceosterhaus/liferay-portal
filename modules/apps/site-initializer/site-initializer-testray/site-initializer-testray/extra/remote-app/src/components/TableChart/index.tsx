@@ -76,7 +76,9 @@ const colors = [
 	],
 ];
 
-const TableChart: React.FC<TableChartProps> = ({matrixData, title}) => {
+const TableChart: React.FC<
+	{children?: React.ReactNode | undefined} & TableChartProps
+> = ({matrixData, title}) => {
 	const {runA, runB} = useParams();
 
 	return (

@@ -131,7 +131,7 @@ const AccessibilityMenu = (props: Props) => {
 	);
 
 	const afterSettingValueChange = useCallback(
-		(value, setting) => {
+		(value: any, setting: any) => {
 			toggleClassName(setting.className, value);
 
 			updateSetting(setting.key, {updating: false, value});

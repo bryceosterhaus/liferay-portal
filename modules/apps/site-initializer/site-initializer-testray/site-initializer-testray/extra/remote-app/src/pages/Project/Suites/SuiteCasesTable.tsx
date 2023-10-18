@@ -56,10 +56,9 @@ const transformData = (isSmartSuite: boolean) => (
 
 type suiteCasesTableProps = {isSmartSuite: boolean; testraySuite: TestraySuite};
 
-const SuitesCasesTable: React.FC<suiteCasesTableProps> = ({
-	isSmartSuite,
-	testraySuite,
-}) => {
+const SuitesCasesTable: React.FC<
+	{children?: React.ReactNode | undefined} & suiteCasesTableProps
+> = ({isSmartSuite, testraySuite}) => {
 	const suiteCaseFilter = useSuiteCaseFilter(testraySuite);
 	const suiteCaseActions = useSuiteCasesActions({isSmartSuite});
 

@@ -18,5 +18,5 @@ declare function Rule({
 	ruleText,
 	ruleTitle,
 	...otherProps
-}: IRule): JSX.Element;
+}: IRule): React.JSX.Element;
 export default Rule;

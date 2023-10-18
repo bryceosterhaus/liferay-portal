@@ -14,5 +14,5 @@ interface ModalAddObjectLayoutTabProps
 export declare function ModalAddObjectLayoutTab({
 	observer,
 	onClose,
-}: ModalAddObjectLayoutTabProps): JSX.Element;
+}: ModalAddObjectLayoutTabProps): React.JSX.Element;
 export {};

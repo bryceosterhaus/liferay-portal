@@ -19,7 +19,9 @@ type InputProps = {
 	type?: string;
 } & InputHTMLAttributes<HTMLInputElement>;
 
-const Input: React.FC<InputProps> = ({
+const Input: React.FC<
+	{children?: React.ReactNode | undefined} & InputProps
+> = ({
 	disabled = false,
 	errors = {},
 	label,

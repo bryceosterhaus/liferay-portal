@@ -16,5 +16,5 @@ export declare function ObjectLayoutColumns({
 	objectLayoutColumns,
 	rowIndex,
 	tabIndex,
-}: ObjectLayoutColumnsProps): JSX.Element;
+}: ObjectLayoutColumnsProps): React.JSX.Element;
 export {};

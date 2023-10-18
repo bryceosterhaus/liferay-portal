@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-import {Dispatch, SetStateAction} from 'react';
+import React, {Dispatch, SetStateAction} from 'react';
 export declare function itemMethodRenderer({
 	itemData,
 }: {
@@ -12,17 +12,17 @@ export declare function itemMethodRenderer({
 			name: string;
 		};
 	};
-}): JSX.Element;
+}): React.JSX.Element;
 export declare function itemPathRenderer({
 	fdsItem,
 	setMainEndpointNav,
 }: {
 	fdsItem: FDSItem<APIEndpointItem>;
 	setMainEndpointNav: Dispatch<SetStateAction<MainNav>>;
-}): JSX.Element;
+}): React.JSX.Element;
 export declare function itemStatusRenderer({
 	itemData,
-}: FDSItem<APIApplicationItem>): JSX.Element;
+}: FDSItem<APIApplicationItem>): React.JSX.Element;
 export declare function itemURLRenderer({
 	itemData,
 }: FDSItem<APIApplicationItem>): string | undefined;

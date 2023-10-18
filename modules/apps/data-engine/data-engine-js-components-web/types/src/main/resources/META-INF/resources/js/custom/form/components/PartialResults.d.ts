@@ -5,7 +5,11 @@
 
 import React from 'react';
 import './PartialResults.scss';
-declare const PartialResults: React.FC<IProps>;
+declare const PartialResults: React.FC<
+	{
+		children?: React.ReactNode | undefined;
+	} & IProps
+>;
 export default PartialResults;
 interface IProps {
 	dataEngineModule: string;

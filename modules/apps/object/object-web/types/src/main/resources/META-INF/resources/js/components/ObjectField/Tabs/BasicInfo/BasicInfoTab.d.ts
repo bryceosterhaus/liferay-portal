@@ -55,5 +55,5 @@ export declare function BasicInfoTab({
 	sidebarElements,
 	values,
 	workflowStatusJSONArray,
-}: BasicInfoTabProps): JSX.Element;
+}: BasicInfoTabProps): React.JSX.Element;
 export {};

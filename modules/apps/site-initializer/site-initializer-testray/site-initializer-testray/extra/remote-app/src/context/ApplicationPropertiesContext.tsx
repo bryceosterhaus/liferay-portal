@@ -22,10 +22,9 @@ export const ApplicationPropertiesContext = createContext<DefaultProperties>(
 	defaultProperties
 );
 
-const ApplicationContextProvider: React.FC<ApplicationContextProviderProps> = ({
-	children,
-	properties,
-}) => (
+const ApplicationContextProvider: React.FC<
+	{children?: React.ReactNode | undefined} & ApplicationContextProviderProps
+> = ({children, properties}) => (
 	<ApplicationPropertiesContext.Provider value={properties}>
 		{children}
 	</ApplicationPropertiesContext.Provider>

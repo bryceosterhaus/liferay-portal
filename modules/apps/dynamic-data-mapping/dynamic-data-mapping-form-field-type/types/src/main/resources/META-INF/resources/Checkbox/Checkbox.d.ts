@@ -5,7 +5,11 @@
 
 import React from 'react';
 import type {FieldChangeEventHandler} from '../types';
-declare const Main: React.FC<IProps>;
+declare const Main: React.FC<
+	{
+		children?: React.ReactNode | undefined;
+	} & IProps
+>;
 interface IProps extends ICheckboxProps {
 	predefinedValue?: boolean | String[];
 	readOnly?: boolean;

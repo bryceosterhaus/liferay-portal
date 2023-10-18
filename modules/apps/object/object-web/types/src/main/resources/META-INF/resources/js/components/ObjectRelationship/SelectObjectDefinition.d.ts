@@ -35,5 +35,5 @@ export default function SelectObjectDefinition({
 	setObjectDefinition,
 	setQuery,
 	setValues,
-}: SelectObjectDefinitionProps): JSX.Element;
+}: SelectObjectDefinitionProps): React.JSX.Element;
 export {};

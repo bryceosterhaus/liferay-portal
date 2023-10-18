@@ -5,8 +5,9 @@
 
 import React from 'react';
 import './index.scss';
-interface AutoCompleteProps<T> extends React.HTMLAttributes<HTMLElement> {
-	children: (item: T) => React.ReactNode;
+interface AutoCompleteProps<T>
+	extends Omit<React.HTMLAttributes<HTMLElement>, 'children'> {
+	children: (item: T) => React.ReactNode | React.ReactNode;
 	contentRight?: React.ReactNode;
 	disabled?: boolean;
 	emptyStateMessage: string;
@@ -52,5 +53,5 @@ export default function AutoComplete<T>({
 	required,
 	tooltip,
 	value,
-}: AutoCompleteProps<T>): JSX.Element;
+}: AutoCompleteProps<T>): React.JSX.Element;
 export {};

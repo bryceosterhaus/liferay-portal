@@ -15,7 +15,7 @@ declare function Preview({
 	activeSize,
 	open,
 	previewRef,
-}: IPreviewProps): JSX.Element | null;
+}: IPreviewProps): React.JSX.Element | null;
 declare namespace Preview {
 	var propTypes: {
 		activeSize: PropTypes.Validator<object>;

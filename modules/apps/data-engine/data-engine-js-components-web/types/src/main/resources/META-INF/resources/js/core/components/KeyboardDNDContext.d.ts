@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-import {ReactNode} from 'react';
+import React from 'react';
 declare type ITargetPosition = 'bottom' | 'middle' | 'top';
 declare type IItemType = 'root' | 'page' | 'row' | 'column' | 'field';
 interface IState {
@@ -28,8 +28,8 @@ interface IState {
 export declare function KeyboardDNDContextProvider({
 	children,
 }: {
-	children: ReactNode;
-}): JSX.Element;
+	children: React.ReactNode;
+}): React.JSX.Element;
 export declare function useSetSourceItem(): (
 	nextSourceItem: IState['sourceItem'] | null
 ) => void;

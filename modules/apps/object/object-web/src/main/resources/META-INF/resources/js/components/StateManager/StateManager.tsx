@@ -46,7 +46,7 @@ export default function StateManager({
 		return (
 			<div className="table-list-title">
 				<a href="#" onClick={handleEditField}>
-					{value}
+					{value as string}
 				</a>
 			</div>
 		);

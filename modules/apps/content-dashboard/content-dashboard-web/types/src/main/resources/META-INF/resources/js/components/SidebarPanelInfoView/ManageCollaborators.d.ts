@@ -7,7 +7,7 @@ import React from 'react';
 declare const ManageCollaborators: ({
 	fetchSharingCollaboratorsURL,
 	onError,
-}: IProps) => JSX.Element;
+}: IProps) => React.JSX.Element;
 interface IProps {
 	children?: React.ReactNode;
 	fetchSharingCollaboratorsURL: RequestInfo;

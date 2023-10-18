@@ -11,7 +11,7 @@ import {
 } from '@liferay/accessibility-settings-state-web';
 import {useLiferayState} from '@liferay/frontend-js-state-web';
 import React, {useMemo} from 'react';
-import ReactDOM from 'react-dom';
+import {createRoot} from 'react-dom/client';
 
 let counter = 0;
 
@@ -64,21 +64,6 @@ export default function render(
 			componentId = `__UNNAMED_COMPONENT__${portletId}__${counter++}`;
 		}
 
-		(window.Liferay as any).component(
-			componentId,
-			{
-				destroy: () => {
-					container.classList.remove('lfr-tooltip-scope');
-
-					ReactDOM.unmountComponentAtNode(container);
-				},
-			},
-			{
-				destroyOnNavigate,
-				portletId,
-			}
-		);
-
 		const Component: React.ElementType =
 			typeof renderable === 'function' ||
 			(renderable as any).$$typeof === Symbol.for('react.forward_ref')
@@ -99,12 +84,33 @@ export default function render(
 			delete renderData.hasBodyContent;
 		}
 
-		// eslint-disable-next-line @liferay/portal/no-react-dom-render
-		ReactDOM.render(
+		const root = createRoot(container);
+
+		(window.Liferay as any).component(
+			componentId,
+			{
+				destroy: () => {
+					container.classList.remove('lfr-tooltip-scope');
+
+					root.unmount();
+				},
+			},
+			{
+				destroyOnNavigate,
+				portletId,
+			}
+		);
+
+		root.render(
 			<LiferayProvider spritemap={spritemap}>
-				{Component ? <Component {...renderData} /> : renderable}
-			</LiferayProvider>,
-			container
+				{
+					(Component ? (
+						<Component {...renderData} />
+					) : (
+						renderable
+					)) as React.ReactNode
+				}
+			</LiferayProvider>
 		);
 	}
 	else {

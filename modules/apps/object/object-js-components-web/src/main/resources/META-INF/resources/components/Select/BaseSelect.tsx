@@ -8,7 +8,7 @@ import ClayDropDown from '@clayui/drop-down';
 import ClayIcon from '@clayui/icon';
 import classNames from 'classnames';
 import {FieldBase} from 'frontend-js-components-web';
-import React, {FocusEvent, ReactNode, cloneElement, useRef} from 'react';
+import React, {FocusEvent, cloneElement, useRef} from 'react';
 
 import './index.scss';
 
@@ -38,8 +38,8 @@ export interface SelectProps {
 }
 
 interface BaseSelectProps extends SelectProps {
-	children: ReactNode;
-	contentRight?: ReactNode;
+	children: React.ReactNode;
+	contentRight?: React.ReactNode;
 	dropdownActive: boolean;
 	setDropdownActive: React.Dispatch<React.SetStateAction<boolean>>;
 	trigger?: JSX.Element;

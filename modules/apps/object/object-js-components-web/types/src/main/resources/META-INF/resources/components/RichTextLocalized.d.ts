@@ -16,7 +16,7 @@ export declare function RichTextLocalized({
 	onTranslationsChange,
 	selectedLocale,
 	translations,
-}: IProps): JSX.Element;
+}: IProps): React.JSX.Element;
 interface IItem {
 	label: Liferay.Language.Locale;
 	symbol: string;

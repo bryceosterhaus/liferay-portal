@@ -5,5 +5,9 @@
 
 import React from 'react';
 import {ICommonModalProps} from './Modal';
-declare const ModalUserGroups: React.FC<ICommonModalProps>;
+declare const ModalUserGroups: React.FC<
+	{
+		children?: React.ReactNode | undefined;
+	} & ICommonModalProps
+>;
 export default ModalUserGroups;

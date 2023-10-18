@@ -18,4 +18,4 @@ export default function LeftSidebarTreeView({
 	leftSidebarSelectedObjectFolderItem: LeftSidebarItem;
 	setExpandedKeys: React.Dispatch<React.SetStateAction<Set<React.Key>>>;
 	showActions?: boolean;
-}): JSX.Element;
+}): React.JSX.Element;

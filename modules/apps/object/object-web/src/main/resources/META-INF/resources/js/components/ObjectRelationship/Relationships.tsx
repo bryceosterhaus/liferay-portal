@@ -133,7 +133,7 @@ export default function Relationships({
 		return (
 			<div className="table-list-title">
 				<a href="#" onClick={handleEditField}>
-					{value}
+					{value as string}
 				</a>
 			</div>
 		);

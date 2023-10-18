@@ -19,10 +19,9 @@ type TestflowLoadingProps = {
 	testrayTask: TestrayTask;
 };
 
-const TestflowLoading: React.FC<TestflowLoadingProps> = ({
-	mutateTask,
-	testrayTask,
-}) => {
+const TestflowLoading: React.FC<
+	{children?: React.ReactNode | undefined} & TestflowLoadingProps
+> = ({mutateTask, testrayTask}) => {
 	useHeader({
 		heading: [
 			{

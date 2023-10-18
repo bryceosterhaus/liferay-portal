@@ -26,5 +26,5 @@ export default function ContentContainer({
 	setSelectedLocale,
 	setValues,
 	values,
-}: ContentContainerProps): JSX.Element;
+}: ContentContainerProps): React.JSX.Element;
 export {};

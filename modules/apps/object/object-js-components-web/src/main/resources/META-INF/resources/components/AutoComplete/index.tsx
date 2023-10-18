@@ -10,8 +10,9 @@ import React, {useState} from 'react';
 import {CustomSelect} from './CustomSelect';
 
 import './index.scss';
-interface AutoCompleteProps<T> extends React.HTMLAttributes<HTMLElement> {
-	children: (item: T) => React.ReactNode;
+interface AutoCompleteProps<T>
+	extends Omit<React.HTMLAttributes<HTMLElement>, 'children'> {
+	children: (item: T) => React.ReactNode | React.ReactNode;
 	contentRight?: React.ReactNode;
 	disabled?: boolean;
 	emptyStateMessage: string;

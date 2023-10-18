@@ -10,7 +10,7 @@ export default function WarningModal({
 	observer,
 	onClose,
 	title,
-}: IProps): JSX.Element;
+}: IProps): React.JSX.Element;
 interface IProps {
 	children?: React.ReactNode;
 	observer: Observer;

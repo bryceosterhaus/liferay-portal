@@ -4,10 +4,10 @@
  */
 
 import {ClayButtonWithIcon} from '@clayui/button';
-import React, {ReactNode} from 'react';
+import React from 'react';
 
 interface RuleBuilderItemProps {
-	children: ReactNode;
+	children: React.ReactNode;
 	onDeleteButtonClick: () => void;
 	type: 'action' | 'condition';
 }

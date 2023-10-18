@@ -8,7 +8,7 @@ export default function ItemList({
 	children,
 	expand,
 	...otherProps
-}: IProps): JSX.Element;
+}: IProps): React.JSX.Element;
 interface IProps {
 	children?: React.ReactNode;
 	expand?: boolean;

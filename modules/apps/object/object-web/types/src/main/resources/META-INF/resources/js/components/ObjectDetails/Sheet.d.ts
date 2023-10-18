@@ -15,5 +15,5 @@ export default function Sheet({
 	description,
 	footer,
 	title,
-}: SheetProps): JSX.Element;
+}: SheetProps): React.JSX.Element;
 export {};

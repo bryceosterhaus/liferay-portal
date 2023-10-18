@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-import {SetStateAction} from 'react';
+import React, {SetStateAction} from 'react';
 interface ObjectFoldersSidebarProps {
 	objectFolders: ObjectFolder[];
 	selectedObjectFolder: ObjectFolder;
@@ -17,5 +17,5 @@ export default function ObjectFoldersSideBar({
 	selectedObjectFolder,
 	setSelectedObjectFolder,
 	setShowModal,
-}: ObjectFoldersSidebarProps): JSX.Element;
+}: ObjectFoldersSidebarProps): React.JSX.Element;
 export {};

@@ -4,7 +4,11 @@
  */
 
 import React from 'react';
-declare const SelectDateType: React.FC<IProps>;
+declare const SelectDateType: React.FC<
+	{
+		children?: React.ReactNode | undefined;
+	} & IProps
+>;
 export default SelectDateType;
 interface IProps {
 	dateFieldName?: string;

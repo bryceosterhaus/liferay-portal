@@ -20,5 +20,5 @@ export default function BasicInfo({
 	readOnly,
 	setValues,
 	values,
-}: BasicInfoProps): JSX.Element;
+}: BasicInfoProps): React.JSX.Element;
 export {};

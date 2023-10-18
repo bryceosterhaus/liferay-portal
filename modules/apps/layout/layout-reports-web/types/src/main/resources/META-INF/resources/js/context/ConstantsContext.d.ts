@@ -25,5 +25,5 @@ interface Props {
 export declare function ConstantsContextProvider({
 	children,
 	constants,
-}: Props): JSX.Element;
+}: Props): React.JSX.Element;
 export {};

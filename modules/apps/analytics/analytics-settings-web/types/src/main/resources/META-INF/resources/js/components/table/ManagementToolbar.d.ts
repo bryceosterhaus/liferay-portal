@@ -12,5 +12,9 @@ interface IManagementToolbarProps {
 	onAddItem?: () => void;
 	showCheckbox: boolean;
 }
-declare const ManagementToolbar: React.FC<IManagementToolbarProps>;
+declare const ManagementToolbar: React.FC<
+	{
+		children?: React.ReactNode | undefined;
+	} & IManagementToolbarProps
+>;
 export default ManagementToolbar;

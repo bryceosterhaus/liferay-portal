@@ -3,8 +3,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-/// <reference types="react" />
-
+import React from 'react';
 interface DeleteAPIEndpointModalProps {
 	closeModal: voidReturn;
 	itemData: BaseItem;
@@ -14,5 +13,5 @@ export declare function DeleteAPIEndpointModalContent({
 	closeModal,
 	itemData,
 	loadData,
-}: DeleteAPIEndpointModalProps): JSX.Element;
+}: DeleteAPIEndpointModalProps): React.JSX.Element;
 export {};

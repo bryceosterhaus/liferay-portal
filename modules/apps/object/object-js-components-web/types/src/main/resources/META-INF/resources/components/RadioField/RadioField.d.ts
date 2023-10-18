@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-import {ReactText} from 'react';
+import React, {ReactText} from 'react';
 interface RadioFieldProps {
 	defaultValue?: string;
 	disabled?: boolean;
@@ -35,5 +35,5 @@ export declare function RadioField({
 	popover,
 	required,
 	tooltip,
-}: RadioFieldProps): JSX.Element;
+}: RadioFieldProps): React.JSX.Element;
 export {};

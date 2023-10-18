@@ -51,22 +51,26 @@ export function useForm(): ({
 
 export function useFormState<T extends {[key: string]: unknown}>(): T;
 
-export const FormReport: React.FC<{
-	data?: string;
-	dataEngineModule: string;
-	displayChartAsTable: boolean;
-	fields: unknown;
-	formReportRecordsFieldValuesURL: string;
-	portletNamespace: string;
-}>;
+export const FormReport: React.FC<
+	{children?: React.ReactNode | undefined} & {
+		data?: string;
+		dataEngineModule: string;
+		displayChartAsTable: boolean;
+		fields: unknown;
+		formReportRecordsFieldValuesURL: string;
+		portletNamespace: string;
+	}
+>;
 
-export const FormView: React.FC;
+export const FormView: React.FC<{children?: React.ReactNode}>;
 
-export const PartialResults: React.FC<{
-	dataEngineModule: string;
-	displayChartAsTable: boolean;
-	reportDataURL: string;
-}>;
+export const PartialResults: React.FC<
+	{children?: React.ReactNode | undefined} & {
+		dataEngineModule: string;
+		displayChartAsTable: boolean;
+		reportDataURL: string;
+	}
+>;
 
 export class PagesVisitor {
 	constructor(pages: unknown);

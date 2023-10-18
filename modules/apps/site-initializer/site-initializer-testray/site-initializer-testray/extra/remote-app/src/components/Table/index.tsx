@@ -54,7 +54,9 @@ export type TableProps<T = any> = {
 	sort?: Sort;
 };
 
-const Table: React.FC<TableProps> = ({
+const Table: React.FC<
+	{children?: React.ReactNode | undefined} & TableProps
+> = ({
 	allRowsChecked = false,
 	actions,
 	columns,

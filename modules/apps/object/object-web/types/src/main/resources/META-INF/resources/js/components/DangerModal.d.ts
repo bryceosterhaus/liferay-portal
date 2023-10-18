@@ -14,7 +14,7 @@ export default function DangerModal({
 	placeholder,
 	title,
 	token,
-}: IProps): JSX.Element;
+}: IProps): React.JSX.Element;
 interface IProps {
 	children?: React.ReactNode;
 	errorMessage: string;

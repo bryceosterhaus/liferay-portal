@@ -9,7 +9,7 @@ export default function ResultsBarItem({
 	className,
 	expand,
 	...otherProps
-}: IProps): JSX.Element;
+}: IProps): React.JSX.Element;
 interface IProps extends React.LiHTMLAttributes<HTMLLIElement> {
 	expand?: boolean;
 }

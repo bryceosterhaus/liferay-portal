@@ -3,8 +3,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-/// <reference types="react" />
-
+import React from 'react';
 import {MultiSelectItem} from './types';
 interface IProps {
 	accountEntryId: number;
@@ -19,5 +18,5 @@ declare function InviteUsersForm({
 	inviteAccountUsersURL,
 	portletNamespace,
 	redirectURL,
-}: IProps): JSX.Element;
+}: IProps): React.JSX.Element;
 export default InviteUsersForm;

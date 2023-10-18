@@ -16,11 +16,9 @@ type SelectCaseParametersProps = {
 	setState: any;
 };
 
-const SelectCaseParameters: React.FC<SelectCaseParametersProps> = ({
-	selectedCaseIds = [],
-	displayTitle = true,
-	setState,
-}) => {
+const SelectCaseParameters: React.FC<
+	{children?: React.ReactNode | undefined} & SelectCaseParametersProps
+> = ({selectedCaseIds = [], displayTitle = true, setState}) => {
 	const {projectId} = useParams();
 
 	return (

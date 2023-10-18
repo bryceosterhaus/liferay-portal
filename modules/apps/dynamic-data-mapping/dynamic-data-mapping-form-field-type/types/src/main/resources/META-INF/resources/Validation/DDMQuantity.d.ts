@@ -4,7 +4,11 @@
  */
 
 import React from 'react';
-declare const DDMQuantity: React.FC<IProps>;
+declare const DDMQuantity: React.FC<
+	{
+		children?: React.ReactNode | undefined;
+	} & IProps
+>;
 export default DDMQuantity;
 interface IProps {
 	label: string;

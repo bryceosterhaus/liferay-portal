@@ -40,5 +40,5 @@ export declare function ActionContainer({
 	systemObject,
 	validateExpressionURL,
 	values,
-}: ActionContainerProps): JSX.Element;
+}: ActionContainerProps): React.JSX.Element;
 export {};

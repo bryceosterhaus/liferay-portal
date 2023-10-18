@@ -7,5 +7,9 @@ import React from 'react';
 export interface IGenericPageProps {
 	title: string;
 }
-declare const DefaultPage: React.FC<React.HTMLAttributes<HTMLElement>>;
+declare const DefaultPage: React.FC<
+	{
+		children?: React.ReactNode | undefined;
+	} & React.HTMLAttributes<HTMLElement>
+>;
 export default DefaultPage;

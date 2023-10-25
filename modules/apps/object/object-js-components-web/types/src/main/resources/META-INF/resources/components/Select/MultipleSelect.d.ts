@@ -4,9 +4,7 @@
  */
 
 import React from 'react';
-
 import {CustomItem, SelectProps} from './BaseSelect';
-
 import './index.scss';
 interface IProps<T extends CustomItem<number | string> = CustomItem>
 	extends SelectProps {
@@ -23,5 +21,5 @@ export declare function MultipleSelect<
 	selectAllOption,
 	setOptions,
 	...restProps
-}: IProps<T>): JSX.Element;
+}: IProps<T>): React.JSX.Element;
 export {};

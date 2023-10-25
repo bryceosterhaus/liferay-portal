@@ -3,12 +3,11 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-// / <reference types="react" />
-
+import React from 'react';
 import './ModalSelectObjectFields.scss';
 declare function ModalSelectObjectFields<
 	T extends ModalItem
->(): JSX.Element | null;
+>(): React.JSX.Element | null;
 export default ModalSelectObjectFields;
 interface ModalItem {
 	checked?: boolean;

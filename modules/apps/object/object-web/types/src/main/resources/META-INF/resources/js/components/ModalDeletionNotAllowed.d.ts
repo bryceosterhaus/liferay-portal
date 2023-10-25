@@ -11,5 +11,5 @@ interface ModalDeletionNotAllowedProps {
 declare function ModalDeletionNotAllowed({
 	content,
 	onVisibilityChange,
-}: ModalDeletionNotAllowedProps): JSX.Element;
+}: ModalDeletionNotAllowedProps): React.JSX.Element;
 export default ModalDeletionNotAllowed;

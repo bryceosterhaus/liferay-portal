@@ -15,5 +15,5 @@ export declare function ModalDeleteObjectField({
 	onAfterSubmit,
 	setModalVisibility,
 	setObjectField,
-}: ModalDeleteObjectFieldProps): JSX.Element;
+}: ModalDeleteObjectFieldProps): React.JSX.Element;
 export {};

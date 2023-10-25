@@ -4,7 +4,6 @@
  */
 
 import React from 'react';
-
 import {TabProps} from './useObjectValidationForm';
 export interface BasicInfoProps extends TabProps {
 	componentLabel: string;
@@ -19,4 +18,4 @@ export declare function BasicInfo({
 	errors,
 	setValues,
 	values,
-}: BasicInfoProps): JSX.Element;
+}: BasicInfoProps): React.JSX.Element;

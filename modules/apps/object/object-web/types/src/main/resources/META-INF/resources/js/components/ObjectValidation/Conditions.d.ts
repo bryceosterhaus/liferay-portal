@@ -6,7 +6,6 @@
 import 'codemirror/mode/groovy/groovy';
 import {SidebarCategory} from '@liferay/object-js-components-web';
 import React from 'react';
-
 import {TabProps} from './useObjectValidationForm';
 export interface ConditionsProps extends TabProps {
 	creationLanguageId: Liferay.Language.Locale;
@@ -23,4 +22,4 @@ export declare function Conditions({
 	objectValidationRuleElements,
 	setValues,
 	values,
-}: ConditionsProps): JSX.Element;
+}: ConditionsProps): React.JSX.Element;

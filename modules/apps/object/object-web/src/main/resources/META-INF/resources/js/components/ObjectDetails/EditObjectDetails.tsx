@@ -73,6 +73,19 @@ function setAccountRelationshipFieldMandatory(
 	};
 }
 
+// @ts-ignore
+
+import htmlToImage from 'html-to-image';
+
+// @ts-ignore
+
+import jspdf from 'jspdf';
+
+console.log({
+	htmlToImage,
+	jspdf,
+});
+
 export default function EditObjectDetails({
 	backURL,
 	companyKeyValuePair,

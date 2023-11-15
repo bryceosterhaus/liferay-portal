@@ -21,12 +21,11 @@ import {
 	objectFieldsReducer,
 	pageReducer,
 } from 'data-engine-js-components-web/js/custom/form/reducers/index.es';
-import React, {Suspense} from 'react';
+import React, {Suspense, lazy, useMemo} from 'react';
 import {DndProvider} from 'react-dnd';
 import {HTML5Backend} from 'react-dnd-html5-backend';
 import {HashRouter as Router, Route, Switch} from 'react-router-dom';
 
-import LazyRoute from './components/LazyRoute';
 import {NavigationBar} from './components/NavigationBar.es';
 import {INITIAL_CONFIG_STATE} from './config/initialConfigState.es';
 import {BUILDER_INITIAL_STATE, initState} from './config/initialState.es';
@@ -51,6 +50,78 @@ export default function App({
 }) {
 	const {config, state} = parseProps(otherProps);
 	const {defaultLanguageId} = state;
+
+	const FormBuilder = useMemo(
+		() =>
+			lazy(
+				() =>
+					new Promise((resolve, reject) => {
+
+						// @ts-ignore
+
+						Liferay.Loader.require(
+							[`${mainRequire}/admin/js/pages/FormBuilder.es`],
+
+							// @ts-ignore
+
+							(Component) => resolve(Component),
+
+							// @ts-ignore
+
+							(error) => reject(error)
+						);
+					})
+			),
+		[mainRequire]
+	);
+
+	const RuleBuilder = useMemo(
+		() =>
+			lazy(
+				() =>
+					new Promise((resolve, reject) => {
+
+						// @ts-ignore
+
+						Liferay.Loader.require(
+							[`${mainRequire}/admin/js/pages/RuleBuilder.es`],
+
+							// @ts-ignore
+
+							(Component) => resolve(Component),
+
+							// @ts-ignore
+
+							(error) => reject(error)
+						);
+					})
+			),
+		[mainRequire]
+	);
+
+	const Report = useMemo(
+		() =>
+			lazy(
+				() =>
+					new Promise((resolve, reject) => {
+
+						// @ts-ignore
+
+						Liferay.Loader.require(
+							[`${mainRequire}/admin/js/pages/Report`],
+
+							// @ts-ignore
+
+							(Component) => resolve(Component),
+
+							// @ts-ignore
+
+							(error) => reject(error)
+						);
+					})
+			),
+		[mainRequire]
+	);
 
 	return (
 		<DndProvider backend={HTML5Backend} context={window}>
@@ -96,19 +167,19 @@ export default function App({
 											fallback={<ClayLoadingIndicator />}
 										>
 											<Switch>
-												<LazyRoute
+												<Route
+													component={FormBuilder}
 													exact
-													importPath={`${mainRequire}/admin/js/pages/FormBuilder.es`}
 													path="/"
 												/>
 
-												<LazyRoute
-													importPath={`${mainRequire}/admin/js/pages/RuleBuilder.es`}
+												<Route
+													component={RuleBuilder}
 													path="/rules"
 												/>
 
-												<LazyRoute
-													importPath={`${mainRequire}/admin/js/pages/Report`}
+												<Route
+													component={Report}
 													path="/report"
 												/>
 											</Switch>

@@ -28,6 +28,7 @@ export default function render(
 		| NonNullable<React.ForwardRefExoticComponent<any>>
 		| (() => NonNullable<React.ReactNode>),
 	renderData: {
+		__reactLegacyMode?: boolean;
 		componentId?: string;
 		portletId?: string;
 		[key: string]: unknown;

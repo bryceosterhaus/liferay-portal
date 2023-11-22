@@ -31,6 +31,8 @@
 				"userId", themeDisplay.getUserId()
 			).put(
 				"userName", PortalUtil.getUserName(themeDisplay.getUserId(), String.valueOf(themeDisplay.getUserId()))
+			).put(
+				"__reactLegacyMode", true
 			).build()
 		%>'
 	/>

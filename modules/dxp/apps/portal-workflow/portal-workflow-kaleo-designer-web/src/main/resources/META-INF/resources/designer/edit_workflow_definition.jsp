@@ -58,6 +58,8 @@ renderResponse.setTitle(LanguageUtil.get(request, titleKey));
 			"translations", (kaleoDefinitionVersion == null) ? new HashMap<>() : kaleoDefinitionVersion.getTitleMap()
 		).put(
 			"version", (kaleoDefinitionVersion == null) ? "0" : kaleoDefinitionVersion.getVersion()
+		).put(
+			"__reactLegacyMode", true
 		).build()
 	%>'
 />

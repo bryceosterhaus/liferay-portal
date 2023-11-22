@@ -9,5 +9,5 @@ interface LeftSidebarProps {
 }
 export default function LeftSidebar({
 	setShowModal,
-}: LeftSidebarProps): JSX.Element;
+}: LeftSidebarProps): React.JSX.Element;
 export {};

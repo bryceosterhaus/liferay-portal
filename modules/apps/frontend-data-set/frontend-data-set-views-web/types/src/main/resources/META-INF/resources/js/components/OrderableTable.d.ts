@@ -16,7 +16,11 @@ interface IContentRendererProps {
 	query: string;
 }
 interface IContentRenderer {
-	component: React.FC<IContentRendererProps>;
+	component: React.FC<
+		{
+			children?: React.ReactNode | undefined;
+		} & IContentRendererProps
+	>;
 	textMatch?: Function;
 }
 interface IField {
@@ -52,5 +56,5 @@ declare const OrderableTable: ({
 	noItemsTitle,
 	onOrderChange,
 	title,
-}: IOrderableTableProps) => JSX.Element;
+}: IOrderableTableProps) => React.JSX.Element;
 export default OrderableTable;

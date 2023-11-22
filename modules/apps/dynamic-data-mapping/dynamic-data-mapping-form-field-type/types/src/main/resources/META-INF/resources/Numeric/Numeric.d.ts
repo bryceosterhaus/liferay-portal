@@ -7,7 +7,11 @@ import React, {FocusEventHandler} from 'react';
 import {ISymbols} from '../NumericInputMask/NumericInputMask';
 import './Numeric.scss';
 import type {FieldChangeEventHandler, Locale, LocalizedValue} from '../types';
-declare const Numeric: React.FC<IProps>;
+declare const Numeric: React.FC<
+	{
+		children?: React.ReactNode | undefined;
+	} & IProps
+>;
 export {Numeric};
 declare const _default: any;
 export default _default;

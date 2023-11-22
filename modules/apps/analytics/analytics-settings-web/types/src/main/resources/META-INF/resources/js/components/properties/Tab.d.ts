@@ -25,5 +25,9 @@ interface ITabProps {
 	property: TProperty;
 	requestFn: (params: TTableRequestParams) => Promise<any>;
 }
-declare const Tab: React.FC<ITabProps>;
+declare const Tab: React.FC<
+	{
+		children?: React.ReactNode | undefined;
+	} & ITabProps
+>;
 export default Tab;

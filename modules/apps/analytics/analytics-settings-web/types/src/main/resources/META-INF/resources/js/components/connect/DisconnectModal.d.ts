@@ -8,5 +8,9 @@ interface IDisconnectModalProps {
 	observer: any;
 	onOpenChange: (value: boolean) => void;
 }
-declare const DisconnectModal: React.FC<IDisconnectModalProps>;
+declare const DisconnectModal: React.FC<
+	{
+		children?: React.ReactNode | undefined;
+	} & IDisconnectModalProps
+>;
 export default DisconnectModal;

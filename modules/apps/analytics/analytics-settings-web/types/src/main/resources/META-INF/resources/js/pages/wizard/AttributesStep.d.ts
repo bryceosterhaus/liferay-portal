@@ -6,5 +6,9 @@
 import React from 'react';
 import {IGenericStepProps} from './WizardPage';
 interface IStepProps extends IGenericStepProps {}
-declare const Step: React.FC<IStepProps>;
+declare const Step: React.FC<
+	{
+		children?: React.ReactNode | undefined;
+	} & IStepProps
+>;
 export default Step;

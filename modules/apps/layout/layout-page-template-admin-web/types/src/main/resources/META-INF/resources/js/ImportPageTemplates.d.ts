@@ -3,12 +3,11 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-/// <reference types="react" />
-
+import React from 'react';
 interface Props {
 	backURL: string;
 	importURL: string;
 	portletNamespace: string;
 }
-export default function ImportPageTemplates(props: Props): JSX.Element;
+export default function ImportPageTemplates(props: Props): React.JSX.Element;
 export {};

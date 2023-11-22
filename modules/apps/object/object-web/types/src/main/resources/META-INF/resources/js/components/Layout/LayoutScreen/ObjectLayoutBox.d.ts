@@ -20,5 +20,5 @@ export declare function ObjectLayoutBox({
 	objectLayoutRows,
 	tabIndex,
 	type,
-}: ObjectLayoutBoxProps): JSX.Element;
+}: ObjectLayoutBoxProps): React.JSX.Element;
 export {};

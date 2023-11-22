@@ -40,5 +40,5 @@ export declare function EditObjectFieldContent({
 	setValues,
 	values,
 	workflowStatuses,
-}: EditObjectFieldContentProps): JSX.Element;
+}: EditObjectFieldContentProps): React.JSX.Element;
 export {};

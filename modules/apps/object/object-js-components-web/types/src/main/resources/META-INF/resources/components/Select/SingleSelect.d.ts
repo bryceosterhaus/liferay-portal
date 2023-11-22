@@ -44,5 +44,5 @@ export declare function SingleSelect<T extends SingleSelectOption>({
 	required,
 	selectedKey,
 	tooltip,
-}: SingleSelectProps<T>): JSX.Element;
+}: SingleSelectProps<T>): React.JSX.Element;
 export {};

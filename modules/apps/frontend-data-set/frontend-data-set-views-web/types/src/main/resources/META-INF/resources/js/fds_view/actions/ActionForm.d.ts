@@ -3,8 +3,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-/// <reference types="react" />
-
+import React from 'react';
 import {FDSViewType} from '../../FDSViews';
 import {IFDSAction} from '../Actions';
 interface IFDSActionFormProps {
@@ -26,5 +25,5 @@ declare const ActionForm: ({
 	onCancel,
 	onSave,
 	spritemap,
-}: IFDSActionFormProps) => JSX.Element;
+}: IFDSActionFormProps) => React.JSX.Element;
 export default ActionForm;

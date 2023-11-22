@@ -5,7 +5,11 @@
 
 import React from 'react';
 import './StartEndDate.scss';
-declare const StartEndDate: React.FC<IProps>;
+declare const StartEndDate: React.FC<
+	{
+		children?: React.ReactNode | undefined;
+	} & IProps
+>;
 export default StartEndDate;
 interface IProps {
 	dateFieldOptions: IDateFieldOption[];

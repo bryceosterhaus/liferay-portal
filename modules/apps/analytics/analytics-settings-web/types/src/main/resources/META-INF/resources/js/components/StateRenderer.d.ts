@@ -10,14 +10,30 @@ interface IStateRendererProps extends React.HTMLAttributes<HTMLElement> {
 	loading: boolean;
 	loadingProps?: any;
 }
-declare const StateRenderer: React.FC<IStateRendererProps> & {
+declare const StateRenderer: React.FC<
+	{
+		children?: React.ReactNode | undefined;
+	} & IStateRendererProps
+> & {
 	Empty: typeof EmptyState;
 	Error: typeof ErrorState;
 	Success: typeof SuccessState;
 };
-declare const EmptyState: React.FC<React.HTMLAttributes<HTMLElement>>;
-declare const ErrorState: React.FC<React.HTMLAttributes<HTMLElement>>;
-declare const SuccessState: React.FC<React.HTMLAttributes<HTMLElement>>;
+declare const EmptyState: React.FC<
+	{
+		children?: React.ReactNode | undefined;
+	} & React.HTMLAttributes<HTMLElement>
+>;
+declare const ErrorState: React.FC<
+	{
+		children?: React.ReactNode | undefined;
+	} & React.HTMLAttributes<HTMLElement>
+>;
+declare const SuccessState: React.FC<
+	{
+		children?: React.ReactNode | undefined;
+	} & React.HTMLAttributes<HTMLElement>
+>;
 interface IErrorStateComponentProps extends React.HTMLAttributes<HTMLElement> {
 	disabled?: boolean;
 	onClickRefetch?: () => void;
@@ -26,7 +42,7 @@ export declare function ErrorStateComponent({
 	className,
 	disabled,
 	onClickRefetch,
-}: IErrorStateComponentProps): JSX.Element;
+}: IErrorStateComponentProps): React.JSX.Element;
 interface IEmptyStateComponentProps extends React.HTMLAttributes<HTMLElement> {
 	description?: string;
 	imgSrc: string;
@@ -38,5 +54,5 @@ export declare function EmptyStateComponent({
 	description,
 	imgSrc,
 	title,
-}: IEmptyStateComponentProps): JSX.Element;
+}: IEmptyStateComponentProps): React.JSX.Element;
 export default StateRenderer;

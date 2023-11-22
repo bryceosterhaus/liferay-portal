@@ -4,5 +4,9 @@
  */
 
 import React from 'react';
-declare const InfoScreen: React.FC<React.HTMLAttributes<HTMLElement>>;
+declare const InfoScreen: React.FC<
+	{
+		children?: React.ReactNode | undefined;
+	} & React.HTMLAttributes<HTMLElement>
+>;
 export default InfoScreen;

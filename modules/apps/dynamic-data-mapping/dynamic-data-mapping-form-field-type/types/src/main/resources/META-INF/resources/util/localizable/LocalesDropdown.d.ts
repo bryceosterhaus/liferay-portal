@@ -3,8 +3,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-/// <reference types="react" />
-
+import React from 'react';
 interface Locale {
 	displayName: string;
 	icon: string;
@@ -23,5 +22,5 @@ declare const LocalesDropdown: ({
 	editingLocale,
 	fieldName,
 	onLanguageClicked,
-}: LocalesDropdownProps) => JSX.Element;
+}: LocalesDropdownProps) => React.JSX.Element;
 export default LocalesDropdown;

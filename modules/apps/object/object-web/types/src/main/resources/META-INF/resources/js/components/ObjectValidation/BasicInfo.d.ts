@@ -3,8 +3,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-/// <reference types="react" />
-
+import React from 'react';
 import {TabProps} from './useObjectValidationForm';
 export interface BasicInfoProps extends TabProps {
 	componentLabel: string;
@@ -19,4 +18,4 @@ export declare function BasicInfo({
 	errors,
 	setValues,
 	values,
-}: BasicInfoProps): JSX.Element;
+}: BasicInfoProps): React.JSX.Element;

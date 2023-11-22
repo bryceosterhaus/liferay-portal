@@ -4,7 +4,7 @@
  */
 
 import CodeMirror from 'codemirror';
-import {ReactNode, RefObject} from 'react';
+import React, {RefObject} from 'react';
 import './Sidebar.scss';
 interface SidebarElement {
 	content: string;
@@ -17,7 +17,7 @@ export interface SidebarCategory {
 	label: string;
 }
 interface IProps {
-	CustomSidebarContent?: ReactNode;
+	CustomSidebarContent?: React.ReactNode;
 	editorRef: RefObject<CodeMirror.Editor>;
 	elements: SidebarCategory[];
 	elementsDisabled?: boolean;
@@ -28,5 +28,5 @@ export declare function Sidebar({
 	editorRef,
 	elements,
 	elementsDisabled,
-}: IProps): JSX.Element;
+}: IProps): React.JSX.Element;
 export {};

@@ -14,5 +14,5 @@ export declare function ModalAddObjectLayoutBox({
 	observer,
 	onClose,
 	tabIndex,
-}: IModalAddObjectLayoutBoxProps): JSX.Element;
+}: IModalAddObjectLayoutBoxProps): React.JSX.Element;
 export {};

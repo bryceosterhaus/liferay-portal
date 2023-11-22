@@ -3,8 +3,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-/// <reference types="react" />
-
+import React from 'react';
 import {IFDSViewSectionProps} from '../../FDSView';
 import '../../../css/Fields.scss';
 declare type LocalizedValue<T> = Liferay.Language.LocalizedValue<T>;
@@ -25,5 +24,5 @@ declare const Fields: ({
 	fdsView,
 	namespace,
 	saveFDSFieldsURL,
-}: IFDSViewSectionProps) => JSX.Element;
+}: IFDSViewSectionProps) => React.JSX.Element;
 export default Fields;

@@ -4,7 +4,12 @@
  */
 
 import React from 'react';
-declare const Subscribe: ({disabled, icon, label, url}: IProps) => JSX.Element;
+declare const Subscribe: ({
+	disabled,
+	icon,
+	label,
+	url,
+}: IProps) => React.JSX.Element;
 interface IProps {
 	children?: React.ReactNode;
 	disabled: boolean;

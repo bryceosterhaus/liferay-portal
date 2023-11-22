@@ -3,8 +3,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-/// <reference types="react" />
-
+import React from 'react';
 interface FreeMarkerTemplateEditorProps {
 	baseResourceURL: string;
 	objectDefinitions: ObjectDefinition[];
@@ -20,5 +19,5 @@ export declare function FreeMarkerTemplateEditor({
 	setSelectedLocale,
 	setValues,
 	values,
-}: FreeMarkerTemplateEditorProps): JSX.Element;
+}: FreeMarkerTemplateEditorProps): React.JSX.Element;
 export {};

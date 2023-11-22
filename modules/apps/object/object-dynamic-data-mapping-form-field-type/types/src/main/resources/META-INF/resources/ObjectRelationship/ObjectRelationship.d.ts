@@ -22,7 +22,7 @@ export default function ObjectRelationship({
 	value,
 	valueKey,
 	...otherProps
-}: IProps): JSX.Element;
+}: IProps): React.JSX.Element;
 interface IProps {
 	apiURL: string;
 	fieldName: string;

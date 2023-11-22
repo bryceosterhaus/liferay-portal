@@ -32,5 +32,5 @@ export default function SelectObjectDefinition({
 	reverseOrder,
 	setObjectDefinition,
 	setValues,
-}: SelectObjectDefinitionProps): JSX.Element;
+}: SelectObjectDefinitionProps): React.JSX.Element;
 export {};

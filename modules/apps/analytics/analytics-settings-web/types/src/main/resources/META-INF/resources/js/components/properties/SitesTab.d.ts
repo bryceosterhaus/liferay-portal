@@ -10,5 +10,9 @@ interface ISiteTabProps {
 	onSitesChange: (ids: number[]) => void;
 	property: TProperty;
 }
-declare const SitesTab: React.FC<ISiteTabProps>;
+declare const SitesTab: React.FC<
+	{
+		children?: React.ReactNode | undefined;
+	} & ISiteTabProps
+>;
 export default SitesTab;

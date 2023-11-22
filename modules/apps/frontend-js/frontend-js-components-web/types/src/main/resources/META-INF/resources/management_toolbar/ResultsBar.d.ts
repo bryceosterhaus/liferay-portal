@@ -7,4 +7,4 @@ import React from 'react';
 export default function ResultsBar({
 	children,
 	...otherProps
-}: React.HTMLAttributes<HTMLElement>): JSX.Element;
+}: React.HTMLAttributes<HTMLElement>): React.JSX.Element;

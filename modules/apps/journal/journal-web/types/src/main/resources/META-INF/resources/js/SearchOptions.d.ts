@@ -4,7 +4,7 @@
  */
 
 import {Option} from '@clayui/core';
-import {Key} from 'react';
+import React, {Key} from 'react';
 declare type Option = {
 	label: string;
 	value: string;
@@ -28,5 +28,5 @@ declare const SearchOptions: ({
 	searchResults: initialResults,
 	searchResultsOptions,
 	searchURL,
-}: Props) => JSX.Element;
+}: Props) => React.JSX.Element;
 export default SearchOptions;

@@ -4,7 +4,10 @@
  */
 
 import React from 'react';
-export declare function Collapsible({children, label}: IProps): JSX.Element;
+export declare function Collapsible({
+	children,
+	label,
+}: IProps): React.JSX.Element;
 interface IProps {
 	children: React.ReactNode;
 	label: string;

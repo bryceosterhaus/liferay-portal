@@ -3,8 +3,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-/// <reference types="react" />
-
+import React from 'react';
 import {FDSViewType} from '../../../FDSViews';
 import {IFDSField} from '../Fields';
 declare const AddFieldsModalContent: ({
@@ -27,5 +26,5 @@ declare const AddFieldsModalContent: ({
 	}) => void;
 	saveFDSFieldsURL: string;
 	savedFDSFields: Array<IFDSField>;
-}) => JSX.Element;
+}) => React.JSX.Element;
 export default AddFieldsModalContent;

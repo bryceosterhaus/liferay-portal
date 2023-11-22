@@ -38,5 +38,5 @@ export declare function Card({
 	tooltip,
 	viewMode,
 	...otherProps
-}: CardProps): JSX.Element;
+}: CardProps): React.JSX.Element;
 export {};

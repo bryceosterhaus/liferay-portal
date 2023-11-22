@@ -4,10 +4,10 @@
  */
 
 import {FormError} from '@liferay/object-js-components-web';
-import {ChangeEventHandler, ReactNode} from 'react';
+import React, {ChangeEventHandler} from 'react';
 import './ObjectFieldFormBase.scss';
 interface ObjectFieldFormBaseProps {
-	children?: ReactNode;
+	children?: React.ReactNode;
 	creationLanguageId2?: Liferay.Language.Locale;
 	disabled?: boolean;
 	editingObjectField?: boolean;
@@ -49,5 +49,5 @@ export default function ObjectFieldFormBase({
 	onObjectRelationshipChange,
 	onSubmit,
 	setValues,
-}: ObjectFieldFormBaseProps): JSX.Element;
+}: ObjectFieldFormBaseProps): React.JSX.Element;
 export {};

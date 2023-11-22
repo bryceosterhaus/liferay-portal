@@ -10,7 +10,7 @@ export default function FieldFeedback({
 	helpMessage,
 	warningMessage,
 	...otherProps
-}: IProps): JSX.Element | null;
+}: IProps): React.JSX.Element | null;
 interface IProps extends React.HTMLAttributes<HTMLDivElement> {
 	errorMessage?: string;
 	helpMessage?: string;

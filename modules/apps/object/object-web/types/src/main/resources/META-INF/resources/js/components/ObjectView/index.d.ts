@@ -12,5 +12,9 @@ interface ICustomViewWrapperProps extends React.HTMLAttributes<HTMLElement> {
 	objectViewId: string;
 	workflowStatuses: TWorkflowStatus[];
 }
-declare const CustomViewWrapper: React.FC<ICustomViewWrapperProps>;
+declare const CustomViewWrapper: React.FC<
+	{
+		children?: React.ReactNode | undefined;
+	} & ICustomViewWrapperProps
+>;
 export default CustomViewWrapper;

@@ -13,5 +13,5 @@ declare function CustomSizeContextProvider({
 	children,
 }: {
 	children: React.ReactNode;
-}): JSX.Element;
+}): React.JSX.Element;
 export {CustomSizeContextProvider, useCustomSize, useSetCustomSize};

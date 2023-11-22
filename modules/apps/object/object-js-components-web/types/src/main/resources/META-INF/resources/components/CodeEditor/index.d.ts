@@ -4,7 +4,7 @@
  */
 
 import CodeMirror from 'codemirror';
-import React, {ReactNode} from 'react';
+import React from 'react';
 import {ICodeMirrorEditor} from './CodeMirrorEditor';
 import {SidebarCategory} from './Sidebar';
 import './index.scss';
@@ -13,7 +13,7 @@ export {Collapsible} from './Collapsible';
 export {Element} from './Element';
 export {SidebarCategory} from './Sidebar';
 interface CodeEditorProps extends ICodeMirrorEditor {
-	CustomSidebarContent?: ReactNode;
+	CustomSidebarContent?: React.ReactNode;
 	className?: string;
 	error?: string;
 	readOnly?: boolean;

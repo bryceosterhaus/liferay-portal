@@ -5,5 +5,9 @@
 
 import React from 'react';
 import {IGenericPageProps} from './DefaultPage';
-declare const ConnectPage: React.FC<IGenericPageProps>;
+declare const ConnectPage: React.FC<
+	{
+		children?: React.ReactNode | undefined;
+	} & IGenericPageProps
+>;
 export default ConnectPage;

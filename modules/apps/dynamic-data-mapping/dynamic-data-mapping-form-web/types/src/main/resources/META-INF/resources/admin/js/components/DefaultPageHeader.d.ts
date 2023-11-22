@@ -5,7 +5,11 @@
 
 import React, {MouseEventHandler} from 'react';
 import './DefaultPageHeader.scss';
-declare const DefaultPageHeader: React.FC<IProps>;
+declare const DefaultPageHeader: React.FC<
+	{
+		children?: React.ReactNode | undefined;
+	} & IProps
+>;
 export default DefaultPageHeader;
 interface IProps {
 	description?: string;

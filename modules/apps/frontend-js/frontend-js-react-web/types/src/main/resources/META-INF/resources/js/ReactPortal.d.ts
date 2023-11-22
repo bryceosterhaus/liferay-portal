@@ -5,6 +5,7 @@
 
 import React from 'react';
 interface IProps extends React.HTMLAttributes<HTMLDivElement> {
+	children?: React.ReactNode;
 
 	/**
 	 * Element to render portal into.
@@ -18,13 +19,14 @@ interface IProps extends React.HTMLAttributes<HTMLDivElement> {
 	wrapper?:
 		| string
 		| React.ComponentType<{
+				children?: React.ReactNode | undefined;
 				className: string;
 				id?: string;
 				ref?: React.Ref<HTMLElement>;
 		  }>
 		| false;
 }
-declare const ReactPortal: React.ForwardRefExoticComponent<
+declare const LiferayReactPortal: React.ForwardRefExoticComponent<
 	IProps & React.RefAttributes<HTMLElement>
 >;
-export default ReactPortal;
+export default LiferayReactPortal;

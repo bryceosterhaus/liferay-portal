@@ -3,8 +3,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-/// <reference types="react" />
-
+import React from 'react';
 export interface ICreationActionItem {
 	data?: {
 		permissionKey?: string;
@@ -30,5 +29,5 @@ declare function CreationMenu({
 }: {
 	inEmptyState: any;
 	primaryItems: Array<ICreationActionItem>;
-}): false | JSX.Element;
+}): false | React.JSX.Element;
 export default CreationMenu;

@@ -3,10 +3,9 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-/// <reference types="react" />
-
+import React from 'react';
 import {IPickList} from '../../types';
-declare function Header(): JSX.Element;
+declare function Header(): React.JSX.Element;
 interface IBodyProps {
 	includeMode: string;
 	multiple: boolean;
@@ -30,7 +29,7 @@ declare function Body({
 	picklists,
 	preselectedValues,
 	selectedPicklist,
-}: IBodyProps): JSX.Element;
+}: IBodyProps): React.JSX.Element;
 declare const _default: {
 	Body: typeof Body;
 	Header: typeof Header;

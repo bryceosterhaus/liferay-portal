@@ -13,7 +13,7 @@ export default function NodeList({
 	onMouseDown,
 	role,
 	tabIndex,
-}: IProps): JSX.Element | null;
+}: IProps): React.JSX.Element | null;
 interface IProps {
 	NodeComponent: React.ComponentType<{
 		node: Node;

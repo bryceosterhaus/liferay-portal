@@ -11,5 +11,5 @@ interface ModalObjectFieldDeletionNotAllowedProps {
 declare function ModalObjectFieldDeletionNotAllowed({
 	content,
 	onVisibilityChange,
-}: ModalObjectFieldDeletionNotAllowedProps): JSX.Element;
+}: ModalObjectFieldDeletionNotAllowedProps): React.JSX.Element;
 export default ModalObjectFieldDeletionNotAllowed;

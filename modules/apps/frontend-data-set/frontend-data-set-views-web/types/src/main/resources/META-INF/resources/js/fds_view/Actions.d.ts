@@ -3,8 +3,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-/// <reference types="react" />
-
+import React from 'react';
 import {OBJECT_RELATIONSHIP} from '../Constants';
 import {IFDSViewSectionProps} from '../FDSView';
 import '../../css/Actions.scss';
@@ -58,6 +57,6 @@ declare const Actions: ({
 	fdsView,
 	namespace,
 	spritemap,
-}: IFDSViewSectionProps) => JSX.Element;
+}: IFDSViewSectionProps) => React.JSX.Element;
 export {IFDSAction, SECTIONS};
 export default Actions;

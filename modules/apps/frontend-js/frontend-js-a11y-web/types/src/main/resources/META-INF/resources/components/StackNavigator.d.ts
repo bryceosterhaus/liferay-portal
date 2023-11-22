@@ -17,8 +17,5 @@ export declare function StackNavigator<T>({
 	onActiveChange,
 	onParamsChange,
 	params,
-}: StackNavigatorProps<T>): React.ReactElement<
-	any,
-	string | React.JSXElementConstructor<any>
->;
+}: StackNavigatorProps<T>): React.DetailedReactHTMLElement<any, any>;
 export {};

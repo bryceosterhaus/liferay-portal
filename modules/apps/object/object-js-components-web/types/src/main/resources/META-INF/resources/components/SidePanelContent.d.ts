@@ -18,14 +18,14 @@ export declare function SidePanelContent({
 	onSave,
 	readOnly,
 	title,
-}: IProps): JSX.Element;
+}: IProps): React.JSX.Element;
 export declare function SidePanelForm({
 	children,
 	customLabel,
 	onSubmit,
 	readOnly,
 	title,
-}: ISidePanelFormProps): JSX.Element;
+}: ISidePanelFormProps): React.JSX.Element;
 interface IContainerProps {
 	children: React.ReactNode;
 	className?: string;

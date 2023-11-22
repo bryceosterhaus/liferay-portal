@@ -5,5 +5,9 @@
 
 import React from 'react';
 import {IGenericPageProps} from './DefaultPage';
-declare const PropertiesPage: React.FC<IGenericPageProps>;
+declare const PropertiesPage: React.FC<
+	{
+		children?: React.ReactNode | undefined;
+	} & IGenericPageProps
+>;
 export default PropertiesPage;

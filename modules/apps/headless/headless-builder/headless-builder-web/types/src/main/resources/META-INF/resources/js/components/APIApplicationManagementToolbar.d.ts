@@ -3,8 +3,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-/// <reference types="react" />
-
+import React from 'react';
 interface APIApplicationManagementToolbarProps {
 	applicationStatusKey: 'published' | 'unpublished';
 	hideManagementButtons: boolean;
@@ -16,5 +15,5 @@ export declare function APIApplicationManagementToolbar({
 	hideManagementButtons,
 	managementButtonsProps: buttons,
 	title,
-}: APIApplicationManagementToolbarProps): JSX.Element;
+}: APIApplicationManagementToolbarProps): React.JSX.Element;
 export {};

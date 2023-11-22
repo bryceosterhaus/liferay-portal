@@ -22,8 +22,10 @@ export declare function useObjectFieldForm({
 	errors: import('@liferay/object-js-components-web').FormError<
 		ObjectField & {
 			function: unknown;
-			defaultValue: unknown;
+			output: unknown;
+			script: unknown;
 			acceptedFileExtensions: unknown;
+			defaultValue: unknown;
 			defaultValueType: unknown;
 			fileSource: unknown;
 			filters: unknown;
@@ -33,9 +35,7 @@ export declare function useObjectFieldForm({
 			objectDefinition1ShortName: unknown;
 			objectFieldName: unknown;
 			objectRelationshipName: unknown;
-			output: unknown;
 			prefix: unknown;
-			script: unknown;
 			showCounter: unknown;
 			showFilesInDocumentsAndMedia: unknown;
 			stateFlow: unknown;
@@ -53,8 +53,10 @@ export declare function useObjectFieldForm({
 	) => import('@liferay/object-js-components-web').FormError<
 		ObjectField & {
 			function: unknown;
-			defaultValue: unknown;
+			output: unknown;
+			script: unknown;
 			acceptedFileExtensions: unknown;
+			defaultValue: unknown;
 			defaultValueType: unknown;
 			fileSource: unknown;
 			filters: unknown;
@@ -64,9 +66,7 @@ export declare function useObjectFieldForm({
 			objectDefinition1ShortName: unknown;
 			objectFieldName: unknown;
 			objectRelationshipName: unknown;
-			output: unknown;
 			prefix: unknown;
-			script: unknown;
 			showCounter: unknown;
 			showFilesInDocumentsAndMedia: unknown;
 			stateFlow: unknown;

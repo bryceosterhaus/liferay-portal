@@ -5,5 +5,9 @@
 
 import React from 'react';
 import {IGenericStepProps} from './WizardPage';
-declare const Step: React.FC<IGenericStepProps>;
+declare const Step: React.FC<
+	{
+		children?: React.ReactNode | undefined;
+	} & IGenericStepProps
+>;
 export default Step;

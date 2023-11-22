@@ -3,8 +3,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-/// <reference types="react" />
-
+import {default as React} from 'react';
 interface IProps {
 	addLayoutURL: string;
 	getLayoutPageTemplateEntryListURL: string;
@@ -21,5 +20,5 @@ export default function LayoutPageTemplateEntryCard({
 	subtitle,
 	thumbnailURL,
 	title,
-}: IProps): JSX.Element;
+}: IProps): React.JSX.Element;
 export {};

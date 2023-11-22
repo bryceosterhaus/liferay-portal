@@ -68,7 +68,7 @@ export declare function ChartStateContextProvider({
 	publishDate,
 	timeRange,
 	timeSpanKey,
-}: ChartStateContextProps): JSX.Element;
+}: ChartStateContextProps): React.JSX.Element;
 export declare function useDateTitle():
 	| {
 			firstDate: null;

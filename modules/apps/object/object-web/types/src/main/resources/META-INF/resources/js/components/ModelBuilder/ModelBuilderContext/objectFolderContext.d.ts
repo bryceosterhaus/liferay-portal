@@ -17,6 +17,6 @@ declare const initialState: TState;
 export declare function ObjectFolderContextProvider({
 	children,
 	value,
-}: ObjectFolderContextProviderProps): JSX.Element;
+}: ObjectFolderContextProviderProps): React.JSX.Element;
 export declare function useObjectFolderContext(): ObjectFolderContextProps;
 export {};

@@ -10,5 +10,5 @@ interface ObjectLayoutRelationshipProps
 }
 export declare function ObjectLayoutRelationship({
 	objectRelationshipId,
-}: ObjectLayoutRelationshipProps): JSX.Element;
+}: ObjectLayoutRelationshipProps): React.JSX.Element;
 export {};

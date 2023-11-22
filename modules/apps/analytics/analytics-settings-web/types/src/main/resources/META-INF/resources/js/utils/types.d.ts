@@ -5,7 +5,11 @@
 
 import React from 'react';
 export interface IPages<T, K> {
-	Component: React.FC<T>;
+	Component: React.FC<
+		{
+			children?: React.ReactNode | undefined;
+		} & T
+	>;
 	key: K;
 	title: string;
 }

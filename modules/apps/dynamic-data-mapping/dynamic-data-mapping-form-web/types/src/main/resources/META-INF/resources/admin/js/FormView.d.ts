@@ -4,7 +4,11 @@
  */
 
 import React from 'react';
-declare const FormView: React.FC<IProps>;
+declare const FormView: React.FC<
+	{
+		children?: React.ReactNode | undefined;
+	} & IProps
+>;
 export default FormView;
 interface IProps {
 	description?: string;

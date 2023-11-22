@@ -12,7 +12,7 @@ declare function DDMSelect({
 	onChange,
 	options,
 	value: selectedValue,
-}: IProps): JSX.Element;
+}: IProps): React.JSX.Element;
 export default DDMSelect;
 interface IProps {
 	className?: string;

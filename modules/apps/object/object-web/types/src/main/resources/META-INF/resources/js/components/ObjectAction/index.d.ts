@@ -3,10 +3,9 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-/// <reference types="react" />
-
 import 'codemirror/mode/groovy/groovy';
 import {FormError, SidebarCategory} from '@liferay/object-js-components-web';
+import React from 'react';
 interface ActionProps {
 	isApproved?: boolean;
 	objectAction: Partial<ObjectAction>;
@@ -47,5 +46,5 @@ export default function Action({
 	successMessage,
 	systemObject,
 	validateExpressionURL,
-}: ActionProps): JSX.Element;
+}: ActionProps): React.JSX.Element;
 export {};

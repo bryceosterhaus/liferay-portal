@@ -10,5 +10,9 @@ interface IChannelTabProps {
 	onChannelsChange: (ids: number[]) => void;
 	property: TProperty;
 }
-declare const ChannelTab: React.FC<IChannelTabProps>;
+declare const ChannelTab: React.FC<
+	{
+		children?: React.ReactNode | undefined;
+	} & IChannelTabProps
+>;
 export default ChannelTab;

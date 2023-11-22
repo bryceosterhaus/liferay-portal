@@ -3,8 +3,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-/// <reference types="react" />
-
+import React from 'react';
 import {DeletedObjectDefinition} from './ViewObjectDefinitions';
 interface ModalDeleteObjectDefinitionProps {
 	handleOnClose: () => void;
@@ -15,5 +14,5 @@ export declare function ModalDeleteObjectDefinition({
 	handleOnClose,
 	objectDefinition,
 	setDeletedObjectDefinition,
-}: ModalDeleteObjectDefinitionProps): JSX.Element;
+}: ModalDeleteObjectDefinitionProps): React.JSX.Element;
 export {};

@@ -14,5 +14,9 @@ export declare enum ESteps {
 	People = 2,
 	Attributes = 3,
 }
-declare const WizardPage: React.FC<React.HTMLAttributes<HTMLElement>>;
+declare const WizardPage: React.FC<
+	{
+		children?: React.ReactNode | undefined;
+	} & React.HTMLAttributes<HTMLElement>
+>;
 export default WizardPage;

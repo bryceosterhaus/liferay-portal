@@ -47,5 +47,5 @@ export default function InputLocalized({
 	tooltip,
 	translations,
 	...otherProps
-}: InputLocalizedProps): JSX.Element;
+}: InputLocalizedProps): React.JSX.Element;
 export {};

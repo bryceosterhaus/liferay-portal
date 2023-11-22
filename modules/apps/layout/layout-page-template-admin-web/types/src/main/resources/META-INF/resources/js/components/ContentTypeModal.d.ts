@@ -3,8 +3,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-/// <reference types="react" />
-
+import React from 'react';
 import {ModalType} from '../constants/modalTypes';
 import {MappingType} from '../types/MappingTypes';
 interface Props {
@@ -34,5 +33,5 @@ export default function ContentTypeModal({
 	title,
 	type,
 	warningMessage,
-}: Props): JSX.Element;
+}: Props): React.JSX.Element;
 export {};

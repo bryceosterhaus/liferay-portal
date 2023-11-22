@@ -5,7 +5,11 @@
 
 import React from 'react';
 import './DefaultPage.scss';
-declare const DefaultPage: React.FC<IProps>;
+declare const DefaultPage: React.FC<
+	{
+		children?: React.ReactNode | undefined;
+	} & IProps
+>;
 export default DefaultPage;
 interface IProps {
 	dataEngineModule: string;

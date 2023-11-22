@@ -3,10 +3,9 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-/// <reference types="react" />
-
 import {Observer} from '@clayui/modal/lib/types';
 import {MultiSelectItem} from '@liferay/object-js-components-web';
+import React from 'react';
 import './ModalAddFilter.scss';
 interface ModalAddFilterProps {
 	aggregationFilter?: boolean;
@@ -89,5 +88,5 @@ export declare function ModalAddFilter({
 	onSave,
 	validate,
 	workflowStatuses,
-}: ModalAddFilterProps): JSX.Element;
+}: ModalAddFilterProps): React.JSX.Element;
 export {};

@@ -15,5 +15,5 @@ export declare function ModalAddObjectFolder({
 	handleOnClose,
 	setObjectFolders,
 	setSelectedObjectFolder,
-}: ModalAddObjectFolderProps): JSX.Element;
+}: ModalAddObjectFolderProps): React.JSX.Element;
 export {};

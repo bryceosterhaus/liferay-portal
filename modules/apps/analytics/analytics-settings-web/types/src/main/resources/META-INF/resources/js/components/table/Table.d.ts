@@ -3,8 +3,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-/// <reference types="react" />
-
+import React from 'react';
 import {TEmptyState} from './StateRenderer';
 import {TColumn, TFormattedItems, TItem, TTableRequestParams} from './types';
 export interface ITableProps<TRawItem> {
@@ -28,8 +27,8 @@ export declare function Table<TRawItem>({
 	onItemsChange,
 	requestFn,
 	showCheckbox,
-}: ITableProps<TRawItem>): JSX.Element;
+}: ITableProps<TRawItem>): React.JSX.Element;
 declare function ComposedTable<TRawItem>(
 	props: ITableProps<TRawItem>
-): JSX.Element;
+): React.JSX.Element;
 export default ComposedTable;

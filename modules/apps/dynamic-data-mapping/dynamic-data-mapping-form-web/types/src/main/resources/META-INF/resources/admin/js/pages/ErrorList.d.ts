@@ -4,7 +4,11 @@
  */
 
 import React from 'react';
-declare const ErrorList: React.FC<IProps>;
+declare const ErrorList: React.FC<
+	{
+		children?: React.ReactNode | undefined;
+	} & IProps
+>;
 export default ErrorList;
 interface IProps {
 	errorMessages?: string[];

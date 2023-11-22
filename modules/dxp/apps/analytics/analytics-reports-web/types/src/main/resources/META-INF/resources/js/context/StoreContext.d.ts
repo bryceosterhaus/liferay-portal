@@ -23,5 +23,5 @@ interface Props {
 export declare function StoreContextProvider({
 	children,
 	value,
-}: Props): JSX.Element;
+}: Props): React.JSX.Element;
 export {};

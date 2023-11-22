@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-import {ElementType} from 'react';
+import React, {ElementType} from 'react';
 import '../../EditObjectFieldContent.scss';
 interface AggregationFilters {
 	defaultSort?: boolean;
@@ -46,5 +46,5 @@ export declare function AggregationFilterContainer({
 	setValues,
 	values,
 	workflowStatuses,
-}: AggregationFilterProps): JSX.Element;
+}: AggregationFilterProps): React.JSX.Element;
 export {};

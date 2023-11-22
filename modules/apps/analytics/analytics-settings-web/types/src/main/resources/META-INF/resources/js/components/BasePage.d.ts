@@ -8,8 +8,16 @@ interface IBasePageProps extends React.HTMLAttributes<HTMLElement> {
 	description?: string;
 	title: string;
 }
-declare const BasePage: React.FC<IBasePageProps> & {
+declare const BasePage: React.FC<
+	{
+		children?: React.ReactNode | undefined;
+	} & IBasePageProps
+> & {
 	Footer: typeof BasePageFooter;
 };
-declare const BasePageFooter: React.FC<React.HTMLAttributes<HTMLElement>>;
+declare const BasePageFooter: React.FC<
+	{
+		children?: React.ReactNode | undefined;
+	} & React.HTMLAttributes<HTMLElement>
+>;
 export default BasePage;

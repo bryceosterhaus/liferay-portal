@@ -38,5 +38,5 @@ export declare function DatePicker({
 	required,
 	type,
 	value,
-}: DatePickerProps): JSX.Element;
+}: DatePickerProps): React.JSX.Element;
 export {};

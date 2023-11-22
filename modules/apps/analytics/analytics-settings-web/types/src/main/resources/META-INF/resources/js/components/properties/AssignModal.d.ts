@@ -21,5 +21,9 @@ interface IAssignModalWrapperProps {
 	}) => void;
 	property: TProperty | null;
 }
-declare const AssignModalWrapper: React.FC<IAssignModalWrapperProps>;
+declare const AssignModalWrapper: React.FC<
+	{
+		children?: React.ReactNode | undefined;
+	} & IAssignModalWrapperProps
+>;
 export default AssignModalWrapper;

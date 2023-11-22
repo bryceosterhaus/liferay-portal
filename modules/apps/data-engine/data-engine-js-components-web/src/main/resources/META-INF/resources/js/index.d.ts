@@ -60,7 +60,7 @@ export const FormReport: React.FC<{
 	portletNamespace: string;
 }>;
 
-export const FormView: React.FC;
+export const FormView: React.FC<any>;
 
 export const PartialResults: React.FC<{
 	dataEngineModule: string;

@@ -10,5 +10,5 @@ interface EmptyObjectFolderCardProps {
 }
 export default function EmptyObjectFolderCard({
 	setShowModal,
-}: EmptyObjectFolderCardProps): JSX.Element;
+}: EmptyObjectFolderCardProps): React.JSX.Element;
 export {};

@@ -34,6 +34,10 @@ interface ITableContextProps {
 	initialKeywords?: string;
 	initialPagination?: TPagination;
 }
-declare const TableContext: React.FC<ITableContextProps>;
+declare const TableContext: React.FC<
+	{
+		children?: React.ReactNode | undefined;
+	} & ITableContextProps
+>;
 export {useData, useDispatch};
 export default TableContext;

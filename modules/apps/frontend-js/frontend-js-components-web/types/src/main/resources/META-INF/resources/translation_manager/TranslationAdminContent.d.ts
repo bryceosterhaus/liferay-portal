@@ -41,5 +41,5 @@ export default function TranslationAdminContent({
 	onDone,
 	onRemoveLocale,
 	translations,
-}: IProps): JSX.Element;
+}: IProps): React.JSX.Element;
 export {};

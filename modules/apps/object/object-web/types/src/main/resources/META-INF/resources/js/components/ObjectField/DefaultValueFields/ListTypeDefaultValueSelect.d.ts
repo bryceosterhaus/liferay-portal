@@ -5,5 +5,9 @@
 
 import React from 'react';
 import {InputAsValueFieldComponentProps} from '../Tabs/Advanced/DefaultValueContainer';
-declare const ListTypeDefaultValueSelect: React.FC<InputAsValueFieldComponentProps>;
+declare const ListTypeDefaultValueSelect: React.FC<
+	{
+		children?: React.ReactNode | undefined;
+	} & InputAsValueFieldComponentProps
+>;
 export default ListTypeDefaultValueSelect;

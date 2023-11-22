@@ -8,7 +8,7 @@ import {Node} from './TreeviewContext';
 export default function NodeListItem({
 	NodeComponent,
 	node,
-}: IProps): JSX.Element;
+}: IProps): React.JSX.Element;
 interface IProps {
 	NodeComponent: React.ComponentType<{
 		node: Node;

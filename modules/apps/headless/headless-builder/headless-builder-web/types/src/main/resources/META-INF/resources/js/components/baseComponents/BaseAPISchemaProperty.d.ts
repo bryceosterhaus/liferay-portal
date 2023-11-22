@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-import {Dispatch, SetStateAction} from 'react';
+import React, {Dispatch, SetStateAction} from 'react';
 interface BaseAPISchemaPropertyProps {
 	added: boolean;
 	objectDefinitionName: string;
@@ -17,5 +17,5 @@ export default function BaseAPISchemaProperty({
 	objectField,
 	objectRelationshipName,
 	setSchemaUIData,
-}: BaseAPISchemaPropertyProps): JSX.Element;
+}: BaseAPISchemaPropertyProps): React.JSX.Element;
 export {};

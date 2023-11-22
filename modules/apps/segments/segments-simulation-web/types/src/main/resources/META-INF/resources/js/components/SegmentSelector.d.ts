@@ -16,5 +16,5 @@ declare function SegmentSelector({
 	onSelectSegmentEntry,
 	segmentsEntries,
 	selectedSegmentEntry,
-}: Props): JSX.Element;
+}: Props): React.JSX.Element;
 export default SegmentSelector;

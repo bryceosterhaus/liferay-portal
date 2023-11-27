@@ -7,10 +7,12 @@ import {ClayButtonWithIcon} from '@clayui/button';
 import {fetch, openToast} from 'frontend-js-web';
 import React, {useContext} from 'react';
 
-const {SidebarContext} = require('../Sidebar');
+// @ts-ignore
+
+import {SidebarContext} from '../Sidebar';
 
 const Subscribe = ({disabled, icon, label, url}: IProps) => {
-	const {fetchData} = useContext(SidebarContext);
+	const {fetchData}: any = useContext(SidebarContext);
 
 	const handleSubscribe = async (): Promise<void> => {
 		if (disabled) {

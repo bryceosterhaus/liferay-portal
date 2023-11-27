@@ -51,7 +51,7 @@ export function useForm(): ({
 
 export function useFormState<T extends {[key: string]: unknown}>(): T;
 
-export const FormReport: React.FC<{
+export declare const FormReport: React.FC<{
 	data?: string;
 	dataEngineModule: string;
 	displayChartAsTable: boolean;
@@ -60,9 +60,9 @@ export const FormReport: React.FC<{
 	portletNamespace: string;
 }>;
 
-export const FormView: React.FC;
+export declare const FormView: React.FC;
 
-export const PartialResults: React.FC<{
+export declare const PartialResults: React.FC<{
 	dataEngineModule: string;
 	displayChartAsTable: boolean;
 	reportDataURL: string;

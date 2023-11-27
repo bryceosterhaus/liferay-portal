@@ -21,7 +21,7 @@ export function updateIn<T extends Record<string, any> | any[]>(
 			? ([...nextObjectOrArray] as T)
 			: ({...nextObjectOrArray} as T);
 
-		nextObjectOrArray[nextKey] = updateIn<T[keyof T]>(
+		nextObjectOrArray[nextKey] = updateIn<any>(
 			(nextObjectOrArray[nextKey] || {}) as T[keyof T],
 			keyPath.slice(1),
 			updater,

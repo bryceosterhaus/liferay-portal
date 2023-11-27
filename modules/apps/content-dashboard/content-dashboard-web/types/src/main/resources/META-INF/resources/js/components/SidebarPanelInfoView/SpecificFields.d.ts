@@ -8,7 +8,7 @@ declare const SpecificFields: ({
 	fields,
 	languageTag,
 }: IProps) => (string | JSX.Element)[] | null;
-declare type SpecificItemTypes = 'Date' | 'String' | 'URL';
+type SpecificItemTypes = 'Date' | 'String' | 'URL';
 interface SpecificField {
 	help?: string;
 	title: string;

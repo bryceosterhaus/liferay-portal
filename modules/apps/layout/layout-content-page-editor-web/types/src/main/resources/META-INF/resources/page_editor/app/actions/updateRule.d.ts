@@ -4,7 +4,7 @@
  */
 
 import {LayoutData} from '../../types/layout_data/LayoutData';
-declare type Props = {
+type Props = {
 	layoutData: LayoutData;
 	ruleId: string;
 };

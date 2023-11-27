@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-export declare type Entries<T> = {
+export type Entries<T> = {
 	[K in keyof T]: [K, T[K]];
 }[keyof T][];
-export declare type Fragment = {
+export type Fragment = {
 	cached: boolean;
 	fragmentCollectionURL: string;
 	fromMaster: boolean;
@@ -31,7 +31,7 @@ export declare const FRAGMENT_FILTERS: {
 	readonly status: readonly ['cached', 'notCached'];
 	readonly type: readonly ['fragment', 'widget'];
 };
-export declare type FragmentFilter = {
+export type FragmentFilter = {
 	[key in keyof typeof FRAGMENT_FILTERS]:
 		| typeof FRAGMENT_FILTERS[key][number]
 		| null;

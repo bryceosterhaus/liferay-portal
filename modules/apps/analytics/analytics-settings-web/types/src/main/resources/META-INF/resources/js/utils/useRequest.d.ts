@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-declare type TRequestFn = (params?: any) => Promise<any>;
-declare type TResult<TData> = {
+type TRequestFn = (params?: any) => Promise<any>;
+type TResult<TData> = {
 	data: TData | null;
 	error: boolean;
 	loading: boolean;

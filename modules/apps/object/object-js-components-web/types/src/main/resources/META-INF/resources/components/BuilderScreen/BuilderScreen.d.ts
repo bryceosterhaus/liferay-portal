@@ -24,11 +24,11 @@ export declare function BuilderScreen({
 	secondColumnHeader,
 	thirdColumnHeader,
 }: IProps): JSX.Element;
-declare type TLabelValueObject = {
+type TLabelValueObject = {
 	label: string;
 	value: string;
 };
-export declare type TBuilderScreenItem = {
+export type TBuilderScreenItem = {
 	defaultSort?: boolean;
 	disableEdit?: boolean;
 	externalReferenceCode?: string;

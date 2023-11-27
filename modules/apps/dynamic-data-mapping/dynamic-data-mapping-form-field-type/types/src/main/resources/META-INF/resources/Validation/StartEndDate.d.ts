@@ -28,4 +28,4 @@ interface IOptions {
 	name: 'customDate' | 'responseDate';
 	value: 'customDate' | 'responseDate';
 }
-declare type EventType = 'startsFrom' | 'endsOn';
+type EventType = 'startsFrom' | 'endsOn';

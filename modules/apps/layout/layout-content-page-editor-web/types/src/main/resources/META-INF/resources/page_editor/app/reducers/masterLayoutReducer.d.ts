@@ -5,7 +5,7 @@
 
 import {LayoutData} from '../../types/layout_data/LayoutData';
 import changeMasterLayout from '../actions/changeMasterLayout';
-declare type State =
+type State =
 	| {
 			masterLayoutData: null;
 			masterLayoutPlid: '0';

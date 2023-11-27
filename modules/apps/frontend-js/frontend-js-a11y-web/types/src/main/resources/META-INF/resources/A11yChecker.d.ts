@@ -4,12 +4,12 @@
  */
 
 import {AxeResults, RunOptions} from 'axe-core';
-declare type Task<T> = {
+type Task<T> = {
 	callback: Function;
 	id: number;
 	target: T;
 };
-declare type Selector<T> = (
+type Selector<T> = (
 	this: void,
 	value: T,
 	index: number,
@@ -83,7 +83,7 @@ export declare class Scheduler<T> {
  * Attributes are the attributes of a node. The array is considered a
  * conditional `or`, the same for the values of an attribute.
  */
-declare type Attributes = Record<string, Array<string>>;
+type Attributes = Record<string, Array<string>>;
 export interface A11yCheckerOptions {
 
 	/**

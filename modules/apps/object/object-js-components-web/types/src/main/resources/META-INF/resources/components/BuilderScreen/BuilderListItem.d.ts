@@ -19,7 +19,7 @@ interface IProps {
 	secondColumnValue?: string;
 	thirdColumnValues?: TThirdColumnValues[] | string;
 }
-declare type TThirdColumnValues = {
+type TThirdColumnValues = {
 	label: string;
 	value: string;
 };

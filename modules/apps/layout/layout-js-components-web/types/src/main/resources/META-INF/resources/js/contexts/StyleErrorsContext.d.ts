@@ -8,7 +8,7 @@ interface Error {
 	error: string;
 	value: string;
 }
-declare type State = Record<string, Record<string, Error>>;
+type State = Record<string, Record<string, Error>>;
 interface Props {
 	children: ReactNode;
 	initialState?: State;

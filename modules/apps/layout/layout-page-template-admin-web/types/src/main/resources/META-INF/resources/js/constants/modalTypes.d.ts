@@ -7,4 +7,4 @@ export declare const MODAL_TYPES: {
 	readonly create: 'create';
 	readonly edit: 'edit';
 };
-export declare type ModalType = typeof MODAL_TYPES[keyof typeof MODAL_TYPES];
+export type ModalType = typeof MODAL_TYPES[keyof typeof MODAL_TYPES];

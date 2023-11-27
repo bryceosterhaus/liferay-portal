@@ -6,7 +6,7 @@
 import {Dispatch, SetStateAction} from 'react';
 import {Action} from './Action';
 import {Condition} from './Condition';
-declare type RuleBuilderActionProps = {
+type RuleBuilderActionProps = {
 	actions: Action[];
 	layoutDataItems: {
 		label: string;
@@ -19,8 +19,8 @@ export declare function RuleBuilderActionSection({
 	layoutDataItems,
 	setActions,
 }: RuleBuilderActionProps): JSX.Element;
-export declare type ConditionType = 'all' | 'any';
-declare type RuleBuilderConditionProps = {
+export type ConditionType = 'all' | 'any';
+type RuleBuilderConditionProps = {
 	conditionType: ConditionType;
 	conditions: Condition[];
 	setConditionType: Dispatch<SetStateAction<ConditionType>>;

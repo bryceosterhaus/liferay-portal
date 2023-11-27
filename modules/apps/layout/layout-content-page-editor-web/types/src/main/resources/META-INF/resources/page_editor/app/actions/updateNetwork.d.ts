@@ -7,8 +7,8 @@ import type {
 	SERVICE_NETWORK_STATUS_TYPES,
 	ServiceNetworkStatusType,
 } from '../config/constants/serviceNetworkStatusTypes';
-declare type ErrorStatusType = typeof SERVICE_NETWORK_STATUS_TYPES['error'];
-export declare type NetworkStatus =
+type ErrorStatusType = typeof SERVICE_NETWORK_STATUS_TYPES['error'];
+export type NetworkStatus =
 	| {
 			error: string;
 			status: ErrorStatusType;

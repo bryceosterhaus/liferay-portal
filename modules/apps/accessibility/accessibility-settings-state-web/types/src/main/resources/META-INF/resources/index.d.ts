@@ -9,43 +9,24 @@ export declare const CONSTANTS: {
 	readonly ACCESSIBILITY_SETTING_REDUCED_MOTION: 'ACCESSIBILITY_SETTING_REDUCED_MOTION';
 	readonly ACCESSIBILITY_SETTING_UNDERLINED_LINKS: 'ACCESSIBILITY_SETTING_UNDERLINED_LINKS';
 };
-declare type KEYS = keyof typeof CONSTANTS;
-export declare const accessibilityMenuAtom: {
-	readonly 'default': {
-		readonly ACCESSIBILITY_SETTING_EXPANDED_TEXT: {
-			readonly className: string;
-			readonly description: string;
-			readonly key: KEYS;
-			readonly label: string;
-			readonly updating?: boolean | undefined;
-			readonly value: boolean;
-		};
-		readonly ACCESSIBILITY_SETTING_INCREASED_TEXT_SPACING: {
-			readonly className: string;
-			readonly description: string;
-			readonly key: KEYS;
-			readonly label: string;
-			readonly updating?: boolean | undefined;
-			readonly value: boolean;
-		};
-		readonly ACCESSIBILITY_SETTING_REDUCED_MOTION: {
-			readonly className: string;
-			readonly description: string;
-			readonly key: KEYS;
-			readonly label: string;
-			readonly updating?: boolean | undefined;
-			readonly value: boolean;
-		};
-		readonly ACCESSIBILITY_SETTING_UNDERLINED_LINKS: {
-			readonly className: string;
-			readonly description: string;
-			readonly key: KEYS;
-			readonly label: string;
-			readonly updating?: boolean | undefined;
-			readonly value: boolean;
-		};
-	};
-	readonly 'key': string;
-	readonly 'Liferay.State.ATOM': true;
+type KEYS = keyof typeof CONSTANTS;
+type AccessibilityMenuSetting = {
+	className: string;
+	description: string;
+	key: KEYS;
+	label: string;
+	updating?: boolean;
+	value: boolean;
 };
+export declare const accessibilityMenuAtom: import('@liferay/frontend-js-state-web').Immutable<{
+	'default': Record<
+		| 'ACCESSIBILITY_SETTING_EXPANDED_TEXT'
+		| 'ACCESSIBILITY_SETTING_INCREASED_TEXT_SPACING'
+		| 'ACCESSIBILITY_SETTING_REDUCED_MOTION'
+		| 'ACCESSIBILITY_SETTING_UNDERLINED_LINKS',
+		AccessibilityMenuSetting
+	>;
+	'key': string;
+	'Liferay.State.ATOM': true;
+}>;
 export {};

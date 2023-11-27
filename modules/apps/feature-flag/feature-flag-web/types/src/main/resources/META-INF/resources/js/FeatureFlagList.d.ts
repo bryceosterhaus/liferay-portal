@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-export declare type TFeatureFlags = {
+export type TFeatureFlags = {
 	companyId: number;
 	dependenciesFulfilled: boolean;
 	dependencyKeys: Array<string>;

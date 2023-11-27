@@ -11,4 +11,4 @@ export declare const DRAG_OVER_POSITIONS_LABELS: Record<
 	DragOverPosition,
 	string
 >;
-export declare type DragOverPosition = typeof DRAG_OVER_POSITIONS[keyof typeof DRAG_OVER_POSITIONS];
+export type DragOverPosition = typeof DRAG_OVER_POSITIONS[keyof typeof DRAG_OVER_POSITIONS];

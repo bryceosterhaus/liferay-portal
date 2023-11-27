@@ -4,11 +4,11 @@
  */
 
 import React from 'react';
-declare type Props = {
+type Props = {
 	children: React.ReactElement;
 	fallback: React.ReactElement;
 };
-declare type State = {
+type State = {
 	hasError: boolean;
 };
 export declare class ErrorBoundary extends React.Component<Props, State> {

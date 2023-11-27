@@ -5,11 +5,11 @@
 
 import {Option} from '@clayui/core';
 import {Key} from 'react';
-declare type Option = {
+type Option = {
 	label: string;
 	value: string;
 };
-declare type Props = {
+type Props = {
 	portletNamespace: string;
 	searchIn: Key;
 	searchInOptions: Option[];

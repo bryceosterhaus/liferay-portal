@@ -7,12 +7,12 @@
 
 import './Occurrence.scss';
 import type {Violations} from '../hooks/useA11y';
-declare type Params = {
+type Params = {
 	name: string;
 	ruleId: string;
 	target: string;
 };
-declare type OccurrenceProps = {
+type OccurrenceProps = {
 	params?: Params;
 	previous?: (state: Omit<Params, 'target'>) => void;
 	violations: Omit<Violations, 'iframes'>;

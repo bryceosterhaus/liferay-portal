@@ -9,12 +9,12 @@ declare const SELECTOR = 'Liferay.State.SELECTOR';
 interface Getter {
 	<T>(atomOrSelector: Atom<T> | Selector<T>): Immutable<T>;
 }
-export declare type Atom<T> = Immutable<{
+export type Atom<T> = Immutable<{
 	[ATOM]: true;
 	default: T;
 	key: string;
 }>;
-export declare type Selector<T> = Immutable<{
+export type Selector<T> = Immutable<{
 	[SELECTOR]: true;
 	deriveValue: (get: Getter) => T;
 	key: string;
@@ -22,16 +22,16 @@ export declare type Selector<T> = Immutable<{
 declare const State: {
 	__internal__: {
 		debug: {
-			readonly atoms: {
-				readonly 'default': Readonly<unknown>;
-				readonly 'key': string;
-				readonly 'Liferay.State.ATOM': true;
-			}[];
-			readonly selectors: {
-				readonly 'deriveValue': (get: Getter) => unknown;
-				readonly 'key': string;
-				readonly 'Liferay.State.SELECTOR': true;
-			}[];
+			readonly atoms: Immutable<{
+				'default': unknown;
+				'key': string;
+				'Liferay.State.ATOM': true;
+			}>[];
+			readonly selectors: Immutable<{
+				'deriveValue': (get: Getter) => unknown;
+				'key': string;
+				'Liferay.State.SELECTOR': true;
+			}>[];
 		};
 		reset(): void;
 	};
@@ -69,11 +69,11 @@ declare const State: {
 	): void;
 	_notify<T>(callback: (value: T) => void, value: T): void;
 	_readSelector<T_1>(
-		selector: {
-			readonly 'deriveValue': (get: Getter) => T_1;
-			readonly 'key': string;
-			readonly 'Liferay.State.SELECTOR': true;
-		},
+		selector: Immutable<{
+			'deriveValue': (get: Getter) => T_1;
+			'key': string;
+			'Liferay.State.SELECTOR': true;
+		}>,
 		seen: Set<Selector<unknown>>
 	): Immutable<T_1>;
 
@@ -94,11 +94,11 @@ declare const State: {
 	atom<T_2>(
 		key: string,
 		value: T_2
-	): {
-		readonly 'default': Immutable<T_2>;
-		readonly 'key': string;
-		readonly 'Liferay.State.ATOM': true;
-	};
+	): Immutable<{
+		'default': T_2;
+		'key': string;
+		'Liferay.State.ATOM': true;
+	}>;
 
 	/**
 	 * Read the current value associated with the provided atom or selector.
@@ -107,35 +107,39 @@ declare const State: {
 	 */
 	read<T_3>(
 		atomOrSelector:
-			| {
-					readonly 'default': Immutable<T_3>;
-					readonly 'key': string;
-					readonly 'Liferay.State.ATOM': true;
-			  }
-			| {
-					readonly 'deriveValue': (get: Getter) => T_3;
-					readonly 'key': string;
-					readonly 'Liferay.State.SELECTOR': true;
-			  }
+			| Immutable<{
+					'default': T_3;
+					'key': string;
+					'Liferay.State.ATOM': true;
+			  }>
+			| Immutable<{
+					'deriveValue': (get: Getter) => T_3;
+					'key': string;
+					'Liferay.State.SELECTOR': true;
+			  }>
 	): Immutable<T_3>;
 
 	/**
 	 * Read the current value associated with the provided atom.
 	 */
-	readAtom<T_4>(atom: {
-		readonly 'default': Immutable<T_4>;
-		readonly 'key': string;
-		readonly 'Liferay.State.ATOM': true;
-	}): Immutable<T_4>;
+	readAtom<T_4>(
+		atom: Immutable<{
+			'default': T_4;
+			'key': string;
+			'Liferay.State.ATOM': true;
+		}>
+	): Immutable<T_4>;
 
 	/**
 	 * Read the current value associated with the provided selector.
 	 */
-	readSelector<T_5>(selector: {
-		readonly 'deriveValue': (get: Getter) => T_5;
-		readonly 'key': string;
-		readonly 'Liferay.State.SELECTOR': true;
-	}): Immutable<T_5>;
+	readSelector<T_5>(
+		selector: Immutable<{
+			'deriveValue': (get: Getter) => T_5;
+			'key': string;
+			'Liferay.State.SELECTOR': true;
+		}>
+	): Immutable<T_5>;
 
 	/**
 	 * Register a shared unit of derived state called a "selector", identified
@@ -159,11 +163,11 @@ declare const State: {
 	selector<T_6>(
 		key: string,
 		deriveValue: (get: Getter) => T_6
-	): {
+	): Immutable<{
 		readonly 'Liferay.State.SELECTOR': true;
 		readonly 'deriveValue': (get: Getter) => T_6;
 		readonly 'key': string;
-	};
+	}>;
 
 	/**
 	 * Subscribe to be notified of changes to an atom or selector.
@@ -178,16 +182,16 @@ declare const State: {
 	 */
 	subscribe<T_7 extends unknown>(
 		atomOrSelector:
-			| {
-					readonly 'default': Immutable<T_7>;
-					readonly 'key': string;
-					readonly 'Liferay.State.ATOM': true;
-			  }
-			| {
-					readonly 'deriveValue': (get: Getter) => T_7;
-					readonly 'key': string;
-					readonly 'Liferay.State.SELECTOR': true;
-			  },
+			| Immutable<{
+					'default': T_7;
+					'key': string;
+					'Liferay.State.ATOM': true;
+			  }>
+			| Immutable<{
+					'deriveValue': (get: Getter) => T_7;
+					'key': string;
+					'Liferay.State.SELECTOR': true;
+			  }>,
 		callback: (value: Immutable<T_7>) => void
 	): {
 		dispose: () => void;
@@ -205,16 +209,16 @@ declare const State: {
 	 */
 	write<T_8>(
 		atomOrSelector:
-			| {
-					readonly 'default': Immutable<T_8>;
-					readonly 'key': string;
-					readonly 'Liferay.State.ATOM': true;
-			  }
-			| {
-					readonly 'deriveValue': (get: Getter) => T_8;
-					readonly 'key': string;
-					readonly 'Liferay.State.SELECTOR': true;
-			  },
+			| Immutable<{
+					'default': T_8;
+					'key': string;
+					'Liferay.State.ATOM': true;
+			  }>
+			| Immutable<{
+					'deriveValue': (get: Getter) => T_8;
+					'key': string;
+					'Liferay.State.SELECTOR': true;
+			  }>,
 		value: T_8
 	): void;
 
@@ -224,11 +228,11 @@ declare const State: {
 	 * it).
 	 */
 	writeAtom<T_9>(
-		atom: {
-			readonly 'default': Immutable<T_9>;
-			readonly 'key': string;
-			readonly 'Liferay.State.ATOM': true;
-		},
+		atom: Immutable<{
+			'default': T_9;
+			'key': string;
+			'Liferay.State.ATOM': true;
+		}>,
 		value: T_9
 	): void;
 };

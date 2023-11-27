@@ -12,7 +12,7 @@ import updateNetwork from '../actions/updateNetwork';
 /**
  * Add a rule
  */
-declare type AddRuleProps = {
+type AddRuleProps = {
 	actions: Action[];
 	conditionType: ConditionType;
 	conditions: Condition[];
@@ -35,7 +35,7 @@ declare function addRule({
 /**
  * Delete a rule
  */
-declare type DeleteRuleProps = {
+type DeleteRuleProps = {
 	onNetworkStatus: (action: ReturnType<typeof updateNetwork>) => void;
 	ruleId: string;
 	segmentsExperienceId: string;
@@ -71,7 +71,7 @@ declare function getUsers(): Promise<
 /**
  * Update a rule with new name, actions and conditions
  */
-declare type UpdateRuleProps = {
+type UpdateRuleProps = {
 	actions: Action[];
 	conditionType: ConditionType;
 	conditions: Condition[];

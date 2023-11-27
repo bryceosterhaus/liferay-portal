@@ -10,7 +10,7 @@ interface UseObjectDetailsFormProps {
 	initialValues: Partial<ObjectDefinition>;
 	onSubmit: (field: ObjectDefinition) => void;
 }
-export declare type ObjectDetailsErrors = FormError<Partial<ObjectDefinition>>;
+export type ObjectDetailsErrors = FormError<Partial<ObjectDefinition>>;
 export declare function useObjectDetailsForm({
 	initialValues,
 	onSubmit,

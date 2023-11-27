@@ -3,12 +3,12 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-export declare type FetcherReturn<T> = Promise<
+export type FetcherReturn<T> = Promise<
 	T & {
 		error?: string;
 	}
 >;
-export declare type CacheData<T> = {
+export type CacheData<T> = {
 	data?: T;
 	key: string;
 	loadPromise?: FetcherReturn<T>;
@@ -24,7 +24,7 @@ export declare const CACHE_KEYS: {
 	readonly roles: 'roles';
 	readonly users: 'users';
 };
-export declare type CacheKey = typeof CACHE_KEYS[keyof typeof CACHE_KEYS];
+export type CacheKey = typeof CACHE_KEYS[keyof typeof CACHE_KEYS];
 export declare const CACHE_STATUS: {
 	readonly loading: 'loading';
 	readonly saved: 'saved';

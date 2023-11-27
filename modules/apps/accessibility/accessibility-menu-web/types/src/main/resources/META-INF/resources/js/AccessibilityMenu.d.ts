@@ -7,8 +7,8 @@
 
 import {CONSTANTS} from '@liferay/accessibility-settings-state-web';
 import PropTypes from 'prop-types';
-declare type KEYS = keyof typeof CONSTANTS;
-declare type Setting = {
+type KEYS = keyof typeof CONSTANTS;
+type Setting = {
 	className: string;
 	defaultValue: boolean;
 	description: string;
@@ -16,7 +16,7 @@ declare type Setting = {
 	label: string;
 	sessionClicksValue: boolean;
 };
-declare type Props = {
+type Props = {
 	settings: Array<Setting>;
 };
 declare const AccessibilityMenu: {

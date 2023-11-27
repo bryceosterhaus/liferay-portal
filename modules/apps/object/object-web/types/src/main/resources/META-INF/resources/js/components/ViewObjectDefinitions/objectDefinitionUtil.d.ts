@@ -6,14 +6,14 @@
 import {SetStateAction} from 'react';
 import {DropDownItems} from '../ModelBuilder/types';
 import {DeletedObjectDefinition} from './ViewObjectDefinitions';
-declare type DeleteObjectDefinitionProps = {
+type DeleteObjectDefinitionProps = {
 	baseResourceURL: string;
 	handleShowDeleteObjectDefinitionModal: () => void;
 	objectDefinitionId: number;
 	objectDefinitionName: string;
 	setDeletedObjectDefinition: (value: DeletedObjectDefinition) => void;
 };
-declare type ObjectDefinitionNodeActionsProps = {
+type ObjectDefinitionNodeActionsProps = {
 	baseResourceURL: string;
 	handleShowDeleteObjectDefinitionModal: () => void;
 	handleShowEditObjectDefinitionExternalReferenceCodeModal: () => void;
@@ -30,11 +30,11 @@ declare type ObjectDefinitionNodeActionsProps = {
 		label_i18n: string;
 	};
 };
-declare type ObjectFolderAction = {
+type ObjectFolderAction = {
 	href: string;
 	method: string;
 };
-declare type ObjectFolderActions = {
+type ObjectFolderActions = {
 	delete?: ObjectFolderAction;
 	get?: ObjectFolderAction;
 	permissions?: ObjectFolderAction;

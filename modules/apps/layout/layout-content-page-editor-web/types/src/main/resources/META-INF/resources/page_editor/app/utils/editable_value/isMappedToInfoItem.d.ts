@@ -19,7 +19,7 @@ interface MappedWithClassPK extends BaseMapped {
 interface MappedWithERC extends BaseMapped {
 	externalReferenceCode: string;
 }
-declare type MappedEditable = MappedWithClassPK | MappedWithERC;
+type MappedEditable = MappedWithClassPK | MappedWithERC;
 export default function isMappedToInfoItem(
 	editable: Editable | null
 ): editable is MappedEditable;

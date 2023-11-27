@@ -31,9 +31,9 @@ interface ListTypeEntry {
 	name: string;
 	name_i18n: LocalizedValue<string>;
 }
-declare type NotificationTemplateType = 'email' | 'userNotification';
-declare type RecipientType = 'role' | 'term' | 'user';
-declare type Recipient = {
+type NotificationTemplateType = 'email' | 'userNotification';
+type RecipientType = 'role' | 'term' | 'user';
+type Recipient = {
 	bcc: string;
 	cc: string;
 	from: string;
@@ -77,7 +77,7 @@ interface ObjectFolder {
 	name: string;
 	objectFolderItems: ObjectFolderItem[];
 }
-declare type ObjectRelationshipType = 'manyToMany' | 'oneToMany' | 'oneToOne';
+type ObjectRelationshipType = 'manyToMany' | 'oneToMany' | 'oneToOne';
 interface ObjectRelationship {
 	deletionType: string;
 	edge: boolean;

@@ -7,16 +7,16 @@ import React from 'react';
 export declare enum TYPES {
 	CHANGE_PANEL_EXPANDED = 'CHANGE_PANEL_EXPANDED',
 }
-declare type TState = {
+type TState = {
 	expanded: boolean;
 };
-declare type TAction = {
+type TAction = {
 	payload: {
 		expanded: boolean;
 	};
 	type: TYPES.CHANGE_PANEL_EXPANDED;
 };
-declare type TDispatch = React.Dispatch<
+type TDispatch = React.Dispatch<
 	React.ReducerAction<React.Reducer<TState, TAction>>
 >;
 declare const initialState: {

@@ -6,7 +6,7 @@
 import './PanelNavigator.scss';
 import React from 'react';
 import type {ImpactValue} from 'axe-core';
-declare type PanelNavigatorProps = {
+type PanelNavigatorProps = {
 	helpUrl: string;
 	impact?: ImpactValue;
 	onBack: (event: React.MouseEvent<HTMLButtonElement>) => void;

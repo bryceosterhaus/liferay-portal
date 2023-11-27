@@ -4,7 +4,7 @@
  */
 
 import {TOGGLE_PERMISSION} from './types';
-export declare type PermissionKey =
+export type PermissionKey =
 	| 'EDIT_SEGMENTS_ENTRY'
 	| 'LOCKED_SEGMENTS_EXPERIMENT'
 	| 'SWITCH_EDIT_MODE'

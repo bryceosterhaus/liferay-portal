@@ -9,4 +9,4 @@ export declare const LAYOUT_TYPES: {
 	readonly master: '3';
 	readonly pageTemplate: '0';
 };
-export declare type LayoutType = typeof LAYOUT_TYPES[keyof typeof LAYOUT_TYPES];
+export type LayoutType = typeof LAYOUT_TYPES[keyof typeof LAYOUT_TYPES];

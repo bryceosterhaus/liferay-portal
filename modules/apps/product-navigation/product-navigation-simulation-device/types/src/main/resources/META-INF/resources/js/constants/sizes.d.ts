@@ -7,7 +7,7 @@ export interface ScreenSize {
 	height: number;
 	width: number;
 }
-export declare type Size = {
+export type Size = {
 	cssClass?: string;
 	icon: string;
 	id: string;

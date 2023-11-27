@@ -5,14 +5,14 @@
 
 import type {NodeResult, Result} from 'axe-core';
 import type {A11yCheckerOptions} from '../A11yChecker';
-declare type Target = string;
-declare type RuleId = string;
-declare type IframeId = string;
+type Target = string;
+type RuleId = string;
+type IframeId = string;
 export interface RuleRaw extends Omit<Result, 'nodes'> {
 	nodes: Array<Target>;
 }
-export declare type NodeViolations = Record<RuleId, NodeResult>;
-export declare type Violations = {
+export type NodeViolations = Record<RuleId, NodeResult>;
+export type Violations = {
 	iframes: Record<IframeId, Array<Target>>;
 	nodes: Record<Target, NodeViolations>;
 	rules: Record<RuleId, RuleRaw>;

@@ -7,7 +7,7 @@
 
 import {OBJECT_RELATIONSHIP} from './Constants';
 import {FDSEntryType} from './FDSEntries';
-declare type FDSViewType = {
+type FDSViewType = {
 	[OBJECT_RELATIONSHIP.FDS_ENTRY_FDS_VIEW]: FDSEntryType;
 	defaultItemsPerPage: number;
 	description: string;

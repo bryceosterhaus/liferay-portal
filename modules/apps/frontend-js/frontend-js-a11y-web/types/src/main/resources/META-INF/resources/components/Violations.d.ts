@@ -8,17 +8,17 @@
 import './Violations.scss';
 import {TYPES} from '../hooks/useFilterViolations';
 import type {RuleRaw, Violations} from '../hooks/useA11y';
-declare type TViolationNext = {
+type TViolationNext = {
 	ruleId: string;
 };
-declare type onFilterChange = (
+type onFilterChange = (
 	type: keyof typeof TYPES,
 	payload: {
 		key: keyof RuleRaw;
 		value: string;
 	}
 ) => void;
-declare type ViolationsPanelProps = {
+type ViolationsPanelProps = {
 	filters: Record<keyof RuleRaw, Array<string>>;
 	next?: (payload: TViolationNext) => void;
 	onFilterChange: onFilterChange;

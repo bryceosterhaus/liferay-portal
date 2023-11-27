@@ -34,7 +34,7 @@ export declare enum TYPES {
 	SET_OBJECT_VIEW_AS_DEFAULT = 'SET_OBJECT_VIEW_AS_DEFAULT',
 }
 declare const initialState: TState;
-export declare type TAction =
+export type TAction =
 	| {
 			payload: {
 				creationLanguageId: Liferay.Language.Locale;

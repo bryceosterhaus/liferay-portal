@@ -16,4 +16,4 @@ export declare const EDITABLE_TYPES: {
 	readonly 'rich-text': 'rich-text';
 	readonly 'text': 'text';
 };
-export declare type EditableType = typeof EDITABLE_TYPES[keyof typeof EDITABLE_TYPES];
+export type EditableType = typeof EDITABLE_TYPES[keyof typeof EDITABLE_TYPES];

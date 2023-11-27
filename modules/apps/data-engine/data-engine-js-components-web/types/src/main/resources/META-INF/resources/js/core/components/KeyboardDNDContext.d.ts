@@ -4,8 +4,8 @@
  */
 
 import {ReactNode} from 'react';
-declare type ITargetPosition = 'bottom' | 'middle' | 'top';
-declare type IItemType = 'root' | 'page' | 'row' | 'column' | 'field';
+type ITargetPosition = 'bottom' | 'middle' | 'top';
+type IItemType = 'root' | 'page' | 'row' | 'column' | 'field';
 interface IState {
 	currentTarget: {
 		itemPath: number[];

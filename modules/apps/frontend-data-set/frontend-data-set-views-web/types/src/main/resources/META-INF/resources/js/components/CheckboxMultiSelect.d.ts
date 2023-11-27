@@ -5,13 +5,13 @@
 
 import ClayMultiSelect from '@clayui/multi-select';
 import React from 'react';
-declare type TItem = {
+type TItem = {
 	key?: string;
 	label?: string;
 	value?: string;
 	[propName: string]: any;
 };
-declare type TItems = Array<TItem>;
+type TItems = Array<TItem>;
 interface IProps extends React.ComponentProps<typeof ClayMultiSelect> {
 	items: TItems;
 	onItemsChange: Exclude<

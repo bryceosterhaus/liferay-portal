@@ -7,7 +7,7 @@ import React from 'react';
 interface DefaultRendererOptions {
 	truncate?: boolean;
 }
-declare type DefaultRendererValue =
+type DefaultRendererValue =
 	| string
 	| number
 	| boolean

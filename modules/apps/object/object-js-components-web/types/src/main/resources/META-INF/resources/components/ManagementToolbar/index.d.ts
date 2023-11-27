@@ -7,7 +7,7 @@
 
 import './index.scss';
 import {NotificationTemplate} from '../../utils/api';
-export declare type Entity = NotificationTemplate | ObjectDefinition;
+export type Entity = NotificationTemplate | ObjectDefinition;
 interface ManagementToolbarProps {
 	backURL: string;
 	badgeClassName?: string;

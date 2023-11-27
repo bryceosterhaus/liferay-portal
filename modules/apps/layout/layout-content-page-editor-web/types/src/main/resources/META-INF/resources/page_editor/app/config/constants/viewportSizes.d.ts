@@ -9,4 +9,4 @@ export declare const VIEWPORT_SIZES: {
 	readonly portraitMobile: 'portraitMobile';
 	readonly tablet: 'tablet';
 };
-export declare type ViewportSize = typeof VIEWPORT_SIZES[keyof typeof VIEWPORT_SIZES];
+export type ViewportSize = typeof VIEWPORT_SIZES[keyof typeof VIEWPORT_SIZES];

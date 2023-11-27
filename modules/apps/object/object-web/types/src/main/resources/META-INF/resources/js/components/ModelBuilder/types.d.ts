@@ -15,7 +15,7 @@ declare type TDropDownType =
 	| 'radio'
 	| 'radiogroup'
 	| 'divider';
-export declare type DropDownItems = {
+export type DropDownItems = {
 	active?: boolean;
 	checked?: boolean;
 	disabled?: boolean;
@@ -30,7 +30,7 @@ export declare type DropDownItems = {
 	type?: TDropDownType;
 	value?: string;
 };
-export declare type TAction =
+export type TAction =
 	| {
 			payload: {
 				newObjectDefinition: ObjectDefinition;
@@ -180,7 +180,7 @@ export declare type TAction =
 			};
 			type: TYPES.UPDATE_OBJECT_FIELD_NODE_ROW;
 	  };
-export declare type TState = {
+export type TState = {
 	baseResourceURL: string;
 	editObjectDefinitionURL: string;
 	elements: Elements<ObjectDefinitionNodeData | ObjectRelationshipEdgeData>;
@@ -235,11 +235,11 @@ export interface ObjectRelationshipEdgeData {
 	targetY: number;
 	type: string;
 }
-export declare type nonRelationshipObjectFieldsInfo = {
+export type nonRelationshipObjectFieldsInfo = {
 	label: LocalizedValue<string>;
 	name: string;
 };
-export declare type RightSidebarType =
+export type RightSidebarType =
 	| 'empty'
 	| 'objectFieldDetails'
 	| 'objectDefinitionDetails'

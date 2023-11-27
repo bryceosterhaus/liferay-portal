@@ -21,11 +21,8 @@ interface UseObjectRelationshipFormProps {
 	onSubmit: (relationship: ObjectRelationship) => void;
 	parameterRequired: boolean;
 }
-export declare type ObjectRelationshipType =
-	| 'manyToMany'
-	| 'oneToMany'
-	| 'oneToOne';
-declare type ObjectRelationshipTypeInfo = {
+export type ObjectRelationshipType = 'manyToMany' | 'oneToMany' | 'oneToOne';
+type ObjectRelationshipTypeInfo = {
 	description: string;
 	label: string;
 	objectInputLabel1: string;

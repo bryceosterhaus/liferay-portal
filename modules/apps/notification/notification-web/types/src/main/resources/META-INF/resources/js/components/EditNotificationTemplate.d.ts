@@ -6,7 +6,7 @@
 /// <reference types="react" />
 
 import './EditNotificationTemplate.scss';
-export declare type NotificationTemplateError = {
+export type NotificationTemplateError = {
 	bcc?: string;
 	body?: string;
 	cc?: string;

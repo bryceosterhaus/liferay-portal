@@ -14,4 +14,4 @@ export declare const SERVICE_NETWORK_STATUS_TYPES: {
 	readonly error: 1;
 	readonly savingDraft: 2;
 };
-export declare type ServiceNetworkStatusType = typeof SERVICE_NETWORK_STATUS_TYPES[keyof typeof SERVICE_NETWORK_STATUS_TYPES];
+export type ServiceNetworkStatusType = typeof SERVICE_NETWORK_STATUS_TYPES[keyof typeof SERVICE_NETWORK_STATUS_TYPES];

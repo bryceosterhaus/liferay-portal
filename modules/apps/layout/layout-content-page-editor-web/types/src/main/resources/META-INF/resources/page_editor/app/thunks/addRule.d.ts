@@ -9,7 +9,7 @@ import {ConditionType} from '../../plugins/page_rules/components/RuleBuilderSect
 import {State} from '../../types/State';
 import addRuleAction from '../actions/addRule';
 import updateNetwork from '../actions/updateNetwork';
-declare type Props = {
+type Props = {
 	actions: Action[];
 	conditionType: ConditionType;
 	conditions: Condition[];

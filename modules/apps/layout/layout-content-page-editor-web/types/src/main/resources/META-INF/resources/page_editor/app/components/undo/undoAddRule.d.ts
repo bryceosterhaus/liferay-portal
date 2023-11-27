@@ -4,7 +4,7 @@
  */
 
 import addRule from '../../actions/addRule';
-declare type Props = {
+type Props = {
 	action: ReturnType<typeof addRule>;
 };
 declare function undoAction({

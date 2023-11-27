@@ -12,5 +12,5 @@ interface SelectedFragment extends Fragment {
 interface SelectedIssue extends Issue {
 	type: 'issue';
 }
-export declare type SelectedItem = SelectedFragment | SelectedIssue;
+export type SelectedItem = SelectedFragment | SelectedIssue;
 export {};

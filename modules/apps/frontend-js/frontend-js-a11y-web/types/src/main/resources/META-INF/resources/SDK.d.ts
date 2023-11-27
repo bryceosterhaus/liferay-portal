@@ -4,12 +4,12 @@
  */
 
 declare const PROTOCOL = 'com.liferay.frontend.js.a11y.protocol';
-export declare type ChannelEvent<T, K> = {
+export type ChannelEvent<T, K> = {
 	kind: K;
 	payload: T;
 	protocol: typeof PROTOCOL;
 };
-export declare type Recv<T, S> = (payload: T, kind?: S) => void;
+export type Recv<T, S> = (payload: T, kind?: S) => void;
 
 /**
  * The communication channel is responsible for implementing the tx and rx

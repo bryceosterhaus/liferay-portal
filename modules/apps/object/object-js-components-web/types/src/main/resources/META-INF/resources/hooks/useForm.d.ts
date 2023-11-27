@@ -22,7 +22,7 @@ interface IUseForm<T, P = {}, K extends Partial<T> = Partial<T>> {
 	validateSubmit: () => void;
 	values: K;
 }
-export declare type FormError<T> = {
+export type FormError<T> = {
 	[key in keyof T]?: string;
 };
 export declare function useForm<T, P = {}, K extends Partial<T> = Partial<T>>({

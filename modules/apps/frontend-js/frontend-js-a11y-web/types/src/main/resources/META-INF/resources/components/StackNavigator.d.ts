@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-declare type StackNavigatorProps<T> = {
+type StackNavigatorProps<T> = {
 	activePage: number;
 	children: Array<React.ReactElement>;
 	onActiveChange: (index: number) => void;

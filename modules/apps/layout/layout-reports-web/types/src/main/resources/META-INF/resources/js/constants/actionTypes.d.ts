@@ -36,7 +36,7 @@ interface SetSelectedItemAction {
 	item: SelectedItem;
 	type: typeof SET_SELECTED_ITEM;
 }
-export declare type Action =
+export type Action =
 	| LoadDataAction
 	| SetDataAction
 	| SetErrorAction

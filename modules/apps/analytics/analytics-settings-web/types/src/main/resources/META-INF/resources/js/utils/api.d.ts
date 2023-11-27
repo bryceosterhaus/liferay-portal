@@ -71,7 +71,7 @@ export declare function fetchPeopleFields(
 export declare function fetchProductsFields(
 	params: TTableRequestParams
 ): Promise<any>;
-declare type TField = {
+type TField = {
 	example: string;
 	name: string;
 	required: boolean;

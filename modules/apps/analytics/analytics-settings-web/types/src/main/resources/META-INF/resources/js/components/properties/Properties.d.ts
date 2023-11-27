@@ -5,12 +5,12 @@
 
 /// <reference types="react" />
 
-export declare type TDataSource = {
+export type TDataSource = {
 	commerceChannelIds: number[];
 	dataSourceId?: string;
 	siteIds: number[];
 };
-export declare type TProperty = {
+export type TProperty = {
 	channelId: string;
 	commerceSyncEnabled: boolean;
 	dataSources: TDataSource[] | [];

@@ -10,7 +10,7 @@ import {
 	TObjectLayout,
 	TObjectRelationship,
 } from './types';
-declare type TState = {
+type TState = {
 	creationLanguageId: Liferay.Language.Locale;
 	enableCategorization: boolean;
 	isViewOnly: boolean;
@@ -20,7 +20,7 @@ declare type TState = {
 	objectLayoutId: string;
 	objectRelationships: TObjectRelationship[];
 };
-declare type TAction =
+type TAction =
 	| {
 			payload: {
 				creationLanguageId: Liferay.Language.Locale;

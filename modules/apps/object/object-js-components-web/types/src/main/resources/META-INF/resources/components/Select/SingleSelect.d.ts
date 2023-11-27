@@ -4,7 +4,7 @@
  */
 
 import React, {Key, ReactElement} from 'react';
-declare type SingleSelectOption = {
+type SingleSelectOption = {
 	label?: string;
 	value?: string | number;
 };

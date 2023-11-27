@@ -4,13 +4,13 @@
  */
 
 export declare const STR_NULL_IMAGE_FILE_ENTRY_ID = '0';
-declare const imageSelectorImageAtom: {
-	readonly 'default': {
-		readonly fileEntryId: string;
-		readonly paramName: string;
-		readonly src: string;
+declare const imageSelectorImageAtom: import('@liferay/frontend-js-state-web').Immutable<{
+	'default': {
+		fileEntryId: string;
+		paramName: string;
+		src: string;
 	};
-	readonly 'key': string;
-	readonly 'Liferay.State.ATOM': true;
-};
+	'key': string;
+	'Liferay.State.ATOM': true;
+}>;
 export default imageSelectorImageAtom;

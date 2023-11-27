@@ -5,7 +5,7 @@
 
 import {Condition} from '../../plugins/page_rules/components/Condition';
 import {ConditionType} from '../../plugins/page_rules/components/RuleBuilderSection';
-declare type Props = {
+type Props = {
 	conditionType?: ConditionType;
 	conditions: Condition[];
 };

@@ -17,7 +17,7 @@ export declare enum Events {
 	Reload = 'RELOAD',
 	ToggleGlobalCheckbox = 'TOGGLE_CHECKBOX',
 }
-declare type TState = {
+type TState = {
 	filter: TFilter;
 	formattedItems: TFormattedItems;
 	globalChecked: boolean;

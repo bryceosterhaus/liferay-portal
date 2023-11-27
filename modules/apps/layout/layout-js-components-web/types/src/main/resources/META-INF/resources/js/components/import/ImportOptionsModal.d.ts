@@ -23,7 +23,7 @@ declare const OPTIONS: readonly [
 		readonly value: 'keep_both';
 	}
 ];
-export declare type OverwriteStrategy = typeof OPTIONS[number]['value'];
+export type OverwriteStrategy = typeof OPTIONS[number]['value'];
 declare function ImportOptionsModal({
 	onCloseModal,
 	onImport,

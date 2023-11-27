@@ -5,7 +5,7 @@
 
 /// <reference types="react" />
 
-declare type Props = {
+type Props = {
 	description: string;
 	disabled: boolean;
 	index: number;

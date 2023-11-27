@@ -8,4 +8,4 @@ export declare const CONTENT_DISPLAY_OPTIONS: {
 	readonly flexColumn: 'flex-column';
 	readonly flexRow: 'flex-row';
 };
-export declare type ContentDisplayOption = typeof CONTENT_DISPLAY_OPTIONS[keyof typeof CONTENT_DISPLAY_OPTIONS];
+export type ContentDisplayOption = typeof CONTENT_DISPLAY_OPTIONS[keyof typeof CONTENT_DISPLAY_OPTIONS];

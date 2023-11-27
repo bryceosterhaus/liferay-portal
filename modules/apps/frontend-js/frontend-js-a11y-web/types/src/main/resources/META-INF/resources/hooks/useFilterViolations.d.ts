@@ -10,7 +10,7 @@ export declare const TYPES: {
 	readonly ADD_FILTER: 'ADD_FILTER';
 	readonly REMOVE_FILTER: 'REMOVE_FILTER';
 };
-declare type TAction = {
+type TAction = {
 	payload: {
 		key: keyof RuleRaw;
 		value: string;

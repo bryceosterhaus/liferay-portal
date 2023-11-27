@@ -4,8 +4,8 @@
  */
 
 import React from 'react';
-export declare type TimeSpan = 'last-7-days' | 'last-30-days' | null;
-declare type Histogram = Array<Record<string, string | number | null>>;
+export type TimeSpan = 'last-7-days' | 'last-30-days' | null;
+type Histogram = Array<Record<string, string | number | null>>;
 interface DataSet {
 	histogram: Histogram;
 	keyList?: Array<string>;
@@ -25,7 +25,7 @@ interface State {
 	timeSpanKey?: TimeSpan;
 	timeSpanOffset: number;
 }
-declare type Action =
+type Action =
 	| {
 			payload: {
 				loading: boolean;

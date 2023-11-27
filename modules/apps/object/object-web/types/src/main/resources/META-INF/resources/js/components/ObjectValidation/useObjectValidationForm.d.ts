@@ -9,7 +9,7 @@ interface IUseObjectValidationForm {
 	initialValues: Partial<ObjectValidation>;
 	onSubmit: (validation: ObjectValidation) => void;
 }
-export declare type ObjectValidationErrors = FormError<ObjectValidation>;
+export type ObjectValidationErrors = FormError<ObjectValidation>;
 export interface TabProps {
 	disabled: boolean;
 	errors: ObjectValidationErrors;

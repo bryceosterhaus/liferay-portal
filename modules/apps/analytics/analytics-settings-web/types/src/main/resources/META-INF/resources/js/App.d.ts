@@ -4,14 +4,14 @@
  */
 
 import React from 'react';
-export declare type TData = {
+export type TData = {
 	connected: boolean;
 	liferayAnalyticsURL: string;
 	pageView: EPageView;
 	token: string;
 	wizardMode: boolean;
 };
-declare type TView = {
+type TView = {
 	[key in EPageView]: React.FC;
 };
 export declare enum EPageView {

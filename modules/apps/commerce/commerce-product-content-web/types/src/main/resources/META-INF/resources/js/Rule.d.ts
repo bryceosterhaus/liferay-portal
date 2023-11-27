@@ -7,13 +7,13 @@
 
 import {CategoryRule} from './CategorySelector';
 import {TagRule} from './TagSelector';
-export declare type RuleType = 'assetCategories' | 'assetTags';
+export type RuleType = 'assetCategories' | 'assetTags';
 export interface BaseRule {
 	queryAndOperator: boolean;
 	queryContains: boolean;
 	type: RuleType;
 }
-export declare type Rule<T extends RuleType = RuleType> = T extends 'assetTags'
+export type Rule<T extends RuleType = RuleType> = T extends 'assetTags'
 	? TagRule
 	: T extends 'assetCategories'
 	? CategoryRule

@@ -23,11 +23,11 @@ export interface Node {
 	nodePath?: string;
 	selected?: boolean;
 }
-export declare type NodeFilter = (node: LinkedNode) => boolean;
+export type NodeFilter = (node: LinkedNode) => boolean;
 export interface NodeMap {
 	[key: string]: LinkedNode;
 }
-export declare type TreeviewAction =
+export type TreeviewAction =
 	| {
 			mouseNavigation?: true;
 			type: 'ACTIVATE';

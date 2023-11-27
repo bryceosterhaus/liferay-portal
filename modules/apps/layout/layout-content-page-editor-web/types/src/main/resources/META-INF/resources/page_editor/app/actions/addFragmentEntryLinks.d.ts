@@ -46,7 +46,7 @@ export interface FragmentEntryLink<
 	removed: boolean;
 	segmentsExperienceId: string;
 }
-export declare type FragmentEntryLinkMap = Record<
+export type FragmentEntryLinkMap = Record<
 	FragmentEntryLink['fragmentEntryId'],
 	FragmentEntryLink
 >;

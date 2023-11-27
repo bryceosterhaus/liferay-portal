@@ -7,7 +7,7 @@ import React from 'react';
 import {TEmptyState} from '../table/StateRenderer';
 import {TColumn, TTableRequestParams} from '../table/types';
 import {TProperty} from './Properties';
-export declare type TRawItem = {
+export type TRawItem = {
 	channelName?: string;
 	friendlyURL?: string;
 	id: string;

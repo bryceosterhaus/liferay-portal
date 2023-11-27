@@ -4,7 +4,7 @@
  */
 
 export declare const DELTAS: readonly [5, 10, 20, 30, 50];
-export declare type TPagination = {
+export type TPagination = {
 	maxCount: number;
 	page: number;
 	pageSize: typeof DELTAS[number];

@@ -21,7 +21,7 @@ interface ILearnResourceItem {
 interface ILearnResourceContext {
 	[learnResourceName: string]: ILearnResourceItem;
 }
-declare type ClayLinkProps = React.ComponentProps<typeof ClayLink>;
+type ClayLinkProps = React.ComponentProps<typeof ClayLink>;
 interface IProps extends ClayLinkProps {
 	className?: string;
 

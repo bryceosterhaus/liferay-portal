@@ -3,13 +3,13 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-export declare const activeLanguageIdsAtom: {
-	readonly 'default': readonly never[];
-	readonly 'key': string;
-	readonly 'Liferay.State.ATOM': true;
-};
-export declare const selectedLanguageIdAtom: {
-	readonly 'default': readonly never[];
-	readonly 'key': string;
-	readonly 'Liferay.State.ATOM': true;
-};
+export declare const activeLanguageIdsAtom: import('@liferay/frontend-js-state-web').Immutable<{
+	'default': never[];
+	'key': string;
+	'Liferay.State.ATOM': true;
+}>;
+export declare const selectedLanguageIdAtom: import('@liferay/frontend-js-state-web').Immutable<{
+	'default': never[];
+	'key': string;
+	'Liferay.State.ATOM': true;
+}>;

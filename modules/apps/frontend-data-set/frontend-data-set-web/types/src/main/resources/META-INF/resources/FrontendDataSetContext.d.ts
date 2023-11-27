@@ -71,6 +71,6 @@ export interface IInternalRenderer {
 	type: 'internal';
 	url?: string;
 }
-export declare type TRenderer = IClientExtensionRenderer | IInternalRenderer;
+export type TRenderer = IClientExtensionRenderer | IInternalRenderer;
 declare const FrontendDataSetContext: React.Context<IFrontendDataSetContext>;
 export default FrontendDataSetContext;

@@ -6,7 +6,7 @@
 /// <reference types="react" />
 
 import {InputGroup, MultiSelectItem} from './types';
-declare type OnItemsChangeFn = (items: MultiSelectItem[]) => void;
+type OnItemsChangeFn = (items: MultiSelectItem[]) => void;
 interface IProps extends InputGroup {
 	availableAccountRoles: MultiSelectItem[];
 	index: number;

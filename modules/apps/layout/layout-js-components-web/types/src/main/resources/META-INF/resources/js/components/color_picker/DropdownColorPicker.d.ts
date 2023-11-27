@@ -10,9 +10,9 @@ export interface Color {
 	name: string;
 	value: string;
 }
-export declare type ColorCategory = Record<string, Color[]>;
-export declare type ColorCategoryMap = Record<string, ColorCategory>;
-declare type Props = {
+export type ColorCategory = Record<string, Color[]>;
+export type ColorCategoryMap = Record<string, ColorCategory>;
+type Props = {
 	active: boolean;
 	colors: ColorCategoryMap;
 	fieldLabel?: string | null;

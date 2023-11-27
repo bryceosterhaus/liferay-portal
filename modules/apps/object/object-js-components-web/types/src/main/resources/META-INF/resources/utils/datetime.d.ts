@@ -26,7 +26,7 @@ interface GenerateDateProps {
 	serverFormat: string;
 	value: string;
 }
-declare type maskItem = string | RegExp;
+type maskItem = string | RegExp;
 export declare function generateDateConfigurations({
 	defaultLanguageId,
 	locale,

@@ -5,7 +5,7 @@
 
 import React from 'react';
 import {TFormattedItems, TTableRequestParams} from '../table/types';
-export declare type TRawItem = {
+export type TRawItem = {
 	example: string;
 	name: string;
 	required: boolean;

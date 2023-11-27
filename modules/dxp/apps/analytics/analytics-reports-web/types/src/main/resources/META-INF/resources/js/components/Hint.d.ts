@@ -5,7 +5,7 @@
 
 /// <reference types="react" />
 
-export declare type Position =
+export type Position =
 	| 'top'
 	| 'top-left'
 	| 'top-right'

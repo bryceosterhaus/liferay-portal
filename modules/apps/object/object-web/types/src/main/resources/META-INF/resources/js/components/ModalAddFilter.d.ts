@@ -42,7 +42,7 @@ interface ModalAddFilterProps {
 	}: FilterValidation) => FilterErrors;
 	workflowStatuses: LabelValueObject[];
 }
-export declare type FilterErrors = {
+export type FilterErrors = {
 	endDate?: string;
 	items?: string;
 	selectedFilterBy?: string;
@@ -50,7 +50,7 @@ export declare type FilterErrors = {
 	startDate?: string;
 	value?: string;
 };
-export declare type FilterValidation = {
+export type FilterValidation = {
 	checkedItems: MultiSelectItem[];
 	disableDateValues?: boolean;
 	items: MultiSelectItem[];
@@ -59,7 +59,7 @@ export declare type FilterValidation = {
 	setErrors: (value: FilterErrors) => void;
 	value?: string;
 };
-declare type CurrentFilter = {
+type CurrentFilter = {
 	definition: {
 		[key: string]: string[] | number[];
 	} | null;

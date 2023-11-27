@@ -6,7 +6,7 @@
 /// <reference types="react" />
 
 import './ObjectDetails.scss';
-export declare type Scope = {
+export type Scope = {
 	items: LabelValueObject[];
 	label: string;
 };

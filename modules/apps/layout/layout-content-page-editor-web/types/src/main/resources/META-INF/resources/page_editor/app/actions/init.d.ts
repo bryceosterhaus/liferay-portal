@@ -4,6 +4,6 @@
  */
 
 import {INIT} from './types';
-export declare type InitAction = {
+export type InitAction = {
 	type: typeof INIT;
 };

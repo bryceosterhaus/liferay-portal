@@ -75,7 +75,7 @@ export interface FieldType {
 		pages: unknown[];
 	};
 }
-export declare type FieldTypeName =
+export type FieldTypeName =
 	| 'checkbox_multiple'
 	| 'captcha'
 	| 'checkbox'
@@ -104,6 +104,6 @@ export declare type FieldTypeName =
 	| 'select'
 	| 'text'
 	| 'validation';
-declare type Locale = Liferay.Language.Locale;
-declare type LocalizedValue<T> = Liferay.Language.LocalizedValue<T>;
+type Locale = Liferay.Language.Locale;
+type LocalizedValue<T> = Liferay.Language.LocalizedValue<T>;
 export {};

@@ -15,4 +15,4 @@ export declare const LAYOUT_DATA_ITEM_TYPES: {
 	readonly root: 'root';
 	readonly row: 'row';
 };
-export declare type LayoutDataItemType = typeof LAYOUT_DATA_ITEM_TYPES[keyof typeof LAYOUT_DATA_ITEM_TYPES];
+export type LayoutDataItemType = typeof LAYOUT_DATA_ITEM_TYPES[keyof typeof LAYOUT_DATA_ITEM_TYPES];

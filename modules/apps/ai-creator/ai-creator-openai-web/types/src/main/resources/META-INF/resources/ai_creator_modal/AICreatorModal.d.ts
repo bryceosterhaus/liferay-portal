@@ -10,7 +10,7 @@ interface Props {
 	learnResources: AICreatorModalLearnResources;
 	portletNamespace: string;
 }
-declare type AICreatorModalLearnResources = {
+type AICreatorModalLearnResources = {
 	'ai-creator-openai-web': {
 		general: {
 			[key: string]: {

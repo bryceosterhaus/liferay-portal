@@ -7,4 +7,4 @@ export declare const FRAGMENT_ENTRY_TYPES: {
 	readonly composition: 'composition';
 	readonly input: 'input';
 };
-export declare type FragmentEntryType = typeof FRAGMENT_ENTRY_TYPES[keyof typeof FRAGMENT_ENTRY_TYPES];
+export type FragmentEntryType = typeof FRAGMENT_ENTRY_TYPES[keyof typeof FRAGMENT_ENTRY_TYPES];

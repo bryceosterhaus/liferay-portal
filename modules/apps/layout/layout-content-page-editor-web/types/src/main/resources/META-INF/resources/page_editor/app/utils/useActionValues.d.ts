@@ -4,11 +4,11 @@
  */
 
 import {Action} from '../../plugins/page_rules/components/Action';
-declare type Item = {
+type Item = {
 	label: string;
 	value: string;
 };
-declare type Props = {
+type Props = {
 	actions: Action[];
 	items: Item[];
 };

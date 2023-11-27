@@ -4,7 +4,7 @@
  */
 
 import React, {AriaAttributes} from 'react';
-declare type ScreenReaderAnnouncerProps = {
+type ScreenReaderAnnouncerProps = {
 	'aria-atomic'?: AriaAttributes['aria-atomic'];
 	'aria-live'?: AriaAttributes['aria-live'];
 };

@@ -4,7 +4,7 @@
  */
 
 import {CacheKey} from './cache';
-export declare type Fetcher<T> = () => Promise<
+export type Fetcher<T> = () => Promise<
 	T & {
 		error?: string;
 	}

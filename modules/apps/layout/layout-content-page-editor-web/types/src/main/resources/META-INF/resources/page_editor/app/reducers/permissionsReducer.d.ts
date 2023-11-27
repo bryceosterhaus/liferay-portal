@@ -6,10 +6,7 @@
 import togglePermission from '../actions/togglePermission';
 import {INIT} from '../actions/types';
 import type {PermissionKey} from '../actions/togglePermission';
-export declare type PermissionsState = Record<
-	PermissionKey,
-	boolean | undefined
->;
+export type PermissionsState = Record<PermissionKey, boolean | undefined>;
 export declare const INITIAL_STATE: PermissionsState;
 export default function permissionsReducer(
 	state: PermissionsState | undefined,

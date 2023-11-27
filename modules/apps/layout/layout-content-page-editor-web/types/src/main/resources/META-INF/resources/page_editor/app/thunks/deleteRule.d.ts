@@ -6,7 +6,7 @@
 import {State} from '../../types/State';
 import deleteRuleAction from '../actions/deleteRule';
 import updateNetwork from '../actions/updateNetwork';
-declare type Props = {
+type Props = {
 	ruleId: string;
 };
 export default function deleteRule({

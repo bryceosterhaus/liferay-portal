@@ -26,9 +26,7 @@ interface ActionProps {
 	title: string;
 	validateExpressionURL: string;
 }
-export declare type ActionError = FormError<
-	ObjectAction & ObjectActionParameters
-> & {
+export type ActionError = FormError<ObjectAction & ObjectActionParameters> & {
 	predefinedValues?: {
 		[key: string]: string;
 	};

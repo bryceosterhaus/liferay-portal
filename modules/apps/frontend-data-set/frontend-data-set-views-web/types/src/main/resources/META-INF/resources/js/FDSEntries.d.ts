@@ -8,7 +8,7 @@
 import '../css/FDSEntries.scss';
 import {OBJECT_RELATIONSHIP} from './Constants';
 import {FDSViewType} from './FDSViews';
-declare type FDSEntryType = {
+type FDSEntryType = {
 	[OBJECT_RELATIONSHIP.FDS_ENTRY_FDS_VIEW]: Array<FDSViewType>;
 	actions: {
 		delete: {

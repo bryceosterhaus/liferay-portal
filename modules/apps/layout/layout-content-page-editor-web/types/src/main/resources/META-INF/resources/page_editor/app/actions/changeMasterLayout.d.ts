@@ -5,7 +5,7 @@
 
 import type {LayoutData} from '../../types/layout_data/LayoutData';
 import type {FragmentEntryLinkMap} from './addFragmentEntryLinks';
-declare type MasterLayoutOptions =
+type MasterLayoutOptions =
 	| {
 			masterLayoutData: null;
 			masterLayoutPlid: '0';

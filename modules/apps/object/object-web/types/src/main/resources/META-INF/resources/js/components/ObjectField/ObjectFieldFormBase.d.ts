@@ -26,7 +26,7 @@ interface ObjectFieldFormBaseProps {
 	onSubmit?: (values?: Partial<ObjectField>) => void;
 	setValues: (values: Partial<ObjectField>) => void;
 }
-export declare type ObjectFieldErrors = FormError<
+export type ObjectFieldErrors = FormError<
 	ObjectField &
 		{
 			[key in ObjectFieldSettingName]: unknown;

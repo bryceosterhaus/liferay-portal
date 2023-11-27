@@ -3,11 +3,11 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-export declare type TWorkflowStatus = {
+export type TWorkflowStatus = {
 	label: string;
 	value: string;
 };
-export declare type TObjectColumn = {
+export type TObjectColumn = {
 	defaultSort?: boolean;
 	fieldLabel?: string;
 	filterBy?: string;
@@ -20,7 +20,7 @@ export declare type TObjectColumn = {
 	value?: string;
 	valueList?: LabelValueObject[];
 };
-export declare type TObjectViewColumn = {
+export type TObjectViewColumn = {
 	defaultSort?: boolean;
 	fieldLabel?: string;
 	label: LocalizedValue<string>;
@@ -28,14 +28,14 @@ export declare type TObjectViewColumn = {
 	objectFieldName: string;
 	priority?: number;
 };
-export declare type TObjectViewSortColumn = {
+export type TObjectViewSortColumn = {
 	fieldLabel?: string;
 	label: LocalizedValue<string>;
 	objectFieldName: string;
 	priority?: number;
 	sortOrder?: string;
 };
-export declare type TObjectViewFilterColumn = {
+export type TObjectViewFilterColumn = {
 	definition: {
 		[key: string]: string[];
 	} | null;
@@ -49,7 +49,7 @@ export declare type TObjectViewFilterColumn = {
 	value?: string;
 	valueList?: LabelValueObject[];
 };
-export declare type TObjectView = {
+export type TObjectView = {
 	defaultObjectView: boolean;
 	name: LocalizedValue<string>;
 	objectDefinitionId: number;
@@ -57,7 +57,7 @@ export declare type TObjectView = {
 	objectViewFilterColumns: TObjectViewFilterColumn[];
 	objectViewSortColumns: TObjectViewSortColumn[];
 };
-export declare type TState = {
+export type TState = {
 	creationLanguageId: Liferay.Language.Locale;
 	filterOperators: TFilterOperators;
 	isViewOnly: boolean;

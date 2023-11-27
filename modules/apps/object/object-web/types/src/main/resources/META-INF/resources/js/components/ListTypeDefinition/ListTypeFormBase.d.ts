@@ -20,5 +20,5 @@ interface IUseListTypeForm {
 	initialValues: Partial<ListTypeDefinition>;
 	onSubmit: (picklist: ListTypeDefinition) => void;
 }
-export declare type ObjectValidationErrors = FormError<ListTypeDefinition>;
+export type ObjectValidationErrors = FormError<ListTypeDefinition>;
 export {};

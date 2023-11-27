@@ -7,7 +7,7 @@
 
 import {IClayAlertProps} from '@clayui/alert';
 import './ModalSelectObjectFields.scss';
-export declare type Alert = {
+export type Alert = {
 	content: string;
 	otherProps: IClayAlertProps;
 };

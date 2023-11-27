@@ -19,7 +19,7 @@ declare const VERTICAL_ALIGNMENT_OPTIONS: readonly [
 		readonly value: 'end';
 	}
 ];
-export declare type VerticalAlignmentOption = typeof VERTICAL_ALIGNMENT_OPTIONS[number]['value'];
+export type VerticalAlignmentOption = typeof VERTICAL_ALIGNMENT_OPTIONS[number]['value'];
 interface Props {
 	collectionVerticalAlignmentId: string;
 	handleConfigurationChanged: (change: {

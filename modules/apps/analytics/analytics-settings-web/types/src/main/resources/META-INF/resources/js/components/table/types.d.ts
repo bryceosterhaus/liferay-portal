@@ -10,7 +10,7 @@ export declare enum EColumnAlign {
 	Left = 'start',
 	Right = 'end',
 }
-export declare type TColumn = {
+export type TColumn = {
 	align?: EColumnAlign;
 	expanded?: boolean;
 	id: string;
@@ -18,21 +18,21 @@ export declare type TColumn = {
 	show?: boolean;
 	sortable?: boolean;
 };
-export declare type TColumnItem = {
+export type TColumnItem = {
 	cellRenderer?: (item: TItem) => JSX.Element;
 	id: string;
 	value: boolean | string | number;
 };
-export declare type TItem = {
+export type TItem = {
 	checked?: boolean;
 	columns: TColumnItem[];
 	disabled?: boolean;
 	id: string;
 };
-export declare type TFormattedItems = {
+export type TFormattedItems = {
 	[key: string]: TItem;
 };
-export declare type TTableRequestParams = {
+export type TTableRequestParams = {
 	filter: TFilter;
 	keywords: string;
 	pagination: {

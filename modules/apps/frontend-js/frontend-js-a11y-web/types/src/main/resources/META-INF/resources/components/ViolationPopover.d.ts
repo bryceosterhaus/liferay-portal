@@ -7,7 +7,7 @@
 
 import './ViolationPopover.scss';
 import type {RuleRaw} from '../hooks/useA11y';
-declare type ViolationProps = {
+type ViolationProps = {
 	onClick: (target: string, id: string) => void;
 	rules: Record<string, RuleRaw>;
 	target: string;

@@ -1,5 +1,5 @@
 {
-	"@generated": "e1cfacada806e3a4ae578071d90ce85a568d5ad2",
+	"@generated": "9a00f005fa0def3b6e55cd43ff3351d8e1d8ed87",
 	"@overrides": {
 	},
 	"@readonly": "** AUTO-GENERATED: DO NOT EDIT OUTSIDE @overrides **",
@@ -23,9 +23,10 @@
 				"../frontend-js-state-web/src/main/resources/META-INF/resources/index.ts"
 			]
 		},
+		"skipLibCheck": true,
 		"sourceMap": false,
 		"strict": true,
-		"target": "es6",
+		"target": "es2022",
 		"tsBuildInfoFile": "tmp/tsconfig.tsbuildinfo",
 		"typeRoots": [
 			"../../../node_modules/@types",

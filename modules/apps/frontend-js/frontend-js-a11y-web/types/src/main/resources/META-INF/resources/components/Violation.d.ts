@@ -7,12 +7,12 @@
 
 import './Violation.scss';
 import type {Violations} from '../hooks/useA11y';
-declare type Params = {
+type Params = {
 	name: string;
 	ruleId: string;
 	target: string;
 };
-declare type ViolationProps = {
+type ViolationProps = {
 	next?: (payload: Params) => void;
 	params?: Pick<Params, 'ruleId'>;
 	previous?: () => void;

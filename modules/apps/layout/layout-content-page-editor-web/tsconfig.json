@@ -1,5 +1,5 @@
 {
-	"@generated": "109e0c993736e731aa262b77a67d3150df8056fc",
+	"@generated": "d8dbe44acb63356f32cb1b4422c5055dbe5fe2b4",
 	"@overrides": {
 		"compilerOptions": {
 			"lib": [
@@ -45,9 +45,10 @@
 				"../../item-selector/item-selector-taglib/src/main/resources/META-INF/resources/index.d.ts"
 			]
 		},
+		"skipLibCheck": true,
 		"sourceMap": false,
 		"strict": true,
-		"target": "es6",
+		"target": "es2022",
 		"tsBuildInfoFile": "tmp/tsconfig.tsbuildinfo",
 		"typeRoots": [
 			"../../../node_modules/@types",

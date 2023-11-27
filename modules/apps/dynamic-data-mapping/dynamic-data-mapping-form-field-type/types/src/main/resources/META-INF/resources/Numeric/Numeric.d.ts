@@ -38,4 +38,4 @@ interface IProps {
 	valid?: boolean;
 	value?: string;
 }
-declare type NumericDataType = 'integer' | 'double';
+type NumericDataType = 'integer' | 'double';

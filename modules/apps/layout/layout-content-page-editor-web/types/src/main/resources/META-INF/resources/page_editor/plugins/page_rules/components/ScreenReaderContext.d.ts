@@ -4,7 +4,7 @@
  */
 
 import React, {ReactNode} from 'react';
-export declare type ScreenReaderAnnouncerContextType = {
+export type ScreenReaderAnnouncerContextType = {
 	sendMessage: (message: string) => void;
 };
 declare const ScreenReaderAnnouncerContext: React.Context<ScreenReaderAnnouncerContextType>;

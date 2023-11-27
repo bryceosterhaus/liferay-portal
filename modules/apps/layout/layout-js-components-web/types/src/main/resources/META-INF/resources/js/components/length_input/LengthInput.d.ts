@@ -8,7 +8,7 @@
 import {Field} from '../color_picker/ColorPicker';
 import './LengthInput.scss';
 declare const UNITS: readonly ['px', '%', 'em', 'rem', 'vw', 'vh', 'custom'];
-declare type Unit = typeof UNITS[number];
+type Unit = typeof UNITS[number];
 interface Props {
 	className?: string;
 	defaultUnit?: Unit;

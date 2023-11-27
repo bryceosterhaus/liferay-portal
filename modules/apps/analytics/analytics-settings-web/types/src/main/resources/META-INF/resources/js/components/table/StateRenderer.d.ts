@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-export declare type TEmptyState = {
+export type TEmptyState = {
 	contentRenderer?: () => JSX.Element;
 	description?: string;
 	noResultsTitle: string;

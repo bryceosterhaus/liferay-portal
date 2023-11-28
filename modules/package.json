@@ -17,10 +17,11 @@
 	},
 	"private": true,
 	"resolutions": {
-		"@typescript-eslint/eslint-plugin": "6.12.0",
-		"@typescript-eslint/parser": "6.12.0",
 		"@liferay/eslint-plugin": "1.5.0",
 		"@types/html-minifier-terser": "5.1.0",
+		"@typescript-eslint/eslint-plugin": "6.12.0",
+		"@typescript-eslint/parser": "6.12.0",
+		"liferay-npm-bundler": "3.0.0-alpha.6",
 		"html-webpack-plugin": "5.5.0",
 		"ua-parser-js": "^0.7.30",
 		"webpack": "5.89.0"

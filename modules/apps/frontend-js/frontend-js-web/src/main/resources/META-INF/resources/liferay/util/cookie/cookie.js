@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-import {CONSENT_TYPES, checkConsent} from '../consent';
+import {checkConsent} from '../consent';
 
 const generateCookie = (name, value, options = {}) => {
 	let cookie = `${name}=${value}`;
@@ -85,7 +85,6 @@ export function setCookie(name, value, type, options) {
 }
 
 export default {
-	TYPES: CONSENT_TYPES,
 	get: getCookie,
 	remove: removeCookie,
 	set: setCookie,

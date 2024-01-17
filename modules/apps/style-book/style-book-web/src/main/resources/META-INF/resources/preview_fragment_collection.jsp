@@ -13,7 +13,7 @@ PreviewFragmentCollectionDisplayContext previewFragmentCollectionDisplayContext 
 
 <div>
 	<react:component
-		module="js/fragment-collection-preview/FragmentCollectionPreview"
+		module="{FragmentCollectionPreview} from style-book-web"
 		props='<%=
 			HashMapBuilder.<String, Object>put(
 				"fragmentCollectionKey", previewFragmentCollectionDisplayContext.getFragmentCollectionKey()

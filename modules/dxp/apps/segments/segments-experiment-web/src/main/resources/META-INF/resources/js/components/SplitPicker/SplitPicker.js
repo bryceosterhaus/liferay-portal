@@ -6,9 +6,9 @@
 import PropTypes from 'prop-types';
 import React, {useEffect, useReducer} from 'react';
 
-import {SegmentsVariantType} from '../../types.es';
-import {SliderWithLabel} from '../SliderWithLabel.es';
-import {changeSplitValue} from './utils.es';
+import {SegmentsVariantType} from '../../types';
+import {SliderWithLabel} from '../SliderWithLabel';
+import {changeSplitValue} from './utils';
 
 function SplitPicker({disabled, onChange, selectedTestType, variants}) {
 	const [splitVariants, dispatch] = useReducer(_reducer, variants);

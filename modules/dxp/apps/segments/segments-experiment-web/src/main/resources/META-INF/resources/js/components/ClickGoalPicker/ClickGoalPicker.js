@@ -12,15 +12,15 @@ import {sub, throttle} from 'frontend-js-web';
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import {StateContext as GlobalStateContext} from './../../state/context.es';
-import {StateContext, getInitialState, reducer} from './reducer.es';
+import {StateContext as GlobalStateContext} from '../../state/context';
+import {StateContext, getInitialState, reducer} from './reducer';
 import {
 	GeometryType,
 	getElementGeometry,
 	getRootElementGeometry,
 	getTargetableElements,
 	stopImmediatePropagation,
-} from './utils.es';
+} from './utils';
 
 const {
 	useCallback,

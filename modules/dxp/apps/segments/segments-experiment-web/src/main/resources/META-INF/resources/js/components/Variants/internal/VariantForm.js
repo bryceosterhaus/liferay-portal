@@ -8,8 +8,8 @@ import ClayButton from '@clayui/button';
 import ClayModal from '@clayui/modal';
 import React, {useEffect, useRef, useState} from 'react';
 
-import LoadingButton from '../../LoadingButton/LoadingButton.es';
-import ValidatedInput from '../../ValidatedInput/ValidatedInput.es';
+import LoadingButton from '../../LoadingButton/LoadingButton';
+import ValidatedInput from '../../ValidatedInput/ValidatedInput';
 
 export default function VariantForm({
 	errorMessage,

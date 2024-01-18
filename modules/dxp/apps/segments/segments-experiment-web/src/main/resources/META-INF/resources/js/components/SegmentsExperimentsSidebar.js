@@ -8,7 +8,7 @@ import {sub} from 'frontend-js-web';
 import PropTypes from 'prop-types';
 import React, {useContext, useEffect, useReducer} from 'react';
 
-import SegmentsExperimentsContext from '../context.es';
+import SegmentsExperimentsContext from '../context';
 import {
 	closeCreationModal,
 	closeDeletionModal,
@@ -24,22 +24,18 @@ import {
 	reviewClickTargetElement,
 	updateSegmentsExperimentStatus,
 	updateSegmentsExperimentTarget,
-} from '../state/actions.es';
-import {
-	DispatchContext,
-	StateContext,
-	getInitialState,
-} from '../state/context.es';
-import {reducer} from '../state/reducer.es';
+} from '../state/actions';
+import {DispatchContext, StateContext, getInitialState} from '../state/context';
+import {reducer} from '../state/reducer';
 import {
 	SegmentsExperimentGoal,
 	SegmentsExperimentType,
 	SegmentsVariantType,
-} from '../types.es';
+} from '../types';
 import {
 	getSegmentsExperimentAction,
 	navigateToExperience,
-} from '../util/navigation.es';
+} from '../util/navigation';
 import {
 	STATUS_COMPLETED,
 	STATUS_DRAFT,
@@ -47,12 +43,12 @@ import {
 	STATUS_FINISHED_WINNER,
 	STATUS_RUNNING,
 	STATUS_TERMINATED,
-} from '../util/statuses.es';
-import {openErrorToast, openSuccessToast} from '../util/toasts.es';
+} from '../util/statuses';
+import {openErrorToast, openSuccessToast} from '../util/toasts';
 import {ConfirmModal} from './ConfirmModal';
-import SegmentsExperiments from './SegmentsExperiments.es';
-import SegmentsExperimentsModal from './SegmentsExperimentsModal.es';
-import UnsupportedSegmentsExperiments from './UnsupportedSegmentsExperiments.es';
+import SegmentsExperiments from './SegmentsExperiments';
+import SegmentsExperimentsModal from './SegmentsExperimentsModal';
+import UnsupportedSegmentsExperiments from './UnsupportedSegmentsExperiments';
 
 function SegmentsExperimentsSidebar({
 	initialGoals,

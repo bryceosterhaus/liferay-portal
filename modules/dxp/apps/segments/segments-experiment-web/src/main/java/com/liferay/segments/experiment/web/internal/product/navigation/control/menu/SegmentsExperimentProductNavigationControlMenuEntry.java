@@ -458,9 +458,7 @@ public class SegmentsExperimentProductNavigationControlMenuEntry
 			jspWriter.write(sb.toString());
 
 			_reactRenderer.renderReact(
-				new ComponentDescriptor(
-					_npmResolver.resolveModuleName("segments-experiment-web") +
-						"/js/SegmentsExperimentApp.es"),
+				new ComponentDescriptor("{SegmentsExperimentApp} from segments-experiment-web"),
 				_getData(httpServletRequest, panelStateOpen),
 				httpServletRequest, jspWriter);
 

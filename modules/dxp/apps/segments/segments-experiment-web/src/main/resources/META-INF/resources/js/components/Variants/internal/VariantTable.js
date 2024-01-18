@@ -13,19 +13,19 @@ import {sub} from 'frontend-js-web';
 import PropTypes from 'prop-types';
 import React, {useContext, useState} from 'react';
 
-import SegmentsExperimentsContext from '../../../context.es';
-import {openPublishModal} from '../../../state/actions.es';
-import {DispatchContext} from '../../../state/context.es';
-import {SegmentsVariantType} from '../../../types.es';
-import {navigateToExperience} from '../../../util/navigation.es';
-import {indexToPercentageString} from '../../../util/percentages.es';
+import SegmentsExperimentsContext from '../../../context';
+import {openPublishModal} from '../../../state/actions';
+import {DispatchContext} from '../../../state/context';
+import {SegmentsVariantType} from '../../../types';
+import {navigateToExperience} from '../../../util/navigation';
+import {indexToPercentageString} from '../../../util/percentages';
 import {
 	STATUS_DRAFT,
 	STATUS_FINISHED_NO_WINNER,
 	STATUS_FINISHED_WINNER,
 	STATUS_RUNNING,
 	STATUS_TERMINATED,
-} from '../../../util/statuses.es';
+} from '../../../util/statuses';
 import {ConfirmModal} from '../../ConfirmModal';
 
 function ImprovementCell({control, improvement: initialImprovement}) {

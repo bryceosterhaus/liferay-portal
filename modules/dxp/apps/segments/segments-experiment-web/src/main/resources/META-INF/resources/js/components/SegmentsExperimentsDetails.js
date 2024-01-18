@@ -5,9 +5,9 @@
 
 import React from 'react';
 
-import {SegmentsExperimentType} from '../types.es';
-import {indexToPercentageString} from '../util/percentages.es';
-import {STATUS_DRAFT} from '../util/statuses.es';
+import {SegmentsExperimentType} from '../types';
+import {indexToPercentageString} from '../util/percentages';
+import {STATUS_DRAFT} from '../util/statuses';
 
 function SegmentsExperimentsDetails({segmentsExperiment}) {
 	const {

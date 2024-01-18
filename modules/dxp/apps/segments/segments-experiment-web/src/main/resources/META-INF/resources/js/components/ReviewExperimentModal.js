@@ -17,20 +17,20 @@ import React, {
 	useState,
 } from 'react';
 
-import SegmentsExperimentContext from '../context.es';
-import {StateContext} from '../state/context.es';
-import {SegmentsVariantType} from '../types.es';
-import {SUCCESS_ANIMATION_FILE_NAME} from '../util/contants.es';
-import {useDebounceCallback} from '../util/hooks.es';
+import SegmentsExperimentContext from '../context';
+import {StateContext} from '../state/context';
+import {SegmentsVariantType} from '../types';
+import {SUCCESS_ANIMATION_FILE_NAME} from '../util/contants';
+import {useDebounceCallback} from '../util/hooks';
 import {
 	INITIAL_CONFIDENCE_LEVEL,
 	MAX_CONFIDENCE_LEVEL,
 	MIN_CONFIDENCE_LEVEL,
 	percentageNumberToIndex,
-} from '../util/percentages.es';
-import LoadingButton from './LoadingButton/LoadingButton.es';
-import {SliderWithLabel} from './SliderWithLabel.es';
-import {SplitPicker} from './SplitPicker/SplitPicker.es';
+} from '../util/percentages';
+import LoadingButton from './LoadingButton/LoadingButton';
+import {SliderWithLabel} from './SliderWithLabel';
+import {SplitPicker} from './SplitPicker/SplitPicker';
 
 const TIME_ESTIMATION_THROTTLE_TIME_MS = 1000;
 

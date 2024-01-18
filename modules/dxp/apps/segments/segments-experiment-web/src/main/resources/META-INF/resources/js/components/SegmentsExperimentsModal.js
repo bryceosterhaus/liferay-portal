@@ -12,9 +12,9 @@ import {useIsMounted} from '@liferay/frontend-js-react-web';
 import PropTypes from 'prop-types';
 import React, {useState} from 'react';
 
-import {SegmentsExperimentGoal} from '../types.es';
-import LoadingButton from './LoadingButton/LoadingButton.es';
-import ValidatedInput from './ValidatedInput/ValidatedInput.es';
+import {SegmentsExperimentGoal} from '../types';
+import LoadingButton from './LoadingButton/LoadingButton';
+import ValidatedInput from './ValidatedInput/ValidatedInput';
 
 function SegmentsExperimentsModal({
 	description = '',

@@ -7,7 +7,7 @@ import {useEventListener} from '@liferay/frontend-js-react-web';
 import {setSessionValue} from 'frontend-js-web';
 import React, {useEffect, useState} from 'react';
 
-import SegmentsExperimentsMain from './components/SegmentsExperimentsMain.es';
+import SegmentsExperimentsMain from './components/SegmentsExperimentsMain';
 
 import '../css/main.scss';
 
@@ -16,7 +16,7 @@ const SEGMENTS_EXPERIMENT_OPEN_PANEL_VALUE = 'open';
 const SEGMENTS_EXPERIMENT_PANEL_ID =
 	'com.liferay.segments.experiment.web_panelState';
 
-export default function SegmentsExperimentApp({context}) {
+export function SegmentsExperimentApp({context}) {
 	const [eventTriggered, setEventTriggered] = useState(false);
 
 	const {isPanelStateOpen, namespace, segmentExperimentDataURL} = context;

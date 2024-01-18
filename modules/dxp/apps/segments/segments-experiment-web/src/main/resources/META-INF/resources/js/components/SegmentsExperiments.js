@@ -12,21 +12,21 @@ import {sub} from 'frontend-js-web';
 import PropTypes from 'prop-types';
 import React, {useContext, useState} from 'react';
 
-import SegmentsExperimentsContext from '../context.es';
-import {openDeletionModal} from '../state/actions.es';
-import {DispatchContext, StateContext} from '../state/context.es';
-import {NO_EXPERIMENT_ILLUSTRATION_FILE_NAME} from '../util/contants.es';
+import SegmentsExperimentsContext from '../context';
+import {openDeletionModal} from '../state/actions';
+import {DispatchContext, StateContext} from '../state/context';
+import {NO_EXPERIMENT_ILLUSTRATION_FILE_NAME} from '../util/contants';
 import {
 	STATUS_DRAFT,
 	STATUS_FINISHED_WINNER,
 	STATUS_RUNNING,
 	STATUS_TERMINATED,
 	statusToLabelDisplayType,
-} from '../util/statuses.es';
-import ClickGoalPicker from './ClickGoalPicker/ClickGoalPicker.es';
-import SegmentsExperimentsActions from './SegmentsExperimentsActions.es';
-import SegmentsExperimentsDetails from './SegmentsExperimentsDetails.es';
-import Variants from './Variants/Variants.es';
+} from '../util/statuses';
+import ClickGoalPicker from './ClickGoalPicker/ClickGoalPicker';
+import SegmentsExperimentsActions from './SegmentsExperimentsActions';
+import SegmentsExperimentsDetails from './SegmentsExperimentsDetails';
+import Variants from './Variants/Variants';
 
 function SegmentsExperiments({
 	onCreateSegmentsExperiment,

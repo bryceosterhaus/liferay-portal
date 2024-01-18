@@ -10,13 +10,14 @@ import {useModal} from '@clayui/modal';
 import PropTypes from 'prop-types';
 import React, {useContext} from 'react';
 
-import SegmentsExperimentsContext from '../context.es';
+import SegmentsExperimentsContext from '../context';
 import {
 	closeReviewAndRunExperiment,
 	openTerminateModal,
 	reviewAndRunExperiment,
 	runExperiment,
-} from '../state/actions.es';
+} from '../state/actions';
+import {DispatchContext, StateContext} from '../state/context';
 import {
 	STATUS_DRAFT,
 	STATUS_FINISHED_NO_WINNER,
@@ -24,9 +25,8 @@ import {
 	STATUS_PAUSED,
 	STATUS_RUNNING,
 	STATUS_TERMINATED,
-} from '../util/statuses.es';
-import {DispatchContext, StateContext} from './../state/context.es';
-import {ReviewExperimentModal} from './ReviewExperimentModal.es';
+} from '../util/statuses';
+import {ReviewExperimentModal} from './ReviewExperimentModal';
 
 function SegmentsExperimentsActions({
 	onCreateSegmentsExperiment,

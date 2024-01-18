@@ -9,19 +9,19 @@ import ClayModal, {useModal} from '@clayui/modal';
 import PropTypes from 'prop-types';
 import React, {useContext, useState} from 'react';
 
-import SegmentsExperimentsContext from '../../context.es';
+import SegmentsExperimentsContext from '../../context';
 import {
 	addVariant,
 	reviewVariants,
 	updateVariant,
 	updateVariants,
-} from '../../state/actions.es';
-import {DispatchContext, StateContext} from '../../state/context.es';
-import {navigateToExperience} from '../../util/navigation.es';
-import {STATUS_DRAFT} from '../../util/statuses.es';
-import {openErrorToast, openSuccessToast} from '../../util/toasts.es';
-import VariantForm from './internal/VariantForm.es';
-import VariantTable from './internal/VariantTable.es';
+} from '../../state/actions';
+import {DispatchContext, StateContext} from '../../state/context';
+import {navigateToExperience} from '../../util/navigation';
+import {STATUS_DRAFT} from '../../util/statuses';
+import {openErrorToast, openSuccessToast} from '../../util/toasts';
+import VariantForm from './internal/VariantForm';
+import VariantTable from './internal/VariantTable';
 
 function Variants({selectedSegmentsExperienceId}) {
 	const dispatch = useContext(DispatchContext);

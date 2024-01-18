@@ -8,10 +8,10 @@ import {fetch} from 'frontend-js-web';
 import PropTypes from 'prop-types';
 import React, {useCallback, useEffect, useState} from 'react';
 
-import SegmentsExperimentsContext from '../context.es';
-import APIService from '../util/APIService.es';
-import ConnectToAC from './ConnectToAC.es';
-import SegmentsExperimentsSidebar from './SegmentsExperimentsSidebar.es';
+import SegmentsExperimentsContext from '../context';
+import APIService from '../util/APIService';
+import ConnectToAC from './ConnectToAC';
+import SegmentsExperimentsSidebar from './SegmentsExperimentsSidebar';
 
 const useExperimentsData = (eventTriggered, fetchDataURL, isPanelStateOpen) => {
 	const [loading, setLoading] = useState(false);

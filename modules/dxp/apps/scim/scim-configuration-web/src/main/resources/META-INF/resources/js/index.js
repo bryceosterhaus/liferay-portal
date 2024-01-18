@@ -38,4 +38,4 @@ class InfoPanel extends PortletBase {
 	}
 }
 
-export default InfoPanel;
+export {InfoPanel};

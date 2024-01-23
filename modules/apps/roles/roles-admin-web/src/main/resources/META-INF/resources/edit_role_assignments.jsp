@@ -155,9 +155,9 @@ renderResponse.setTitle(role.getTitle(locale));
 <liferay-frontend:component
 	context='<%=
 		HashMapBuilder.<String, Object>put(
-			"modalSegmentState", RolesAdminWebKeys.MODAL_SEGMENT_STATE
-		).put(
 			"editRoleAssignmentsURL", editRoleAssignmentsURL.toString()
+		).put(
+			"modalSegmentState", RolesAdminWebKeys.MODAL_SEGMENT_STATE
 		).put(
 			"namespace", liferayPortletResponse.getNamespace()
 		).put(

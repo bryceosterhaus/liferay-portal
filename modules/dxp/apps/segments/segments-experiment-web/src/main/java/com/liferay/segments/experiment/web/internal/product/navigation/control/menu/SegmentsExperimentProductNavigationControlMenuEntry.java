@@ -6,7 +6,6 @@
 package com.liferay.segments.experiment.web.internal.product.navigation.control.menu;
 
 import com.liferay.analytics.settings.rest.manager.AnalyticsSettingsManager;
-import com.liferay.frontend.js.loader.modules.extender.npm.NPMResolver;
 import com.liferay.frontend.taglib.clay.servlet.taglib.ButtonTag;
 import com.liferay.frontend.taglib.clay.servlet.taglib.IconTag;
 import com.liferay.petra.reflect.ReflectionUtil;
@@ -458,7 +457,8 @@ public class SegmentsExperimentProductNavigationControlMenuEntry
 			jspWriter.write(sb.toString());
 
 			_reactRenderer.renderReact(
-				new ComponentDescriptor("{SegmentsExperimentApp} from segments-experiment-web"),
+				new ComponentDescriptor(
+					"{SegmentsExperimentApp} from segments-experiment-web"),
 				_getData(httpServletRequest, panelStateOpen),
 				httpServletRequest, jspWriter);
 
@@ -483,9 +483,6 @@ public class SegmentsExperimentProductNavigationControlMenuEntry
 
 	@Reference
 	private LayoutLocalService _layoutLocalService;
-
-	@Reference
-	private NPMResolver _npmResolver;
 
 	@Reference
 	private Portal _portal;

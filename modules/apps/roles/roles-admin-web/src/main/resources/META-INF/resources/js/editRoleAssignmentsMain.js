@@ -15,14 +15,6 @@ export default function editRoleAssignmentsMain({
 	roleName,
 	selectAssigneesURL,
 }) {
-	console.log({
-		editRoleAssignmentsURL,
-		modalSegmentState,
-		namespace,
-		portletURL,
-		roleName,
-		selectAssigneesURL,
-	});
 	const state = sessionStorage.getItem(
 		modalSegmentState,
 		COOKIE_TYPES.NECESSARY

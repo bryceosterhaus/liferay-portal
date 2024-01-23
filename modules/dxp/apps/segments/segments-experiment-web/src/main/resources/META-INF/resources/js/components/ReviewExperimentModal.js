@@ -223,7 +223,7 @@ function ReviewExperimentModal({modalObserver, onModalClose, onRun, variants}) {
 
 						{Liferay.FeatureFlags['LRAC-15017'] && (
 							<>
-								<label>{Liferay.Language.get('Dynamic')}</label>
+								<label>{Liferay.Language.get('dynamic')}</label>
 
 								<p className="small">
 									{Liferay.Language.get(

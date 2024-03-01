@@ -25,6 +25,11 @@ import org.osgi.service.component.annotations.Component;
 public class OptionsDDMFormFieldType extends BaseDDMFormFieldType {
 
 	@Override
+	public String getESModule() {
+		return "{Options} from dynamic-data-mapping-form-field-type";
+	}
+
+	@Override
 	public String getModuleName() {
 		return "dynamic-data-mapping-form-field-type/Options/Options.es";
 	}

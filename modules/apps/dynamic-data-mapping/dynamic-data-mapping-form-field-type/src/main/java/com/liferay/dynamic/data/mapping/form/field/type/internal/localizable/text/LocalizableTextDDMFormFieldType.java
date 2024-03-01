@@ -36,6 +36,11 @@ public class LocalizableTextDDMFormFieldType extends BaseDDMFormFieldType {
 	}
 
 	@Override
+	public String getESModule() {
+		return "{LocalizableText} from dynamic-data-mapping-form-field-type";
+	}
+
+	@Override
 	public String getModuleName() {
 		return "dynamic-data-mapping-form-field-type/LocalizableText" +
 			"/LocalizableText.es";

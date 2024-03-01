@@ -37,6 +37,11 @@ public class SeparatorDDMFormFieldType extends BaseDDMFormFieldType {
 	}
 
 	@Override
+	public String getESModule() {
+		return "{Separator} from dynamic-data-mapping-form-field-type";
+	}
+
+	@Override
 	public String getModuleName() {
 		return "dynamic-data-mapping-form-field-type/Separator/Separator.es";
 	}

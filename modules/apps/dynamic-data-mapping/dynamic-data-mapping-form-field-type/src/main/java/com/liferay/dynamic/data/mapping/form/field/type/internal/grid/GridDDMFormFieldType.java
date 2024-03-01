@@ -37,6 +37,11 @@ public class GridDDMFormFieldType extends BaseDDMFormFieldType {
 	}
 
 	@Override
+	public String getESModule() {
+		return "{Grid} from dynamic-data-mapping-form-field-type";
+	}
+
+	@Override
 	public String getModuleName() {
 		return "dynamic-data-mapping-form-field-type/Grid/Grid.es";
 	}

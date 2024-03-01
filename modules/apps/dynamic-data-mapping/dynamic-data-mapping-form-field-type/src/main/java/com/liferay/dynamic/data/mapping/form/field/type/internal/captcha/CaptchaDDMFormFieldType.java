@@ -26,6 +26,11 @@ import org.osgi.service.component.annotations.Component;
 public class CaptchaDDMFormFieldType extends BaseDDMFormFieldType {
 
 	@Override
+	public String getESModule() {
+		return "{Captcha} from dynamic-data-mapping-form-field-type";
+	}
+
+	@Override
 	public String getModuleName() {
 		return "dynamic-data-mapping-form-field-type/Captcha/Captcha.es";
 	}

@@ -37,6 +37,11 @@ public class ParagraphDDMFormFieldType extends BaseDDMFormFieldType {
 	}
 
 	@Override
+	public String getESModule() {
+		return "{Paragraph} from dynamic-data-mapping-form-field-type";
+	}
+
+	@Override
 	public String getModuleName() {
 		return "dynamic-data-mapping-form-field-type/Paragraph/Paragraph.es";
 	}

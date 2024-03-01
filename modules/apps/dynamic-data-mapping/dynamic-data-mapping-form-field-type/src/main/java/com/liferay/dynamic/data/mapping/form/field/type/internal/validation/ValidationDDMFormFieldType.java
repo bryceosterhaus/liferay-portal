@@ -24,6 +24,11 @@ import org.osgi.service.component.annotations.Component;
 public class ValidationDDMFormFieldType extends BaseDDMFormFieldType {
 
 	@Override
+	public String getESModule() {
+		return "{Validation} from dynamic-data-mapping-form-field-type";
+	}
+
+	@Override
 	public String getModuleName() {
 		return "dynamic-data-mapping-form-field-type/Validation/Validation";
 	}

@@ -7,7 +7,6 @@ package com.liferay.commerce.product.definitions.web.internal.option;
 
 import com.liferay.commerce.product.model.CPDefinitionOptionRel;
 import com.liferay.commerce.product.option.CommerceOptionType;
-import com.liferay.frontend.js.loader.modules.extender.npm.NPMResolver;
 import com.liferay.headless.commerce.delivery.catalog.dto.v1_0.ProductOption;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.theme.PortletDisplay;
@@ -77,9 +76,6 @@ public class CheckboxMultipleCommerceOptionTypeImpl
 
 		printWriter.write("<div>");
 
-		String moduleName = _npmResolver.resolveModuleName(
-			"commerce-frontend-js");
-
 		ThemeDisplay themeDisplay =
 			(ThemeDisplay)httpServletRequest.getAttribute(
 				WebKeys.THEME_DISPLAY);
@@ -88,8 +84,7 @@ public class CheckboxMultipleCommerceOptionTypeImpl
 
 		_reactRenderer.renderReact(
 			new ComponentDescriptor(
-				moduleName + "/components/product_options" +
-					"/ProductOptionCheckboxMultiple"),
+				"{ProductOptionCheckboxMultiple} from commerce-frontend-js"),
 			HashMapBuilder.<String, Object>put(
 				"forceRequired", forceRequired
 			).put(
@@ -113,9 +108,6 @@ public class CheckboxMultipleCommerceOptionTypeImpl
 
 	@Reference
 	private Language _language;
-
-	@Reference
-	private NPMResolver _npmResolver;
 
 	@Reference
 	private Portal _portal;

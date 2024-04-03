@@ -3,22 +3,40 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
+import * as commerceEvents from './utilities/eventsDefinitions';
+
 export {
+	accountSelector,
 	AddToCart,
+	AddToCartButtonComponent,
+	AddToCartComponent,
 	AddToWishList,
 	Autocomplete,
-	AutocompletePureComponent,
+	AutocompleteComponent,
+	compareCheckbox,
 	DropdownMenu,
 	Gallery,
+	GalleryComponent,
+	InfiniteScrollerComponent,
 	ItemFinder,
 	MiniCart,
+	MiniCartContext,
+	Modal,
 	Price,
+	ProductOptionCheckbox,
+	ProductOptionCheckboxMultiple,
+	ProductOptionDate,
+	ProductOptionNumeric,
+	ProductOptionRadio,
+	ProductOptionSelect,
+	ProductOptionText,
 	QuantitySelector,
+	QuantitySelectorComponent,
+	RequestQuote,
 	StepTracker,
 	Summary,
 	TierPrice,
 	UnitOfMeasureSelector,
-	MiniCartContext,
 } from './components/index';
 export {default as CommerceServiceProvider} from './ServiceProvider/index';
 export {default as CommerceFrontendUtils} from './utilities/interface/index';
@@ -29,13 +47,26 @@ export {default as CommerceFrontendUtils} from './utilities/interface/index';
 
 export const CommerceContext = Liferay.CommerceContext;
 
-export {default as commerceEvents} from './utilities/eventsDefinitions';
+export {commerceEvents};
+
 export {default as FormUtils} from './utilities/forms/index';
-export {default as frontendJsWeb} from 'frontend-js-web';
+export {
+	useLiferayModule,
+	useCommerceAccount,
+	useCommerceCart,
+} from './utilities/hooks';
 export {default as MiniCompare} from './components/mini_compare/entry';
 export {default as slugify} from './utilities/slugify';
 export {
+	getMinQuantity,
+	getProductMaxQuantity,
+	getProductMinQuantity,
+	getNumberOfDecimals,
+	isMultiple,
+} from './utilities/quantities';
+export {
 	fetchHeaders,
+	fetchParams,
 	getData,
 	liferayNavigate,
 	getObjectFromPath,
@@ -47,4 +78,6 @@ export {
 	sortByKey,
 	isProductPurchasable,
 } from './utilities/index';
-export {default as ModalUtils} from './utilities/modals/index';
+export * as modalUtils from './utilities/modals/index';
+
+export {default as PriceRenderer} from './components/data_renderers/PriceRenderer';

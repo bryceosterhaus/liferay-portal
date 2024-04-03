@@ -32,18 +32,16 @@ boolean hasPermission = commercePricingClassCPDefinitionDisplayContext.hasPermis
 						HashMapBuilder.<String, Object>put(
 							"commercePricingClassId", commercePricingClass.getCommercePricingClassId()
 						).put(
-							"namespace", liferayPortletResponse.getNamespace()
-						).put(
 							"portletId", portletDisplay.getRootPortletId()
 						).put(
-							"pricingClassExternalReferenceCode", HtmlUtil.escapeJS(commercePricingClass.getExternalReferenceCode())
+							"pricingClassExternalReferenceCode", commercePricingClass.getExternalReferenceCode()
 						).put(
 							"pricingFDSName", CommercePricingFDSNames.PRICING_CLASSES_PRODUCT_DEFINITIONS
 						).put(
 							"spritemap", themeDisplay.getPathThemeSpritemap()
 						).build()
 					%>'
-					module="{accounts} from commerce-pricing-web"
+					module="{pricingClassesProducts} from commerce-pricing-web"
 				/>
 			</div>
 

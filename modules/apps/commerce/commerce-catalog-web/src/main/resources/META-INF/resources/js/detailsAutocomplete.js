@@ -26,7 +26,7 @@ export function detailsAutocompleteBasePrice({
 		onValueUpdated(value, priceListData) {
 			if (value) {
 				window.document.querySelector(
-					'#<portlet:namespace />baseCommercePriceListId'
+					`#${namespace}baseCommercePriceListId`
 				).value = priceListData.id;
 			}
 			else {

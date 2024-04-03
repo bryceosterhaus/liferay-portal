@@ -4,19 +4,20 @@
  */
 
 import {
+	CommerceServiceProvider,
 	ItemFinder,
-	ServiceProvider,
 	commerceEvents,
 } from 'commerce-frontend-js';
 
 export default function ({
+	catalogId,
 	commercePriceModifierId,
 	portletId,
 	priceModifierExternalReferenceCode,
 	pricingFDSName,
 	spritemap,
 }) {
-	const CommercePriceModifierProductsResource = ServiceProvider.AdminPricingAPI(
+	const CommercePriceModifierProductsResource = CommerceServiceProvider.AdminPricingAPI(
 		'v2'
 	);
 
@@ -49,8 +50,7 @@ export default function ({
 	}
 
 	ItemFinder('itemFinder', 'item-finder-root', {
-		apiUrl:
-			'/o/headless-commerce-admin-catalog/v1.0/products?filter=catalogId eq <%= commercePriceListDisplayContext.getCommerceCatalogId() %>',
+		apiUrl: `/o/headless-commerce-admin-catalog/v1.0/products?filter=catalogId eq ${catalogId}`,
 		getSelectedItems,
 		inputPlaceholder: Liferay.Language.get('find-a-product'),
 		itemCreation: false,

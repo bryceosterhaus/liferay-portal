@@ -38,6 +38,6 @@
 				"productTypeName", ParamUtil.getString(request, "productTypeName")
 			).build()
 		%>'
-		module="{addCPDefinition} from commerce-product-definitions-web"
+		module="{addCpDefinition} from commerce-product-definitions-web"
 	/>
 </commerce-ui:modal-content>

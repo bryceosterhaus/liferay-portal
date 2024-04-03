@@ -34,8 +34,8 @@ class D3Handler extends DiagramZoomHandler {
 		this._allowPinsUpdate = allowPinsUpdate;
 		this._closeDropdowns = closeDropdowns;
 		this._currentScale = 1;
-		this._d3diagramWrapper = d3select(diagramWrapper);
-		this._d3zoomWrapper = d3select(zoomWrapper);
+		this._d3diagramWrapper = this.select(diagramWrapper);
+		this._d3zoomWrapper = this.select(zoomWrapper);
 		this._diagramWrapper = diagramWrapper;
 		this._imageURL = imageURL;
 		this._pinBackground = null;
@@ -56,6 +56,18 @@ class D3Handler extends DiagramZoomHandler {
 		this._addListeners();
 		this._printImage();
 		this._addZoom();
+	}
+
+	get event() {
+		return d3event;
+	}
+
+	get drag() {
+		return d3drag;
+	}
+
+	get select() {
+		return d3select;
 	}
 
 	_addListeners() {
@@ -146,9 +158,9 @@ class D3Handler extends DiagramZoomHandler {
 		}
 
 		const [x, y] = getPercentagePositions(
-			d3event.x,
-			d3event.y,
-			d3event.target
+			this.event.x,
+			this.event.y,
+			this.event.target
 		);
 
 		this._newPinPlaceholder = this._d3zoomWrapper
@@ -159,7 +171,7 @@ class D3Handler extends DiagramZoomHandler {
 				`translate(${getAbsolutePositions(
 					x,
 					y,
-					d3event.target,
+					this.event.target,
 					this._currentScale
 				)})`
 			)
@@ -264,7 +276,7 @@ class D3Handler extends DiagramZoomHandler {
 
 		if (this._allowPinsUpdate) {
 			pinsWrapper.call(
-				d3drag()
+				this.drag()
 					.on('start', this._handleDragStarted)
 					.on('drag', this._handleDragging)
 					.on('end', this._handleDragEnded)
@@ -309,8 +321,8 @@ class D3Handler extends DiagramZoomHandler {
 
 		this._dragDetails = {
 			startTransform: selectedPin.getAttribute('transform'),
-			startX: d3event.x,
-			startY: d3event.y,
+			startX: this.event.x,
+			startY: this.event.y,
 		};
 
 		selectedPin.classList.add('drag-started');
@@ -324,8 +336,8 @@ class D3Handler extends DiagramZoomHandler {
 
 		if (
 			isPinMoving(
-				d3event.x,
-				d3event.y,
+				this.event.x,
+				this.event.y,
 				this._dragDetails.startX,
 				this._dragDetails.startY
 			)
@@ -333,16 +345,16 @@ class D3Handler extends DiagramZoomHandler {
 			selectedPin.classList.add('dragging');
 			this._dragDetails.moved = true;
 
-			d3select(selectedPin).attr(
+			this.select(selectedPin).attr(
 				'transform',
-				`translate(${d3event.x},${d3event.y})`
+				`translate(${this.event.x},${this.event.y})`
 			);
 		}
 		else {
 			selectedPin.classList.remove('dragging');
 			this._dragDetails.moved = false;
 
-			d3select(selectedPin).attr(
+			this.select(selectedPin).attr(
 				'transform',
 				this._dragDetails.startTransform
 			);
@@ -356,8 +368,8 @@ class D3Handler extends DiagramZoomHandler {
 
 		if (this._dragDetails.moved) {
 			const [x, y] = getPercentagePositions(
-				d3event.sourceEvent.x,
-				d3event.sourceEvent.y,
+				this.event.sourceEvent.x,
+				this.event.sourceEvent.y,
 				this._image.node()
 			);
 

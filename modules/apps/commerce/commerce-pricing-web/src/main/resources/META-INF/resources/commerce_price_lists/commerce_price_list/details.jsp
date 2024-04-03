@@ -94,9 +94,9 @@ if ((commercePriceList != null) && (commercePriceList.getExpirationDate() != nul
 				<liferay-frontend:component
 					context='<%=
 						HashMapBuilder.<String, Object>put(
-							"apiUrl", commercePriceListDisplayContext.getPriceListsAPIURL(portletName)
+							"apiUrl", String.valueOf(commercePriceListDisplayContext.getPriceListsAPIURL(portletName))
 						).put(
-							"initialLabel", (parentCommercePriceList == null) ? StringPool.BLANK : HtmlUtil.escapeJS(parentCommercePriceList.getName())
+							"initialLabel", (parentCommercePriceList == null) ? StringPool.BLANK : parentCommercePriceList.getName()
 						).put(
 							"initialValue", (parentCommercePriceList == null) ? 0 : parentCommercePriceList.getCommercePriceListId()
 						).put(

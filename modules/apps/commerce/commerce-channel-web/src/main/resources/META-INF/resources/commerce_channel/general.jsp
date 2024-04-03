@@ -294,7 +294,7 @@ if (shippingTaxCategory != null) {
 <liferay-frontend:component
 	context='<%=
 		HashMapBuilder.<String, Object>put(
-			"autocompleteInitialLabel", HtmlUtil.escapeJS(shippingTaxCategoryLabel)
+			"autocompleteInitialLabel", shippingTaxCategoryLabel
 		).put(
 			"autocompleteInitialValue", shippingTaxCategoryId
 		).put(

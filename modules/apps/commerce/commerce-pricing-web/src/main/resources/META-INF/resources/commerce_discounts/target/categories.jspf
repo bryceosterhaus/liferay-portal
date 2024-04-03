@@ -15,7 +15,7 @@
 					HashMapBuilder.<String, Object>put(
 						"commerceDiscountId", commerceDiscountId
 					).put(
-						"discountExternalReferenceCode", HtmlUtil.escapeJS(commerceDiscount.getExternalReferenceCode())
+						"discountExternalReferenceCode", commerceDiscount.getExternalReferenceCode()
 					).put(
 						"portletId", portletDisplay.getRootPortletId()
 					).put(
@@ -24,7 +24,7 @@
 						"spritemap", themeDisplay.getPathThemeSpritemap()
 					).build()
 				%>'
-				module="{accounts} from commerce-pricing-web"
+				module="{categories} from commerce-pricing-web"
 			/>
 		</div>
 

@@ -117,6 +117,8 @@ CSDiagramType csDiagramType = csDiagramSettingDisplayContext.getCSDiagramType(ty
 	context='<%=
 		HashMapBuilder.<String, Object>put(
 			"diagramId", (csDiagramSetting != null) ? csDiagramSetting.getCSDiagramSettingId() : 0
+		).put(
+			"namespace", liferayPortletResponse.getNamespace()
 		).build()
 	%>'
 	module="{editCsDiagramSetting} from commerce-shop-by-diagram-web"

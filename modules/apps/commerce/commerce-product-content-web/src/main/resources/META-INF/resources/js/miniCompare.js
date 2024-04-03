@@ -14,7 +14,7 @@ export default function main({
 	spritemap,
 }) {
 	MiniCompare('mini-compare', 'mini-compare-root', {
-		commerceChannelGroupId,
+		commerceChannelGroupId: Number(commerceChannelGroupId),
 		compareProductsURL,
 		items,
 		itemsLimit,

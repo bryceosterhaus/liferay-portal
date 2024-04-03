@@ -28,7 +28,7 @@ long commercePriceModifierId = commercePriceListDisplayContext.getCommercePriceM
 					).put(
 						"portletId", portletDisplay.getRootPortletId()
 					).put(
-						"priceModifierExternalReferenceCode", HtmlUtil.escapeJS(commercePriceModifier.getExternalReferenceCode())
+						"priceModifierExternalReferenceCode", commercePriceModifier.getExternalReferenceCode()
 					).put(
 						"pricingFDSName", CommercePricingFDSNames.PRICE_MODIFIER_CATEGORIES
 					).put(

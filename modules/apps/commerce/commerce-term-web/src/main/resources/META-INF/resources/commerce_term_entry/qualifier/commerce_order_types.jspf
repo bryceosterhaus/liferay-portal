@@ -15,7 +15,7 @@
 			).put(
 				"rootPortletId", portletDisplay.getRootPortletId()
 			).put(
-				"termExternalReferenceCode", HtmlUtil.escapeJS(commerceTermEntry.getExternalReferenceCode())
+				"termExternalReferenceCode", commerceTermEntry.getExternalReferenceCode()
 			).put(
 				"termId", commerceTermEntryId
 			).build()

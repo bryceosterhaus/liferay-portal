@@ -96,9 +96,9 @@ List<CommerceCurrency> commerceCurrencies = commerceCatalogDisplayContext.getCom
 					<liferay-frontend:component
 						context='<%=
 							HashMapBuilder.<String, Object>put(
-								"apiUrl", commerceCatalogDisplayContext.getAccountEntriesAPIURL()
+								"apiUrl", String.valueOf(commerceCatalogDisplayContext.getAccountEntriesAPIURL())
 							).put(
-								"initialLabel", (defaultAccountEntry == null) ? StringPool.BLANK : HtmlUtil.escapeJS(defaultAccountEntry.getName())
+								"initialLabel", (defaultAccountEntry == null) ? StringPool.BLANK : defaultAccountEntry.getName()
 							).put(
 								"initialValue", (defaultAccountEntry == null) ? 0 : defaultAccountEntry.getAccountEntryId()
 							).put(
@@ -121,7 +121,9 @@ List<CommerceCurrency> commerceCurrencies = commerceCatalogDisplayContext.getCom
 	<liferay-frontend:component
 		context='<%=
 			HashMapBuilder.<String, Object>put(
-				"editCatalogPortletURL", editCatalogPortletURL
+				"editCatalogPortletURL", String.valueOf(editCatalogPortletURL)
+			).put(
+				"namespace", liferayPortletResponse.getNamespace()
 			).build()
 		%>'
 		module="{addCommerceCatalog} from commerce-catalog-web"

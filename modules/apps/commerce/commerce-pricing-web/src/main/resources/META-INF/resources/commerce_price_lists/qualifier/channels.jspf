@@ -19,7 +19,7 @@
 					).put(
 						"portletId", portletDisplay.getRootPortletId()
 					).put(
-						"priceListExternalReferenceCode", HtmlUtil.escapeJS(commercePriceList.getExternalReferenceCode())
+						"priceListExternalReferenceCode", commercePriceList.getExternalReferenceCode()
 					).put(
 						"pricingFDSName", CommercePricingFDSNames.DISCOUNT_QUALIFIER_ACCOUNTS
 					).put(

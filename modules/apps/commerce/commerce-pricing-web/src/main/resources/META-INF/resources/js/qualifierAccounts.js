@@ -4,8 +4,8 @@
  */
 
 import {
+	CommerceServiceProvider,
 	ItemFinder,
-	ServiceProvider,
 	commerceEvents,
 } from 'commerce-frontend-js';
 
@@ -16,7 +16,7 @@ export default function ({
 	pricingFDSName,
 	spritemap,
 }) {
-	const CommercePriceListAccountsResource = ServiceProvider.default.AdminPricingAPI(
+	const CommercePriceListAccountsResource = CommerceServiceProvider.AdminPricingAPI(
 		'v2'
 	);
 
@@ -51,14 +51,14 @@ export default function ({
 	ItemFinder('itemFinder', 'item-finder-root', {
 		apiUrl: '/o/headless-commerce-admin-account/v1.0/accounts/',
 		getSelectedItems,
-		inputPlaceholder: Liferay.Language.gets('find-an-account'),
+		inputPlaceholder: Liferay.Language.get('find-an-account'),
 		itemCreation: false,
-		itemSelectedMessage: Liferay.Language.gets('account-selected'),
+		itemSelectedMessage: Liferay.Language.get('account-selected'),
 		itemsKey: 'id',
 		linkedDataSetsId: [pricingFDSName],
 		onItemSelected: selectItem,
 		pageSize: 10,
-		panelHeaderLabel: Liferay.Language.gets('add-accounts'),
+		panelHeaderLabel: Liferay.Language.get('add-accounts'),
 		portletId,
 		schema: [
 			{
@@ -66,6 +66,6 @@ export default function ({
 			},
 		],
 		spritemap,
-		titleLabel: Liferay.Language.gets('add-existing-account'),
+		titleLabel: Liferay.Language.get('add-existing-account'),
 	});
 }

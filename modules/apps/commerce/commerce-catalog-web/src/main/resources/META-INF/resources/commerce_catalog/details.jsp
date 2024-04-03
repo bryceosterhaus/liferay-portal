@@ -106,7 +106,7 @@ boolean viewOnly = !commerceCatalogDisplayContext.hasModelResourcePermission(com
 								HashMapBuilder.<String, Object>put(
 									"apiUrl", commerceCatalogDisplayContext.getPriceListsAPIURL(CommercePriceListConstants.TYPE_PRICE_LIST)
 								).put(
-									"initialLabel", (baseCommercePriceList == null) ? StringPool.BLANK : HtmlUtil.escapeJS(baseCommercePriceList.getName())
+									"initialLabel", (baseCommercePriceList == null) ? StringPool.BLANK : baseCommercePriceList.getName()
 								).put(
 									"initialValue", (baseCommercePriceList == null) ? 0 : baseCommercePriceList.getCommercePriceListId()
 								).put(
@@ -133,7 +133,7 @@ boolean viewOnly = !commerceCatalogDisplayContext.hasModelResourcePermission(com
 								HashMapBuilder.<String, Object>put(
 									"apiUrl", commerceCatalogDisplayContext.getPriceListsAPIURL(CommercePriceListConstants.TYPE_PROMOTION)
 								).put(
-									"initialLabel", (basePromotionCommercePriceList == null) ? StringPool.BLANK : HtmlUtil.escapeJS(basePromotionCommercePriceList.getName())
+									"initialLabel", (basePromotionCommercePriceList == null) ? StringPool.BLANK : basePromotionCommercePriceList.getName()
 								).put(
 									"initialValue", (basePromotionCommercePriceList == null) ? 0 : basePromotionCommercePriceList.getCommercePriceListId()
 								).put(
@@ -144,6 +144,8 @@ boolean viewOnly = !commerceCatalogDisplayContext.hasModelResourcePermission(com
 									"itemsKey", "id"
 								).put(
 									"itemsLabel", "name"
+								).put(
+									"namespace", liferayPortletResponse.getNamespace()
 								).build()
 							%>'
 							module="{detailsAutocompleteBasePromotion} from commerce-catalog-web"
@@ -165,7 +167,7 @@ boolean viewOnly = !commerceCatalogDisplayContext.hasModelResourcePermission(com
 									HashMapBuilder.<String, Object>put(
 										"apiUrl", commerceCatalogDisplayContext.getAccountEntriesAPIURL()
 									).put(
-										"initialLabel", (accountEntry == null) ? StringPool.BLANK : HtmlUtil.escapeJS(accountEntry.getName())
+										"initialLabel", (accountEntry == null) ? StringPool.BLANK : accountEntry.getName()
 									).put(
 										"initialValue", (accountEntry == null) ? 0 : accountEntry.getAccountEntryId()
 									).put(

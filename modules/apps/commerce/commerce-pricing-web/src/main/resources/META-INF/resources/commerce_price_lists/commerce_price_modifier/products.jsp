@@ -22,13 +22,15 @@ long commercePriceModifierId = commercePriceListDisplayContext.getCommercePriceM
 			<liferay-frontend:component
 				context='<%=
 					HashMapBuilder.<String, Object>put(
+						"catalogId", commercePriceListDisplayContext.getCommerceCatalogId()
+					).put(
 						"commercePriceModifierId", commercePriceModifierId
 					).put(
 						"namespace", liferayPortletResponse.getNamespace()
 					).put(
 						"portletId", portletDisplay.getRootPortletId()
 					).put(
-						"priceModifierExternalReferenceCode", HtmlUtil.escapeJS(commercePriceModifier.getExternalReferenceCode())
+						"priceModifierExternalReferenceCode", commercePriceModifier.getExternalReferenceCode()
 					).put(
 						"pricingFDSName", CommercePricingFDSNames.DISCOUNT_QUALIFIER_ACCOUNTS
 					).put(

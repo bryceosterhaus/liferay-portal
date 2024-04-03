@@ -4,8 +4,8 @@
  */
 
 import {
+	CommerceServiceProvider,
 	ItemFinder,
-	ServiceProvider,
 	commerceEvents,
 } from 'commerce-frontend-js';
 
@@ -16,7 +16,7 @@ export default function ({
 	pricingFDSName,
 	spritemap,
 }) {
-	const CommercePriceModifierCategoriesResource = ServiceProvider.AdminPricingAPI(
+	const CommercePriceModifierCategoriesResource = CommerceServiceProvider.AdminPricingAPI(
 		'v2'
 	);
 

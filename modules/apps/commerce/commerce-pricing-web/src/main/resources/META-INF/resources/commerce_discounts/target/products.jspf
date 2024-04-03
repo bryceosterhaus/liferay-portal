@@ -15,7 +15,7 @@
 					HashMapBuilder.<String, Object>put(
 						"commerceDiscountId", commerceDiscountId
 					).put(
-						"discountExternalReferenceCode", HtmlUtil.escapeJS(commerceDiscount.getExternalReferenceCode())
+						"discountExternalReferenceCode", commerceDiscount.getExternalReferenceCode()
 					).put(
 						"namespace", liferayPortletResponse.getNamespace()
 					).put(

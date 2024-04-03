@@ -433,7 +433,7 @@ CommerceOrder commerceOrder = commerceOrderEditDisplayContext.getCommerceOrder()
 						"portletId", portletDisplay.getRootPortletId()
 					).build()
 				%>'
-				module="{Summary} from commerce-order-web"
+				module="{summary} from commerce-order-web"
 			/>
 		</commerce-ui:panel>
 	</div>

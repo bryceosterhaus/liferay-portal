@@ -8,7 +8,7 @@ import ClayLabel from '@clayui/label';
 import ClayLoadingIndicator from '@clayui/loading-indicator';
 import ClaySticker from '@clayui/sticker';
 import {useIsMounted} from '@liferay/frontend-js-react-web';
-import {AddToCart, isProductPurchasable} from 'commerce-frontend-js';
+import {AddToCartComponent, isProductPurchasable} from 'commerce-frontend-js';
 import {sub} from 'frontend-js-web';
 import React, {useEffect, useState} from 'react';
 
@@ -130,7 +130,7 @@ function SkuContent({
 					<>
 						<Price className="mb-1" {...product.price} />
 
-						<AddToCart
+						<AddToCartComponent
 							accountId={accountId}
 							cartId={cartId}
 							cartUUID={orderUUID}

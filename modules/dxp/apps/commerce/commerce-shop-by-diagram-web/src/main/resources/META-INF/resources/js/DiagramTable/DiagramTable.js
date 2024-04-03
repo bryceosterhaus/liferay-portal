@@ -7,8 +7,8 @@ import ClayEmptyState from '@clayui/empty-state';
 import ClayLoadingIndicator from '@clayui/loading-indicator';
 import ClayTable from '@clayui/table';
 import {
-	AddToCartButton,
-	InfiniteScroller,
+	AddToCartButtonComponent,
+	InfiniteScrollerComponent,
 	useCommerceAccount,
 	useCommerceCart,
 } from 'commerce-frontend-js';
@@ -182,7 +182,7 @@ function DiagramTable({
 
 	if (!loaderActive && mappedProducts && !!mappedProducts.length) {
 		content = (
-			<InfiniteScroller
+			<InfiniteScrollerComponent
 				onBottomTouched={() => setCurrentPage(currentPage + 1)}
 				scrollCompleted={currentPage >= lastPage}
 			>
@@ -219,7 +219,7 @@ function DiagramTable({
 							))}
 					</ClayTable.Body>
 				</ClayTable>
-			</InfiniteScroller>
+			</InfiniteScrollerComponent>
 		);
 	}
 
@@ -256,7 +256,7 @@ function DiagramTable({
 			{content}
 
 			{!isAdmin && (
-				<AddToCartButton
+				<AddToCartButtonComponent
 					accountId={commerceAccount.id}
 					cartId={commerceCart.id}
 					cartUUID={orderUUID}

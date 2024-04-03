@@ -34,7 +34,7 @@ if (CommercePriceListConstants.TYPE_PROMOTION.equals(commercePriceEntryDisplayCo
 					).put(
 						"dataSetId", dataSetId
 					).put(
-						"discountExternalReferenceCode", HtmlUtil.escapeJS(commercePriceList.getExternalReferenceCode())
+						"discountExternalReferenceCode", commercePriceList.getExternalReferenceCode()
 					).put(
 						"portletId", portletDisplay.getRootPortletId()
 					).put(

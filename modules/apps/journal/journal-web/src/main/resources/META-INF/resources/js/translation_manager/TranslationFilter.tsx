@@ -10,7 +10,7 @@ import {TranslationManagerProps} from './Types';
 import useTranslationProgress from './useTranslationProgress';
 
 const Trigger = React.forwardRef(
-	({children, ...otherProps}, ref: LegacyRef<HTMLButtonElement>) => (
+	({children, ...otherProps}: any, ref: LegacyRef<HTMLButtonElement>) => (
 		<button
 			{...otherProps}
 			className="btn btn-block btn-secondary btn-sm form-control-select"
@@ -68,8 +68,7 @@ export default function TranslationFilter({
 						case 'translated':
 							if (!field.languages.includes(selectedLanguageId)) {
 								fieldNode.hidden = true;
-							}
-							else {
+							} else {
 								fieldNode.hidden = false;
 							}
 							if (
@@ -80,8 +79,7 @@ export default function TranslationFilter({
 								metadataWrapper.hidden = true;
 								contentWrapper.hidden = true;
 								emptyPlaceholder.hidden = false;
-							}
-							else {
+							} else {
 								metadataWrapper.hidden = false;
 								contentWrapper.hidden = false;
 								emptyPlaceholder.hidden = true;
@@ -90,8 +88,7 @@ export default function TranslationFilter({
 						case 'untranslated':
 							if (field.languages.includes(selectedLanguageId)) {
 								fieldNode.hidden = true;
-							}
-							else {
+							} else {
 								fieldNode.hidden = false;
 							}
 							if (
@@ -103,8 +100,7 @@ export default function TranslationFilter({
 								metadataWrapper.hidden = true;
 								contentWrapper.hidden = true;
 								emptyPlaceholder.hidden = false;
-							}
-							else {
+							} else {
 								metadataWrapper.hidden = false;
 								contentWrapper.hidden = false;
 								emptyPlaceholder.hidden = true;

@@ -176,13 +176,13 @@ boolean allowUpdateDomains = AccountEntryPermission.contains(permissionChecker, 
 					iframeBodyCssClass: '',
 					title: '<liferay-ui:message key="add-domain" />',
 					url: '<%=
-							PortletURLBuilder.createRenderURL(
-								renderResponse
-							).setMVCPath(
-								"/account_entries_admin/account_entry/add_domains.jsp"
-							).setWindowState(
-								LiferayWindowState.POP_UP
-							).buildPortletURL()
+						PortletURLBuilder.createRenderURL(
+							renderResponse
+						).setMVCPath(
+							"/account_entries_admin/account_entry/add_domains.jsp"
+						).setWindowState(
+							LiferayWindowState.POP_UP
+						).buildPortletURL()
 					%>',
 				});
 			});

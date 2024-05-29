@@ -17,14 +17,14 @@
 				portletId: '<%= portletDisplay.getId() %>',
 				title: '<liferay-ui:message key="configuration" />',
 				url: '<%=
-						HtmlUtil.escapeJS(
-							PortletURLBuilder.create(
-								PortletURLFactoryUtil.create(renderRequest, NotificationsPortletKeys.NOTIFICATIONS, PortletRequest.RENDER_PHASE)
-							).setMVCPath(
-								"/notifications/configuration.jsp"
-							).setWindowState(
-								LiferayWindowState.POP_UP
-							).buildString())
+					HtmlUtil.escapeJS(
+						PortletURLBuilder.create(
+							PortletURLFactoryUtil.create(renderRequest, NotificationsPortletKeys.NOTIFICATIONS, PortletRequest.RENDER_PHASE)
+						).setMVCPath(
+							"/notifications/configuration.jsp"
+						).setWindowState(
+							LiferayWindowState.POP_UP
+						).buildString())
 			%>',
 			});
 		}

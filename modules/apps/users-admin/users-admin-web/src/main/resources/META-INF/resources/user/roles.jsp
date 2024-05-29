@@ -669,21 +669,21 @@ currentURLObj.setParameter("historyKey", liferayPortletResponse.getNamespace() +
 
 							title: '<liferay-ui:message arguments="site-role" key="select-x" />',
 							url: '<%=
-									PortletURLBuilder.create(
-										PortletProviderUtil.getPortletURL(request, Role.class.getName(), PortletProvider.Action.BROWSE)
-									).setParameter(
-										"eventName", siteRoleEventName
-									).setParameter(
-										"groupEventName", groupEventName
-									).setParameter(
-										"p_u_i_d", (selUser == null) ? "0" : String.valueOf(selUser.getUserId())
-									).setParameter(
-										"roleType", RoleConstants.TYPE_SITE
-									).setParameter(
-										"step", "1"
-									).setWindowState(
-										LiferayWindowState.POP_UP
-									).buildPortletURL()
+								PortletURLBuilder.create(
+									PortletProviderUtil.getPortletURL(request, Role.class.getName(), PortletProvider.Action.BROWSE)
+								).setParameter(
+									"eventName", siteRoleEventName
+								).setParameter(
+									"groupEventName", groupEventName
+								).setParameter(
+									"p_u_i_d", (selUser == null) ? "0" : String.valueOf(selUser.getUserId())
+								).setParameter(
+									"roleType", RoleConstants.TYPE_SITE
+								).setParameter(
+									"step", "1"
+								).setWindowState(
+									LiferayWindowState.POP_UP
+								).buildPortletURL()
 								%>',
 						});
 					});

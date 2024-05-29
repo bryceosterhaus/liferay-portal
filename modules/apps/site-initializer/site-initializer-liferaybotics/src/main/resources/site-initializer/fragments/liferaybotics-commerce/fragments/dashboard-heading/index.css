@@ -1,11 +1,11 @@
 .fragment_1410 {
-	font-family: 'Open Sans';
-	font-style: normal;
-	font-weight: 600;
 	align-items: center;
 	background-color: #fff;
 	border-radius: 8px 8px 0 0;
 	display: flex;
+	font-family: 'Open Sans';
+	font-style: normal;
+	font-weight: 600;
 	justify-content: space-between;
 	padding: 1rem;
 }

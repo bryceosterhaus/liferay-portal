@@ -68,8 +68,8 @@ input:-webkit-autofill:active {
 	padding-right: 16px;
 }
 .row {
-	margin-right: -16px;
 	margin-left: -16px;
+	margin-right: -16px;
 }
 .col-1,
 .col-2,
@@ -141,8 +141,8 @@ input:-webkit-autofill:active {
 .col-xl-12,
 .col-xl,
 .col-xl-auto {
-	padding-right: 16px;
 	padding-left: 16px;
+	padding-right: 16px;
 }
 
 /*Button*/

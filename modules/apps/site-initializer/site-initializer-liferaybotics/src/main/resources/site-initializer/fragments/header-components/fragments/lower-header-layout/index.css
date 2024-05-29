@@ -17,10 +17,10 @@
 
 .lower-header .navbar .navbar-toggler {
 	align-items: center;
+	background-color: #fff;
+	border: none;
 	color: currentColor;
 	cursor: pointer;
-	border: none;
-	background-color: #fff;
 	display: flex;
 	font-size: 1rem;
 	height: 70px;

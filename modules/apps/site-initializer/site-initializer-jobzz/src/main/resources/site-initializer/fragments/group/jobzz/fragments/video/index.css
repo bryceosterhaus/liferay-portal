@@ -3,8 +3,8 @@ video-wrapper {
   be relative to this element */
 	position: relative;
 
-	width: 400px;
 	height: 200px;
+	width: 400px;
 
 	/* Will not allow the video to overflow the 
   container */
@@ -12,10 +12,10 @@ video-wrapper {
 
 	/* Centering the container's content vertically 
   and horizontally */
-	text-align: center;
-	display: flex;
 	align-items: center;
+	display: flex;
 	justify-content: center;
+	text-align: center;
 }
 
 /* Add some content at the bottom of the video/page */
@@ -24,9 +24,9 @@ video-wrapper {
 	top: 20%;
 	/*background: rgba(0, 0, 0, 0.5);*/
 	color: #f1f1f1;
-	width: 100%;
 	padding: 20px;
 	text-align: center;
+	width: 100%;
 }
 
 .content > .cta {

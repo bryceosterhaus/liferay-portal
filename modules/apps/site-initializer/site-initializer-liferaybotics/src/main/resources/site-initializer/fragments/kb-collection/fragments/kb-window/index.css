@@ -27,11 +27,11 @@
 }
 
 .kb-window .header-wrapper .go-back {
-	margin: auto !important;
 	cursor: pointer !important;
 	font-family: 'Font Awesome 5 Free';
 	font-size: 2rem;
 	font-weight: 900;
+	margin: auto !important;
 	-moz-osx-font-smoothing: grayscale;
 	-webkit-font-smoothing: antialiased;
 	color: var(--primary);

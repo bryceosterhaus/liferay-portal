@@ -143,9 +143,10 @@ function PageContentSelectors({
 			return;
 		}
 
-		// @ts-ignore
-
 		const sidenavInstance =
+
+			// @ts-ignore
+
 			Liferay.SideNavigation.initialize(simulationToggle);
 
 		sidenavInstance.on('closed.lexicon.sidenav', () => {

@@ -36,9 +36,10 @@ export default function App({portletNamespace: namespace}: IProps) {
 			`${namespace}simulationToggleId`
 		);
 
-		// @ts-ignore
-
 		const sidenavInstance =
+
+			// @ts-ignore
+
 			Liferay.SideNavigation.initialize(simulationToggle);
 
 		sidenavInstance.on('closed.lexicon.sidenav', () => {

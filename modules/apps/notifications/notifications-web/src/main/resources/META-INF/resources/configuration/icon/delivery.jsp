@@ -16,8 +16,7 @@
 				portletSelector: '#p_p_id_<%= portletDisplay.getId() %>_',
 				portletId: '<%= portletDisplay.getId() %>',
 				title: '<liferay-ui:message key="configuration" />',
-				url:
-					'<%=
+				url: '<%=
 						HtmlUtil.escapeJS(
 							PortletURLBuilder.create(
 								PortletURLFactoryUtil.create(renderRequest, NotificationsPortletKeys.NOTIFICATIONS, PortletRequest.RENDER_PHASE)

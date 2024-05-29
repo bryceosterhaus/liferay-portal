@@ -59,11 +59,11 @@ const TableHeadCell = ({
 							active: true,
 							direction:
 								element.direction === 'asc' ? 'desc' : 'asc',
-					  }
+						}
 					: {
 							...element,
 							active: false,
-					  }
+						}
 			);
 		}
 		else {
@@ -76,16 +76,16 @@ const TableHeadCell = ({
 										element.direction === 'asc'
 											? 'desc'
 											: 'asc',
-							  }
+								}
 							: element
-				  )
+					)
 				: [
 						{
 							direction: 'asc',
 							fieldName,
 							key: sortingKey,
 						},
-				  ];
+					];
 		}
 
 		viewsDispatch({
@@ -108,12 +108,12 @@ const TableHeadCell = ({
 						symbol={
 							Liferay.FeatureFlags['LPD-19465']
 								? sortingMatch?.active &&
-								  sortingMatch?.direction === 'asc'
+									sortingMatch?.direction === 'asc'
 									? 'order-arrow-up'
 									: 'order-arrow-down'
 								: sortingMatch?.direction === 'asc'
-								? 'order-arrow-up'
-								: 'order-arrow-down'
+									? 'order-arrow-up'
+									: 'order-arrow-down'
 						}
 					/>
 				</span>
@@ -134,7 +134,7 @@ const TableHeadCell = ({
 						className={classNames('sorting-icon', {
 							active: Liferay.FeatureFlags['LPD-19465']
 								? sortingMatch?.direction === 'asc' &&
-								  sortingMatch?.active
+									sortingMatch?.active
 								: sortingMatch?.direction === 'asc',
 						})}
 						symbol="order-arrow-up"
@@ -144,7 +144,7 @@ const TableHeadCell = ({
 						className={classNames('sorting-icon', {
 							active: Liferay.FeatureFlags['LPD-19465']
 								? sortingMatch?.direction === 'desc' &&
-								  sortingMatch?.active
+									sortingMatch?.active
 								: sortingMatch?.direction === 'desc',
 						})}
 						symbol="order-arrow-down"

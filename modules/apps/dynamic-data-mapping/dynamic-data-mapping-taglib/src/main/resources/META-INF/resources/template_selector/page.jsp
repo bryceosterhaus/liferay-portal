@@ -103,10 +103,8 @@ Group ddmTemplateGroup = GroupLocalServiceUtil.getGroup(ddmTemplateGroupId);
 						submitForm(form, '<%= HtmlUtil.escapeJS(refreshURL) %>');
 					}
 				},
-				title:
-					'<%= UnicodeLanguageUtil.get(request, "widget-templates") %>',
-				url:
-					'<%=
+				title: '<%= UnicodeLanguageUtil.get(request, "widget-templates") %>',
+				url: '<%=
 						PortletURLBuilder.create(
 							PortletURLFactoryUtil.create(request, PortletProviderUtil.getPortletId(DDMTemplate.class.getName(), PortletProvider.Action.VIEW), themeDisplay.getPlid(), PortletRequest.RENDER_PHASE)
 						).setMVCPath(

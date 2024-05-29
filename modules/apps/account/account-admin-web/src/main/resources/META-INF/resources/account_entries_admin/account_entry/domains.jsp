@@ -143,8 +143,7 @@ boolean allowUpdateDomains = AccountEntryPermission.contains(permissionChecker, 
 					},
 					customEvents: [
 						{
-							name:
-								'<%= liferayPortletResponse.getNamespace() %>addDomains',
+							name: '<%= liferayPortletResponse.getNamespace() %>addDomains',
 							onEvent: function (event) {
 								var newDomains = event.data.split(',');
 
@@ -176,8 +175,7 @@ boolean allowUpdateDomains = AccountEntryPermission.contains(permissionChecker, 
 					id: '<%= liferayPortletResponse.getNamespace() %>addDomains',
 					iframeBodyCssClass: '',
 					title: '<liferay-ui:message key="add-domain" />',
-					url:
-						'<%=
+					url: '<%=
 							PortletURLBuilder.createRenderURL(
 								renderResponse
 							).setMVCPath(

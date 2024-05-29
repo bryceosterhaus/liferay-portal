@@ -316,9 +316,10 @@ function Target({
 						switch (action) {
 							case 'auto-fill':
 								onChange({
-									ddmDataProviderInstanceUUID: dataProvider.find(
-										({id}) => id === value
-									).uuid,
+									ddmDataProviderInstanceUUID:
+										dataProvider.find(
+											({id}) => id === value
+										).uuid,
 									value,
 								});
 								break;
@@ -444,8 +445,7 @@ export function Actions({
 												...event,
 												loc: index,
 											},
-											type:
-												ACTIONS_TYPES.CHANGE_ACTION_TARGET,
+											type: ACTIONS_TYPES.CHANGE_ACTION_TARGET,
 										})
 									}
 									pages={pages}
@@ -489,8 +489,7 @@ export function Actions({
 																payload: {
 																	loc: index,
 																},
-																type:
-																	ACTIONS_TYPES.DELETE_ACTION,
+																type: ACTIONS_TYPES.DELETE_ACTION,
 															});
 															modal.onClose();
 														}}

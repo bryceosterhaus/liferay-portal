@@ -335,8 +335,7 @@ if (Validator.isNotNull(requestUpdateStructureURL)) {
 			Portlet portlet = PortletLocalServiceUtil.getPortletById(portletDisplay.getId());
 			%>
 
-			url:
-				'<%=
+			url: '<%=
 					PortletURLBuilder.create(
 						PortletURLFactoryUtil.create(request, DDMPortletKeys.DYNAMIC_DATA_MAPPING, PortletRequest.RENDER_PHASE)
 					).setMVCPath(

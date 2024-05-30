@@ -5,7 +5,7 @@
 
 import {ESLint} from 'eslint';
 import fg from 'fast-glob';
-import fs from 'fs';
+import * as fs from 'fs/promises';
 import path from 'path';
 import prettier from 'prettier';
 import stylelint from 'stylelint';
@@ -24,9 +24,7 @@ const PRETTIER_IGNORE_FILE = '.prettierignore';
 const ESLINT_IGNORE_FILE = '.eslintignore';
 const GIT_IGNORE_FILE = '.gitignore';
 
-async function getFilesToCheck() {
-	const rootDir = await getRootDir();
-
+async function getFilesToCheck(rootDir) {
 	const eslintIgnoreFilePath = path.join(rootDir, ESLINT_IGNORE_FILE);
 	const prettierIgnoreFilePath = path.join(rootDir, PRETTIER_IGNORE_FILE);
 	const gitIgnoreFilePath = path.join(rootDir, GIT_IGNORE_FILE);
@@ -74,18 +72,22 @@ const FALLBACK_FILE_PATH = '__fallback__.js';
 export default async function format() {
 	const fix = process.argv[3] !== '--check';
 
-	let filepaths = await getFilesToCheck();
+	const rootDir = await getRootDir();
+
+	let filepaths = await getFilesToCheck(rootDir);
 
 	filepaths = await filterChangedFiles(filepaths);
 
-	const eslintConfig = await getEslintConfig();
-	const prettierConfig = await getPrettierConfig();
-	const stylelintConfig = await getStylelintConfig();
+	const [eslintConfig, prettierConfig, stylelintConfig] = await Promise.all([
+		getEslintConfig(rootDir),
+		getPrettierConfig(rootDir),
+		getStylelintConfig(rootDir),
+	]);
 
 	const eslintCLI = new ESLint({
 		baseConfig: eslintConfig,
 		fix: true,
-		ignorePath: path.join(await getRootDir(), ESLINT_IGNORE_FILE),
+		ignorePath: path.join(rootDir, ESLINT_IGNORE_FILE),
 	});
 
 	const badFiles = [];
@@ -155,7 +157,7 @@ export default async function format() {
 	for (const filepath of filepaths) {
 		checked++;
 
-		const source = fs.readFileSync(filepath, 'utf8');
+		const source = await fs.readFile(filepath, 'utf8');
 		const extName = path.extname(filepath);
 
 		let transformedContent = source;
@@ -248,7 +250,7 @@ export default async function format() {
 		}
 
 		if (fixed) {
-			fs.writeFileSync(filepath, transformedContent);
+			await fs.writeFile(filepath, transformedContent);
 		}
 	}
 
@@ -281,27 +283,24 @@ export default async function format() {
 	}
 }
 
-async function getEslintConfig() {
-	const eslintConfigPath = path.join(await getRootDir(), '.eslintrc.js');
+async function getEslintConfig(rootDir) {
+	const eslintConfigPath = path.join(rootDir, '.eslintrc.js');
 
 	const {default: eslintConfig} = await import(eslintConfigPath);
 
 	return eslintConfig;
 }
 
-async function getPrettierConfig() {
-	const prettierConfigPath = path.join(await getRootDir(), '.prettierrc.js');
+async function getPrettierConfig(rootDir) {
+	const prettierConfigPath = path.join(rootDir, '.prettierrc.js');
 
 	const {default: prettierConfig} = await import(prettierConfigPath);
 
 	return prettierConfig;
 }
 
-async function getStylelintConfig() {
-	const stylelintConfigPath = path.join(
-		await getRootDir(),
-		'.stylelintrc.js'
-	);
+async function getStylelintConfig(rootDir) {
+	const stylelintConfigPath = path.join(rootDir, '.stylelintrc.js');
 
 	const {default: stylelintConfig} = await import(stylelintConfigPath);
 

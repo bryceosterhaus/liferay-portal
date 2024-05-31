@@ -31,10 +31,8 @@ export default function SaveButtons({
 
 	const [articleId, setArticleId] = useState(initialArticleId);
 
-	const [
-		{publishModalAction, publishModalVisible},
-		setPublishModalState,
-	] = useState({publishModalAction: '', publishModalVisible: false});
+	const [{publishModalAction, publishModalVisible}, setPublishModalState] =
+		useState({publishModalAction: '', publishModalVisible: false});
 
 	const [saveButtonDisabled, setSaveButtonDisabled] = useState(false);
 

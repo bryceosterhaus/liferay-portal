@@ -5,46 +5,26 @@
 
 const path = require('path');
 
-/**
- * We use @liferay/npm-scripts to perform linting in a controlled way, but we
- * also try to expose its configuration here so it can be picked up by editors.
- */
-let config = {};
-
-try {
-	config = require('@liferay/npm-scripts/src/config/eslint.config');
-}
-catch (error) {
-	throw new Error('@liferay/npm-scripts is not installed; please run "yarn"');
-}
-
-config = {
-	...config,
+module.exports = {
 	env: {
 		browser: true,
-		es6: true,
+		es2021: true,
 		node: true,
 	},
+	extends: ['plugin:@liferay/portal'],
 	globals: {
-		...config.globals,
 		MODULE_PATH: true,
 		configuration: true,
 		fragmentElement: true,
 		fragmentNamespace: true,
 		layoutMode: true,
 	},
-	overrides: [
-		{
-			files: [
-				'liferay-sample-workspace/client-extensions/liferay-sample-custom-element-*/**',
-			],
-			rules: {
-				'@liferay/no-abbreviations': 'off',
-				'@liferay/no-it-should': 'off',
-				'sort-keys': 'off',
-			},
-		},
-	],
+	parserOptions: {
+		ecmaVersion: '2022',
+		type: 'module',
+	},
+	plugins: ['@liferay'],
+	root: true,
 	rules: {
 		'@liferay/empty-line-between-elements': 'off',
 		'@liferay/import-extensions': 'off',
@@ -70,5 +50,3 @@ config = {
 		],
 	},
 };
-
-module.exports = config;

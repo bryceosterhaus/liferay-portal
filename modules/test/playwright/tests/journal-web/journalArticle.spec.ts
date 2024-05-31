@@ -206,9 +206,8 @@ autoSaveAsDraftTest(
 keepTitlesUntranslated(
 	'LPD-20723: Clay link is translating asset titles/names by default in vertical card',
 	async ({apiHelpers, journalPage, page, site}) => {
-		const contentStructureId = await getBasicWebContentStructureId(
-			apiHelpers
-		);
+		const contentStructureId =
+			await getBasicWebContentStructureId(apiHelpers);
 
 		const title = 'add-web-content';
 
@@ -244,9 +243,8 @@ keepTitlesUntranslated(
 privateContentIconTest(
 	'LPD-15807: Identify at a glance if a Web Content is visible for guests in content management',
 	async ({apiHelpers, journalEditArticlePage, journalPage, site}) => {
-		const contentStructureId = await getBasicWebContentStructureId(
-			apiHelpers
-		);
+		const contentStructureId =
+			await getBasicWebContentStructureId(apiHelpers);
 
 		const title = getRandomString();
 
@@ -276,9 +274,8 @@ privateContentIconTest(
 privateContentIconTest(
 	'LPD-15807: Identify at a glance if a Web Content is visible for guests in the item selector',
 	async ({apiHelpers, journalEditArticlePage, journalPage, site}) => {
-		const contentStructureId = await getBasicWebContentStructureId(
-			apiHelpers
-		);
+		const contentStructureId =
+			await getBasicWebContentStructureId(apiHelpers);
 
 		await addApprovedStructuredContent({
 			apiHelpers,
@@ -328,9 +325,8 @@ prefixUrlTest(
 	}) => {
 		const articleTitle = getRandomString();
 
-		const contentStructureId = await getBasicWebContentStructureId(
-			apiHelpers
-		);
+		const contentStructureId =
+			await getBasicWebContentStructureId(apiHelpers);
 
 		await addApprovedStructuredContent({
 			apiHelpers,
@@ -607,9 +603,8 @@ translationTest(
 		journalPage,
 		site,
 	}) => {
-		const contentStructureId = await getBasicWebContentStructureId(
-			apiHelpers
-		);
+		const contentStructureId =
+			await getBasicWebContentStructureId(apiHelpers);
 
 		const title = getRandomString();
 
@@ -644,9 +639,8 @@ bulkTest(
 			{enabled: true, locator: '#guest_ACTION_PERMISSIONS'},
 		];
 
-		const contentStructureId = await getBasicWebContentStructureId(
-			apiHelpers
-		);
+		const contentStructureId =
+			await getBasicWebContentStructureId(apiHelpers);
 
 		const title1 = getRandomString();
 		const title2 = getRandomString();

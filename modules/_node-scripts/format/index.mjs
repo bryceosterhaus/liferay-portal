@@ -35,9 +35,8 @@ async function getFilesToCheck(rootDir) {
 
 	return await fg(
 		[
-			'**/types/**/*.d.ts',
-			'*.{js,mjs,ts}',
-			'**/*.{css,js,mjs,scss,ts,tsx}',
+			'*.{css,graphql,js,mjs,scss,ts,tsx}',
+			'**/*.{css,graphql,js,mjs,scss,ts,tsx}',
 			'**/src/**/*.{jsp,jspf}',
 		],
 		{

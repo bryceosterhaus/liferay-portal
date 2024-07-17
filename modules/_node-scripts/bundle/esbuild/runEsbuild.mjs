@@ -18,10 +18,7 @@ async function doRunEsbuild(esbuildesbuildConfig, configName) {
 	const start = performance.now();
 
 	try {
-		await esbuild.build({
-			minify: process.env.NODE_ENV === 'production',
-			...esbuildesbuildConfig,
-		});
+		await esbuild.build(esbuildesbuildConfig);
 	}
 	catch (error) {
 		throw new Error(`Esbuild command failed: ${error}`);

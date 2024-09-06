@@ -73,8 +73,8 @@ const Filter = ({
 	const onSelect = useCallback(
 		(item) => {
 			if (setItems) {
-				setItems(
-					items.map((arrayItem) => {
+				setItems((oldItems) =>
+					oldItems.map((arrayItem) => {
 						if (arrayItem.key === item.key) {
 							item.active = !arrayItem.active;
 
@@ -125,8 +125,8 @@ const Filter = ({
 				);
 
 				if (setItems) {
-					setItems(
-						items.map((item, itemIndex) => {
+					setItems((oldItems) =>
+						oldItems.map((item, itemIndex) => {
 							item.active = itemIndex === index;
 
 							return item;
@@ -155,9 +155,7 @@ const Filter = ({
 
 	useEffect(() => {
 		selectDefaultItem();
-
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [defaultItem, getSelectedItems(items).length]);
+	}, [defaultItem, selectDefaultItem, selectedItems]);
 
 	useEffect(() => {
 		setFilteredItems(

@@ -32,7 +32,6 @@ const Filter = ({
 	name,
 	onClickFilter,
 	prefixKey = '',
-	setItems,
 	show = true,
 	withoutRouteParams,
 }) => {
@@ -41,70 +40,69 @@ const Filter = ({
 	const [filteredItems, setFilteredItems] = useState([]);
 	const [searchTerm, setSearchTerm] = useState('');
 	const [changed, setChanged] = useState(false);
-	const [selectedItems, setSelectedItems] = useState([]);
 
 	const prefixedFilterKey = getCapitalizedFilterKey(prefixKey, filterKey);
 	const routerProps = useRouter();
 
-	const getSelectedItems = (items) => items.filter((item) => item.active);
+	const getSelectedItems = useCallback(
+		(items) => items.filter((item) => item.active),
+		[]
+	);
 
-	const applyFilterChanges = useCallback(() => {
-		if (!withoutRouteParams) {
-			const query = getSelectedItemsQuery(
-				items,
-				prefixedFilterKey,
-				routerProps.location.search
-			);
-
-			replaceHistory(query, routerProps);
-		}
-		else {
-			dispatchFilter(prefixedFilterKey, getSelectedItems(items));
-		}
-
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [items, routerProps]);
-
-	const closeDropdown = () => {
-		setExpanded(false);
-		setSearchTerm('');
-	};
-
-	const onSelect = useCallback(
-		(item) => {
-			if (setItems) {
-				setItems((oldItems) =>
-					oldItems.map((arrayItem) => {
-						if (arrayItem.key === item.key) {
-							item.active = !arrayItem.active;
-
-							return item;
-						}
-						if (!multiple) {
-							arrayItem.active = false;
-						}
-
-						return arrayItem;
-					})
+	const applyFilterChanges = useCallback(
+		(updatedItems) => {
+			if (!withoutRouteParams) {
+				const query = getSelectedItemsQuery(
+					updatedItems ?? items,
+					prefixedFilterKey,
+					routerProps.location.search
 				);
+
+				replaceHistory(query, routerProps);
 			}
 			else {
-				if (!multiple) {
-					items.forEach((item) => {
-						item.active = false;
-					});
-				}
-
-				item.active = !item.active;
+				dispatchFilter(
+					prefixedFilterKey,
+					getSelectedItems(updatedItems ?? items)
+				);
 			}
 
+			// eslint-disable-next-line react-hooks/exhaustive-deps
+		},
+		[
+			items,
+			prefixedFilterKey,
+			routerProps,
+			withoutRouteParams,
+			dispatchFilter,
+			getSelectedItems,
+		]
+	);
+
+	const closeDropdown = useCallback(() => {
+		setExpanded(false);
+		setSearchTerm('');
+	}, []);
+	const onSelect = useCallback(
+		(item) => {
+			const updatedItems = items.map((currentItem) => {
+				if (currentItem.key === item.key) {
+					return {...currentItem, active: true};
+				}
+				if (!multiple) {
+					return {...currentItem, active: false};
+				}
+
+				return currentItem;
+			});
+
 			if (onClickFilter) {
-				onClickFilter(item);
+				onClickFilter(updatedItems.find((item) => item.active));
 				closeDropdown();
 			}
 			else {
 				if (!multiple) {
-					applyFilterChanges();
+					applyFilterChanges(updatedItems);
 					closeDropdown();
 				}
 				else {
@@ -112,50 +110,47 @@ const Filter = ({
 				}
 			}
 		},
-
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-		[applyFilterChanges, items]
+		[items, multiple, onClickFilter, applyFilterChanges, closeDropdown]
 	);
 
 	const selectDefaultItem = useCallback(() => {
 		if (defaultItem && !multiple) {
+			const selectedItems = getSelectedItems(items);
+
 			if (!selectedItems.length) {
 				const index = items.findIndex(
 					(item) => item.key === defaultItem.key
 				);
 
-				if (setItems) {
-					setItems((oldItems) =>
-						oldItems.map((item, itemIndex) => {
-							item.active = itemIndex === index;
+				if (index !== -1) {
+					const updatedItems = items.map((item, i) => ({
+						...item,
+						active: i === index,
+					}));
 
-							return item;
-						})
-					);
-				}
-				else {
-					items[index].active = true;
-				}
+					items = updatedItems;
 
-				if (!onClickFilter) {
-					applyFilterChanges();
-				}
-				else {
-					onClickFilter(items[index]);
+					if (!onClickFilter) {
+						applyFilterChanges(updatedItems);
+					}
+					else {
+						onClickFilter(updatedItems[index]);
+					}
 				}
 			}
 		}
-
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [applyFilterChanges, defaultItem, items, selectedItems]);
-
-	useEffect(() => {
-		setSelectedItems(getSelectedItems(items));
-	}, [items]);
+	}, [
+		defaultItem,
+		multiple,
+		items,
+		getSelectedItems,
+		onClickFilter,
+		applyFilterChanges,
+	]);
 
 	useEffect(() => {
 		selectDefaultItem();
-	}, [defaultItem, selectDefaultItem, selectedItems]);
+	}, [selectDefaultItem]);
 
 	useEffect(() => {
 		setFilteredItems(
@@ -177,9 +172,7 @@ const Filter = ({
 		else if (!expanded && !multiple && childrenVisibility) {
 			setExpanded(true);
 		}
-
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [expanded]);
+	}, [expanded, multiple, changed, childrenVisibility, applyFilterChanges]);
 
 	return (
 		show && (

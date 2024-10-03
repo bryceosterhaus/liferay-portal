@@ -16,6 +16,8 @@ import {createRoot} from 'react-dom/client';
 
 let counter = 0;
 
+const CLASSNAME_TOOLTIP_SCOPE = 'lfr-tooltip-scope';
+
 /**
  * This flag is a temporary workaround for unit tests that still use React 16.
  * It will be removed once the tests are converted to React 18
@@ -56,41 +58,31 @@ export default function render(
 		return;
 	}
 
-	if (!(window.Liferay as any).SPA || (window.Liferay as any).SPA.app) {
-		const {portletId} = renderData;
-
-		// Temporary workaround until frontend-icons-web is converted to ESM.
-		// We will replace with an import from frontend-icons-web later.
-
-		const spritemap = ((Liferay as any).Icons || {}).spritemap as string;
+	if (!Liferay.SPA || Liferay.SPA.app) {
+		const {
+			__reactDOMFlushSync,
+			hasBodyContent,
+			portletId,
+			...componentProps
+		} = renderData;
 
 		let {componentId} = renderData;
-
-		const destroyOnNavigate = !portletId;
 
 		if (!componentId) {
 			componentId = `__UNNAMED_COMPONENT__${portletId}__${counter++}`;
 		}
 
-		const Component: React.ElementType =
-			typeof renderable === 'function' ||
-			(renderable as any).$$typeof === Symbol.for('react.forward_ref')
-				? (renderable as any)
-				: null;
-
-		container.classList.add('lfr-tooltip-scope');
-
-		if (renderData.hasBodyContent) {
+		if (hasBodyContent) {
 			const children = container.querySelectorAll(
 				'.tag-body-content > *'
 			);
 
 			if (children.length) {
-				renderData.children = children;
+				componentProps.children = children;
 			}
 		}
 
-		delete renderData.hasBodyContent;
+		container.classList.add(CLASSNAME_TOOLTIP_SCOPE);
 
 		let root: any;
 
@@ -98,29 +90,12 @@ export default function render(
 			root = createRoot(container);
 		}
 
-		(window.Liferay as any).component(
+		Liferay.component(
 			componentId,
 			{
 				destroy: () => {
-					container.classList.remove('lfr-tooltip-scope');
+					container.classList.remove(CLASSNAME_TOOLTIP_SCOPE);
 
-					/**
-					 * When navigating to another page, this error can be thrown
-					 * when a component uses a React portal:
-					 *
-					 * "Uncaught DOMException: Failed to execute 'removeChild'
-					 * on 'Node': The node to be removed is not a child of this
-					 * node."
-					 *
-					 * This is because the contents of the React portal can be
-					 * placed in an additional senna surface <div> so when
-					 * `container.removeChild(child)` is called, this error is
-					 * thrown. (`container` being document.body and `child`
-					 * being the portal contents)
-					 *
-					 * This temporarily catches this error until a better fix
-					 * can be found.
-					 */
 					try {
 						if (USE_REACT_16) {
 							ReactDOM.unmountComponentAtNode(container);
@@ -136,19 +111,20 @@ export default function render(
 					}
 				},
 			},
-			{
-				destroyOnNavigate,
-				portletId,
-			}
+			{destroyOnNavigate: !portletId, portletId}
 		);
 
-		const {__reactDOMFlushSync, ...componentProps} = renderData;
+		const Component: React.ElementType =
+			typeof renderable === 'function' ||
+			(renderable as any).$$typeof === Symbol.for('react.forward_ref')
+				? (renderable as any)
+				: null;
 
 		const App = (
-			<LiferayProvider spritemap={spritemap}>
+			<LiferayProvider spritemap={Liferay.Icons.spritemap}>
 				{
 					(Component ? (
-						<Component {...componentProps} />
+						<Component {...componentProps} portletId={portletId} />
 					) : (
 						renderable
 					)) as React.ReactNode
@@ -176,9 +152,11 @@ export default function render(
 				renderApp();
 			}
 		}
+
+		return root;
 	}
 	else {
-		(window.Liferay as any).once('SPAReady', () => {
+		Liferay.once('SPAReady', () => {
 			render(renderable, renderData, container);
 		});
 	}

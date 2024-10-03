@@ -20,4 +20,6 @@ declare module Liferay {
 		fn: (event: any) => void,
 		context?: any
 	): void;
+
+	export const SPA = {app: any};
 }

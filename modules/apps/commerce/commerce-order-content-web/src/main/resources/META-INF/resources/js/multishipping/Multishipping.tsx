@@ -259,7 +259,7 @@ const Multishipping = ({
 	}, [orderId, prepareData]);
 
 	const updateFullCart = useCallback(
-		async (data) => {
+		async (data: any) => {
 			setSaving(true);
 
 			await CommerceServiceProvider.DeliveryCartAPI('v1')
@@ -281,7 +281,7 @@ const Multishipping = ({
 	);
 
 	const handleDeleteDeliveryGroup = useCallback(
-		async (deliveryGroup) => {
+		async (deliveryGroup: any) => {
 			try {
 				if (deliveryGroups.length === 1) {
 					await updateFullCart(
@@ -323,14 +323,14 @@ const Multishipping = ({
 		[deliveryGroups, formattedOrderItems, updateFullCart]
 	);
 
-	const handlePaginationDeltaChange = useCallback((value) => {
+	const handlePaginationDeltaChange = useCallback((value: any) => {
 		setPagination((prevState) => ({
 			...prevState,
 			pageSize: value,
 		}));
 	}, []);
 
-	const handlePaginationPageChange = useCallback((value) => {
+	const handlePaginationPageChange = useCallback((value: any) => {
 		setPagination((prevState) => ({
 			...prevState,
 			currentPage: value,

@@ -631,6 +631,10 @@ test.describe('Text input field', () => {
 
 			await pageEditorPage.selectFragment(inputId);
 
+			await pageEditorPage.goToConfigurationTab('Styles');
+
+			await pageEditorPage.goToConfigurationTab('General');
+
 			const selectedOption = page
 				.getByLabel('Field', {exact: true})
 				.getByRole('option', {selected: true});
@@ -2287,6 +2291,10 @@ test.describe('Multistep', () => {
 			await page.locator('[data-multi-step-icon="2"]').click();
 
 			await pageEditorPage.selectFragment(textInputId);
+
+			await pageEditorPage.goToConfigurationTab('Styles');
+
+			await pageEditorPage.goToConfigurationTab('General');
 
 			await page.getByLabel('Field', {exact: true}).waitFor();
 

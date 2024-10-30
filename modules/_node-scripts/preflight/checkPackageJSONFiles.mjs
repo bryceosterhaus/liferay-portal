@@ -446,7 +446,6 @@ const ALLOWED_NAMED_SCOPE_EXCEPTIONS = [
 
 const ALLOWED_NON_GLOBAL_DEPENDENCIES = [
 	'@liferay/amd-loader',
-	'@liferay/npm-scripts',
 	'@types/node-fetch',
 	'@vscode/ripgrep',
 	'alloy-ui',

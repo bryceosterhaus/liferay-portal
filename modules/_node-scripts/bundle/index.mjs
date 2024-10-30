@@ -9,7 +9,6 @@ import getOverridenPackageSymbols from '../configuration/getOverridenPackageSymb
 import getProjectDescription from '../configuration/getProjectDescription.mjs';
 import getProjectEntryPoints from '../configuration/getProjectEntryPoints.mjs';
 import getProjectExports from '../configuration/getProjectExports.mjs';
-import getProjectNpmScriptsConfig from '../configuration/getProjectNpmScriptsConfig.mjs';
 import getProjectWebContextPath from '../configuration/getProjectWebContextPath.mjs';
 import writeExportBridges from './amd/writeExportBridges.mjs';
 import writeMainBridge from './amd/writeMainBridge.mjs';
@@ -33,7 +32,6 @@ export default async function main() {
 		projectDescription,
 		projectEntryPoints,
 		projectExports,
-
 		projectWebContextPath,
 	] = await Promise.all([
 		getGlobalImports(),
@@ -42,7 +40,6 @@ export default async function main() {
 		getProjectDescription(),
 		getProjectEntryPoints(),
 		getProjectExports(),
-		getProjectNpmScriptsConfig(),
 		getProjectWebContextPath(),
 	]);
 
@@ -98,9 +95,6 @@ export default async function main() {
 
 		processCSSFiles(),
 		processSassFiles(),
-
-		// Rest of legacy build
-
 	]);
 
 	await writeTimings(start, endConfig);

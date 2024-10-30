@@ -14,5 +14,4 @@ module.exports = {
 		'react-dom',
 	],
 	main: 'src/main/resources/META-INF/resources/js/index.ts',
-	npmscripts: {},
 };

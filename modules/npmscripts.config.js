@@ -789,7 +789,6 @@ module.exports = {
 			'youtube-web',
 		],
 		'allowed-non-global-dependencies': [
-			'@liferay/npm-scripts',
 			'@typescript-eslint/parser',
 			'@vscode/ripgrep',
 			'alloy-ui',

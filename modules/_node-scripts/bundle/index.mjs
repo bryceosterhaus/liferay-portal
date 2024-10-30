@@ -20,7 +20,6 @@ import writeCSSExportsLoaderModules from './cssLoad/writeCSSExportsLoaderModules
 import bundleCSSExports from './esbuild/bundleCSSExports.mjs';
 import bundleJavaScriptExports from './esbuild/bundleJavaScriptExports.mjs';
 import bundleJavaScriptMain from './esbuild/bundleJavaScriptMain.mjs';
-import runNpmScripts from './npmscripts/runNpmScripts.mjs';
 import processSassFiles from './sass/processSassFiles.mjs';
 import writeTimings from './writeTimings.mjs';
 
@@ -34,7 +33,7 @@ export default async function main() {
 		projectDescription,
 		projectEntryPoints,
 		projectExports,
-		projectNpmScriptsConfig,
+
 		projectWebContextPath,
 	] = await Promise.all([
 		getGlobalImports(),
@@ -102,7 +101,6 @@ export default async function main() {
 
 		// Rest of legacy build
 
-		runNpmScripts(projectNpmScriptsConfig),
 	]);
 
 	await writeTimings(start, endConfig);

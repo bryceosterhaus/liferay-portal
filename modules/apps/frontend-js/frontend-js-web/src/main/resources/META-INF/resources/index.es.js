@@ -94,4 +94,5 @@ export {default as toggleSelectBox} from './liferay/util/toggle_select_box';
 export {default as zIndex} from './liferay/zIndex';
 export {default as loadClientExtensions} from './utils/client_extensions/loadClientExtensions';
 export {default as loadEditorClientExtensions} from './utils/client_extensions/loadEditorClientExtensions';
+
 export {loadModule} from './utils/client_extensions/loadModule';

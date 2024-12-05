@@ -1,5 +1,4 @@
 {
-	"_sha-256": "fd82aec9b180550deb83f6f1342d60b9250d7ddb9c3598c4266c533f4c9e6583",
 	"bin": {
 		"node-scripts": "./bin.js"
 	},

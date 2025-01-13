@@ -5,4 +5,7 @@
 
 module.exports = {
 	main: 'src/main/resources/META-INF/resources/js/App.js',
+	submodules: {
+		mySubmodule: 'src/main/resources/META-INF/resources/js/mySubmodule.js',
+	},
 };

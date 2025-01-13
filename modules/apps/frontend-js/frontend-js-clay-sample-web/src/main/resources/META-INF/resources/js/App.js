@@ -6,12 +6,15 @@
 import ClayAlert from '@clayui/alert';
 import React from 'react';
 
+import {Main} from './mySubmodule';
+
 export function App() {
 	return (
 		<div>
 			<ClayAlert title="Info">
 				This widget is used to test out Clay components. Simply add
 				whatever JS you want to App.js and redeploy.
+				{Main()}
 			</ClayAlert>
 
 			<div className="clay-test-class">This is where your code goes.</div>

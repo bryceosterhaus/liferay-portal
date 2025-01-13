@@ -8,7 +8,7 @@
 <%@ include file="/init.jsp" %>
 
 <div>
-	<react:component
+	<liferay-frontend:component
 		module="{App} from frontend-js-clay-sample-web"
 	/>
 </div>

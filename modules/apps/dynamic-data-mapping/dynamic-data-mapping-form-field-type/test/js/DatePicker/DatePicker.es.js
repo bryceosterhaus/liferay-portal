@@ -6,7 +6,7 @@
 import '@testing-library/jest-dom/extend-expect';
 import {fireEvent, render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import moment from 'moment';
+import {dateUtils} from 'frontend-js-web';
 import React from 'react';
 
 import DatePicker from '../../../src/main/resources/META-INF/resources/DatePicker/DatePicker.es';
@@ -72,7 +72,7 @@ describe('DatePicker', () => {
 		fireEvent.click(getByLabelText('select-current-date'));
 
 		expect(screen.getByRole('textbox', {hidden: true})).toHaveValue(
-			moment().format('MM/DD/YYYY')
+			dateUtils.format(new Date(), 'MM/dd/yyyy')
 		);
 	});
 
@@ -88,7 +88,7 @@ describe('DatePicker', () => {
 
 		expect(onChange).toHaveBeenCalledWith(
 			{},
-			moment().format('YYYY-MM-DD')
+			dateUtils.format(new Date(), 'yyyy-MM-dd')
 		);
 	});
 
@@ -101,7 +101,7 @@ describe('DatePicker', () => {
 		fireEvent.click(screen.getByLabelText('select-current-date'));
 
 		expect(screen.getByRole('textbox', {hidden: true})).toHaveValue(
-			moment().format('YYYY/MM/DD')
+			dateUtils.format(new Date(), 'yyyy/MM/dd')
 		);
 	});
 
@@ -162,8 +162,13 @@ describe('DatePicker', () => {
 		userEvent.type(hours, '23');
 		userEvent.type(minutes, '30');
 
+		const date = new Date();
+
+		date.setHours(23);
+		date.setMinutes(30);
+
 		expect(container.querySelector('[type=text]')).toHaveValue(
-			moment().format('DD/MM/YYYY [23:30]')
+			dateUtils.format(date, 'P p', 'pr_BR')
 		);
 	});
 
@@ -188,9 +193,14 @@ describe('DatePicker', () => {
 		userEvent.type(minutes, '30');
 		fireEvent.keyDown(sufix, {code: 'ArrowUp', key: 'ArrowUp'}); // PM
 
+		const date = new Date();
+
+		date.setHours(11);
+		date.setMinutes(30);
+
 		expect(onChange).toHaveBeenCalledWith(
 			{},
-			moment().format('YYYY-MM-DD [23:30]')
+			dateUtils.format(date, 'P p', 'pr_BR')
 		);
 	});
 });

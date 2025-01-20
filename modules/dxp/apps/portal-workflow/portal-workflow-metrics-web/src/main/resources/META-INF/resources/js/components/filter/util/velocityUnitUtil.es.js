@@ -5,8 +5,6 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-import moment from 'moment';
-
 const asDefault = (velocityUnit) => {
 	return {
 		...velocityUnit,
@@ -55,10 +53,12 @@ const getVelocityUnits = (timeRange) => {
 		return [];
 	}
 
-	const dateEnd = moment(timeRange.dateEnd);
-	const dateStart = moment(timeRange.dateStart);
+	const dateEnd = new Date(timeRange.dateEnd);
+	const dateStart = new Date(timeRange.dateStart);
 
-	let daysDiff = dateEnd.diff(dateStart, 'days');
+	const differenceInMilliseconds = dateEnd - dateStart;
+
+	let daysDiff = differenceInMilliseconds / (1000 * 60 * 60 * 24);
 
 	if (daysDiff === 366 && (dateEnd.isLeapYear() || dateStart.isLeapYear())) {
 		--daysDiff;

@@ -3,24 +3,29 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
+import {dateUtils} from 'frontend-js-web';
+
 import {
 	defaultDateFormat,
 	formatDate,
 	getLocaleDateFormat,
 	isValidDate,
 } from '../../../shared/util/date.es';
-import moment from '../../../shared/util/moment.es';
 
-const convertQueryDate = (date = '', format = 'L') => {
-	return moment(decodeURIComponent(date), null, 'en').format(format);
+const convertQueryDate = (date = '', format = 'P') => {
+	return dateUtils.format(
+		new Date(decodeURIComponent(date)),
+		format,
+		'en-US'
+	);
 };
 
-const parseDateMoment = (date, format = 'L') => {
-	return moment(date, format, 'en');
+const parseDateMoment = (date, format = 'P') => {
+	return dateUtils.parse(date, format, 'en-US');
 };
 
 const formatDateTime = (date, format, isEndDate) => {
-	let dateTime = parseDateMoment(date, format || 'L');
+	let dateTime = parseDateMoment(date, format || 'P');
 
 	dateTime = isEndDate ? dateTime.endOf('day') : dateTime.startOf('day');
 
@@ -35,25 +40,27 @@ const formatDescriptionDate = (date) => {
 	);
 };
 
-const getFormatPattern = (dateEndMoment, dateStartMoment, isAmPm) => {
-	let dateStartPattern = Liferay.Language.get('mmm-dd-yyyy');
+const getFormatPattern = (dateEnd, dateStart, isAmPm) => {
+	let dateStartPattern = 'MMM dd, yyyy';
 
-	if (dateEndMoment.diff(dateStartMoment, 'days') <= 1) {
+	const daysDiff = dateEnd.getDate() - dateStart.getDate();
+
+	if (daysDiff <= 1) {
 		if (isAmPm) {
-			dateStartPattern = Liferay.Language.get('mmm-dd-hh-mm-a');
+			dateStartPattern = 'MMM dd, hh:mm a';
 		}
 		else {
-			dateStartPattern = Liferay.Language.get('mmm-dd-hh-mm');
+			dateStartPattern = 'MMM dd, HH:mm';
 		}
 	}
-	else if (dateEndMoment.diff(dateStartMoment, 'years') < 1) {
-		dateStartPattern = Liferay.Language.get('mmm-dd');
+	else if (dateEnd.getFullYear() - dateStart.getFullYear() < 1) {
+		dateStartPattern = 'MMM dd';
 	}
 
 	let dateEndPattern = dateStartPattern;
 
-	if (dateEndMoment.diff(dateStartMoment, 'days') > 90) {
-		dateEndPattern = Liferay.Language.get('mmm-dd-yyyy');
+	if (daysDiff > 90) {
+		dateEndPattern = 'MMM dd, yyyy';
 	}
 
 	return {
@@ -69,18 +76,16 @@ const formatTimeRange = (timeRange, isAmPm) => {
 		return null;
 	}
 
-	const dateEndMoment = moment(dateEnd);
-	const dateStartMoment = moment(dateStart);
-
 	const {dateEndPattern, dateStartPattern} = getFormatPattern(
-		dateEndMoment,
-		dateStartMoment,
+		dateEnd,
+		dateStart,
 		isAmPm
 	);
 
-	return `${dateStartMoment.format(
+	return `${dateUtils.format(
+		dateStart,
 		dateStartPattern
-	)} - ${dateEndMoment.format(dateEndPattern)}`;
+	)} - ${dateUtils.format(dateEnd, dateEndPattern)}`;
 };
 
 const getCustomTimeRange = (dateEnd, dateStart) => {

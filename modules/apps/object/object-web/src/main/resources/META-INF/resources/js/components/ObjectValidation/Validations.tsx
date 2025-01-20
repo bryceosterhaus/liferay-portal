@@ -4,10 +4,7 @@
  */
 
 import {FrontendDataSet} from '@liferay/frontend-data-set-web';
-
-// @ts-ignore
-
-import moment from 'moment/min/moment-with-locales';
+import {dateUtils} from 'frontend-js-web';
 import React, {useEffect, useMemo, useState} from 'react';
 
 import {defaultFDSDataSetProps, formatActionURL} from '../../utils/fds';
@@ -27,8 +24,6 @@ function ObjectFieldActiveDataRenderer({itemData}: {itemData: ItemData}) {
 		? Liferay.Language.get('yes')
 		: Liferay.Language.get('no');
 }
-
-const language = Liferay.ThemeDisplay.getBCP47LanguageId();
 
 interface ValidationsProps extends IFDSTableProps {
 	allowScriptContentToBeExecutedOrIncluded: boolean;
@@ -74,9 +69,7 @@ export default function Validations({
 	}
 
 	function ObjectFieldModifiedDateDataRenderer() {
-		moment.locale(language);
-
-		return moment().format('MMMM D, YYYY, h:mm:ss A');
+		return dateUtils.format(new Date(), 'PP p');
 	}
 
 	const frontendDataSetProps = {

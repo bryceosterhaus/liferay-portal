@@ -5,6 +5,7 @@
 
 import ClayDatePicker from '@clayui/date-picker';
 import {FieldBase} from 'frontend-js-components-web';
+import {dateUtils} from 'frontend-js-web';
 
 // @ts-ignore
 
@@ -14,7 +15,7 @@ import {createTextMaskInputElement} from 'text-mask-core';
 
 import {createAutoCorrectedDatePipe} from '../utils/createAutoCorrectedDatePipe';
 import {
-	Date,
+	type Date,
 	generateDate,
 	generateDateConfigurations,
 	generateInputMask,
@@ -88,9 +89,10 @@ export function DatePicker({
 }: DatePickerProps) {
 	const [expanded, setExpanded] = useState(false);
 
-	const momentLocale = moment().locale(locale ?? defaultLanguageId);
-	const months = momentLocale.localeData().months();
-	const weekdaysShort = momentLocale.localeData().weekdaysShort();
+	const months = dateUtils.getMonthsLong(locale ?? defaultLanguageId);
+	const weekdaysShort = dateUtils.getWeekdaysShort(
+		locale ?? defaultLanguageId
+	);
 
 	const inputRef = useRef(null);
 	const maskRef = useRef<null | MaskRef>(null);
@@ -116,7 +118,7 @@ export function DatePicker({
 
 	const date: Date = useMemo(() => {
 		let formattedDate = '';
-		let year = moment().year();
+		let year = new Date().getFullYear();
 		const rawDate = value ?? '';
 
 		if (rawDate !== '') {

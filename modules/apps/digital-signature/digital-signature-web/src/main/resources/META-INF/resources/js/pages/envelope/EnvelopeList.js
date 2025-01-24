@@ -13,7 +13,7 @@ import {Link} from 'react-router-dom';
 import {AppContext} from '../../AppContext';
 import ListView from '../../components/list-view/ListView';
 import {DOCUSIGN_STATUS} from '../../utils/contants';
-import {toDateFromNow} from '../../utils/moment';
+import {toDateFromNow} from '../../utils/date';
 
 const COLUMNS = [
 	{

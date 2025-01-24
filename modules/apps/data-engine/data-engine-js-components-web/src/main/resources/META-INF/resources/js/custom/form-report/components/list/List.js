@@ -4,7 +4,7 @@
  */
 
 import ClayButton from '@clayui/button';
-import moment from 'moment/min/moment-with-locales';
+import {dateUtils} from 'frontend-js-web';
 import React, {useContext, useEffect} from 'react';
 
 import {removeEmptyValues} from '../../utils/data';
@@ -25,13 +25,14 @@ export default function List({data, field, summary, totalEntries, type}) {
 
 	const formatDate = (field, isDateTime) => {
 		const locale = themeDisplay.getLanguageId().split('_', 1).join('');
-		const date = moment(field).locale(locale).format('L');
+
+		const date = dateUtils.format(field, 'P', locale);
 
 		if (!isDateTime) {
 			return date;
 		}
 
-		const time = moment(field).locale(locale).format('LT');
+		const time = dateUtils.format(field, 'p', locale);
 
 		return `${date} ${time}`;
 	};

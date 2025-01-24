@@ -5,16 +5,13 @@
 
 import ClayDatePicker from '@clayui/date-picker';
 import {FieldBase} from 'frontend-js-components-web';
-
-// @ts-ignore
-
-import moment from 'moment/min/moment-with-locales';
+import {dateUtils} from 'frontend-js-web';
 import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {createTextMaskInputElement} from 'text-mask-core';
 
 import {createAutoCorrectedDatePipe} from '../utils/createAutoCorrectedDatePipe';
 import {
-	Date,
+	type DateData,
 	generateDate,
 	generateDateConfigurations,
 	generateInputMask,
@@ -53,8 +50,6 @@ type DateMaskParams = {
 	clayFormat?: string;
 	firstDayOfWeek?: FirstDayOfWeek;
 	isDateTime?: boolean;
-	momentFormat?: string;
-	months?: string[];
 	placeholder?: string;
 	serverFormat?: string;
 	use12Hours?: boolean;
@@ -88,9 +83,10 @@ export function DatePicker({
 }: DatePickerProps) {
 	const [expanded, setExpanded] = useState(false);
 
-	const momentLocale = moment().locale(locale ?? defaultLanguageId);
-	const months = momentLocale.localeData().months();
-	const weekdaysShort = momentLocale.localeData().weekdaysShort();
+	const months = dateUtils.getMonthsLong(locale ?? defaultLanguageId);
+	const weekdaysShort = dateUtils.getWeekdaysShort(
+		locale ?? defaultLanguageId
+	);
 
 	const inputRef = useRef(null);
 	const maskRef = useRef<null | MaskRef>(null);
@@ -98,7 +94,6 @@ export function DatePicker({
 		clayFormat,
 		firstDayOfWeek,
 		isDateTime = false,
-		momentFormat = '',
 		placeholder,
 		serverFormat = '',
 		use12Hours,
@@ -114,17 +109,33 @@ export function DatePicker({
 		return dateMaskParameters;
 	}, [defaultLanguageId, locale, type]);
 
-	const date: Date = useMemo(() => {
+	const date: DateData = useMemo(() => {
 		let formattedDate = '';
-		let year = moment().year();
+		let year = new Date().getFullYear();
 		const rawDate = value ?? '';
 
 		if (rawDate !== '') {
-			const date = moment(rawDate, serverFormat, true);
-			formattedDate = date
-				.locale(locale ?? defaultLanguageId)
-				.format(momentFormat);
-			year = date.year();
+			const parsedDate = new Date(rawDate);
+
+			if (!isNaN(parsedDate.getTime())) {
+				const options: Intl.DateTimeFormatOptions = isDateTime
+					? {
+							day: '2-digit',
+							hour: '2-digit',
+							hour12: use12Hours,
+							minute: '2-digit',
+							month: '2-digit',
+							year: 'numeric',
+						}
+					: {
+							day: '2-digit',
+							month: '2-digit',
+							year: 'numeric',
+						};
+
+				formattedDate = parsedDate.toLocaleDateString(locale, options);
+				year = parsedDate.getFullYear();
+			}
 		}
 
 		return {
@@ -135,7 +146,15 @@ export function DatePicker({
 			value,
 			years: {end: year + 5, start: year - 5},
 		};
-	}, [momentFormat, defaultLanguageId, locale, name, serverFormat, value]);
+	}, [
+		defaultLanguageId,
+		isDateTime,
+		locale,
+		name,
+		serverFormat,
+		use12Hours,
+		value,
+	]);
 
 	const [{formattedDate, rawDate, years}, setDate] = useState(date);
 
@@ -155,7 +174,7 @@ export function DatePicker({
 	 * Creates the input mask and update it whenever the format changes
 	 */
 	useEffect(() => {
-		const {mask, pipeFormat} = generateInputMask(momentFormat);
+		const {mask, pipeFormat} = generateInputMask(clayFormat as any);
 
 		maskRef.current = createTextMaskInputElement({
 			guide: true,
@@ -165,12 +184,11 @@ export function DatePicker({
 			pipe: createAutoCorrectedDatePipe(pipeFormat),
 			showMask: true,
 		});
-	}, [momentFormat]);
+	}, [clayFormat]);
 
 	const handleValueChange = (value: string) => {
 		const nextState = generateDate({
 			isDateTime,
-			momentFormat,
 			serverFormat,
 			value,
 		});

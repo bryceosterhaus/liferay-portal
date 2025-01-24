@@ -19,7 +19,7 @@ import {AppContext} from '../../AppContext';
 import {BackButtonPortal} from '../../components/control-menu/ControlMenu';
 import DocumentPreviewerWrapper from '../../components/document-previewer/DocumentPreviewerWrapper';
 import {DOCUSIGN_STATUS} from '../../utils/contants';
-import {toLocalDateTimeFormatted} from '../../utils/moment';
+import {toLocalDateTimeFormatted} from '../../utils/date';
 import {concatValues} from '../../utils/utils';
 
 const QuestionLine = ({children, className, colon = true, question}) => (

@@ -3,16 +3,12 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-import moment from 'moment/min/moment-with-locales';
+import {dateUtils} from 'frontend-js-web';
 
 export function formatDate(date, locale) {
-	const dateFormat = moment.localeData(locale).longDateFormat('L');
-
-	return moment(date).format(dateFormat);
+	return dateUtils.format(date, 'P', locale);
 }
 
 export function parseDate(locale, value) {
-	const dateFormat = moment.localeData(locale).longDateFormat('L');
-
-	return moment(value, dateFormat).toDate();
+	return dateUtils.parse(value, 'P', locale);
 }

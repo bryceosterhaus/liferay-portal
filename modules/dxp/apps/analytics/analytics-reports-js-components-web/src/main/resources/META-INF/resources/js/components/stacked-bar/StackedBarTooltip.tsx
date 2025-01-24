@@ -5,7 +5,6 @@
 
 import classNames from 'classnames';
 import {utcFormat} from 'd3';
-import moment from 'moment';
 import React, {useContext} from 'react';
 
 import {AnalyticsReportsContext} from '../../AnalyticsReportsContext';
@@ -24,10 +23,8 @@ function formatStackedBarTooltipDate(rangeSelector: RangeSelectors) {
 	const dayMonthFormat = utcFormat('%b %-d');
 	const yearMonthDayFormat = utcFormat('%Y %b %-d');
 
-	const sameMonth =
-		moment(startDate).get('month') === moment(endDate).get('month');
-	const sameYear =
-		moment(startDate).get('year') === moment(endDate).get('year');
+	const sameMonth = startDate.getMonth() === endDate.getMonth();
+	const sameYear = startDate.getFullYear() === endDate.getFullYear();
 
 	if (sameMonth && sameYear) {
 		return `${yearMonthDayFormat(startDate)} - ${dayFormat(endDate)}`;

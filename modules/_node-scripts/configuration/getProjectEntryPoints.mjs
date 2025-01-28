@@ -15,7 +15,7 @@ import projectScopeRequire from '../util/projectScopeRequire.mjs';
  * }
  */
 export default function getProjectEntryPoints(projectDir = '.') {
-	const {main, typescript} = projectScopeRequire(
+	const {main, submodules, typescript} = projectScopeRequire(
 		'./node-scripts.config.js',
 		projectDir
 	);
@@ -29,6 +29,10 @@ export default function getProjectEntryPoints(projectDir = '.') {
 
 	if (typescript && typescript.main) {
 		entryPoints.typescript = typescript.main;
+	}
+
+	if (submodules) {
+		entryPoints.submodules = submodules;
 	}
 
 	return entryPoints;

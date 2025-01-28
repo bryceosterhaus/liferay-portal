@@ -27,7 +27,7 @@ export default async function bundleJavaScriptMain(
 	projectEntryPoints,
 	projectWebContextPath
 ) {
-	const {main: mainEntryPoint} = projectEntryPoints;
+	const {main: mainEntryPoint, submodules = {}} = projectEntryPoints;
 
 	if (!mainEntryPoint) {
 		return;
@@ -35,9 +35,16 @@ export default async function bundleJavaScriptMain(
 
 	const esbuildConfig = {
 		bundle: true,
-		entryNames: 'index',
-		entryPoints: [path.resolve(mainEntryPoint)],
-		external: getExternals(globalImports, projectWebContextPath, 'main'),
+		entryPoints: [
+			...Object.keys(submodules).map((submoduleName) => ({
+				in: path.resolve(submodules[submoduleName]),
+				out: submoduleName,
+			})),
+			{in: path.resolve(mainEntryPoint), out: 'index'},
+		],
+		external: [
+			...getExternals(globalImports, projectWebContextPath, 'main'),
+		],
 		format: 'esm',
 		loader: {
 			'.js': 'jsx',

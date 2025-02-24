@@ -44,6 +44,8 @@ public class ApplicationsMenuDisplayContext {
 				WebKeys.THEME_DISPLAY);
 
 		return HashMapBuilder.<String, Object>put(
+			"__reactDOMFlushSync", true
+		).put(
 			"liferayLogoURL",
 			() -> {
 				LiferayPortletURL applicationsMenuLiferayLogoURL =

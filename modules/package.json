@@ -31,7 +31,7 @@
 		"format": "node-scripts format",
 		"formatCurrentBranch": "node-scripts format --current-branch",
 		"formatLocalChanges": "node-scripts format --local-changes",
-		"test:all": "node-scripts test"
+		"test:all": "node-scripts test:all"
 	},
 	"workspaces": {
 		"packages": [

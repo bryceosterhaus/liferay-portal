@@ -201,13 +201,15 @@ const COMMANDS = {
 	},
 	'test': {
 		description: `
-		Runs unit tests in a single or multiple projects.
-
-		When multiple projects are tested and --sync argument is given, project tests are run
-		serially.
+		Runs unit tests in a single project.
 `,
-		parameters: '[--sync]',
 		script: './test/index.mjs',
+	},
+	'test:all': {
+		description: `
+		Runs all unit tests across all projects.
+`,
+		script: './test/all.mjs',
 	},
 };
 

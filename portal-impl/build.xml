@@ -931,6 +931,10 @@ svn://svn.liferay.com/repos/public/alloy/trunk/sandbox/taglibs.
 		</for>
 	</target>
 
+	<target name="js-unit-all">
+		<gradle-execute dir="${project.dir}/modules" task="packageRunTestAll" />
+	</target>
+
 	<target name="prepare-upgrade-table">
 		<for param="zip.file">
 			<path>

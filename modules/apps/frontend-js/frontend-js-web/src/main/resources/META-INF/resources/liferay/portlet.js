@@ -293,7 +293,9 @@
 
 				portletPosition -= nestedPortletOffset;
 
-				currentColumnId = Util.getColumnId(column.attr('id'));
+				currentColumnId = column
+					.attr('id')
+					.replace(/layout-column_/, '');
 			}
 
 			const url = themeDisplay.getPathMain() + '/portal/update_layout';

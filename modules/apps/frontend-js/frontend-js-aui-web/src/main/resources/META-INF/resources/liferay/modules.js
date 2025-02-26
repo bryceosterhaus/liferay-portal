@@ -68,10 +68,6 @@
 							'autocomplete-highlighters',
 						],
 					},
-					'liferay-dynamic-select': {
-						path: 'dynamic_select.js',
-						requires: ['aui-base'],
-					},
 					'liferay-form': {
 						path: 'form.js',
 						requires: ['aui-base', 'aui-form-validator'],

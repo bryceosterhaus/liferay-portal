@@ -18,7 +18,32 @@ AUI.add(
 		const Icon = {
 			_forcePost(event) {
 				if (!Liferay.SPA || !Liferay.SPA.app) {
-					Liferay.Util.forcePost(event.currentTarget);
+					const currentElement = Liferay.Util.getElement(
+						event.currentTarget
+					);
+
+					if (currentElement) {
+						const url = currentElement.getAttribute('href');
+
+						// LPS-127302
+
+						if (url === 'javascript:void(0);') {
+							return;
+						}
+
+						const newWindow =
+							currentElement.getAttribute('target') === '_blank';
+
+						const hrefFm = document.hrefFm;
+
+						if (newWindow) {
+							hrefFm.setAttribute('target', '_blank');
+						}
+
+						submitForm(hrefFm, url, !newWindow);
+
+						Liferay.Util._submitLocked = null;
+					}
 
 					event.preventDefault();
 				}

@@ -485,24 +485,4 @@
 		},
 		['aui-base']
 	);
-
-	/**
-	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
-	 */
-	Liferay.provide(
-		Util,
-		'switchEditor',
-		(options) => {
-			const uri = options.uri;
-
-			const windowName = Liferay.Util.getWindowName();
-
-			const dialog = Liferay.Util.getWindow(windowName);
-
-			if (dialog) {
-				dialog.iframe.set('uri', uri);
-			}
-		},
-		['aui-io']
-	);
 })(AUI());

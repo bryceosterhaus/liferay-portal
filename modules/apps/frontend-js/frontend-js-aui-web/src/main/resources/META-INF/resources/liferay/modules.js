@@ -76,10 +76,6 @@
 						path: 'fullscreen_source_editor.js',
 						requires: ['liferay-source-editor'],
 					},
-					'liferay-icon': {
-						path: 'icon.js',
-						requires: ['aui-base'],
-					},
 					'liferay-inline-editor-base': {
 						path: 'inline_editor_base.js',
 						requires: ['aui-base', 'aui-overlay-base-deprecated'],

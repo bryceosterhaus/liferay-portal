@@ -189,10 +189,6 @@
 						path: 'portlet_base.js',
 						requires: ['aui-base'],
 					},
-					'liferay-portlet-url': {
-						path: 'portlet_url.js',
-						requires: ['aui-base'],
-					},
 					'liferay-progress': {
 						path: 'progress.js',
 						requires: ['aui-progressbar'],

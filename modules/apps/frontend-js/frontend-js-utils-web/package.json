@@ -1,0 +1,9 @@
+{
+	"main": "index.ts",
+	"name": "@liferay/frontend-js-utils-web",
+	"scripts": {
+		"build": "node-scripts build",
+		"format": "node-scripts format"
+	},
+	"version": "1.0.0"
+}

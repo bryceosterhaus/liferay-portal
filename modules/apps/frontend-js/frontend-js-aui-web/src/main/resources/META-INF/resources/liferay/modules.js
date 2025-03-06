@@ -152,10 +152,6 @@
 							'liferay-menu-filter',
 						],
 					},
-					'liferay-navigation': {
-						path: 'navigation.js',
-						requires: ['aui-component', 'event-mouseenter'],
-					},
 					'liferay-navigation-interaction': {
 						path: 'navigation_interaction.js',
 						plugins: {

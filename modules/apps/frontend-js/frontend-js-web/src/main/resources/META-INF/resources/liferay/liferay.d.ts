@@ -460,6 +460,8 @@ declare module Liferay {
 			name?: string
 		): Array<number> | '';
 
+		export function getDOM(arg: any): HTMLElement | null;
+
 		export function getUncheckedCheckboxes(
 			form: HTMLFormElement,
 			except: string,

@@ -12,3 +12,29 @@ export default function openWindow(config, callback) {
 
 	topUtil.Liferay.Util._openWindowProvider(config, callback);
 }
+
+export function openInDialog(event, config) {
+	event.preventDefault();
+
+	const {currentTarget} = event;
+
+	// eslint-disable-next-line prefer-object-spread
+	config = Object.assign(
+		{},
+
+		// eslint-disable-next-line prefer-object-spread
+		Object.assign({}, currentTarget.dataset),
+		config
+	);
+
+	if (!config.uri) {
+		config.uri =
+			currentTarget.dataset.href || currentTarget.getAttribute('href');
+	}
+
+	if (!config.title) {
+		config.title = currentTarget.getAttribute('title');
+	}
+
+	openWindow(config);
+}

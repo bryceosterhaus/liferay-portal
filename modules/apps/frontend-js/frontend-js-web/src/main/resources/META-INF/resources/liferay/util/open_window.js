@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
+import {openModal} from '../modal/Modal';
 import getTop from './get_top';
 
 export default function openWindow(config, callback) {
@@ -10,7 +11,7 @@ export default function openWindow(config, callback) {
 
 	config.openingWindow = window;
 
-	topUtil.Liferay.Util._openWindowProvider(config, callback);
+	topUtil.Liferay.Util.openModal(config, callback);
 }
 
 export function openInDialog(event, config) {

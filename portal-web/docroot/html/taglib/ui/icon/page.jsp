@@ -80,12 +80,12 @@ if (!linkCssClass.contains("keep-aria-attributes") && (useDialog || (urlIsNotNul
 
 <c:if test="<%= Validator.isNotNull(srcHover) || forcePost || useDialog %>">
 	<aui:script>
-		const _ICON_REGISTRY = {};
-		let _docClickHandler;
-		let _mouseOverEvent;
-		let _mouseOutEvent;
+		const ICON_REGISTRY = {};
+		let docClickHandler;
+		let mouseOverEvent;
+		let mouseOutEvent;
 
-		function _forcePost(event) {
+		function forcePost(event) {
 			if (!Liferay.SPA || !Liferay.SPA.app) {
 				const currentElement = Liferay.Util.getElement(
 					event.currentTarget
@@ -118,12 +118,12 @@ if (!linkCssClass.contains("keep-aria-attributes") && (useDialog || (urlIsNotNul
 			}
 		}
 
-		function _getConfig(event) {
-			return _ICON_REGISTRY[event.currentTarget.attr('id')];
+		function getConfig(event) {
+			return ICON_REGISTRY[event.currentTarget.attr('id')];
 		}
 
-		function _handleDocClick(event) {
-			const config = _getConfig(event);
+		function handleDocClick(event) {
+			const config = getConfig(event);
 
 			if (config) {
 				event.preventDefault();
@@ -137,23 +137,23 @@ if (!linkCssClass.contains("keep-aria-attributes") && (useDialog || (urlIsNotNul
 			}
 		}
 
-		function _handleDocMouseOut(event) {
-			const config = _getConfig(event);
+		function handleDocMouseOut(event) {
+			const config = getConfig(event);
 
 			if (config && config.srcHover) {
 				_onMouseHover(event, config.src);
 			}
 		}
 
-		function _handleDocMouseOver(event) {
-			const config = _getConfig(event);
+		function handleDocMouseOver(event) {
+			const config = getConfig(event);
 
 			if (config && config.srcHover) {
 				_onMouseHover(event, config.srcHover);
 			}
 		}
 
-		function _onMouseHover(event, src) {
+		function onMouseHover(event, src) {
 			const image = event.currentTarget.one('img');
 
 			if (image) {
@@ -161,7 +161,7 @@ if (!linkCssClass.contains("keep-aria-attributes") && (useDialog || (urlIsNotNul
 			}
 		}
 
-		function _useDialog(event) {
+		function useDialog(event) {
 			Liferay.Util.openInDialog(event, {
 				dialog: {
 					destroyOnHide: true,
@@ -197,7 +197,7 @@ if (!linkCssClass.contains("keep-aria-attributes") && (useDialog || (urlIsNotNul
 			}
 
 			Liferay.once('screenLoad', () => {
-				delete _ICON_REGISTRY[config.id];
+				delete ICON_REGISTRY[config.id];
 			});
 		}
 

@@ -1,4 +1,7 @@
 {
+	"dependencies": {
+		"frontend-js-components-web": "*"
+	},
 	"main": "index.ts",
 	"name": "@liferay/frontend-js-utils-web",
 	"scripts": {

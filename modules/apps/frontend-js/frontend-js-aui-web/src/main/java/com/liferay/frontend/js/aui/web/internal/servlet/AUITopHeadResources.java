@@ -168,8 +168,7 @@ public class AUITopHeadResources implements TopHeadResources {
 		"/aui/aui-overlay-manager-deprecated" +
 			"/aui-overlay-manager-deprecated-min.js",
 		"/aui/aui-overlay-mask-deprecated/aui-overlay-mask-deprecated-min.js",
-		"/aui/aui-parse-content/aui-parse-content-min.js",
-		"/liferay/session.js"
+		"/aui/aui-parse-content/aui-parse-content-min.js"
 	};
 
 	private volatile List<String> _authenticatedJsResourcePaths =

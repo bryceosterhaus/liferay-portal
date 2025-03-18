@@ -5,5 +5,7 @@
 
 module.exports = {
 	main: './src/main/resources/META-INF/resources/index.ts',
-	submodules: {},
+	submodules: {
+		session: './src/main/resources/META-INF/resources/session.ts',
+	},
 };

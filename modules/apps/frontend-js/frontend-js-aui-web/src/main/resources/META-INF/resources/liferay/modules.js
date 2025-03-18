@@ -205,16 +205,6 @@
 						path: 'search_container_select.js',
 						requires: ['aui-component', 'aui-url', 'plugin'],
 					},
-					'liferay-session': {
-						path: 'session.js',
-						requires: [
-							'aui-base',
-							'aui-component',
-							'aui-timer',
-							'cookie',
-							'plugin',
-						],
-					},
 					'liferay-source-editor': {
 						path: 'source_editor.js',
 						requires: ['aui-ace-editor'],

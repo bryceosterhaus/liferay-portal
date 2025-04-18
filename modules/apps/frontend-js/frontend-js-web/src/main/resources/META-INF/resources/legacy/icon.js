@@ -41,7 +41,7 @@ function forcePost(event) {
 }
 
 function getConfig(event) {
-	return ICON_REGISTRY[event.currentTarget.attr('id')];
+	return ICON_REGISTRY[event.currentTarget.getAttribute('id')];
 }
 
 function handleDocClick(event) {
@@ -95,19 +95,19 @@ export function registerIcon(config) {
 
 	if (!_docClickHandler) {
 		_docClickHandler = document
-			.getElementById('<portlet:namespace /><%= id %>')
+			.getElementById(config.id)
 			.addEventListener('click', handleDocClick);
 	}
 
 	if (!_mouseOverEvent) {
 		_mouseOverEvent = document
-			.getElementById('<portlet:namespace /><%= id %>')
+			.getElementById(config.id)
 			.addEventListener('mouseover', handleDocMouseOver);
 	}
 
 	if (!_mouseOutEvent) {
 		_mouseOutEvent = document
-			.getElementById('<portlet:namespace /><%= id %>')
+			.getElementById(config.id)
 			.addEventListener('mouseout', handleDocMouseOut);
 	}
 

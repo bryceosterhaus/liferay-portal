@@ -28,6 +28,7 @@ import com.liferay.commerce.util.CommerceUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.configuration.module.configuration.ConfigurationProvider;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -62,12 +63,13 @@ public class RequestQuoteTag extends IncludeTag {
 				(CommerceContext)httpServletRequest.getAttribute(
 					CommerceWebKeys.COMMERCE_CONTEXT);
 
-			_commerceChannelId = commerceContext.getCommerceChannelId();
+			if ((commerceContext == null) ||
+				(commerceContext.getCommerceChannelId() == 0)) {
 
-			if (_commerceChannelId == 0) {
 				return SKIP_BODY;
 			}
 
+			_commerceChannelId = commerceContext.getCommerceChannelId();
 			_commerceAccountId = CommerceUtil.getCommerceAccountId(
 				commerceContext);
 
@@ -284,7 +286,7 @@ public class RequestQuoteTag extends IncludeTag {
 
 		long plid = PortalUtil.getPlidFromPortletId(groupId, portletId);
 
-		if (plid > 0) {
+		if ((plid > 0) || FeatureFlagManagerUtil.isEnabled("LPD-20379")) {
 			return PortletURLFactoryUtil.create(
 				httpServletRequest, portletId, plid,
 				PortletRequest.ACTION_PHASE);

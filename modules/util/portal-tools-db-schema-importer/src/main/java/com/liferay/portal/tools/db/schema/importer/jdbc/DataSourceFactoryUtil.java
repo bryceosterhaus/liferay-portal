@@ -31,8 +31,17 @@ public class DataSourceFactoryUtil {
 
 		String driverClassName = "com.mysql.cj.jdbc.Driver";
 
-		if (jdbcURL.indexOf("postgresql") > 0) {
+		if (jdbcURL.contains("mariadb")) {
+			driverClassName = "org.mariadb.jdbc.Driver";
+		}
+		else if (jdbcURL.contains("oracle")) {
+			driverClassName = "oracle.jdbc.OracleDriver";
+		}
+		else if (jdbcURL.contains("postgresql")) {
 			driverClassName = "org.postgresql.Driver";
+		}
+		else if (jdbcURL.contains("sqlserver")) {
+			driverClassName = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
 		}
 
 		Class.forName(driverClassName);
@@ -47,7 +56,15 @@ public class DataSourceFactoryUtil {
 		hikariConfig.setMaximumPoolSize(10);
 		hikariConfig.setMinimumIdle(10);
 		hikariConfig.setPassword(password);
-		hikariConfig.setTransactionIsolation("TRANSACTION_READ_UNCOMMITTED");
+
+		if (jdbcURL.contains("oracle")) {
+			hikariConfig.setTransactionIsolation("TRANSACTION_READ_COMMITTED");
+		}
+		else {
+			hikariConfig.setTransactionIsolation(
+				"TRANSACTION_READ_UNCOMMITTED");
+		}
+
 		hikariConfig.setUsername(userName);
 
 		if (partitionName != null) {
@@ -60,6 +77,20 @@ public class DataSourceFactoryUtil {
 		}
 
 		return new HikariDataSource(hikariConfig);
+	}
+
+	public static boolean isValidSourceDatabase(String jdbcURL) {
+		if (jdbcURL.contains("mariadb") || jdbcURL.contains("mysql") ||
+			jdbcURL.contains("oracle") || jdbcURL.contains("sqlserver")) {
+
+			return true;
+		}
+
+		return false;
+	}
+
+	public static boolean isValidTargetDatabase(String jdbcURL) {
+		return jdbcURL.contains("postgresql");
 	}
 
 }

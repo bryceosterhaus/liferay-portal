@@ -5,10 +5,13 @@
 
 package com.liferay.object.service.impl;
 
+import com.liferay.asset.kernel.service.AssetEntryLocalService;
 import com.liferay.object.constants.ObjectEntryFolderConstants;
+import com.liferay.object.entry.folder.util.ObjectEntryFolderThreadLocal;
 import com.liferay.object.exception.DuplicateObjectEntryFolderExternalReferenceCodeException;
 import com.liferay.object.exception.ObjectEntryFolderNameException;
 import com.liferay.object.exception.ObjectEntryFolderScopeException;
+import com.liferay.object.exception.RequiredObjectEntryFolderException;
 import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.model.ObjectEntryFolder;
 import com.liferay.object.service.ObjectEntryLocalService;
@@ -28,6 +31,7 @@ import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.MapUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.util.List;
@@ -58,11 +62,11 @@ public class ObjectEntryFolderLocalServiceImpl
 		User user = _userLocalService.getUser(userId);
 
 		_validateExternalReferenceCode(
-			externalReferenceCode, user.getCompanyId(), groupId);
+			externalReferenceCode, groupId, user.getCompanyId());
 
 		_validateParentObjectEntryFolderId(groupId, parentObjectEntryFolderId);
 		_validateName(
-			user.getCompanyId(), groupId, 0, parentObjectEntryFolderId, name);
+			groupId, user.getCompanyId(), 0, parentObjectEntryFolderId, name);
 
 		ObjectEntryFolder objectEntryFolder =
 			objectEntryFolderPersistence.create(
@@ -82,6 +86,8 @@ public class ObjectEntryFolderLocalServiceImpl
 
 		objectEntryFolder = objectEntryFolderPersistence.update(
 			objectEntryFolder);
+
+		_updateAsset(objectEntryFolder, serviceContext);
 
 		if (serviceContext.isAddGroupPermissions() ||
 			serviceContext.isAddGuestPermissions()) {
@@ -120,6 +126,19 @@ public class ObjectEntryFolderLocalServiceImpl
 	public ObjectEntryFolder deleteObjectEntryFolder(
 			ObjectEntryFolder objectEntryFolder)
 		throws PortalException {
+
+		if (!ObjectEntryFolderThreadLocal.
+				isForceDeleteSystemObjectEntryFolder() &&
+			StringUtil.startsWith(
+				objectEntryFolder.getExternalReferenceCode(),
+				ObjectEntryFolderConstants.
+					EXTERNAL_REFERENCE_CODE_PREFIX_SYSTEM_OBJECT_ENTRY_FOLDER)) {
+
+			throw new RequiredObjectEntryFolderException(
+				"System object entry folder " +
+					objectEntryFolder.getExternalReferenceCode() +
+						" cannot be deleted");
+		}
 
 		// Object entries
 
@@ -171,6 +190,10 @@ public class ObjectEntryFolderLocalServiceImpl
 
 		actionableDynamicQuery.performActions();
 
+		_assetEntryLocalService.deleteEntry(
+			ObjectEntryFolder.class.getName(),
+			objectEntryFolder.getObjectEntryFolderId());
+
 		objectEntryFolderPersistence.removeByG_C_LikeT(
 			objectEntryFolder.getGroupId(), objectEntryFolder.getCompanyId(),
 			objectEntryFolder.getTreePath() + "%");
@@ -180,7 +203,7 @@ public class ObjectEntryFolderLocalServiceImpl
 
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
-	public ObjectEntryFolder deleteObjectEntryFolder(
+	public ObjectEntryFolder deleteObjectEntryFolderByExternalReferenceCode(
 			String externalReferenceCode, long groupId, long companyId)
 		throws PortalException {
 
@@ -190,6 +213,23 @@ public class ObjectEntryFolderLocalServiceImpl
 
 		return objectEntryFolderLocalService.deleteObjectEntryFolder(
 			objectEntryFolder);
+	}
+
+	@Override
+	public ObjectEntryFolder fetchObjectEntryFolderByExternalReferenceCode(
+		String externalReferenceCode, long groupId, long companyId) {
+
+		return objectEntryFolderPersistence.fetchByERC_G_C(
+			externalReferenceCode, groupId, companyId);
+	}
+
+	@Override
+	public ObjectEntryFolder getObjectEntryFolderByExternalReferenceCode(
+			String externalReferenceCode, long groupId, long companyId)
+		throws PortalException {
+
+		return objectEntryFolderPersistence.findByERC_G_C(
+			externalReferenceCode, groupId, companyId);
 	}
 
 	@Override
@@ -213,7 +253,7 @@ public class ObjectEntryFolderLocalServiceImpl
 	public ObjectEntryFolder updateObjectEntryFolder(
 			long userId, long objectEntryFolderId,
 			long parentObjectEntryFolderId, Map<Locale, String> labelMap,
-			String name)
+			String name, ServiceContext serviceContext)
 		throws PortalException {
 
 		ObjectEntryFolder objectEntryFolder =
@@ -222,7 +262,7 @@ public class ObjectEntryFolderLocalServiceImpl
 		_validateParentObjectEntryFolderId(
 			objectEntryFolder.getGroupId(), parentObjectEntryFolderId);
 		_validateName(
-			objectEntryFolder.getCompanyId(), objectEntryFolder.getGroupId(),
+			objectEntryFolder.getGroupId(), objectEntryFolder.getCompanyId(),
 			objectEntryFolderId, parentObjectEntryFolderId, name);
 
 		objectEntryFolder.setParentObjectEntryFolderId(
@@ -231,7 +271,12 @@ public class ObjectEntryFolderLocalServiceImpl
 		objectEntryFolder.setName(name);
 		objectEntryFolder.setTreePath(objectEntryFolder.buildTreePath());
 
-		return objectEntryFolderPersistence.update(objectEntryFolder);
+		objectEntryFolder = objectEntryFolderPersistence.update(
+			objectEntryFolder);
+
+		_updateAsset(objectEntryFolder, serviceContext);
+
+		return objectEntryFolder;
 	}
 
 	private Map<Locale, String> _getLabelMap(
@@ -248,6 +293,23 @@ public class ObjectEntryFolderLocalServiceImpl
 		}
 
 		return labelMap;
+	}
+
+	private void _updateAsset(
+			ObjectEntryFolder objectEntryFolder, ServiceContext serviceContext)
+		throws PortalException {
+
+		_assetEntryLocalService.updateEntry(
+			serviceContext.getUserId(), objectEntryFolder.getGroupId(),
+			objectEntryFolder.getCreateDate(),
+			objectEntryFolder.getModifiedDate(),
+			ObjectEntryFolder.class.getName(),
+			objectEntryFolder.getObjectEntryFolderId(),
+			objectEntryFolder.getUuid(), 0,
+			serviceContext.getAssetCategoryIds(),
+			serviceContext.getAssetTagNames(), true, true, null, null,
+			objectEntryFolder.getCreateDate(), null, null,
+			objectEntryFolder.getName(), null, null, null, null, 0, 0, null);
 	}
 
 	private void _validateExternalReferenceCode(
@@ -305,10 +367,13 @@ public class ObjectEntryFolderLocalServiceImpl
 			throw new ObjectEntryFolderScopeException(
 				StringBundler.concat(
 					"Group ID ", groupId,
-					" does not match parent folder group ID ",
+					" does not match parent object entry folder group ID ",
 					objectEntryFolder.getGroupId()));
 		}
 	}
+
+	@Reference
+	private AssetEntryLocalService _assetEntryLocalService;
 
 	@Reference
 	private ObjectEntryLocalService _objectEntryLocalService;

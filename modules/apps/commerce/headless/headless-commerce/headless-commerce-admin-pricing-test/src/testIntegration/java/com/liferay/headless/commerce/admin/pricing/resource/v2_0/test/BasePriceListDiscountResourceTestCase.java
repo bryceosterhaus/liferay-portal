@@ -13,6 +13,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
+import com.liferay.headless.batch.engine.client.dto.v1_0.ImportTask;
+import com.liferay.headless.batch.engine.client.resource.v1_0.ImportTaskResource;
 import com.liferay.headless.commerce.admin.pricing.client.dto.v2_0.PriceListDiscount;
 import com.liferay.headless.commerce.admin.pricing.client.http.HttpInvoker;
 import com.liferay.headless.commerce.admin.pricing.client.pagination.Page;
@@ -31,7 +33,7 @@ import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
-import com.liferay.portal.kernel.util.DateFormatFactoryUtil;
+import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -44,7 +46,7 @@ import com.liferay.portal.vulcan.resource.EntityModelResource;
 
 import java.lang.reflect.Method;
 
-import java.text.DateFormat;
+import java.text.Format;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -83,7 +85,7 @@ public abstract class BasePriceListDiscountResourceTestCase {
 
 	@BeforeClass
 	public static void setUpClass() throws Exception {
-		_dateFormat = DateFormatFactoryUtil.getSimpleDateFormat(
+		_format = FastDateFormatFactoryUtil.getSimpleDateFormat(
 			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 	}
 
@@ -97,12 +99,22 @@ public abstract class BasePriceListDiscountResourceTestCase {
 
 		_priceListDiscountResource.setContextCompany(testCompany);
 
-		com.liferay.portal.kernel.model.User testCompanyAdminUser =
-			UserTestUtil.getAdminUser(testCompany.getCompanyId());
+		_testCompanyAdminUser = UserTestUtil.getAdminUser(
+			testCompany.getCompanyId());
 
 		priceListDiscountResource = PriceListDiscountResource.builder(
 		).authentication(
-			testCompanyAdminUser.getEmailAddress(),
+			_testCompanyAdminUser.getEmailAddress(),
+			PropsValues.DEFAULT_ADMIN_PASSWORD
+		).endpoint(
+			testCompany.getVirtualHostname(), 8080, "http"
+		).locale(
+			LocaleUtil.getDefault()
+		).build();
+
+		importTaskResource = ImportTaskResource.builder(
+		).authentication(
+			_testCompanyAdminUser.getEmailAddress(),
 			PropsValues.DEFAULT_ADMIN_PASSWORD
 		).endpoint(
 			testCompany.getVirtualHostname(), 8080, "http"
@@ -193,6 +205,44 @@ public abstract class BasePriceListDiscountResourceTestCase {
 	@Test
 	public void testGraphQLDeletePriceListDiscount() throws Exception {
 		Assert.assertTrue(false);
+	}
+
+	@Test
+	public void testDeletePriceListDiscountBatch() throws Exception {
+		PriceListDiscount priceListDiscount1 =
+			testDeletePriceListDiscountBatch_addPriceListDiscount();
+
+		testDeletePriceListDiscountBatch_deletePriceListDiscount(
+			"COMPLETED", null, priceListDiscount1.getPriceListDiscountId());
+	}
+
+	protected PriceListDiscount
+			testDeletePriceListDiscountBatch_addPriceListDiscount()
+		throws Exception {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	protected void testDeletePriceListDiscountBatch_deletePriceListDiscount(
+			String expectedExecuteStatus, String externalReferenceCode, Long id)
+		throws Exception {
+
+		HttpInvoker.HttpResponse httpResponse =
+			priceListDiscountResource.deletePriceListDiscountBatchHttpResponse(
+				null,
+				JSONUtil.putAll(
+					JSONUtil.put(
+						"externalReferenceCode", () -> externalReferenceCode
+					).put(
+						"priceListDiscountId", () -> id
+					)));
+
+		Assert.assertEquals(202, httpResponse.getStatusCode());
+
+		waitForFinish(
+			expectedExecuteStatus,
+			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
 	}
 
 	@Test
@@ -405,29 +455,6 @@ public abstract class BasePriceListDiscountResourceTestCase {
 	}
 
 	@Test
-	public void testPostPriceListByExternalReferenceCodePriceListDiscount()
-		throws Exception {
-
-		PriceListDiscount randomPriceListDiscount = randomPriceListDiscount();
-
-		PriceListDiscount postPriceListDiscount =
-			testPostPriceListByExternalReferenceCodePriceListDiscount_addPriceListDiscount(
-				randomPriceListDiscount);
-
-		assertEquals(randomPriceListDiscount, postPriceListDiscount);
-		assertValid(postPriceListDiscount);
-	}
-
-	protected PriceListDiscount
-			testPostPriceListByExternalReferenceCodePriceListDiscount_addPriceListDiscount(
-				PriceListDiscount priceListDiscount)
-		throws Exception {
-
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
-	}
-
-	@Test
 	public void testGetPriceListIdPriceListDiscountsPage() throws Exception {
 		Long id = testGetPriceListIdPriceListDiscountsPage_getId();
 		Long irrelevantId =
@@ -609,6 +636,29 @@ public abstract class BasePriceListDiscountResourceTestCase {
 		throws Exception {
 
 		return null;
+	}
+
+	@Test
+	public void testPostPriceListByExternalReferenceCodePriceListDiscount()
+		throws Exception {
+
+		PriceListDiscount randomPriceListDiscount = randomPriceListDiscount();
+
+		PriceListDiscount postPriceListDiscount =
+			testPostPriceListByExternalReferenceCodePriceListDiscount_addPriceListDiscount(
+				randomPriceListDiscount);
+
+		assertEquals(randomPriceListDiscount, postPriceListDiscount);
+		assertValid(postPriceListDiscount);
+	}
+
+	protected PriceListDiscount
+			testPostPriceListByExternalReferenceCodePriceListDiscount_addPriceListDiscount(
+				PriceListDiscount priceListDiscount)
+		throws Exception {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
 	}
 
 	@Test
@@ -1334,7 +1384,30 @@ public abstract class BasePriceListDiscountResourceTestCase {
 		return randomPriceListDiscount();
 	}
 
+	protected final JSONObject waitForFinish(
+			String expectedExecuteStatus, JSONObject jsonObject)
+		throws Exception {
+
+		while (true) {
+			ImportTask importTask = importTaskResource.getImportTask(
+				jsonObject.getLong("id"));
+
+			ImportTask.ExecuteStatus executeStatus =
+				importTask.getExecuteStatus();
+
+			if (StringUtil.equals(executeStatus.getValue(), "COMPLETED") ||
+				StringUtil.equals(executeStatus.getValue(), "FAILED")) {
+
+				Assert.assertEquals(
+					expectedExecuteStatus, executeStatus.getValue());
+
+				return jsonObject;
+			}
+		}
+	}
+
 	protected PriceListDiscountResource priceListDiscountResource;
+	protected ImportTaskResource importTaskResource;
 	protected com.liferay.portal.kernel.model.Group irrelevantGroup;
 	protected com.liferay.portal.kernel.model.Company testCompany;
 	protected com.liferay.portal.kernel.model.Group testGroup;
@@ -1535,7 +1608,9 @@ public abstract class BasePriceListDiscountResourceTestCase {
 	private static final com.liferay.portal.kernel.log.Log _log =
 		LogFactoryUtil.getLog(BasePriceListDiscountResourceTestCase.class);
 
-	private static DateFormat _dateFormat;
+	private static Format _format;
+
+	private com.liferay.portal.kernel.model.User _testCompanyAdminUser;
 
 	@Inject
 	private com.liferay.headless.commerce.admin.pricing.resource.v2_0.

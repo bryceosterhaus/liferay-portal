@@ -30,7 +30,7 @@ import './Multishipping.scss';
 import ClayButton from '@clayui/button';
 import ClayIcon from '@clayui/icon';
 import classNames from 'classnames';
-import {openConfirmModal} from 'frontend-js-web';
+import {openConfirmModal} from 'frontend-js-components-web';
 
 import AddDeliveryGroupButton from './AddDeliveryGroupButton';
 import DeliveryGroupHeaderCell from './DeliveryGroupHeaderCell';
@@ -43,6 +43,7 @@ import OrderItemRow, {
 } from './OrderItemRow';
 import {
 	IAPIResponseError,
+	IAddressSubtypeConfiguration,
 	IDeliveryGroup,
 	IOrderItem,
 	IOrderItemAPIResponse,
@@ -53,6 +54,7 @@ const MAX_DELIVERY_GROUPS = 20;
 
 interface IMultishippingProps {
 	accountId: number;
+	addressSubtypeConfiguration?: IAddressSubtypeConfiguration;
 	defaultAddressId?: number;
 	defaultAddressName?: string;
 	namespace?: string;
@@ -166,6 +168,7 @@ const updateCartById = async function (
 
 const Multishipping = ({
 	accountId,
+	addressSubtypeConfiguration,
 	defaultAddressId = 0,
 	defaultAddressName = '',
 	namespace = '',
@@ -729,6 +732,9 @@ const Multishipping = ({
 								<ClayManagementToolbar.Item>
 									<AddDeliveryGroupButton
 										accountId={accountId}
+										addressSubtypeConfiguration={
+											addressSubtypeConfiguration
+										}
 										disabled={
 											loading ||
 											readonly ||
@@ -965,6 +971,9 @@ const Multishipping = ({
 							{deliveryGroups.map((deliveryGroup) => (
 								<DeliveryGroupHeaderCell
 									accountId={accountId}
+									addressSubtypeConfiguration={
+										addressSubtypeConfiguration
+									}
 									deliveryGroup={deliveryGroup}
 									disabled={readonly}
 									handleDeleteDeliveryGroup={

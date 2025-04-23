@@ -64,6 +64,7 @@ String screenNavigationCategoryKey = ParamUtil.getString(request, "screenNavigat
 	<liferay-frontend:screen-navigation
 		context="<%= objectDefinition %>"
 		key="<%= ObjectDefinitionsScreenNavigationEntryConstants.SCREEN_NAVIGATION_KEY_OBJECT_DEFINITION %>"
+		navCssClass="container-fluid-max-xxxl"
 		portletURL='<%=
 			PortletURLBuilder.createRenderURL(
 				renderResponse

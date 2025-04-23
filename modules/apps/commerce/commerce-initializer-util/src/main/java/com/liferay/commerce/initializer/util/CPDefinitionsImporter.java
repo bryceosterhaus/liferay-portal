@@ -241,7 +241,7 @@ public class CPDefinitionsImporter {
 			locale, description);
 
 		return _cpDefinitionLocalService.addCPDefinition(
-			externalReferenceCode, catalogGroupId, user.getUserId(), nameMap,
+			externalReferenceCode, user.getUserId(), catalogGroupId, nameMap,
 			shortDescriptionMap, descriptionMap, nameMap, null, null, null,
 			"simple", true, shippable, false, false, 0D, width, height, depth,
 			weight, _getCPTaxCategoryId(taxCategory, serviceContext), false,
@@ -841,7 +841,11 @@ public class CPDefinitionsImporter {
 			addCPDefinitionSpecificationOptionValue(
 				StringPool.BLANK, cpDefinitionId,
 				cpSpecificationOption.getCPSpecificationOptionId(),
-				cpOptionCategoryId, priority, valueMap, serviceContext);
+				cpOptionCategoryId, priority, valueMap,
+				GetterUtil.getBoolean(
+					jsonObject.get("visible"),
+					cpSpecificationOption.isVisible()),
+				serviceContext);
 	}
 
 	private CPInstance _importCPInstance(

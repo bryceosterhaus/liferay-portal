@@ -52,36 +52,8 @@ public class CaptchaConfigurationTest {
 
 	@Test
 	public void test() throws Exception {
-		try (CompanyConfigurationTemporarySwapper
-				companyConfigurationTemporarySwapper =
-					new CompanyConfigurationTemporarySwapper(
-						TestPropsValues.getCompanyId(),
-						CaptchaConfiguration.class.getName(),
-						new HashMapDictionaryBuilder(
-						).<String, Object>put(
-							"createAccountCaptchaEnabled", true
-						).build());
-			ConfigurationTemporarySwapper configurationTemporarySwapper =
-				new ConfigurationTemporarySwapper(
-					CaptchaConfiguration.class.getName(),
-					new HashMapDictionaryBuilder(
-					).<String, Object>put(
-						"createAccountCaptchaEnabled", false
-					).build())) {
-
-			Assert.assertTrue(_isCaptchaRendered());
-		}
-
-		try (ConfigurationTemporarySwapper configurationTemporarySwapper =
-				new ConfigurationTemporarySwapper(
-					CaptchaConfiguration.class.getName(),
-					new HashMapDictionaryBuilder(
-					).<String, Object>put(
-						"createAccountCaptchaEnabled", false
-					).build())) {
-
-			Assert.assertFalse(_isCaptchaRendered());
-		}
+		_test(false, false, true);
+		_test(true, true, false);
 	}
 
 	private MockHttpServletRequest _getMockHttpServletRequest()
@@ -141,6 +113,35 @@ public class CaptchaConfigurationTest {
 		}
 
 		return false;
+	}
+
+	private void _test(
+			boolean expectedCaptchaRendered,
+			boolean instanceSettingsCreateAccountCaptchaEnabled,
+			boolean systemSettingsCreateAccountCaptchaEnabled)
+		throws Exception {
+
+		try (CompanyConfigurationTemporarySwapper
+				companyConfigurationTemporarySwapper =
+					new CompanyConfigurationTemporarySwapper(
+						TestPropsValues.getCompanyId(),
+						CaptchaConfiguration.class.getName(),
+						new HashMapDictionaryBuilder(
+						).<String, Object>put(
+							"createAccountCaptchaEnabled",
+							instanceSettingsCreateAccountCaptchaEnabled
+						).build());
+			ConfigurationTemporarySwapper configurationTemporarySwapper =
+				new ConfigurationTemporarySwapper(
+					CaptchaConfiguration.class.getName(),
+					new HashMapDictionaryBuilder(
+					).<String, Object>put(
+						"createAccountCaptchaEnabled",
+						systemSettingsCreateAccountCaptchaEnabled
+					).build())) {
+
+			Assert.assertEquals(expectedCaptchaRendered, _isCaptchaRendered());
+		}
 	}
 
 	@Inject

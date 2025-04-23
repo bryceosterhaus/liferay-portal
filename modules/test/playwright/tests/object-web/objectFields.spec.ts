@@ -5,13 +5,11 @@
 
 import {
 	ObjectDefinition,
-	ObjectDefinitionApi,
-	ObjectField,
-	ObjectFieldApi,
+	ObjectDefinitionAPI,
+	ObjectFieldAPI,
 	ObjectFolder,
-	ObjectFolderApi,
-	ObjectValidationRule,
-	ObjectValidationRuleApi,
+	ObjectFolderAPI,
+	ObjectValidationRuleAPI,
 } from '@liferay/object-admin-rest-client-js';
 import {Locator, Page, expect, mergeTests} from '@playwright/test';
 
@@ -61,7 +59,7 @@ test.afterEach(async ({apiHelpers}) => {
 	>();
 
 	const objectDefinitionAPIClient =
-		await apiHelpers.buildRestClient(ObjectDefinitionApi);
+		await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 	await asyncArray.map({
 		array: createdEntities.objectDefinitions,
@@ -74,13 +72,13 @@ test.afterEach(async ({apiHelpers}) => {
 
 	createdEntities.objectDefinitions = [];
 
-	const objectFolderApiClient =
-		await apiHelpers.buildRestClient(ObjectFolderApi);
+	const objectFolderAPIClient =
+		await apiHelpers.buildRestClient(ObjectFolderAPI);
 
 	await asyncArray.map({
 		array: createdEntities.objectFolders,
 		predicate: async (objectFolder: ObjectFolder) => {
-			await objectFolderApiClient.deleteObjectFolder(objectFolder.id);
+			await objectFolderAPIClient.deleteObjectFolder(objectFolder.id);
 		},
 	});
 
@@ -164,6 +162,41 @@ test.describe('Manage object fields through Model Builder', () => {
 		);
 	});
 
+	test('assert that field entry translation is disabled by default', async ({
+		modelBuilderDiagramPage,
+		modelBuilderLeftSidebarPage,
+		modelBuilderObjectDefinitionNodePage,
+		page,
+	}) => {
+		const {objectDefinitions} = createdEntities;
+
+		const [objectDefinition] = objectDefinitions;
+
+		await modelBuilderDiagramPage.goto({objectFolderName: 'Default'});
+
+		await modelBuilderLeftSidebarPage.sidebarItems
+			.filter({hasText: objectDefinition.name})
+			.click();
+
+		await modelBuilderObjectDefinitionNodePage.openAddNewObjectFieldOrRelationshipModal(
+			objectDefinition.name,
+			modelBuilderDiagramPage.objectDefinitionNodes,
+			modelBuilderObjectDefinitionNodePage.addObjectFieldButton
+		);
+
+		await modelBuilderObjectDefinitionNodePage.fillObjectFieldLabelInput(
+			'objectFieldLabel' + getRandomInt()
+		);
+
+		await modelBuilderObjectDefinitionNodePage.selectNewObjectFieldBusinessTypeOption(
+			'Decimal'
+		);
+
+		await expect(
+			page.getByRole('switch', {name: 'Enable Entry Translation'})
+		).not.toBeChecked();
+	});
+
 	test('can add picklist object field to object definition node', async ({
 		apiHelpers,
 		modelBuilderDiagramPage,
@@ -221,13 +254,13 @@ test.describe('Manage object fields through Model Builder', () => {
 	}) => {
 		const [objectDefinition] = createdEntities.objectDefinitions;
 
-		const objectFieldApiClient =
-			await apiHelpers.buildRestClient(ObjectFieldApi);
+		const objectFieldAPIClient =
+			await apiHelpers.buildRestClient(ObjectFieldAPI);
 
-		await objectFieldApiClient.postObjectDefinitionByExternalReferenceCodeObjectField(
+		await objectFieldAPIClient.postObjectDefinitionByExternalReferenceCodeObjectField(
 			objectDefinition.externalReferenceCode,
 			{
-				DBType: ObjectField.DBTypeEnum.Integer,
+				DBType: 'Integer',
 				label: {
 					en_US: 'intField',
 				},
@@ -236,7 +269,7 @@ test.describe('Manage object fields through Model Builder', () => {
 				localized: false,
 				name: 'intField',
 				objectFieldSettings: [],
-				readOnly: ObjectField.ReadOnlyEnum.False,
+				readOnly: 'false',
 				readOnlyConditionExpression: '',
 				required: false,
 				state: false,
@@ -295,14 +328,14 @@ test.describe('Manage object fields through Model Builder', () => {
 
 		let picklistFieldName = 'picklistField' + getRandomInt();
 
-		const objectFieldApiClient =
-			await apiHelpers.buildRestClient(ObjectFieldApi);
+		const objectFieldAPIClient =
+			await apiHelpers.buildRestClient(ObjectFieldAPI);
 
-		await objectFieldApiClient.postObjectDefinitionByExternalReferenceCodeObjectField(
+		await objectFieldAPIClient.postObjectDefinitionByExternalReferenceCodeObjectField(
 			draftObjectDefinition.externalReferenceCode,
 			{
-				DBType: ObjectField.DBTypeEnum.String,
-				businessType: ObjectField.BusinessTypeEnum.Picklist,
+				DBType: 'String',
+				businessType: 'Picklist',
 				externalReferenceCode: picklistFieldName,
 				indexed: true,
 				indexedAsKeyword: false,
@@ -313,7 +346,7 @@ test.describe('Manage object fields through Model Builder', () => {
 				listTypeDefinitionId: listTypeDefinition.id,
 				localized: false,
 				name: picklistFieldName,
-				readOnly: ObjectField.ReadOnlyEnum.False,
+				readOnly: 'false',
 				required: false,
 				state: false,
 				system: false,
@@ -363,10 +396,10 @@ test.describe('Manage object fields through Model Builder', () => {
 
 		listTypeDefinitionIds.push(listTypeDefinition.id);
 
-		const objectFieldApiClient =
-			await apiHelpers.buildRestClient(ObjectFieldApi);
+		const objectFieldAPIClient =
+			await apiHelpers.buildRestClient(ObjectFieldAPI);
 
-		await objectFieldApiClient.postObjectDefinitionByExternalReferenceCodeObjectField(
+		await objectFieldAPIClient.postObjectDefinitionByExternalReferenceCodeObjectField(
 			objectDefinition.externalReferenceCode,
 			createObjectFields(
 				'picklist',
@@ -526,14 +559,14 @@ test.describe('Manage object fields through Model Builder', () => {
 		const dateFieldName = 'dateField' + getRandomInt();
 		const integerFieldName = 'integerField' + getRandomInt();
 
-		const objectFieldApiClient =
-			await apiHelpers.buildRestClient(ObjectFieldApi);
+		const objectFieldAPIClient =
+			await apiHelpers.buildRestClient(ObjectFieldAPI);
 
-		await objectFieldApiClient.postObjectDefinitionByExternalReferenceCodeObjectField(
+		await objectFieldAPIClient.postObjectDefinitionByExternalReferenceCodeObjectField(
 			objectDefinition.externalReferenceCode,
 			{
-				DBType: ObjectField.DBTypeEnum.Integer,
-				businessType: ObjectField.BusinessTypeEnum.Integer,
+				DBType: 'Integer',
+				businessType: 'Integer',
 				externalReferenceCode: integerFieldName,
 				indexed: true,
 				indexedAsKeyword: false,
@@ -542,18 +575,18 @@ test.describe('Manage object fields through Model Builder', () => {
 				listTypeDefinitionId: 0,
 				localized: false,
 				name: integerFieldName,
-				readOnly: ObjectField.ReadOnlyEnum.False,
+				readOnly: 'false',
 				required: false,
 				state: false,
 				system: false,
 			}
 		);
 
-		await objectFieldApiClient.postObjectDefinitionByExternalReferenceCodeObjectField(
+		await objectFieldAPIClient.postObjectDefinitionByExternalReferenceCodeObjectField(
 			objectDefinition.externalReferenceCode,
 			{
-				DBType: ObjectField.DBTypeEnum.Date,
-				businessType: ObjectField.BusinessTypeEnum.Date,
+				DBType: 'Date',
+				businessType: 'Date',
 				externalReferenceCode: dateFieldName,
 				indexed: true,
 				indexedAsKeyword: false,
@@ -562,7 +595,7 @@ test.describe('Manage object fields through Model Builder', () => {
 				listTypeDefinitionId: 0,
 				localized: false,
 				name: dateFieldName,
-				readOnly: ObjectField.ReadOnlyEnum.False,
+				readOnly: 'false',
 				required: false,
 				state: false,
 				system: false,
@@ -607,14 +640,14 @@ test.describe('Manage object fields through Model Builder', () => {
 
 		const integerFieldName = 'integerField' + getRandomInt();
 
-		const objectFieldApiClient =
-			await apiHelpers.buildRestClient(ObjectFieldApi);
+		const objectFieldAPIClient =
+			await apiHelpers.buildRestClient(ObjectFieldAPI);
 
-		await objectFieldApiClient.postObjectDefinitionByExternalReferenceCodeObjectField(
+		await objectFieldAPIClient.postObjectDefinitionByExternalReferenceCodeObjectField(
 			objectDefinition.externalReferenceCode,
 			{
-				DBType: ObjectField.DBTypeEnum.Integer,
-				businessType: ObjectField.BusinessTypeEnum.Integer,
+				DBType: 'Integer',
+				businessType: 'Integer',
 				externalReferenceCode: integerFieldName,
 				indexed: true,
 				indexedAsKeyword: false,
@@ -623,7 +656,7 @@ test.describe('Manage object fields through Model Builder', () => {
 				listTypeDefinitionId: 0,
 				localized: false,
 				name: integerFieldName,
-				readOnly: ObjectField.ReadOnlyEnum.False,
+				readOnly: 'false',
 				required: false,
 				state: false,
 				system: false,
@@ -633,11 +666,11 @@ test.describe('Manage object fields through Model Builder', () => {
 		const objectValidationName =
 			'Unique Composite Key Object Validation' + getRandomInt();
 
-		const objectValidationRuleApiClient = await apiHelpers.buildRestClient(
-			ObjectValidationRuleApi
+		const objectValidationRuleAPIClient = await apiHelpers.buildRestClient(
+			ObjectValidationRuleAPI
 		);
 
-		await objectValidationRuleApiClient.postObjectDefinitionByExternalReferenceCodeObjectValidationRule(
+		await objectValidationRuleAPIClient.postObjectDefinitionByExternalReferenceCodeObjectValidationRule(
 			objectDefinition.externalReferenceCode,
 			{
 				active: true,
@@ -659,7 +692,7 @@ test.describe('Manage object fields through Model Builder', () => {
 						value: integerFieldName,
 					} as any,
 				],
-				outputType: ObjectValidationRule.OutputTypeEnum.FullValidation,
+				outputType: 'fullValidation',
 				script: '',
 				system: false,
 			}
@@ -905,14 +938,14 @@ test.describe('Manage objectFields through Objects Admin UI', () => {
 		const [objectDefinition] = createdEntities.objectDefinitions;
 		const integerFieldName = 'integerField' + getRandomInt();
 
-		const objectFieldApiClient =
-			await apiHelpers.buildRestClient(ObjectFieldApi);
+		const objectFieldAPIClient =
+			await apiHelpers.buildRestClient(ObjectFieldAPI);
 
-		await objectFieldApiClient.postObjectDefinitionByExternalReferenceCodeObjectField(
+		await objectFieldAPIClient.postObjectDefinitionByExternalReferenceCodeObjectField(
 			objectDefinition.externalReferenceCode,
 			{
-				DBType: ObjectField.DBTypeEnum.Integer,
-				businessType: ObjectField.BusinessTypeEnum.Integer,
+				DBType: 'Integer',
+				businessType: 'Integer',
 				externalReferenceCode: integerFieldName,
 				indexed: true,
 				indexedAsKeyword: false,
@@ -921,7 +954,7 @@ test.describe('Manage objectFields through Objects Admin UI', () => {
 				listTypeDefinitionId: 0,
 				localized: false,
 				name: integerFieldName,
-				readOnly: ObjectField.ReadOnlyEnum.False,
+				readOnly: 'false',
 				required: false,
 				state: false,
 				system: false,
@@ -931,11 +964,11 @@ test.describe('Manage objectFields through Objects Admin UI', () => {
 		const objectValidationName =
 			'Unique Composite Key Object Validation' + getRandomInt();
 
-		const objectValidationRuleApiClient = await apiHelpers.buildRestClient(
-			ObjectValidationRuleApi
+		const objectValidationRuleAPIClient = await apiHelpers.buildRestClient(
+			ObjectValidationRuleAPI
 		);
 
-		await objectValidationRuleApiClient.postObjectDefinitionByExternalReferenceCodeObjectValidationRule(
+		await objectValidationRuleAPIClient.postObjectDefinitionByExternalReferenceCodeObjectValidationRule(
 			objectDefinition.externalReferenceCode,
 			{
 				active: true,
@@ -957,7 +990,7 @@ test.describe('Manage objectFields through Objects Admin UI', () => {
 						value: integerFieldName,
 					} as any,
 				],
-				outputType: ObjectValidationRule.OutputTypeEnum.FullValidation,
+				outputType: 'fullValidation',
 				script: '',
 				system: false,
 			}

@@ -5,7 +5,6 @@
 
 package com.liferay.headless.commerce.admin.order.internal.resource.v1_0;
 
-import com.liferay.account.exception.NoSuchEntryException;
 import com.liferay.account.model.AccountEntry;
 import com.liferay.account.service.AccountEntryService;
 import com.liferay.commerce.constants.CommerceOrderConstants;
@@ -35,7 +34,6 @@ import com.liferay.headless.commerce.admin.order.dto.v1_0.BillingAddress;
 import com.liferay.headless.commerce.admin.order.dto.v1_0.Order;
 import com.liferay.headless.commerce.admin.order.dto.v1_0.OrderItem;
 import com.liferay.headless.commerce.admin.order.dto.v1_0.ShippingAddress;
-import com.liferay.headless.commerce.admin.order.internal.dto.v1_0.util.CustomFieldsUtil;
 import com.liferay.headless.commerce.admin.order.internal.odata.entity.v1_0.OrderEntityModel;
 import com.liferay.headless.commerce.admin.order.internal.util.v1_0.BillingAddressUtil;
 import com.liferay.headless.commerce.admin.order.internal.util.v1_0.OrderItemUtil;
@@ -51,7 +49,6 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
-import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
@@ -65,6 +62,7 @@ import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.odata.entity.EntityModel;
+import com.liferay.portal.vulcan.custom.field.CustomFieldsUtil;
 import com.liferay.portal.vulcan.dto.converter.DTOConverter;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterRegistry;
 import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
@@ -317,13 +315,9 @@ public class OrderResourceImpl extends BaseOrderResourceImpl {
 			Validator.isNotNull(order.getAccountExternalReferenceCode())) {
 
 			accountEntry =
-				_accountEntryService.fetchAccountEntryByExternalReferenceCode(
-					commerceChannel.getCompanyId(),
-					order.getAccountExternalReferenceCode());
-		}
-
-		if (accountEntry == null) {
-			throw new NoSuchEntryException();
+				_accountEntryService.getAccountEntryByExternalReferenceCode(
+					order.getAccountExternalReferenceCode(),
+					commerceChannel.getCompanyId());
 		}
 
 		CommerceCurrency commerceCurrency =
@@ -381,9 +375,9 @@ public class OrderResourceImpl extends BaseOrderResourceImpl {
 				order.getTaxAmount(), order.getTotal(),
 				order.getTotalWithTaxAmount(),
 				_commerceContextFactory.create(
-					contextCompany.getCompanyId(), commerceChannel.getGroupId(),
-					contextUser.getUserId(), 0,
-					accountEntry.getAccountEntryId()),
+					accountEntry.getAccountEntryId(),
+					commerceChannel.getGroupId(), null, 0,
+					contextCompany.getCompanyId()),
 				serviceContext);
 
 		// Order date
@@ -471,12 +465,12 @@ public class OrderResourceImpl extends BaseOrderResourceImpl {
 
 		// Expando
 
-		Map<String, ?> expandoAttributes = _getExpandoBridgeAttributes(order);
+		Map<String, ?> customFields = order.getCustomFields();
 
-		if (MapUtil.isNotEmpty(expandoAttributes)) {
+		if ((customFields != null) && !customFields.isEmpty()) {
 			ExpandoUtil.updateExpando(
 				contextCompany.getCompanyId(), CommerceOrder.class,
-				commerceOrder.getPrimaryKey(), expandoAttributes);
+				commerceOrder.getPrimaryKey(), customFields);
 		}
 
 		// Update nested resources
@@ -526,13 +520,6 @@ public class OrderResourceImpl extends BaseOrderResourceImpl {
 		}
 
 		return commerceOrderType.getCommerceOrderTypeId();
-	}
-
-	private Map<String, Serializable> _getExpandoBridgeAttributes(Order order) {
-		return CustomFieldsUtil.toMap(
-			CommerceOrder.class.getName(), contextCompany.getCompanyId(),
-			order.getCustomFields(),
-			contextAcceptLanguage.getPreferredLocale());
 	}
 
 	private Map<String, Serializable> _getExpandoBridgeAttributes(
@@ -598,9 +585,7 @@ public class OrderResourceImpl extends BaseOrderResourceImpl {
 			CommerceOrder.class.getName(), search, pagination,
 			queryConfig -> queryConfig.setSelectedFieldNames(
 				Field.ENTRY_CLASS_PK),
-			object -> {
-				SearchContext searchContext = (SearchContext)object;
-
+			searchContext -> {
 				searchContext.setAttribute(
 					"useSearchResultPermissionFilter",
 					useSearchResultPermissionFilter);
@@ -654,10 +639,10 @@ public class OrderResourceImpl extends BaseOrderResourceImpl {
 						_commerceOrderModelResourcePermission, orderItem,
 						commerceOrder,
 						_commerceContextFactory.create(
-							contextCompany.getCompanyId(),
-							commerceOrder.getGroupId(), contextUser.getUserId(),
+							commerceOrder.getCommerceAccountId(),
+							commerceOrder.getGroupId(), null,
 							commerceOrder.getCommerceOrderId(),
-							commerceOrder.getCommerceAccountId()),
+							contextCompany.getCompanyId()),
 						_serviceContextHelper.getServiceContext(
 							commerceOrder.getGroupId()));
 
@@ -784,11 +769,10 @@ public class OrderResourceImpl extends BaseOrderResourceImpl {
 				order.getTotalWithTaxAmount(),
 				commerceOrder.getTotalWithTaxAmount()),
 			_commerceContextFactory.create(
-				contextCompany.getCompanyId(), commerceOrder.getGroupId(),
-				contextUser.getUserId(), 0,
 				GetterUtil.getLong(
-					order.getAccountId(),
-					commerceOrder.getCommerceAccountId())),
+					order.getAccountId(), commerceOrder.getCommerceAccountId()),
+				commerceOrder.getGroupId(), null, 0,
+				contextCompany.getCompanyId()),
 			false);
 
 		_commerceOrderService.updateCommerceOrderPrices(
@@ -983,12 +967,12 @@ public class OrderResourceImpl extends BaseOrderResourceImpl {
 				paymentTermId, contextAcceptLanguage.getPreferredLanguageId());
 		}
 
-		Map<String, ?> expandoAttributes = _getExpandoBridgeAttributes(order);
+		Map<String, ?> customFields = order.getCustomFields();
 
-		if (MapUtil.isNotEmpty(expandoAttributes)) {
+		if ((customFields != null) && !customFields.isEmpty()) {
 			ExpandoUtil.updateExpando(
 				contextCompany.getCompanyId(), CommerceOrder.class,
-				commerceOrder.getPrimaryKey(), expandoAttributes);
+				commerceOrder.getPrimaryKey(), customFields);
 		}
 
 		commerceOrder = _updateNestedResources(

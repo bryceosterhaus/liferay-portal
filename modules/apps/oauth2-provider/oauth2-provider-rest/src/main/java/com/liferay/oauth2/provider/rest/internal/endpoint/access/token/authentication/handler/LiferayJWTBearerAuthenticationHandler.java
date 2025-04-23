@@ -12,6 +12,9 @@ import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 
+import java.nio.charset.StandardCharsets;
+
+import java.util.Base64;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -113,7 +116,28 @@ public class LiferayJWTBearerAuthenticationHandler
 
 		try {
 			if (tokenEndpointAuthMethod.equals("client_secret_jwt")) {
-				return new HmacJwsSignatureVerifier(client.getClientSecret());
+				String clientSecret = client.getClientSecret();
+
+				byte[] bytes = clientSecret.getBytes(StandardCharsets.UTF_8);
+
+				try {
+					Base64.Decoder decoder = Base64.getDecoder();
+
+					decoder.decode(bytes);
+				}
+				catch (IllegalArgumentException illegalArgumentException) {
+					if (_log.isDebugEnabled()) {
+						_log.debug(
+							"Client secret is not Base64 encoded",
+							illegalArgumentException);
+					}
+
+					Base64.Encoder encoder = Base64.getEncoder();
+
+					clientSecret = new String(encoder.encode(bytes), "UTF-8");
+				}
+
+				return new HmacJwsSignatureVerifier(clientSecret);
 			}
 
 			if (tokenEndpointAuthMethod.equals("private_key_jwt")) {

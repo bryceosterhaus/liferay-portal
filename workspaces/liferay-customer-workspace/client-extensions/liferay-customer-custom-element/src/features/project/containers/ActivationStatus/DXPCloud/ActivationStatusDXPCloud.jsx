@@ -33,7 +33,7 @@ import ModalDXPCActivationStatus from '../../ModalDXPCActivationStatus';
 import AlreadySubmittedModal from '../AlreadySubmittedModal';
 import ActivationStatusLayout from '../Layout';
 import PopoverIcon from './components/PopoverIcon';
-import ActivationCardLink from '../index';
+import ActivationCardLink from '../ActivationCardLink'; 
 
 const submittedModalTexts = {
 	paragraph: i18n.translate(
@@ -159,7 +159,7 @@ const ActivationStatusDXPCloud = ({
 			title: i18n.translate('activation-status'),
 		},
 		[STATUS_TAG_TYPE_NAMES.inProgress]: {
-			dropdownIcon: (userAccount.isStaff ||
+			dropdownIcon: (userAccount.isStaff &&
 				userAccount.isProvisioning) && (
 				<ButtonDropDown
 					align={Align.BottomRight}
@@ -168,6 +168,7 @@ const ActivationStatusDXPCloud = ({
 							aria-label={i18n.translate('set-to-active')}
 							displayType="null"
 							small
+							spritemap={Liferay.Icons.spritemap}
 							symbol="caret-bottom"
 						/>
 					}

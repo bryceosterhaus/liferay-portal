@@ -3,13 +3,15 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-import {ClayButtonWithIcon} from '@clayui/button';
+import Button from '@clayui/button';
+import ClayIcon from '@clayui/icon';
 import ClayPopover, {ALIGN_POSITIONS} from '@clayui/popover';
 
 type Writeable<T> = {-readonly [P in keyof T]: T[P]};
 
 type PopoverIconButtonProps = {
 	alignPosition?: Writeable<(typeof ALIGN_POSITIONS)[number]>;
+	formatedHTML?: string;
 	iconSize?: 'regular' | 'sm' | 'xs';
 	isSubscriptionCard?: boolean;
 	popoverLink?: {textLink: string; url: string};
@@ -18,6 +20,7 @@ type PopoverIconButtonProps = {
 
 const PopoverIconButton: React.FC<PopoverIconButtonProps> = ({
 	alignPosition = 'bottom',
+	formatedHTML,
 	iconSize = 'sm',
 	isSubscriptionCard,
 	popoverLink,
@@ -30,29 +33,43 @@ const PopoverIconButton: React.FC<PopoverIconButtonProps> = ({
 			onClick={(event) => event.stopPropagation()}
 			size="lg"
 			trigger={
-				<ClayButtonWithIcon
+				<Button
 					aria-labelledby="Info Icon"
-					className="text-brand-primary-darken-2"
+					className="btn-monospaced text-brand-primary-darken-2"
 					displayType={null}
 					onClick={(event) => event.stopPropagation()}
 					size={iconSize}
-					symbol={
-						isSubscriptionCard ? 'question-circle' : 'info-circle'
-					}
-				/>
+				>
+					<ClayIcon
+						symbol={
+							isSubscriptionCard
+								? 'question-circle'
+								: 'info-circle'
+						}
+					/>
+				</Button>
 			}
 		>
-			<p className="font-weight-bold m-0">
-				{popoverText}
-				&nbsp;
-				<a
-					href={popoverLink?.url}
-					rel="noopener noreferrer"
-					target="_blank"
-				>
-					{popoverLink?.textLink}
-				</a>
-			</p>
+			{formatedHTML ? (
+				<p
+					className="font-weight-bold m-0"
+					dangerouslySetInnerHTML={{
+						__html: formatedHTML,
+					}}
+				/>
+			) : (
+				<p className="font-weight-bold m-0">
+					{popoverText}
+					&nbsp;
+					<a
+						href={popoverLink?.url}
+						rel="noopener noreferrer"
+						target="_blank"
+					>
+						{popoverLink?.textLink}
+					</a>
+				</p>
+			)}
 		</ClayPopover>
 	);
 };

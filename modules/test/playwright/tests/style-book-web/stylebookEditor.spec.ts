@@ -91,7 +91,7 @@ test(
 		});
 
 		await test.step('Add a content page', async () => {
-			await page.goto('/');
+			await styleBooksPage.goto(site.friendlyUrlPath);
 
 			await productMenuPage.goToPages();
 
@@ -127,7 +127,7 @@ test(
 		const styleBookName = getRandomString();
 
 		await test.step('Add a style book', async () => {
-			await styleBooksPage.goto(site['friendlyUrl']);
+			await styleBooksPage.goto(site.friendlyUrlPath);
 
 			await styleBooksPage.create(styleBookName);
 		});
@@ -232,6 +232,7 @@ test(
 	'Preview style book on pages',
 	{tag: '@LPD-35560'},
 	async ({
+		apiHelpers,
 		page,
 		pageEditorPage,
 		pagesAdminPage,
@@ -249,7 +250,21 @@ test(
 			'iframe.style-book-editor__page-preview-frame'
 		);
 
+		await test.step('Add additional pages to ensure pagination is loaded for pages in style book editor preview dropdown menu', async () => {
+			await apiHelpers.jsonWebServicesLayout.addLayout({
+				groupId: site.id,
+				title: getRandomString(),
+			});
+
+			await apiHelpers.jsonWebServicesLayout.addLayout({
+				groupId: site.id,
+				title: getRandomString(),
+			});
+		});
+
 		await test.step('Add the first page with a Blogs widget', async () => {
+			await styleBooksPage.goto(site.friendlyUrlPath);
+
 			await productMenuPage.goToPages();
 
 			await pagesAdminPage.createNewPage({
@@ -274,6 +289,8 @@ test(
 		});
 
 		await test.step('Add and publish the third page with a paragraph fragment', async () => {
+			await styleBooksPage.goto(site.friendlyUrlPath);
+
 			await productMenuPage.goToPages();
 
 			await pagesAdminPage.createNewPage({
@@ -304,7 +321,7 @@ test(
 		});
 
 		await test.step('Add a style book', async () => {
-			await styleBooksPage.goto(site['friendlyUrl']);
+			await styleBooksPage.goto(site.friendlyUrlPath);
 
 			await styleBooksPage.create(styleBookName);
 
@@ -463,3 +480,33 @@ test(
 		});
 	}
 );
+
+test('Fragment collection preview applies the theme in which the style book is based on', async ({
+	page,
+	site,
+	styleBooksPage,
+}) => {
+	await test.step('Create a style book based on the Dialect theme', async () => {
+		await styleBooksPage.goto(site.friendlyUrlPath);
+
+		await styleBooksPage.create('New style book', 'Dialect Theme');
+	});
+
+	await test.step("Assert that the tokens applied to the preview page of the 'Basic Components' fragment collection are from the dialect theme", async () => {
+		await styleBooksPage.previewFragmentCollection('Basic Components');
+
+		const previewIframe = page.frameLocator(
+			'iframe.style-book-editor__page-preview-frame'
+		);
+
+		const firstButton = previewIframe
+			.getByRole('link', {
+				name: 'Go Somewhere',
+			})
+			.first();
+
+		await firstButton.waitFor();
+
+		expect(firstButton).toHaveCSS('background-color', 'rgb(89, 36, 235)');
+	});
+});

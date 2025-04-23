@@ -15,6 +15,8 @@ import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
 import com.liferay.depot.model.DepotEntry;
 import com.liferay.depot.service.DepotEntryLocalServiceUtil;
+import com.liferay.headless.batch.engine.client.dto.v1_0.ImportTask;
+import com.liferay.headless.batch.engine.client.resource.v1_0.ImportTaskResource;
 import com.liferay.headless.delivery.client.dto.v1_0.DocumentMetadataSet;
 import com.liferay.headless.delivery.client.dto.v1_0.Field;
 import com.liferay.headless.delivery.client.http.HttpInvoker;
@@ -22,6 +24,7 @@ import com.liferay.headless.delivery.client.pagination.Page;
 import com.liferay.headless.delivery.client.pagination.Pagination;
 import com.liferay.headless.delivery.client.resource.v1_0.DocumentMetadataSetResource;
 import com.liferay.headless.delivery.client.serdes.v1_0.DocumentMetadataSetSerDes;
+import com.liferay.oauth2.provider.scope.ScopeChecker;
 import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.petra.string.StringBundler;
@@ -32,13 +35,19 @@ import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.service.CompanyLocalServiceUtil;
+import com.liferay.portal.kernel.service.GroupLocalService;
+import com.liferay.portal.kernel.service.ResourceActionLocalService;
+import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
+import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.UserLocalService;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
-import com.liferay.portal.kernel.util.DateFormatFactoryUtil;
+import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -47,12 +56,18 @@ import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
 import com.liferay.portal.util.PropsValues;
+import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
+import com.liferay.portal.vulcan.crud.VulcanCRUDItemDelegate;
+import com.liferay.portal.vulcan.crud.VulcanCRUDItemDelegateBuilderRegistry;
 import com.liferay.portal.vulcan.resource.EntityModelResource;
 
 import java.lang.reflect.Method;
 
-import java.text.DateFormat;
+import java.net.URI;
+
+import java.text.Format;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -61,13 +76,20 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
 import javax.annotation.Generated;
 
+import javax.servlet.http.HttpServletRequest;
+
 import javax.ws.rs.core.MultivaluedHashMap;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.PathSegment;
+import javax.ws.rs.core.UriBuilder;
+import javax.ws.rs.core.UriInfo;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -76,6 +98,9 @@ import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockHttpServletResponse;
 
 /**
  * @author Javier Gamarra
@@ -86,12 +111,14 @@ public abstract class BaseDocumentMetadataSetResourceTestCase {
 
 	@ClassRule
 	@Rule
-	public static final LiferayIntegrationTestRule liferayIntegrationTestRule =
-		new LiferayIntegrationTestRule();
+	public static final AggregateTestRule aggregateTestRule =
+		new AggregateTestRule(
+			new LiferayIntegrationTestRule(),
+			PermissionCheckerMethodTestRule.INSTANCE);
 
 	@BeforeClass
 	public static void setUpClass() throws Exception {
-		_dateFormat = DateFormatFactoryUtil.getSimpleDateFormat(
+		_format = FastDateFormatFactoryUtil.getSimpleDateFormat(
 			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 	}
 
@@ -116,12 +143,22 @@ public abstract class BaseDocumentMetadataSetResourceTestCase {
 
 		_documentMetadataSetResource.setContextCompany(testCompany);
 
-		com.liferay.portal.kernel.model.User testCompanyAdminUser =
-			UserTestUtil.getAdminUser(testCompany.getCompanyId());
+		_testCompanyAdminUser = UserTestUtil.getAdminUser(
+			testCompany.getCompanyId());
 
 		documentMetadataSetResource = DocumentMetadataSetResource.builder(
 		).authentication(
-			testCompanyAdminUser.getEmailAddress(),
+			_testCompanyAdminUser.getEmailAddress(),
+			PropsValues.DEFAULT_ADMIN_PASSWORD
+		).endpoint(
+			testCompany.getVirtualHostname(), 8080, "http"
+		).locale(
+			LocaleUtil.getDefault()
+		).build();
+
+		importTaskResource = ImportTaskResource.builder(
+		).authentication(
+			_testCompanyAdminUser.getEmailAddress(),
 			PropsValues.DEFAULT_ADMIN_PASSWORD
 		).endpoint(
 			testCompany.getVirtualHostname(), 8080, "http"
@@ -203,6 +240,432 @@ public abstract class BaseDocumentMetadataSetResourceTestCase {
 		Assert.assertEquals(
 			regex, documentMetadataSet.getExternalReferenceCode());
 		Assert.assertEquals(regex, documentMetadataSet.getName());
+	}
+
+	@Test
+	public void testDeleteAssetLibraryDocumentMetadataSetByExternalReferenceCode()
+		throws Exception {
+
+		@SuppressWarnings("PMD.UnusedLocalVariable")
+		DocumentMetadataSet documentMetadataSet =
+			testDeleteAssetLibraryDocumentMetadataSetByExternalReferenceCode_addDocumentMetadataSet();
+
+		assertHttpResponseStatusCode(
+			204,
+			documentMetadataSetResource.
+				deleteAssetLibraryDocumentMetadataSetByExternalReferenceCodeHttpResponse(
+					testDeleteAssetLibraryDocumentMetadataSetByExternalReferenceCode_getAssetLibraryId(),
+					documentMetadataSet.getExternalReferenceCode()));
+
+		assertHttpResponseStatusCode(
+			404,
+			documentMetadataSetResource.
+				getAssetLibraryDocumentMetadataSetByExternalReferenceCodeHttpResponse(
+					testDeleteAssetLibraryDocumentMetadataSetByExternalReferenceCode_getAssetLibraryId(),
+					documentMetadataSet.getExternalReferenceCode()));
+		assertHttpResponseStatusCode(
+			404,
+			documentMetadataSetResource.
+				getAssetLibraryDocumentMetadataSetByExternalReferenceCodeHttpResponse(
+					testDeleteAssetLibraryDocumentMetadataSetByExternalReferenceCode_getAssetLibraryId(),
+					"-"));
+	}
+
+	protected Long
+			testDeleteAssetLibraryDocumentMetadataSetByExternalReferenceCode_getAssetLibraryId()
+		throws Exception {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	protected DocumentMetadataSet
+			testDeleteAssetLibraryDocumentMetadataSetByExternalReferenceCode_addDocumentMetadataSet()
+		throws Exception {
+
+		return documentMetadataSetResource.postAssetLibraryDocumentMetadataSet(
+			testDepotEntry.getDepotEntryId(), randomDocumentMetadataSet());
+	}
+
+	@Test
+	public void testDeleteDocumentMetadataSet() throws Exception {
+		@SuppressWarnings("PMD.UnusedLocalVariable")
+		DocumentMetadataSet documentMetadataSet =
+			testDeleteDocumentMetadataSet_addDocumentMetadataSet();
+
+		assertHttpResponseStatusCode(
+			204,
+			documentMetadataSetResource.deleteDocumentMetadataSetHttpResponse(
+				documentMetadataSet.getId()));
+
+		assertHttpResponseStatusCode(
+			404,
+			documentMetadataSetResource.getDocumentMetadataSetHttpResponse(
+				documentMetadataSet.getId()));
+		assertHttpResponseStatusCode(
+			404,
+			documentMetadataSetResource.getDocumentMetadataSetHttpResponse(0L));
+	}
+
+	protected DocumentMetadataSet
+			testDeleteDocumentMetadataSet_addDocumentMetadataSet()
+		throws Exception {
+
+		return documentMetadataSetResource.postSiteDocumentMetadataSet(
+			testGroup.getGroupId(), randomDocumentMetadataSet());
+	}
+
+	@Test
+	public void testGraphQLDeleteDocumentMetadataSet() throws Exception {
+
+		// No namespace
+
+		DocumentMetadataSet documentMetadataSet1 =
+			testGraphQLDeleteDocumentMetadataSet_addDocumentMetadataSet();
+
+		Assert.assertTrue(
+			JSONUtil.getValueAsBoolean(
+				invokeGraphQLMutation(
+					new GraphQLField(
+						"deleteDocumentMetadataSet",
+						new HashMap<String, Object>() {
+							{
+								put(
+									"documentMetadataSetId",
+									documentMetadataSet1.getId());
+							}
+						})),
+				"JSONObject/data", "Object/deleteDocumentMetadataSet"));
+
+		JSONArray errorsJSONArray1 = JSONUtil.getValueAsJSONArray(
+			invokeGraphQLQuery(
+				new GraphQLField(
+					"documentMetadataSet",
+					new HashMap<String, Object>() {
+						{
+							put(
+								"documentMetadataSetId",
+								documentMetadataSet1.getId());
+						}
+					},
+					new GraphQLField("id"))),
+			"JSONArray/errors");
+
+		Assert.assertTrue(errorsJSONArray1.length() > 0);
+
+		// Using the namespace headlessDelivery_v1_0
+
+		DocumentMetadataSet documentMetadataSet2 =
+			testGraphQLDeleteDocumentMetadataSet_addDocumentMetadataSet();
+
+		Assert.assertTrue(
+			JSONUtil.getValueAsBoolean(
+				invokeGraphQLMutation(
+					new GraphQLField(
+						"headlessDelivery_v1_0",
+						new GraphQLField(
+							"deleteDocumentMetadataSet",
+							new HashMap<String, Object>() {
+								{
+									put(
+										"documentMetadataSetId",
+										documentMetadataSet2.getId());
+								}
+							}))),
+				"JSONObject/data", "JSONObject/headlessDelivery_v1_0",
+				"Object/deleteDocumentMetadataSet"));
+
+		JSONArray errorsJSONArray2 = JSONUtil.getValueAsJSONArray(
+			invokeGraphQLQuery(
+				new GraphQLField(
+					"headlessDelivery_v1_0",
+					new GraphQLField(
+						"documentMetadataSet",
+						new HashMap<String, Object>() {
+							{
+								put(
+									"documentMetadataSetId",
+									documentMetadataSet2.getId());
+							}
+						},
+						new GraphQLField("id")))),
+			"JSONArray/errors");
+
+		Assert.assertTrue(errorsJSONArray2.length() > 0);
+	}
+
+	protected DocumentMetadataSet
+			testGraphQLDeleteDocumentMetadataSet_addDocumentMetadataSet()
+		throws Exception {
+
+		return testGraphQLDocumentMetadataSet_addDocumentMetadataSet();
+	}
+
+	@Test
+	public void testDeleteDocumentMetadataSetBatch() throws Exception {
+		DocumentMetadataSet documentMetadataSet1 =
+			testDeleteDocumentMetadataSetBatch_addDocumentMetadataSet();
+
+		testDeleteDocumentMetadataSetBatch_deleteDocumentMetadataSet(
+			"COMPLETED", null, documentMetadataSet1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			documentMetadataSetResource.getDocumentMetadataSetHttpResponse(
+				documentMetadataSet1.getId()));
+	}
+
+	protected DocumentMetadataSet
+			testDeleteDocumentMetadataSetBatch_addDocumentMetadataSet()
+		throws Exception {
+
+		return testDeleteDocumentMetadataSet_addDocumentMetadataSet();
+	}
+
+	protected void testDeleteDocumentMetadataSetBatch_deleteDocumentMetadataSet(
+			String expectedExecuteStatus, String externalReferenceCode, Long id)
+		throws Exception {
+
+		HttpInvoker.HttpResponse httpResponse =
+			documentMetadataSetResource.
+				deleteDocumentMetadataSetBatchHttpResponse(
+					null,
+					JSONUtil.putAll(
+						JSONUtil.put(
+							"externalReferenceCode", () -> externalReferenceCode
+						).put(
+							"id", () -> id
+						)));
+
+		Assert.assertEquals(202, httpResponse.getStatusCode());
+
+		waitForFinish(
+			expectedExecuteStatus,
+			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+	}
+
+	@Test
+	public void testDeleteSiteDocumentMetadataSetByExternalReferenceCode()
+		throws Exception {
+
+		@SuppressWarnings("PMD.UnusedLocalVariable")
+		DocumentMetadataSet documentMetadataSet =
+			testDeleteSiteDocumentMetadataSetByExternalReferenceCode_addDocumentMetadataSet();
+
+		assertHttpResponseStatusCode(
+			204,
+			documentMetadataSetResource.
+				deleteSiteDocumentMetadataSetByExternalReferenceCodeHttpResponse(
+					testDeleteSiteDocumentMetadataSetByExternalReferenceCode_getSiteId(
+						documentMetadataSet),
+					documentMetadataSet.getExternalReferenceCode()));
+
+		assertHttpResponseStatusCode(
+			404,
+			documentMetadataSetResource.
+				getSiteDocumentMetadataSetByExternalReferenceCodeHttpResponse(
+					testDeleteSiteDocumentMetadataSetByExternalReferenceCode_getSiteId(
+						documentMetadataSet),
+					documentMetadataSet.getExternalReferenceCode()));
+		assertHttpResponseStatusCode(
+			404,
+			documentMetadataSetResource.
+				getSiteDocumentMetadataSetByExternalReferenceCodeHttpResponse(
+					testDeleteSiteDocumentMetadataSetByExternalReferenceCode_getSiteId(
+						documentMetadataSet),
+					"-"));
+	}
+
+	protected Long
+			testDeleteSiteDocumentMetadataSetByExternalReferenceCode_getSiteId(
+				DocumentMetadataSet documentMetadataSet)
+		throws Exception {
+
+		return documentMetadataSet.getSiteId();
+	}
+
+	protected DocumentMetadataSet
+			testDeleteSiteDocumentMetadataSetByExternalReferenceCode_addDocumentMetadataSet()
+		throws Exception {
+
+		return documentMetadataSetResource.postSiteDocumentMetadataSet(
+			testGroup.getGroupId(), randomDocumentMetadataSet());
+	}
+
+	@Test
+	public void testGetAssetLibraryDocumentMetadataSetByExternalReferenceCode()
+		throws Exception {
+
+		DocumentMetadataSet postDocumentMetadataSet =
+			testGetAssetLibraryDocumentMetadataSetByExternalReferenceCode_addDocumentMetadataSet();
+
+		DocumentMetadataSet getDocumentMetadataSet =
+			documentMetadataSetResource.
+				getAssetLibraryDocumentMetadataSetByExternalReferenceCode(
+					testGetAssetLibraryDocumentMetadataSetByExternalReferenceCode_getAssetLibraryId(),
+					postDocumentMetadataSet.getExternalReferenceCode());
+
+		assertEquals(postDocumentMetadataSet, getDocumentMetadataSet);
+		assertValid(getDocumentMetadataSet);
+	}
+
+	protected Long
+			testGetAssetLibraryDocumentMetadataSetByExternalReferenceCode_getAssetLibraryId()
+		throws Exception {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	protected DocumentMetadataSet
+			testGetAssetLibraryDocumentMetadataSetByExternalReferenceCode_addDocumentMetadataSet()
+		throws Exception {
+
+		return documentMetadataSetResource.postAssetLibraryDocumentMetadataSet(
+			testDepotEntry.getDepotEntryId(), randomDocumentMetadataSet());
+	}
+
+	@Test
+	public void testGraphQLGetAssetLibraryDocumentMetadataSetByExternalReferenceCode()
+		throws Exception {
+
+		DocumentMetadataSet documentMetadataSet =
+			testGraphQLGetAssetLibraryDocumentMetadataSetByExternalReferenceCode_addDocumentMetadataSet();
+
+		// No namespace
+
+		Assert.assertTrue(
+			equals(
+				documentMetadataSet,
+				DocumentMetadataSetSerDes.toDTO(
+					JSONUtil.getValueAsString(
+						invokeGraphQLQuery(
+							new GraphQLField(
+								"assetLibraryDocumentMetadataSetByExternalReferenceCode",
+								new HashMap<String, Object>() {
+									{
+										put(
+											"assetLibraryId",
+											"\"" +
+												testGraphQLGetAssetLibraryDocumentMetadataSetByExternalReferenceCode_getAssetLibraryId() +
+													"\"");
+
+										put(
+											"externalReferenceCode",
+											"\"" +
+												documentMetadataSet.
+													getExternalReferenceCode() +
+														"\"");
+									}
+								},
+								getGraphQLFields())),
+						"JSONObject/data",
+						"Object/assetLibraryDocumentMetadataSetByExternalReferenceCode"))));
+
+		// Using the namespace headlessDelivery_v1_0
+
+		Assert.assertTrue(
+			equals(
+				documentMetadataSet,
+				DocumentMetadataSetSerDes.toDTO(
+					JSONUtil.getValueAsString(
+						invokeGraphQLQuery(
+							new GraphQLField(
+								"headlessDelivery_v1_0",
+								new GraphQLField(
+									"assetLibraryDocumentMetadataSetByExternalReferenceCode",
+									new HashMap<String, Object>() {
+										{
+											put(
+												"assetLibraryId",
+												"\"" +
+													testGraphQLGetAssetLibraryDocumentMetadataSetByExternalReferenceCode_getAssetLibraryId() +
+														"\"");
+
+											put(
+												"externalReferenceCode",
+												"\"" +
+													documentMetadataSet.
+														getExternalReferenceCode() +
+															"\"");
+										}
+									},
+									getGraphQLFields()))),
+						"JSONObject/data", "JSONObject/headlessDelivery_v1_0",
+						"Object/assetLibraryDocumentMetadataSetByExternalReferenceCode"))));
+	}
+
+	protected Long
+			testGraphQLGetAssetLibraryDocumentMetadataSetByExternalReferenceCode_getAssetLibraryId()
+		throws Exception {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	@Test
+	public void testGraphQLGetAssetLibraryDocumentMetadataSetByExternalReferenceCodeNotFound()
+		throws Exception {
+
+		String irrelevantExternalReferenceCode =
+			"\"" + RandomTestUtil.randomString() + "\"";
+
+		// No namespace
+
+		Assert.assertEquals(
+			"Not Found",
+			JSONUtil.getValueAsString(
+				invokeGraphQLQuery(
+					new GraphQLField(
+						"assetLibraryDocumentMetadataSetByExternalReferenceCode",
+						new HashMap<String, Object>() {
+							{
+								put(
+									"assetLibraryId",
+									"\"" +
+										testGraphQLGetAssetLibraryDocumentMetadataSetByExternalReferenceCode_getAssetLibraryId() +
+											"\"");
+								put(
+									"externalReferenceCode",
+									irrelevantExternalReferenceCode);
+							}
+						},
+						getGraphQLFields())),
+				"JSONArray/errors", "Object/0", "JSONObject/extensions",
+				"Object/code"));
+
+		// Using the namespace headlessDelivery_v1_0
+
+		Assert.assertEquals(
+			"Not Found",
+			JSONUtil.getValueAsString(
+				invokeGraphQLQuery(
+					new GraphQLField(
+						"headlessDelivery_v1_0",
+						new GraphQLField(
+							"assetLibraryDocumentMetadataSetByExternalReferenceCode",
+							new HashMap<String, Object>() {
+								{
+									put(
+										"assetLibraryId",
+										"\"" +
+											testGraphQLGetAssetLibraryDocumentMetadataSetByExternalReferenceCode_getAssetLibraryId() +
+												"\"");
+									put(
+										"externalReferenceCode",
+										irrelevantExternalReferenceCode);
+								}
+							},
+							getGraphQLFields()))),
+				"JSONArray/errors", "Object/0", "JSONObject/extensions",
+				"Object/code"));
+	}
+
+	protected DocumentMetadataSet
+			testGraphQLGetAssetLibraryDocumentMetadataSetByExternalReferenceCode_addDocumentMetadataSet()
+		throws Exception {
+
+		return testGraphQLDocumentMetadataSet_addDocumentMetadataSet();
 	}
 
 	@Test
@@ -427,444 +890,6 @@ public abstract class BaseDocumentMetadataSetResourceTestCase {
 	}
 
 	@Test
-	public void testPostAssetLibraryDocumentMetadataSet() throws Exception {
-		DocumentMetadataSet randomDocumentMetadataSet =
-			randomDocumentMetadataSet();
-
-		DocumentMetadataSet postDocumentMetadataSet =
-			testPostAssetLibraryDocumentMetadataSet_addDocumentMetadataSet(
-				randomDocumentMetadataSet);
-
-		assertEquals(randomDocumentMetadataSet, postDocumentMetadataSet);
-		assertValid(postDocumentMetadataSet);
-	}
-
-	protected DocumentMetadataSet
-			testPostAssetLibraryDocumentMetadataSet_addDocumentMetadataSet(
-				DocumentMetadataSet documentMetadataSet)
-		throws Exception {
-
-		return documentMetadataSetResource.postAssetLibraryDocumentMetadataSet(
-			testGetAssetLibraryDocumentMetadataSetsPage_getAssetLibraryId(),
-			documentMetadataSet);
-	}
-
-	@Test
-	public void testDeleteAssetLibraryDocumentMetadataSetByExternalReferenceCode()
-		throws Exception {
-
-		@SuppressWarnings("PMD.UnusedLocalVariable")
-		DocumentMetadataSet documentMetadataSet =
-			testDeleteAssetLibraryDocumentMetadataSetByExternalReferenceCode_addDocumentMetadataSet();
-
-		assertHttpResponseStatusCode(
-			204,
-			documentMetadataSetResource.
-				deleteAssetLibraryDocumentMetadataSetByExternalReferenceCodeHttpResponse(
-					testDeleteAssetLibraryDocumentMetadataSetByExternalReferenceCode_getAssetLibraryId(),
-					documentMetadataSet.getExternalReferenceCode()));
-
-		assertHttpResponseStatusCode(
-			404,
-			documentMetadataSetResource.
-				getAssetLibraryDocumentMetadataSetByExternalReferenceCodeHttpResponse(
-					testDeleteAssetLibraryDocumentMetadataSetByExternalReferenceCode_getAssetLibraryId(),
-					documentMetadataSet.getExternalReferenceCode()));
-
-		assertHttpResponseStatusCode(
-			404,
-			documentMetadataSetResource.
-				getAssetLibraryDocumentMetadataSetByExternalReferenceCodeHttpResponse(
-					testDeleteAssetLibraryDocumentMetadataSetByExternalReferenceCode_getAssetLibraryId(),
-					documentMetadataSet.getExternalReferenceCode()));
-	}
-
-	protected Long
-			testDeleteAssetLibraryDocumentMetadataSetByExternalReferenceCode_getAssetLibraryId()
-		throws Exception {
-
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
-	}
-
-	protected DocumentMetadataSet
-			testDeleteAssetLibraryDocumentMetadataSetByExternalReferenceCode_addDocumentMetadataSet()
-		throws Exception {
-
-		return documentMetadataSetResource.postAssetLibraryDocumentMetadataSet(
-			testDepotEntry.getDepotEntryId(), randomDocumentMetadataSet());
-	}
-
-	@Test
-	public void testGetAssetLibraryDocumentMetadataSetByExternalReferenceCode()
-		throws Exception {
-
-		DocumentMetadataSet postDocumentMetadataSet =
-			testGetAssetLibraryDocumentMetadataSetByExternalReferenceCode_addDocumentMetadataSet();
-
-		DocumentMetadataSet getDocumentMetadataSet =
-			documentMetadataSetResource.
-				getAssetLibraryDocumentMetadataSetByExternalReferenceCode(
-					testGetAssetLibraryDocumentMetadataSetByExternalReferenceCode_getAssetLibraryId(),
-					postDocumentMetadataSet.getExternalReferenceCode());
-
-		assertEquals(postDocumentMetadataSet, getDocumentMetadataSet);
-		assertValid(getDocumentMetadataSet);
-	}
-
-	protected Long
-			testGetAssetLibraryDocumentMetadataSetByExternalReferenceCode_getAssetLibraryId()
-		throws Exception {
-
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
-	}
-
-	protected DocumentMetadataSet
-			testGetAssetLibraryDocumentMetadataSetByExternalReferenceCode_addDocumentMetadataSet()
-		throws Exception {
-
-		return documentMetadataSetResource.postAssetLibraryDocumentMetadataSet(
-			testDepotEntry.getDepotEntryId(), randomDocumentMetadataSet());
-	}
-
-	@Test
-	public void testGraphQLGetAssetLibraryDocumentMetadataSetByExternalReferenceCode()
-		throws Exception {
-
-		DocumentMetadataSet documentMetadataSet =
-			testGraphQLGetAssetLibraryDocumentMetadataSetByExternalReferenceCode_addDocumentMetadataSet();
-
-		// No namespace
-
-		Assert.assertTrue(
-			equals(
-				documentMetadataSet,
-				DocumentMetadataSetSerDes.toDTO(
-					JSONUtil.getValueAsString(
-						invokeGraphQLQuery(
-							new GraphQLField(
-								"assetLibraryDocumentMetadataSetByExternalReferenceCode",
-								new HashMap<String, Object>() {
-									{
-										put(
-											"assetLibraryId",
-											"\"" +
-												testGraphQLGetAssetLibraryDocumentMetadataSetByExternalReferenceCode_getAssetLibraryId() +
-													"\"");
-
-										put(
-											"externalReferenceCode",
-											"\"" +
-												documentMetadataSet.
-													getExternalReferenceCode() +
-														"\"");
-									}
-								},
-								getGraphQLFields())),
-						"JSONObject/data",
-						"Object/assetLibraryDocumentMetadataSetByExternalReferenceCode"))));
-
-		// Using the namespace headlessDelivery_v1_0
-
-		Assert.assertTrue(
-			equals(
-				documentMetadataSet,
-				DocumentMetadataSetSerDes.toDTO(
-					JSONUtil.getValueAsString(
-						invokeGraphQLQuery(
-							new GraphQLField(
-								"headlessDelivery_v1_0",
-								new GraphQLField(
-									"assetLibraryDocumentMetadataSetByExternalReferenceCode",
-									new HashMap<String, Object>() {
-										{
-											put(
-												"assetLibraryId",
-												"\"" +
-													testGraphQLGetAssetLibraryDocumentMetadataSetByExternalReferenceCode_getAssetLibraryId() +
-														"\"");
-
-											put(
-												"externalReferenceCode",
-												"\"" +
-													documentMetadataSet.
-														getExternalReferenceCode() +
-															"\"");
-										}
-									},
-									getGraphQLFields()))),
-						"JSONObject/data", "JSONObject/headlessDelivery_v1_0",
-						"Object/assetLibraryDocumentMetadataSetByExternalReferenceCode"))));
-	}
-
-	protected Long
-			testGraphQLGetAssetLibraryDocumentMetadataSetByExternalReferenceCode_getAssetLibraryId()
-		throws Exception {
-
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
-	}
-
-	@Test
-	public void testGraphQLGetAssetLibraryDocumentMetadataSetByExternalReferenceCodeNotFound()
-		throws Exception {
-
-		String irrelevantExternalReferenceCode =
-			"\"" + RandomTestUtil.randomString() + "\"";
-
-		// No namespace
-
-		Assert.assertEquals(
-			"Not Found",
-			JSONUtil.getValueAsString(
-				invokeGraphQLQuery(
-					new GraphQLField(
-						"assetLibraryDocumentMetadataSetByExternalReferenceCode",
-						new HashMap<String, Object>() {
-							{
-								put(
-									"assetLibraryId",
-									"\"" +
-										testGraphQLGetAssetLibraryDocumentMetadataSetByExternalReferenceCode_getAssetLibraryId() +
-											"\"");
-								put(
-									"externalReferenceCode",
-									irrelevantExternalReferenceCode);
-							}
-						},
-						getGraphQLFields())),
-				"JSONArray/errors", "Object/0", "JSONObject/extensions",
-				"Object/code"));
-
-		// Using the namespace headlessDelivery_v1_0
-
-		Assert.assertEquals(
-			"Not Found",
-			JSONUtil.getValueAsString(
-				invokeGraphQLQuery(
-					new GraphQLField(
-						"headlessDelivery_v1_0",
-						new GraphQLField(
-							"assetLibraryDocumentMetadataSetByExternalReferenceCode",
-							new HashMap<String, Object>() {
-								{
-									put(
-										"assetLibraryId",
-										"\"" +
-											testGraphQLGetAssetLibraryDocumentMetadataSetByExternalReferenceCode_getAssetLibraryId() +
-												"\"");
-									put(
-										"externalReferenceCode",
-										irrelevantExternalReferenceCode);
-								}
-							},
-							getGraphQLFields()))),
-				"JSONArray/errors", "Object/0", "JSONObject/extensions",
-				"Object/code"));
-	}
-
-	protected DocumentMetadataSet
-			testGraphQLGetAssetLibraryDocumentMetadataSetByExternalReferenceCode_addDocumentMetadataSet()
-		throws Exception {
-
-		return testGraphQLDocumentMetadataSet_addDocumentMetadataSet();
-	}
-
-	@Test
-	public void testPutAssetLibraryDocumentMetadataSetByExternalReferenceCode()
-		throws Exception {
-
-		DocumentMetadataSet postDocumentMetadataSet =
-			testPutAssetLibraryDocumentMetadataSetByExternalReferenceCode_addDocumentMetadataSet();
-
-		DocumentMetadataSet randomDocumentMetadataSet =
-			randomDocumentMetadataSet();
-
-		DocumentMetadataSet putDocumentMetadataSet =
-			documentMetadataSetResource.
-				putAssetLibraryDocumentMetadataSetByExternalReferenceCode(
-					testPutAssetLibraryDocumentMetadataSetByExternalReferenceCode_getAssetLibraryId(),
-					postDocumentMetadataSet.getExternalReferenceCode(),
-					randomDocumentMetadataSet);
-
-		assertEquals(randomDocumentMetadataSet, putDocumentMetadataSet);
-		assertValid(putDocumentMetadataSet);
-
-		DocumentMetadataSet getDocumentMetadataSet =
-			documentMetadataSetResource.
-				getAssetLibraryDocumentMetadataSetByExternalReferenceCode(
-					testPutAssetLibraryDocumentMetadataSetByExternalReferenceCode_getAssetLibraryId(),
-					putDocumentMetadataSet.getExternalReferenceCode());
-
-		assertEquals(randomDocumentMetadataSet, getDocumentMetadataSet);
-		assertValid(getDocumentMetadataSet);
-
-		DocumentMetadataSet newDocumentMetadataSet =
-			testPutAssetLibraryDocumentMetadataSetByExternalReferenceCode_createDocumentMetadataSet();
-
-		putDocumentMetadataSet =
-			documentMetadataSetResource.
-				putAssetLibraryDocumentMetadataSetByExternalReferenceCode(
-					testPutAssetLibraryDocumentMetadataSetByExternalReferenceCode_getAssetLibraryId(),
-					newDocumentMetadataSet.getExternalReferenceCode(),
-					newDocumentMetadataSet);
-
-		assertEquals(newDocumentMetadataSet, putDocumentMetadataSet);
-		assertValid(putDocumentMetadataSet);
-
-		getDocumentMetadataSet =
-			documentMetadataSetResource.
-				getAssetLibraryDocumentMetadataSetByExternalReferenceCode(
-					testPutAssetLibraryDocumentMetadataSetByExternalReferenceCode_getAssetLibraryId(),
-					putDocumentMetadataSet.getExternalReferenceCode());
-
-		assertEquals(newDocumentMetadataSet, getDocumentMetadataSet);
-
-		Assert.assertEquals(
-			newDocumentMetadataSet.getExternalReferenceCode(),
-			putDocumentMetadataSet.getExternalReferenceCode());
-	}
-
-	protected Long
-			testPutAssetLibraryDocumentMetadataSetByExternalReferenceCode_getAssetLibraryId()
-		throws Exception {
-
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
-	}
-
-	protected DocumentMetadataSet
-			testPutAssetLibraryDocumentMetadataSetByExternalReferenceCode_createDocumentMetadataSet()
-		throws Exception {
-
-		return randomDocumentMetadataSet();
-	}
-
-	protected DocumentMetadataSet
-			testPutAssetLibraryDocumentMetadataSetByExternalReferenceCode_addDocumentMetadataSet()
-		throws Exception {
-
-		return documentMetadataSetResource.postAssetLibraryDocumentMetadataSet(
-			testDepotEntry.getDepotEntryId(), randomDocumentMetadataSet());
-	}
-
-	@Test
-	public void testDeleteDocumentMetadataSet() throws Exception {
-		@SuppressWarnings("PMD.UnusedLocalVariable")
-		DocumentMetadataSet documentMetadataSet =
-			testDeleteDocumentMetadataSet_addDocumentMetadataSet();
-
-		assertHttpResponseStatusCode(
-			204,
-			documentMetadataSetResource.deleteDocumentMetadataSetHttpResponse(
-				documentMetadataSet.getId()));
-
-		assertHttpResponseStatusCode(
-			404,
-			documentMetadataSetResource.getDocumentMetadataSetHttpResponse(
-				documentMetadataSet.getId()));
-
-		assertHttpResponseStatusCode(
-			404,
-			documentMetadataSetResource.getDocumentMetadataSetHttpResponse(0L));
-	}
-
-	protected DocumentMetadataSet
-			testDeleteDocumentMetadataSet_addDocumentMetadataSet()
-		throws Exception {
-
-		return documentMetadataSetResource.postSiteDocumentMetadataSet(
-			testGroup.getGroupId(), randomDocumentMetadataSet());
-	}
-
-	@Test
-	public void testGraphQLDeleteDocumentMetadataSet() throws Exception {
-
-		// No namespace
-
-		DocumentMetadataSet documentMetadataSet1 =
-			testGraphQLDeleteDocumentMetadataSet_addDocumentMetadataSet();
-
-		Assert.assertTrue(
-			JSONUtil.getValueAsBoolean(
-				invokeGraphQLMutation(
-					new GraphQLField(
-						"deleteDocumentMetadataSet",
-						new HashMap<String, Object>() {
-							{
-								put(
-									"documentMetadataSetId",
-									documentMetadataSet1.getId());
-							}
-						})),
-				"JSONObject/data", "Object/deleteDocumentMetadataSet"));
-
-		JSONArray errorsJSONArray1 = JSONUtil.getValueAsJSONArray(
-			invokeGraphQLQuery(
-				new GraphQLField(
-					"documentMetadataSet",
-					new HashMap<String, Object>() {
-						{
-							put(
-								"documentMetadataSetId",
-								documentMetadataSet1.getId());
-						}
-					},
-					new GraphQLField("id"))),
-			"JSONArray/errors");
-
-		Assert.assertTrue(errorsJSONArray1.length() > 0);
-
-		// Using the namespace headlessDelivery_v1_0
-
-		DocumentMetadataSet documentMetadataSet2 =
-			testGraphQLDeleteDocumentMetadataSet_addDocumentMetadataSet();
-
-		Assert.assertTrue(
-			JSONUtil.getValueAsBoolean(
-				invokeGraphQLMutation(
-					new GraphQLField(
-						"headlessDelivery_v1_0",
-						new GraphQLField(
-							"deleteDocumentMetadataSet",
-							new HashMap<String, Object>() {
-								{
-									put(
-										"documentMetadataSetId",
-										documentMetadataSet2.getId());
-								}
-							}))),
-				"JSONObject/data", "JSONObject/headlessDelivery_v1_0",
-				"Object/deleteDocumentMetadataSet"));
-
-		JSONArray errorsJSONArray2 = JSONUtil.getValueAsJSONArray(
-			invokeGraphQLQuery(
-				new GraphQLField(
-					"headlessDelivery_v1_0",
-					new GraphQLField(
-						"documentMetadataSet",
-						new HashMap<String, Object>() {
-							{
-								put(
-									"documentMetadataSetId",
-									documentMetadataSet2.getId());
-							}
-						},
-						new GraphQLField("id")))),
-			"JSONArray/errors");
-
-		Assert.assertTrue(errorsJSONArray2.length() > 0);
-	}
-
-	protected DocumentMetadataSet
-			testGraphQLDeleteDocumentMetadataSet_addDocumentMetadataSet()
-		throws Exception {
-
-		return testGraphQLDocumentMetadataSet_addDocumentMetadataSet();
-	}
-
-	@Test
 	public void testGetDocumentMetadataSet() throws Exception {
 		DocumentMetadataSet postDocumentMetadataSet =
 			testGetDocumentMetadataSet_addDocumentMetadataSet();
@@ -875,6 +900,199 @@ public abstract class BaseDocumentMetadataSetResourceTestCase {
 
 		assertEquals(postDocumentMetadataSet, getDocumentMetadataSet);
 		assertValid(getDocumentMetadataSet);
+	}
+
+	@Test
+	public void testVulcanCRUDItemDelegateGetItem() throws Exception {
+		DocumentMetadataSet postDocumentMetadataSet =
+			testGetDocumentMetadataSet_addDocumentMetadataSet();
+
+		DocumentMetadataSet getDocumentMetadataSet =
+			documentMetadataSetResource.getDocumentMetadataSet(
+				postDocumentMetadataSet.getId());
+
+		VulcanCRUDItemDelegate vulcanCRUDItemDelegate =
+			_vulcanCRUDItemDelegateBuilderRegistry.builder(
+				testCompany,
+				"com.liferay.headless.delivery.dto.v1_0.DocumentMetadataSet"
+			).acceptLanguage(
+				new AcceptLanguage() {
+
+					@Override
+					public List<Locale> getLocales() {
+						return Arrays.asList(LocaleUtil.getDefault());
+					}
+
+					@Override
+					public String getPreferredLanguageId() {
+						return LocaleUtil.toLanguageId(LocaleUtil.getDefault());
+					}
+
+					@Override
+					public Locale getPreferredLocale() {
+						return LocaleUtil.getDefault();
+					}
+
+				}
+			).groupLocalService(
+				_groupLocalService
+			).httpServletRequest(
+				testVulcanCRUDItemDelegate_getHttpServletRequest()
+			).httpServletResponse(
+				new MockHttpServletResponse()
+			).resourceActionLocalService(
+				_resourceActionLocalService
+			).resourcePermissionLocalService(
+				_resourcePermissionLocalService
+			).roleLocalService(
+				_roleLocalService
+			).scopeChecker(
+				_scopeChecker
+			).uriInfo(
+				testVulcanCRUDItemDelegate_getUriInfo()
+			).user(
+				testVulcanCRUDItemDelegate_getUser()
+			).build();
+
+		Object item = vulcanCRUDItemDelegate.getItem(
+			postDocumentMetadataSet.getId());
+
+		assertEquals(
+			getDocumentMetadataSet,
+			DocumentMetadataSetSerDes.toDTO(item.toString()));
+	}
+
+	protected HttpServletRequest
+		testVulcanCRUDItemDelegate_getHttpServletRequest() {
+
+		return new MockHttpServletRequest() {
+
+			@Override
+			public StringBuffer getRequestURL() {
+				return new StringBuffer(
+					StringBundler.concat(
+						"http://localhost:8080/o/v1.0/",
+						RandomTestUtil.randomString(), "/",
+						RandomTestUtil.randomString()));
+			}
+
+		};
+	}
+
+	protected UriInfo testVulcanCRUDItemDelegate_getUriInfo() {
+		String applicationPath = RandomTestUtil.randomString() + "/";
+		String resourcePath = RandomTestUtil.randomString();
+
+		return new UriInfo() {
+
+			@Override
+			public String getPath() {
+				return resourcePath;
+			}
+
+			@Override
+			public String getPath(boolean decode) {
+				return getPath();
+			}
+
+			@Override
+			public List<PathSegment> getPathSegments() {
+				return Collections.emptyList();
+			}
+
+			@Override
+			public List<PathSegment> getPathSegments(boolean decode) {
+				return getPathSegments();
+			}
+
+			@Override
+			public URI getRequestUri() {
+				return URI.create(
+					"http://localhost:8080/o/" + applicationPath +
+						resourcePath);
+			}
+
+			@Override
+			public UriBuilder getRequestUriBuilder() {
+				return UriBuilder.fromUri(getRequestUri());
+			}
+
+			@Override
+			public URI getAbsolutePath() {
+				return getRequestUri();
+			}
+
+			@Override
+			public UriBuilder getAbsolutePathBuilder() {
+				return getRequestUriBuilder();
+			}
+
+			@Override
+			public URI getBaseUri() {
+				return URI.create("http://localhost:8080/o/" + applicationPath);
+			}
+
+			@Override
+			public UriBuilder getBaseUriBuilder() {
+				return UriBuilder.fromUri(getBaseUri());
+			}
+
+			@Override
+			public MultivaluedMap<String, String> getPathParameters() {
+				return new MultivaluedHashMap<>();
+			}
+
+			@Override
+			public MultivaluedMap<String, String> getPathParameters(
+				boolean decode) {
+
+				return getPathParameters();
+			}
+
+			@Override
+			public MultivaluedMap<String, String> getQueryParameters() {
+				return new MultivaluedHashMap<>();
+			}
+
+			@Override
+			public MultivaluedMap<String, String> getQueryParameters(
+				boolean decode) {
+
+				return getQueryParameters();
+			}
+
+			@Override
+			public List<String> getMatchedURIs() {
+				return Collections.emptyList();
+			}
+
+			@Override
+			public List<String> getMatchedURIs(boolean decode) {
+				return getMatchedURIs();
+			}
+
+			@Override
+			public List<Object> getMatchedResources() {
+				return Collections.emptyList();
+			}
+
+			@Override
+			public URI resolve(URI requestUri) {
+				return getBaseUri().resolve(requestUri);
+			}
+
+			@Override
+			public URI relativize(URI uri) {
+				return getBaseUri().relativize(uri);
+			}
+
+		};
+	}
+
+	protected com.liferay.portal.kernel.model.User
+		testVulcanCRUDItemDelegate_getUser() {
+
+		return _testCompanyAdminUser;
 	}
 
 	protected DocumentMetadataSet
@@ -981,6 +1199,182 @@ public abstract class BaseDocumentMetadataSetResourceTestCase {
 
 	protected DocumentMetadataSet
 			testGraphQLGetDocumentMetadataSet_addDocumentMetadataSet()
+		throws Exception {
+
+		return testGraphQLDocumentMetadataSet_addDocumentMetadataSet();
+	}
+
+	@Test
+	public void testGetSiteDocumentMetadataSetByExternalReferenceCode()
+		throws Exception {
+
+		DocumentMetadataSet postDocumentMetadataSet =
+			testGetSiteDocumentMetadataSetByExternalReferenceCode_addDocumentMetadataSet();
+
+		DocumentMetadataSet getDocumentMetadataSet =
+			documentMetadataSetResource.
+				getSiteDocumentMetadataSetByExternalReferenceCode(
+					testGetSiteDocumentMetadataSetByExternalReferenceCode_getSiteId(
+						postDocumentMetadataSet),
+					postDocumentMetadataSet.getExternalReferenceCode());
+
+		assertEquals(postDocumentMetadataSet, getDocumentMetadataSet);
+		assertValid(getDocumentMetadataSet);
+	}
+
+	protected Long
+			testGetSiteDocumentMetadataSetByExternalReferenceCode_getSiteId(
+				DocumentMetadataSet documentMetadataSet)
+		throws Exception {
+
+		return documentMetadataSet.getSiteId();
+	}
+
+	protected DocumentMetadataSet
+			testGetSiteDocumentMetadataSetByExternalReferenceCode_addDocumentMetadataSet()
+		throws Exception {
+
+		return documentMetadataSetResource.postSiteDocumentMetadataSet(
+			testGroup.getGroupId(), randomDocumentMetadataSet());
+	}
+
+	@Test
+	public void testGraphQLGetSiteDocumentMetadataSetByExternalReferenceCode()
+		throws Exception {
+
+		DocumentMetadataSet documentMetadataSet =
+			testGraphQLGetSiteDocumentMetadataSetByExternalReferenceCode_addDocumentMetadataSet();
+
+		// No namespace
+
+		Assert.assertTrue(
+			equals(
+				documentMetadataSet,
+				DocumentMetadataSetSerDes.toDTO(
+					JSONUtil.getValueAsString(
+						invokeGraphQLQuery(
+							new GraphQLField(
+								"documentMetadataSetByExternalReferenceCode",
+								new HashMap<String, Object>() {
+									{
+										put(
+											"siteKey",
+											"\"" +
+												testGraphQLGetSiteDocumentMetadataSetByExternalReferenceCode_getSiteId(
+													documentMetadataSet) +
+														"\"");
+
+										put(
+											"externalReferenceCode",
+											"\"" +
+												documentMetadataSet.
+													getExternalReferenceCode() +
+														"\"");
+									}
+								},
+								getGraphQLFields())),
+						"JSONObject/data",
+						"Object/documentMetadataSetByExternalReferenceCode"))));
+
+		// Using the namespace headlessDelivery_v1_0
+
+		Assert.assertTrue(
+			equals(
+				documentMetadataSet,
+				DocumentMetadataSetSerDes.toDTO(
+					JSONUtil.getValueAsString(
+						invokeGraphQLQuery(
+							new GraphQLField(
+								"headlessDelivery_v1_0",
+								new GraphQLField(
+									"documentMetadataSetByExternalReferenceCode",
+									new HashMap<String, Object>() {
+										{
+											put(
+												"siteKey",
+												"\"" +
+													testGraphQLGetSiteDocumentMetadataSetByExternalReferenceCode_getSiteId(
+														documentMetadataSet) +
+															"\"");
+
+											put(
+												"externalReferenceCode",
+												"\"" +
+													documentMetadataSet.
+														getExternalReferenceCode() +
+															"\"");
+										}
+									},
+									getGraphQLFields()))),
+						"JSONObject/data", "JSONObject/headlessDelivery_v1_0",
+						"Object/documentMetadataSetByExternalReferenceCode"))));
+	}
+
+	protected Long
+			testGraphQLGetSiteDocumentMetadataSetByExternalReferenceCode_getSiteId(
+				DocumentMetadataSet documentMetadataSet)
+		throws Exception {
+
+		return documentMetadataSet.getSiteId();
+	}
+
+	@Test
+	public void testGraphQLGetSiteDocumentMetadataSetByExternalReferenceCodeNotFound()
+		throws Exception {
+
+		String irrelevantExternalReferenceCode =
+			"\"" + RandomTestUtil.randomString() + "\"";
+
+		// No namespace
+
+		Assert.assertEquals(
+			"Not Found",
+			JSONUtil.getValueAsString(
+				invokeGraphQLQuery(
+					new GraphQLField(
+						"documentMetadataSetByExternalReferenceCode",
+						new HashMap<String, Object>() {
+							{
+								put(
+									"siteKey",
+									"\"" + irrelevantGroup.getGroupId() + "\"");
+								put(
+									"externalReferenceCode",
+									irrelevantExternalReferenceCode);
+							}
+						},
+						getGraphQLFields())),
+				"JSONArray/errors", "Object/0", "JSONObject/extensions",
+				"Object/code"));
+
+		// Using the namespace headlessDelivery_v1_0
+
+		Assert.assertEquals(
+			"Not Found",
+			JSONUtil.getValueAsString(
+				invokeGraphQLQuery(
+					new GraphQLField(
+						"headlessDelivery_v1_0",
+						new GraphQLField(
+							"documentMetadataSetByExternalReferenceCode",
+							new HashMap<String, Object>() {
+								{
+									put(
+										"siteKey",
+										"\"" + irrelevantGroup.getGroupId() +
+											"\"");
+									put(
+										"externalReferenceCode",
+										irrelevantExternalReferenceCode);
+								}
+							},
+							getGraphQLFields()))),
+				"JSONArray/errors", "Object/0", "JSONObject/extensions",
+				"Object/code"));
+	}
+
+	protected DocumentMetadataSet
+			testGraphQLGetSiteDocumentMetadataSetByExternalReferenceCode_addDocumentMetadataSet()
 		throws Exception {
 
 		return testGraphQLDocumentMetadataSet_addDocumentMetadataSet();
@@ -1272,6 +1666,29 @@ public abstract class BaseDocumentMetadataSetResourceTestCase {
 	}
 
 	@Test
+	public void testPostAssetLibraryDocumentMetadataSet() throws Exception {
+		DocumentMetadataSet randomDocumentMetadataSet =
+			randomDocumentMetadataSet();
+
+		DocumentMetadataSet postDocumentMetadataSet =
+			testPostAssetLibraryDocumentMetadataSet_addDocumentMetadataSet(
+				randomDocumentMetadataSet);
+
+		assertEquals(randomDocumentMetadataSet, postDocumentMetadataSet);
+		assertValid(postDocumentMetadataSet);
+	}
+
+	protected DocumentMetadataSet
+			testPostAssetLibraryDocumentMetadataSet_addDocumentMetadataSet(
+				DocumentMetadataSet documentMetadataSet)
+		throws Exception {
+
+		return documentMetadataSetResource.postAssetLibraryDocumentMetadataSet(
+			testGetAssetLibraryDocumentMetadataSetsPage_getAssetLibraryId(),
+			documentMetadataSet);
+	}
+
+	@Test
 	public void testPostSiteDocumentMetadataSet() throws Exception {
 		DocumentMetadataSet randomDocumentMetadataSet =
 			randomDocumentMetadataSet();
@@ -1308,228 +1725,81 @@ public abstract class BaseDocumentMetadataSetResourceTestCase {
 	}
 
 	@Test
-	public void testDeleteSiteDocumentMetadataSetByExternalReferenceCode()
-		throws Exception {
-
-		@SuppressWarnings("PMD.UnusedLocalVariable")
-		DocumentMetadataSet documentMetadataSet =
-			testDeleteSiteDocumentMetadataSetByExternalReferenceCode_addDocumentMetadataSet();
-
-		assertHttpResponseStatusCode(
-			204,
-			documentMetadataSetResource.
-				deleteSiteDocumentMetadataSetByExternalReferenceCodeHttpResponse(
-					testDeleteSiteDocumentMetadataSetByExternalReferenceCode_getSiteId(
-						documentMetadataSet),
-					documentMetadataSet.getExternalReferenceCode()));
-
-		assertHttpResponseStatusCode(
-			404,
-			documentMetadataSetResource.
-				getSiteDocumentMetadataSetByExternalReferenceCodeHttpResponse(
-					testDeleteSiteDocumentMetadataSetByExternalReferenceCode_getSiteId(
-						documentMetadataSet),
-					documentMetadataSet.getExternalReferenceCode()));
-
-		assertHttpResponseStatusCode(
-			404,
-			documentMetadataSetResource.
-				getSiteDocumentMetadataSetByExternalReferenceCodeHttpResponse(
-					testDeleteSiteDocumentMetadataSetByExternalReferenceCode_getSiteId(
-						documentMetadataSet),
-					documentMetadataSet.getExternalReferenceCode()));
-	}
-
-	protected Long
-			testDeleteSiteDocumentMetadataSetByExternalReferenceCode_getSiteId(
-				DocumentMetadataSet documentMetadataSet)
-		throws Exception {
-
-		return documentMetadataSet.getSiteId();
-	}
-
-	protected DocumentMetadataSet
-			testDeleteSiteDocumentMetadataSetByExternalReferenceCode_addDocumentMetadataSet()
-		throws Exception {
-
-		return documentMetadataSetResource.postSiteDocumentMetadataSet(
-			testGroup.getGroupId(), randomDocumentMetadataSet());
-	}
-
-	@Test
-	public void testGetSiteDocumentMetadataSetByExternalReferenceCode()
+	public void testPutAssetLibraryDocumentMetadataSetByExternalReferenceCode()
 		throws Exception {
 
 		DocumentMetadataSet postDocumentMetadataSet =
-			testGetSiteDocumentMetadataSetByExternalReferenceCode_addDocumentMetadataSet();
+			testPutAssetLibraryDocumentMetadataSetByExternalReferenceCode_addDocumentMetadataSet();
+
+		DocumentMetadataSet randomDocumentMetadataSet =
+			randomDocumentMetadataSet();
+
+		DocumentMetadataSet putDocumentMetadataSet =
+			documentMetadataSetResource.
+				putAssetLibraryDocumentMetadataSetByExternalReferenceCode(
+					testPutAssetLibraryDocumentMetadataSetByExternalReferenceCode_getAssetLibraryId(),
+					postDocumentMetadataSet.getExternalReferenceCode(),
+					randomDocumentMetadataSet);
+
+		assertEquals(randomDocumentMetadataSet, putDocumentMetadataSet);
+		assertValid(putDocumentMetadataSet);
 
 		DocumentMetadataSet getDocumentMetadataSet =
 			documentMetadataSetResource.
-				getSiteDocumentMetadataSetByExternalReferenceCode(
-					testGetSiteDocumentMetadataSetByExternalReferenceCode_getSiteId(
-						postDocumentMetadataSet),
-					postDocumentMetadataSet.getExternalReferenceCode());
+				getAssetLibraryDocumentMetadataSetByExternalReferenceCode(
+					testPutAssetLibraryDocumentMetadataSetByExternalReferenceCode_getAssetLibraryId(),
+					putDocumentMetadataSet.getExternalReferenceCode());
 
-		assertEquals(postDocumentMetadataSet, getDocumentMetadataSet);
+		assertEquals(randomDocumentMetadataSet, getDocumentMetadataSet);
 		assertValid(getDocumentMetadataSet);
+
+		DocumentMetadataSet newDocumentMetadataSet =
+			testPutAssetLibraryDocumentMetadataSetByExternalReferenceCode_createDocumentMetadataSet();
+
+		putDocumentMetadataSet =
+			documentMetadataSetResource.
+				putAssetLibraryDocumentMetadataSetByExternalReferenceCode(
+					testPutAssetLibraryDocumentMetadataSetByExternalReferenceCode_getAssetLibraryId(),
+					newDocumentMetadataSet.getExternalReferenceCode(),
+					newDocumentMetadataSet);
+
+		assertEquals(newDocumentMetadataSet, putDocumentMetadataSet);
+		assertValid(putDocumentMetadataSet);
+
+		getDocumentMetadataSet =
+			documentMetadataSetResource.
+				getAssetLibraryDocumentMetadataSetByExternalReferenceCode(
+					testPutAssetLibraryDocumentMetadataSetByExternalReferenceCode_getAssetLibraryId(),
+					putDocumentMetadataSet.getExternalReferenceCode());
+
+		assertEquals(newDocumentMetadataSet, getDocumentMetadataSet);
+
+		Assert.assertEquals(
+			newDocumentMetadataSet.getExternalReferenceCode(),
+			putDocumentMetadataSet.getExternalReferenceCode());
 	}
 
 	protected Long
-			testGetSiteDocumentMetadataSetByExternalReferenceCode_getSiteId(
-				DocumentMetadataSet documentMetadataSet)
+			testPutAssetLibraryDocumentMetadataSetByExternalReferenceCode_getAssetLibraryId()
 		throws Exception {
 
-		return documentMetadataSet.getSiteId();
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
 	}
 
 	protected DocumentMetadataSet
-			testGetSiteDocumentMetadataSetByExternalReferenceCode_addDocumentMetadataSet()
+			testPutAssetLibraryDocumentMetadataSetByExternalReferenceCode_createDocumentMetadataSet()
 		throws Exception {
 
-		return documentMetadataSetResource.postSiteDocumentMetadataSet(
-			testGroup.getGroupId(), randomDocumentMetadataSet());
-	}
-
-	@Test
-	public void testGraphQLGetSiteDocumentMetadataSetByExternalReferenceCode()
-		throws Exception {
-
-		DocumentMetadataSet documentMetadataSet =
-			testGraphQLGetSiteDocumentMetadataSetByExternalReferenceCode_addDocumentMetadataSet();
-
-		// No namespace
-
-		Assert.assertTrue(
-			equals(
-				documentMetadataSet,
-				DocumentMetadataSetSerDes.toDTO(
-					JSONUtil.getValueAsString(
-						invokeGraphQLQuery(
-							new GraphQLField(
-								"documentMetadataSetByExternalReferenceCode",
-								new HashMap<String, Object>() {
-									{
-										put(
-											"siteKey",
-											"\"" +
-												testGraphQLGetSiteDocumentMetadataSetByExternalReferenceCode_getSiteId(
-													documentMetadataSet) +
-														"\"");
-
-										put(
-											"externalReferenceCode",
-											"\"" +
-												documentMetadataSet.
-													getExternalReferenceCode() +
-														"\"");
-									}
-								},
-								getGraphQLFields())),
-						"JSONObject/data",
-						"Object/documentMetadataSetByExternalReferenceCode"))));
-
-		// Using the namespace headlessDelivery_v1_0
-
-		Assert.assertTrue(
-			equals(
-				documentMetadataSet,
-				DocumentMetadataSetSerDes.toDTO(
-					JSONUtil.getValueAsString(
-						invokeGraphQLQuery(
-							new GraphQLField(
-								"headlessDelivery_v1_0",
-								new GraphQLField(
-									"documentMetadataSetByExternalReferenceCode",
-									new HashMap<String, Object>() {
-										{
-											put(
-												"siteKey",
-												"\"" +
-													testGraphQLGetSiteDocumentMetadataSetByExternalReferenceCode_getSiteId(
-														documentMetadataSet) +
-															"\"");
-
-											put(
-												"externalReferenceCode",
-												"\"" +
-													documentMetadataSet.
-														getExternalReferenceCode() +
-															"\"");
-										}
-									},
-									getGraphQLFields()))),
-						"JSONObject/data", "JSONObject/headlessDelivery_v1_0",
-						"Object/documentMetadataSetByExternalReferenceCode"))));
-	}
-
-	protected Long
-			testGraphQLGetSiteDocumentMetadataSetByExternalReferenceCode_getSiteId(
-				DocumentMetadataSet documentMetadataSet)
-		throws Exception {
-
-		return documentMetadataSet.getSiteId();
-	}
-
-	@Test
-	public void testGraphQLGetSiteDocumentMetadataSetByExternalReferenceCodeNotFound()
-		throws Exception {
-
-		String irrelevantExternalReferenceCode =
-			"\"" + RandomTestUtil.randomString() + "\"";
-
-		// No namespace
-
-		Assert.assertEquals(
-			"Not Found",
-			JSONUtil.getValueAsString(
-				invokeGraphQLQuery(
-					new GraphQLField(
-						"documentMetadataSetByExternalReferenceCode",
-						new HashMap<String, Object>() {
-							{
-								put(
-									"siteKey",
-									"\"" + irrelevantGroup.getGroupId() + "\"");
-								put(
-									"externalReferenceCode",
-									irrelevantExternalReferenceCode);
-							}
-						},
-						getGraphQLFields())),
-				"JSONArray/errors", "Object/0", "JSONObject/extensions",
-				"Object/code"));
-
-		// Using the namespace headlessDelivery_v1_0
-
-		Assert.assertEquals(
-			"Not Found",
-			JSONUtil.getValueAsString(
-				invokeGraphQLQuery(
-					new GraphQLField(
-						"headlessDelivery_v1_0",
-						new GraphQLField(
-							"documentMetadataSetByExternalReferenceCode",
-							new HashMap<String, Object>() {
-								{
-									put(
-										"siteKey",
-										"\"" + irrelevantGroup.getGroupId() +
-											"\"");
-									put(
-										"externalReferenceCode",
-										irrelevantExternalReferenceCode);
-								}
-							},
-							getGraphQLFields()))),
-				"JSONArray/errors", "Object/0", "JSONObject/extensions",
-				"Object/code"));
+		return randomDocumentMetadataSet();
 	}
 
 	protected DocumentMetadataSet
-			testGraphQLGetSiteDocumentMetadataSetByExternalReferenceCode_addDocumentMetadataSet()
+			testPutAssetLibraryDocumentMetadataSetByExternalReferenceCode_addDocumentMetadataSet()
 		throws Exception {
 
-		return testGraphQLDocumentMetadataSet_addDocumentMetadataSet();
+		return documentMetadataSetResource.postAssetLibraryDocumentMetadataSet(
+			testDepotEntry.getDepotEntryId(), randomDocumentMetadataSet());
 	}
 
 	@Test
@@ -2363,13 +2633,11 @@ public abstract class BaseDocumentMetadataSetResourceTestCase {
 				sb.append("(");
 				sb.append(entityFieldName);
 				sb.append(" gt ");
-				sb.append(
-					_dateFormat.format(date.getTime() - (2 * Time.SECOND)));
+				sb.append(_format.format(date.getTime() - (2 * Time.SECOND)));
 				sb.append(" and ");
 				sb.append(entityFieldName);
 				sb.append(" lt ");
-				sb.append(
-					_dateFormat.format(date.getTime() + (2 * Time.SECOND)));
+				sb.append(_format.format(date.getTime() + (2 * Time.SECOND)));
 				sb.append(")");
 			}
 			else {
@@ -2379,8 +2647,7 @@ public abstract class BaseDocumentMetadataSetResourceTestCase {
 				sb.append(operator);
 				sb.append(" ");
 
-				sb.append(
-					_dateFormat.format(documentMetadataSet.getDateCreated()));
+				sb.append(_format.format(documentMetadataSet.getDateCreated()));
 			}
 
 			return sb.toString();
@@ -2395,13 +2662,11 @@ public abstract class BaseDocumentMetadataSetResourceTestCase {
 				sb.append("(");
 				sb.append(entityFieldName);
 				sb.append(" gt ");
-				sb.append(
-					_dateFormat.format(date.getTime() - (2 * Time.SECOND)));
+				sb.append(_format.format(date.getTime() - (2 * Time.SECOND)));
 				sb.append(" and ");
 				sb.append(entityFieldName);
 				sb.append(" lt ");
-				sb.append(
-					_dateFormat.format(date.getTime() + (2 * Time.SECOND)));
+				sb.append(_format.format(date.getTime() + (2 * Time.SECOND)));
 				sb.append(")");
 			}
 			else {
@@ -2412,7 +2677,7 @@ public abstract class BaseDocumentMetadataSetResourceTestCase {
 				sb.append(" ");
 
 				sb.append(
-					_dateFormat.format(documentMetadataSet.getDateModified()));
+					_format.format(documentMetadataSet.getDateModified()));
 			}
 
 			return sb.toString();
@@ -2654,7 +2919,30 @@ public abstract class BaseDocumentMetadataSetResourceTestCase {
 		return randomDocumentMetadataSet();
 	}
 
+	protected final JSONObject waitForFinish(
+			String expectedExecuteStatus, JSONObject jsonObject)
+		throws Exception {
+
+		while (true) {
+			ImportTask importTask = importTaskResource.getImportTask(
+				jsonObject.getLong("id"));
+
+			ImportTask.ExecuteStatus executeStatus =
+				importTask.getExecuteStatus();
+
+			if (StringUtil.equals(executeStatus.getValue(), "COMPLETED") ||
+				StringUtil.equals(executeStatus.getValue(), "FAILED")) {
+
+				Assert.assertEquals(
+					expectedExecuteStatus, executeStatus.getValue());
+
+				return jsonObject;
+			}
+		}
+	}
+
 	protected DocumentMetadataSetResource documentMetadataSetResource;
+	protected ImportTaskResource importTaskResource;
 	protected com.liferay.portal.kernel.model.Group irrelevantGroup;
 	protected com.liferay.portal.kernel.model.Company testCompany;
 	protected DepotEntry testDepotEntry;
@@ -2856,11 +3144,35 @@ public abstract class BaseDocumentMetadataSetResourceTestCase {
 	private static final com.liferay.portal.kernel.log.Log _log =
 		LogFactoryUtil.getLog(BaseDocumentMetadataSetResourceTestCase.class);
 
-	private static DateFormat _dateFormat;
+	private static Format _format;
+
+	private com.liferay.portal.kernel.model.User _testCompanyAdminUser;
 
 	@Inject
 	private
 		com.liferay.headless.delivery.resource.v1_0.DocumentMetadataSetResource
 			_documentMetadataSetResource;
+
+	@Inject
+	private GroupLocalService _groupLocalService;
+
+	@Inject
+	private ResourceActionLocalService _resourceActionLocalService;
+
+	@Inject
+	private ResourcePermissionLocalService _resourcePermissionLocalService;
+
+	@Inject
+	private RoleLocalService _roleLocalService;
+
+	@Inject
+	private ScopeChecker _scopeChecker;
+
+	@Inject
+	private UserLocalService _userLocalService;
+
+	@Inject
+	private VulcanCRUDItemDelegateBuilderRegistry
+		_vulcanCRUDItemDelegateBuilderRegistry;
 
 }

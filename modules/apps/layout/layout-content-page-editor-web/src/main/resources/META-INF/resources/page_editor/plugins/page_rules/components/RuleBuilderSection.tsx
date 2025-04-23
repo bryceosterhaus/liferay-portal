@@ -10,9 +10,6 @@ import ClayPanel from '@clayui/panel';
 import {ScreenReaderAnnouncerContext} from '@liferay/layout-js-components-web';
 import React, {Dispatch, SetStateAction, useContext, useMemo} from 'react';
 import {flushSync} from 'react-dom';
-
-// @ts-ignore
-
 import {v4 as uuidv4} from 'uuid';
 
 import {LAYOUT_DATA_ITEM_TYPES} from '../../../app/config/constants/layoutDataItemTypes';
@@ -75,7 +72,13 @@ export function RuleBuilderActionSection({
 				const fragment =
 					fragmentEntryLinks[item.config.fragmentEntryLinkId];
 
-				if (fragment && fragment.fragmentEntryType === 'input') {
+				if (
+					fragment &&
+					fragment.fragmentEntryType === 'input' &&
+					!fragment.fieldTypes?.includes('categorization') &&
+					!fragment.fieldTypes?.includes('localizationSelect') &&
+					!fragment.fieldTypes?.includes('stepper')
+				) {
 					inputFragments.push({
 						label: selectLayoutDataItemLabel(
 							{fragmentEntryLinks, layoutData},
@@ -229,7 +232,7 @@ export function RuleBuilderConditionSection({
 				if (
 					fragment &&
 					fragment.fragmentEntryType === 'input' &&
-					!fragment.fieldTypes?.includes('localizationSelect')
+					fragment.fieldTypes?.includes('boolean')
 				) {
 					inputFragments.push({
 						label: selectLayoutDataItemLabel(

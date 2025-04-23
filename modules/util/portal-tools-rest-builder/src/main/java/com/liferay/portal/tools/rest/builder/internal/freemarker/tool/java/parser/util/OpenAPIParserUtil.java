@@ -22,6 +22,7 @@ import com.liferay.portal.tools.rest.builder.internal.yaml.openapi.Info;
 import com.liferay.portal.tools.rest.builder.internal.yaml.openapi.Items;
 import com.liferay.portal.tools.rest.builder.internal.yaml.openapi.OpenAPIYAML;
 import com.liferay.portal.tools.rest.builder.internal.yaml.openapi.Operation;
+import com.liferay.portal.tools.rest.builder.internal.yaml.openapi.Parameter;
 import com.liferay.portal.tools.rest.builder.internal.yaml.openapi.PathItem;
 import com.liferay.portal.tools.rest.builder.internal.yaml.openapi.RequestBody;
 import com.liferay.portal.tools.rest.builder.internal.yaml.openapi.Response;
@@ -518,6 +519,78 @@ public class OpenAPIParserUtil {
 		return false;
 	}
 
+	public static OpenAPIYAML loadOpenAPIYAML(String yamlString) {
+		OpenAPIYAML openAPIYAML = YAMLUtil.loadOpenAPIYAML(yamlString);
+
+		Map<String, PathItem> pathItems = openAPIYAML.getPathItems();
+
+		if (pathItems == null) {
+			return openAPIYAML;
+		}
+
+		Components components = openAPIYAML.getComponents();
+
+		if (components == null) {
+			return openAPIYAML;
+		}
+
+		Map<String, Parameter> parameterMap = components.getParameters();
+
+		for (Map.Entry<String, PathItem> entry : pathItems.entrySet()) {
+			PathItem pathItem = entry.getValue();
+
+			List<Operation> operations = new ArrayList<>();
+
+			if (pathItem.getDelete() != null) {
+				operations.add(pathItem.getDelete());
+			}
+
+			if (pathItem.getGet() != null) {
+				operations.add(pathItem.getGet());
+			}
+
+			if (pathItem.getHead() != null) {
+				operations.add(pathItem.getHead());
+			}
+
+			if (pathItem.getOptions() != null) {
+				operations.add(pathItem.getOptions());
+			}
+
+			if (pathItem.getPatch() != null) {
+				operations.add(pathItem.getPatch());
+			}
+
+			if (pathItem.getPost() != null) {
+				operations.add(pathItem.getPost());
+			}
+
+			if (pathItem.getPut() != null) {
+				operations.add(pathItem.getPut());
+			}
+
+			for (Operation operation : operations) {
+				List<Parameter> parameters = operation.getParameters();
+
+				for (int i = 0; i < parameters.size(); i++) {
+					Parameter parameter = parameters.get(i);
+
+					if (Validator.isNull(parameter.getReference())) {
+						continue;
+					}
+
+					String key = getReferenceName(parameter.getReference());
+
+					if (parameterMap.containsKey(key)) {
+						parameters.set(i, parameterMap.get(key));
+					}
+				}
+			}
+		}
+
+		return openAPIYAML;
+	}
+
 	private static void _addExternalReferences(
 		Map<String, Content> contents, Set<String> externalReferences,
 		Map<String, Schema> schemas) {
@@ -665,6 +738,9 @@ public class OpenAPIParserUtil {
 				put(
 					new AbstractMap.SimpleImmutableEntry<>("boolean", null),
 					Boolean.class.getName());
+				put(
+					new AbstractMap.SimpleImmutableEntry<>("customField", null),
+					"com.liferay.portal.vulcan.custom.field.CustomField");
 				put(
 					new AbstractMap.SimpleImmutableEntry<>("integer", "int32"),
 					Integer.class.getName());

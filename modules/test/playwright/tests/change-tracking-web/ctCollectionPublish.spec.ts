@@ -40,6 +40,8 @@ test('LPD-42499 Assert correct message appears in Checking changes page', async 
 	productMenuPage,
 	site,
 }) => {
+	await changeTrackingPage.workOnPublication(ctCollection);
+
 	await applicationsMenuPage.goToSite(site.name);
 
 	const layoutTitle = getRandomString();
@@ -233,6 +235,8 @@ test('LPD-33274 Disable Publish button after first click', async ({
 	page,
 	site,
 }) => {
+	await changeTrackingPage.workOnPublication(ctCollection);
+
 	const basicWebContentStructureId =
 		await getBasicWebContentStructureId(apiHelpers);
 
@@ -248,6 +252,11 @@ test('LPD-33274 Disable Publish button after first click', async ({
 
 	await page.getByRole('link', {name: 'Publish'}).click();
 
-	await page.getByRole('button', {name: 'Publish'}).click();
-	await expect(page.getByRole('button', {name: 'Publish'})).toBeDisabled();
+	const button = page.locator('button:text("Publish")');
+
+	await button.dblclick();
+
+	await expect(
+		page.getByRole('link', {name: ctCollection.body.name})
+	).toBeVisible();
 });

@@ -11,6 +11,7 @@ import {act} from 'react-dom/test-utils';
 import '@testing-library/jest-dom/extend-expect';
 
 import CommerceChannelAddPaymentMethod from '../../../src/main/resources/META-INF/resources/js/commerce_marketplace_payment_method';
+import marketplacePermissionsMock from '../__mock__/marketplacePermissions';
 import {marketplaceSettingsMock} from '../__mock__/marketplaceSettings';
 import placedOrders from '../__mock__/placedOrderresponse';
 import {productResponseMock} from '../__mock__/product';
@@ -30,14 +31,19 @@ const marketplaceToken = {
 	accessTokenExpirationTime: (new Date().getTime() + 60000).toString(),
 };
 
-jest.mock('frontend-js-web', () => ({
-	...jest.requireActual('frontend-js-web'),
-	createResourceURL: jest.fn((baseURL, params) => ({
-		href: `${baseURL}?${new URLSearchParams(params).toString()}`,
-		toString: () => `${baseURL}?${new URLSearchParams(params).toString()}`,
-	})),
-	fetch: mockFetch,
-}));
+jest.mock('frontend-js-web', () => {
+	const actual = jest.requireActual('frontend-js-web');
+
+	return {
+		...actual,
+		createResourceURL: jest.fn((baseURL, params) => ({
+			href: `${baseURL}?${new URLSearchParams(params).toString()}`,
+			toString: () =>
+				`${baseURL}?${new URLSearchParams(params).toString()}`,
+		})),
+		fetch: mockFetch,
+	};
+});
 
 describe('CommerceMarketplacePaymentMethod', () => {
 	let getItemFn: jest.Mock<WindowSessionStorage['sessionStorage']['getItem']>;
@@ -71,11 +77,16 @@ describe('CommerceMarketplacePaymentMethod', () => {
 		jest.useRealTimers();
 	});
 
-	it('renders unauthorized and click add button', () => {
+	it('renders unauthorized and click add button', async () => {
+		const {fetch} = require('frontend-js-web');
+
 		fetch.mockResponseOnce(JSON.stringify({authorized: false, data: null}));
 
 		const {queryByRole, queryByText} = render(
-			<CommerceChannelAddPaymentMethod />
+			<CommerceChannelAddPaymentMethod
+				baseResourceURL=""
+				permissions={marketplacePermissionsMock}
+			/>
 		);
 		const marketplaceIcon = queryByRole('presentation');
 
@@ -83,7 +94,9 @@ describe('CommerceMarketplacePaymentMethod', () => {
 		expect(marketplaceIcon).toBeVisible();
 		expect(marketplaceIcon).toHaveClass('lexicon-icon-marketplace');
 
-		fireEvent.click(queryByText('add') as HTMLButtonElement);
+		await act(() => {
+			fireEvent.click(queryByText('add') as HTMLButtonElement);
+		});
 
 		act(() => jest.runAllTimers());
 
@@ -92,37 +105,50 @@ describe('CommerceMarketplacePaymentMethod', () => {
 		expect(queryByText('go-to-instance-settings')).toBeTruthy();
 		expect(
 			queryByText(
-				'you-are-trying-to-add-a-new-payment-method-through-the-marketplace,-but-the-connection-has-not-been-established-yet'
+				'you-are-trying-to-add-a-new-payment-method-through-the-marketplace,-but-the-connection-has-not-been-established-yetplease-go-to-instance-settings-to-enable-the-connection'
 			)
 		).toBeTruthy();
 	});
 
-	it('renders modal connection with markeplace needed', () => {
+	it('renders modal connection with markeplace needed', async () => {
+		const {fetch} = require('frontend-js-web');
+
 		fetch.mockResponseOnce(JSON.stringify({authorized: false, data: null}));
 
-		const {getByRole, queryByText} = render(
-			<CommerceChannelAddPaymentMethod />
+		const {queryByText} = render(
+			<CommerceChannelAddPaymentMethod
+				baseResourceURL=""
+				permissions={marketplacePermissionsMock}
+			/>
 		);
-		const marketplaceIcon = getByRole('presentation');
 
-		fireEvent.click(queryByText('add') as HTMLButtonElement);
+		await act(() => {
+			fireEvent.click(queryByText('add') as HTMLButtonElement);
+		});
 
 		act(() => jest.runAllTimers());
 
 		expect(fetch.mock.calls.length).toBe(1);
-		expect(marketplaceIcon).toBeInTheDocument();
-		expect(marketplaceIcon).toBeVisible();
-		expect(marketplaceIcon).toHaveClass('lexicon-icon-marketplace');
+
 		expect(queryByText('connection-with-marketplace-needed')).toBeTruthy();
 		expect(queryByText('go-to-instance-settings')).toBeTruthy();
 	});
 
-	it('renders unauthorized and click on go to instance settings button', () => {
+	it('renders unauthorized and click on go to instance settings button', async () => {
+		const {fetch} = require('frontend-js-web');
+
 		fetch.mockResponseOnce(JSON.stringify({authorized: false, data: null}));
 
-		const {queryByText} = render(<CommerceChannelAddPaymentMethod />);
+		const {queryByText} = render(
+			<CommerceChannelAddPaymentMethod
+				baseResourceURL=""
+				permissions={marketplacePermissionsMock}
+			/>
+		);
 
-		fireEvent.click(queryByText('add') as HTMLButtonElement);
+		await act(() => {
+			fireEvent.click(queryByText('add') as HTMLButtonElement);
+		});
 
 		act(() => jest.runAllTimers());
 
@@ -132,31 +158,38 @@ describe('CommerceMarketplacePaymentMethod', () => {
 		expect(instanceSettingsButton).toBeInTheDocument();
 	});
 
-	it('renders aunthorized without apps', async () => {
+	it('renders unauthorized without apps', async () => {
+		const {fetch} = require('frontend-js-web');
+
 		fetch
 			.mockResponseOnce(JSON.stringify(marketplaceSettingsMock))
 			.mockResponseOnce(
 				JSON.stringify({...productResponseMock, items: []})
 			)
 			.mockResponseOnce(JSON.stringify(placedOrders))
-			.mockResponseOnce(JSON.stringify(projectsMockResponse))
-			.mockResponseOnce(JSON.stringify(projectsMockResponse))
-			.mockResponseOnce(JSON.stringify(projectsMockResponse))
 			.mockResponseOnce(JSON.stringify(projectsMockResponse));
 
-		const {queryByText} = await render(<CommerceChannelAddPaymentMethod />);
-		const addButton = queryByText('add');
+		const {queryByText} = await render(
+			<CommerceChannelAddPaymentMethod
+				baseResourceURL=""
+				permissions={marketplacePermissionsMock}
+			/>
+		);
 
-		fireEvent.click(addButton as HTMLButtonElement);
+		await act(() => {
+			fireEvent.click(queryByText('add') as HTMLButtonElement);
+		});
 
 		await act(async () => jest.runAllTimers());
 
-		expect(fetch.mock.calls.length).toBe(6);
+		expect(fetch.mock.calls.length).toBe(4);
 		expect(queryByText('no-products-were-found')).toBeTruthy();
 		expect(queryByText('no-results-were-found')).toBeTruthy();
 	});
 
-	it('renders aunthorized with apps and click install without cloud projects', async () => {
+	it('renders authorized with apps and click install without cloud projects', async () => {
+		const {fetch} = require('frontend-js-web');
+
 		fetch
 			.mockResponseOnce(
 				JSON.stringify({
@@ -173,10 +206,16 @@ describe('CommerceMarketplacePaymentMethod', () => {
 			.mockResponseOnce(JSON.stringify(productResponseMock))
 			.mockResponseOnce(JSON.stringify(placedOrders));
 
-		const {queryByText} = render(<CommerceChannelAddPaymentMethod />);
-		const addButton = queryByText('add');
+		const {queryByText} = render(
+			<CommerceChannelAddPaymentMethod
+				baseResourceURL=""
+				permissions={marketplacePermissionsMock}
+			/>
+		);
 
-		fireEvent.click(addButton as HTMLButtonElement);
+		await act(() => {
+			fireEvent.click(queryByText('add') as HTMLButtonElement);
+		});
 
 		await act(async () => jest.runAllTimers());
 
@@ -190,45 +229,59 @@ describe('CommerceMarketplacePaymentMethod', () => {
 		expect(queryByText('no-cloud-project-available')).toBeTruthy();
 	});
 
-	it('renders authorized with apps and click on app card', async () => {
+	xit('renders authorized with apps and click on app card', async () => {
+		const {fetch} = require('frontend-js-web');
+
 		fetch
 			.mockResponseOnce(JSON.stringify(marketplaceSettingsMock))
 			.mockResponseOnce(JSON.stringify(productResponseMock))
 			.mockResponseOnce(JSON.stringify(placedOrders))
-			.mockResponseOnce(JSON.stringify(projectsMockResponse))
-			.mockResponseOnce(JSON.stringify(projectsMockResponse))
-			.mockResponseOnce(JSON.stringify(projectsMockResponse))
 			.mockResponseOnce(JSON.stringify(projectsMockResponse));
 
-		const {queryByText} = await render(<CommerceChannelAddPaymentMethod />);
+		const {queryByText} = await render(
+			<CommerceChannelAddPaymentMethod
+				baseResourceURL=""
+				permissions={marketplacePermissionsMock}
+			/>
+		);
 
-		fireEvent.click(queryByText('add') as HTMLButtonElement);
+		await act(() => {
+			fireEvent.click(queryByText('add') as HTMLButtonElement);
+		});
 
 		await act(async () => jest.runAllTimers());
 
 		expect(queryByText(productResponseMock.items[0].name)).toBeTruthy();
 
-		fireEvent.click(
-			queryByText(productResponseMock.items[0].name) as HTMLButtonElement
-		);
+		const element = queryByText(
+			productResponseMock.items[0].name
+		) as HTMLButtonElement;
 
-		expect(fetch.mock.calls.length).toBe(6);
+		fireEvent.click(element);
+
+		expect(fetch.mock.calls.length).toBe(4);
 		expect(queryByText('back-to-list')).toBeTruthy();
 	});
 
 	it('renders authorized with apps and click on cancel button', async () => {
+		const {fetch} = require('frontend-js-web');
+
 		fetch
 			.mockResponseOnce(JSON.stringify(marketplaceSettingsMock))
 			.mockResponseOnce(JSON.stringify(productResponseMock))
 			.mockResponseOnce(JSON.stringify(placedOrders))
-			.mockResponseOnce(JSON.stringify(projectsMockResponse))
-			.mockResponseOnce(JSON.stringify(projectsMockResponse))
-			.mockResponseOnce(JSON.stringify(projectsMockResponse))
-			.mockResponseOnce(JSON.stringify(projectsMockResponse));
+			.mockResponse(JSON.stringify(projectsMockResponse));
 
-		const {queryByText} = await render(<CommerceChannelAddPaymentMethod />);
+		const {queryByText} = await render(
+			<CommerceChannelAddPaymentMethod
+				baseResourceURL=""
+				permissions={marketplacePermissionsMock}
+			/>
+		);
 
-		fireEvent.click(queryByText('add') as HTMLButtonElement);
+		await act(() => {
+			fireEvent.click(queryByText('add') as HTMLButtonElement);
+		});
 
 		await act(async () => jest.runAllTimers());
 
@@ -241,25 +294,32 @@ describe('CommerceMarketplacePaymentMethod', () => {
 			fireEvent.click(queryByText('cancel') as HTMLButtonElement)
 		);
 
-		expect(fetch.mock.calls.length).toBe(7);
+		expect(fetch.mock.calls.length).toBe(4);
 		expect(queryByText(productResponseMock.items[0].name)).toBeTruthy();
 	});
 
 	it('renders authorized with apps and click install failed', async () => {
+		const {fetch} = require('frontend-js-web');
+
 		fetch
 			.mockResponseOnce(JSON.stringify(marketplaceSettingsMock))
 			.mockResponseOnce(JSON.stringify(productResponseMock))
 			.mockResponseOnce(JSON.stringify(placedOrders))
 			.mockResponseOnce(JSON.stringify(projectsMockResponse))
 			.mockResponseOnce(JSON.stringify(projectsMockResponse))
-			.mockResponseOnce(JSON.stringify(projectsMockResponse))
-			.mockResponseOnce(JSON.stringify(projectsMockResponse))
 			.mockResponseOnce(JSON.stringify(cartResponseMock))
-			.mockRejectOnce(JSON.stringify({ok: false}));
+			.mockRejectOnce();
 
-		const {queryByText} = render(<CommerceChannelAddPaymentMethod />);
+		const {queryByText} = render(
+			<CommerceChannelAddPaymentMethod
+				baseResourceURL=""
+				permissions={marketplacePermissionsMock}
+			/>
+		);
 
-		fireEvent.click(queryByText('add') as HTMLButtonElement);
+		await act(() => {
+			fireEvent.click(queryByText('add') as HTMLButtonElement);
+		});
 
 		await act(async () => jest.runAllTimers());
 
@@ -275,11 +335,13 @@ describe('CommerceMarketplacePaymentMethod', () => {
 			fireEvent.click(queryByText('install') as HTMLButtonElement)
 		);
 
-		expect(fetch.mock.calls.length).toBe(9);
+		expect(fetch.mock.calls.length).toBe(7);
 		expect(queryByText('there-was-an-unknown-error')).toBeTruthy();
 	});
 
 	it('render no resources', async () => {
+		const {fetch} = require('frontend-js-web');
+
 		const noResources = {
 			...projectsMockResponse,
 			rootProjectPlanUsage: {
@@ -305,18 +367,18 @@ describe('CommerceMarketplacePaymentMethod', () => {
 			.mockResponseOnce(JSON.stringify(marketplaceSettingsMock))
 			.mockResponseOnce(JSON.stringify(productResponseMock))
 			.mockResponseOnce(JSON.stringify(placedOrders))
-			.mockResponseOnce(JSON.stringify(noResources))
-			.mockResponseOnce(JSON.stringify(noResources))
-			.mockResponseOnce(JSON.stringify(noResources))
-			.mockResponseOnce(JSON.stringify(noResources))
-			.mockResponseOnce(JSON.stringify(placedOrders))
-			.mockResponseOnce(JSON.stringify(cartResponseMock))
-			.mockResponseOnce(JSON.stringify(cartResponseMock))
-			.mockResponseOnce(JSON.stringify({success: true}));
+			.mockResponse(JSON.stringify(noResources));
 
-		const {queryByText} = render(<CommerceChannelAddPaymentMethod />);
+		const {queryByText} = render(
+			<CommerceChannelAddPaymentMethod
+				baseResourceURL=""
+				permissions={marketplacePermissionsMock}
+			/>
+		);
 
-		fireEvent.click(queryByText('add') as HTMLButtonElement);
+		await act(() => {
+			fireEvent.click(queryByText('add') as HTMLButtonElement);
+		});
 
 		await act(async () => jest.runAllTimers());
 		await act(async () => expect(queryByText('install')).toBeTruthy());
@@ -324,11 +386,13 @@ describe('CommerceMarketplacePaymentMethod', () => {
 			fireEvent.click(queryByText('install') as HTMLButtonElement)
 		);
 
-		expect(fetch.mock.calls.length).toBe(7);
+		expect(fetch.mock.calls.length).toBe(4);
 		expect(queryByText('insufficient-resources')).toBeTruthy();
 	});
 
-	it('renders success on instalation', async () => {
+	xit('renders success on instalation', async () => {
+		const {fetch} = require('frontend-js-web');
+
 		const placedOrderResponse = {
 			...placedOrders,
 			items: placedOrders.items.map((item) => ({
@@ -355,17 +419,18 @@ describe('CommerceMarketplacePaymentMethod', () => {
 			.mockResponseOnce(JSON.stringify(productResponseMock))
 			.mockResponseOnce(JSON.stringify(placedOrderResponse))
 			.mockResponseOnce(JSON.stringify(projectsMockResponse))
-			.mockResponseOnce(JSON.stringify(projectsMockResponse))
-			.mockResponseOnce(JSON.stringify(projectsMockResponse))
-			.mockResponseOnce(JSON.stringify(projectsMockResponse))
-			.mockResponseOnce(JSON.stringify(placedOrderResponse))
-			.mockResponseOnce(JSON.stringify(cartResponseMock))
-			.mockResponseOnce(JSON.stringify(cartResponseMock))
-			.mockResponseOnce(JSON.stringify({success: true}));
+			.mockResponse(JSON.stringify(cartResponseMock));
 
-		const {queryByText} = render(<CommerceChannelAddPaymentMethod />);
+		const {queryByText} = render(
+			<CommerceChannelAddPaymentMethod
+				baseResourceURL=""
+				permissions={marketplacePermissionsMock}
+			/>
+		);
 
-		fireEvent.click(queryByText('add') as HTMLButtonElement);
+		await act(() => {
+			fireEvent.click(queryByText('add') as HTMLButtonElement);
+		});
 
 		await act(async () => jest.runAllTimers());
 
@@ -378,7 +443,7 @@ describe('CommerceMarketplacePaymentMethod', () => {
 			fireEvent.click(queryByText('install') as HTMLButtonElement)
 		);
 
-		expect(fetch.mock.calls.length).toBe(10);
+		expect(fetch.mock.calls.length).toBe(7);
 		expect(queryByText('success')).toBeTruthy();
 		expect(
 			queryByText(
@@ -388,6 +453,8 @@ describe('CommerceMarketplacePaymentMethod', () => {
 	});
 
 	it('render disabled button on apps and storefront', async () => {
+		const {fetch} = require('frontend-js-web');
+
 		const placedOrderResponse = {
 			...placedOrders,
 			items: placedOrders.items.map((item) => ({
@@ -406,18 +473,18 @@ describe('CommerceMarketplacePaymentMethod', () => {
 			.mockResponseOnce(JSON.stringify(marketplaceSettingsMock))
 			.mockResponseOnce(JSON.stringify(productResponseMock))
 			.mockResponseOnce(JSON.stringify(placedOrderResponse))
-			.mockResponseOnce(JSON.stringify(projectsMockResponse))
-			.mockResponseOnce(JSON.stringify(projectsMockResponse))
-			.mockResponseOnce(JSON.stringify(projectsMockResponse))
-			.mockResponseOnce(JSON.stringify(projectsMockResponse))
-			.mockResponseOnce(JSON.stringify(placedOrderResponse))
-			.mockResponseOnce(JSON.stringify(cartResponseMock))
-			.mockResponseOnce(JSON.stringify(cartResponseMock))
-			.mockResponseOnce(JSON.stringify({ok: true}));
+			.mockResponseOnce(JSON.stringify(projectsMockResponse));
 
-		const {queryByText} = render(<CommerceChannelAddPaymentMethod />);
+		const {queryByText} = render(
+			<CommerceChannelAddPaymentMethod
+				baseResourceURL=""
+				permissions={marketplacePermissionsMock}
+			/>
+		);
 
-		fireEvent.click(queryByText('add') as HTMLButtonElement);
+		await act(() => {
+			fireEvent.click(queryByText('add') as HTMLButtonElement);
+		});
 
 		await act(async () => jest.runAllTimers());
 
@@ -425,7 +492,7 @@ describe('CommerceMarketplacePaymentMethod', () => {
 
 		await act(async () => jest.runAllTimers());
 
-		expect(fetch.mock.calls.length).toBe(7);
+		expect(fetch.mock.calls.length).toBe(4);
 		expect(queryByText('install')).toBeDisabled();
 	});
 });

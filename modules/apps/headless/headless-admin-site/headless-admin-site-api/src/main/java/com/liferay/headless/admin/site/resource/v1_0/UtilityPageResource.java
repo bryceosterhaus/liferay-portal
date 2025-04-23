@@ -7,8 +7,6 @@ package com.liferay.headless.admin.site.resource.v1_0;
 
 import com.liferay.headless.admin.site.dto.v1_0.ContentPageSpecification;
 import com.liferay.headless.admin.site.dto.v1_0.UtilityPage;
-import com.liferay.portal.kernel.search.Sort;
-import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.ResourceActionLocalService;
 import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
@@ -48,27 +46,6 @@ import org.osgi.annotation.versioning.ProviderType;
 @ProviderType
 public interface UtilityPageResource {
 
-	public Page<UtilityPage> getSiteSiteByExternalReferenceCodeUtilityPagesPage(
-			String siteExternalReferenceCode, String search,
-			com.liferay.portal.vulcan.aggregation.Aggregation aggregation,
-			Filter filter, Pagination pagination, Sort[] sorts)
-		throws Exception;
-
-	public UtilityPage postSiteSiteByExternalReferenceCodeUtilityPage(
-			String siteExternalReferenceCode, UtilityPage utilityPage)
-		throws Exception;
-
-	public Page<com.liferay.portal.vulcan.permission.Permission>
-			getSiteSiteByExternalReferenceCodeUtilityPagePermissionsPage(
-				String siteExternalReferenceCode, String roleNames)
-		throws Exception;
-
-	public Page<com.liferay.portal.vulcan.permission.Permission>
-			putSiteSiteByExternalReferenceCodeUtilityPagePermissionsPage(
-				String siteExternalReferenceCode,
-				com.liferay.portal.vulcan.permission.Permission[] permissions)
-		throws Exception;
-
 	public void deleteSiteSiteByExternalReferenceCodeUtilityPage(
 			String siteExternalReferenceCode,
 			String utilityPageExternalReferenceCode)
@@ -79,14 +56,32 @@ public interface UtilityPageResource {
 			String utilityPageExternalReferenceCode)
 		throws Exception;
 
+	public Page<com.liferay.portal.vulcan.permission.Permission>
+			getSiteSiteByExternalReferenceCodeUtilityPagePermissionsPage(
+				String siteExternalReferenceCode, String roleNames)
+		throws Exception;
+
+	public Page<UtilityPage> getSiteSiteByExternalReferenceCodeUtilityPagesPage(
+			String siteExternalReferenceCode, String search,
+			com.liferay.portal.vulcan.aggregation.Aggregation aggregation,
+			com.liferay.portal.kernel.search.filter.Filter filter,
+			Pagination pagination,
+			com.liferay.portal.kernel.search.Sort[] sorts)
+		throws Exception;
+
+	public Page<com.liferay.portal.vulcan.permission.Permission>
+			getSiteSiteExternalReferenceCodeUtilityPagePermissionsPage(
+				String siteExternalReferenceCode,
+				String utilityPageExternalReferenceCode, String roleNames)
+		throws Exception;
+
 	public UtilityPage patchSiteSiteByExternalReferenceCodeUtilityPage(
 			String siteExternalReferenceCode,
 			String utilityPageExternalReferenceCode, UtilityPage utilityPage)
 		throws Exception;
 
-	public UtilityPage putSiteSiteByExternalReferenceCodeUtilityPage(
-			String siteExternalReferenceCode,
-			String utilityPageExternalReferenceCode, UtilityPage utilityPage)
+	public UtilityPage postSiteSiteByExternalReferenceCodeUtilityPage(
+			String siteExternalReferenceCode, UtilityPage utilityPage)
 		throws Exception;
 
 	public ContentPageSpecification
@@ -96,16 +91,22 @@ public interface UtilityPageResource {
 				ContentPageSpecification contentPageSpecification)
 		throws Exception;
 
+	public UtilityPage putSiteSiteByExternalReferenceCodeUtilityPage(
+			String siteExternalReferenceCode,
+			String utilityPageExternalReferenceCode, UtilityPage utilityPage)
+		throws Exception;
+
 	public Page<com.liferay.portal.vulcan.permission.Permission>
-			getSiteSiteExternalReferenceCodeUtilityPagePermissionsPage(
+			putSiteSiteByExternalReferenceCodeUtilityPagePermissionsPage(
 				String siteExternalReferenceCode,
-				String utilityPageExternalReferenceCode, String roleNames)
+				com.liferay.portal.vulcan.permission.Permission[] permissions)
 		throws Exception;
 
 	public Page<com.liferay.portal.vulcan.permission.Permission>
 			putSiteSiteExternalReferenceCodeUtilityPagePermissionsPage(
 				String siteExternalReferenceCode,
-				String utilityPageExternalReferenceCode)
+				String utilityPageExternalReferenceCode,
+				com.liferay.portal.vulcan.permission.Permission[] permissions)
 		throws Exception;
 
 	public default void setContextAcceptLanguage(
@@ -130,7 +131,8 @@ public interface UtilityPageResource {
 		com.liferay.portal.kernel.model.User contextUser);
 
 	public void setExpressionConvert(
-		ExpressionConvert<Filter> expressionConvert);
+		ExpressionConvert<com.liferay.portal.kernel.search.filter.Filter>
+			expressionConvert);
 
 	public void setFilterParserProvider(
 		FilterParserProvider filterParserProvider);
@@ -155,19 +157,23 @@ public interface UtilityPageResource {
 		VulcanBatchEngineImportTaskResource
 			vulcanBatchEngineImportTaskResource);
 
-	public default Filter toFilter(String filterString) {
+	public default com.liferay.portal.kernel.search.filter.Filter toFilter(
+		String filterString) {
+
 		return toFilter(
 			filterString, Collections.<String, List<String>>emptyMap());
 	}
 
-	public default Filter toFilter(
+	public default com.liferay.portal.kernel.search.filter.Filter toFilter(
 		String filterString, Map<String, List<String>> multivaluedMap) {
 
 		return null;
 	}
 
-	public default Sort[] toSorts(String sortsString) {
-		return new Sort[0];
+	public default com.liferay.portal.kernel.search.Sort[] toSorts(
+		String sortsString) {
+
+		return new com.liferay.portal.kernel.search.Sort[0];
 	}
 
 	@ProviderType

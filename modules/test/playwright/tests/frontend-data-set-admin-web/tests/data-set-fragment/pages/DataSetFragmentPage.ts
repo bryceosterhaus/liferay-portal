@@ -20,6 +20,7 @@ export class DataSetFragmentPage {
 	readonly emptyStateTitle: Locator;
 	readonly filterButton: Locator;
 	filterItem: Locator;
+	readonly filterConfirmButton: Locator;
 	readonly filterResumeButton: Locator;
 	readonly fragmentWidgetSearchInput: Locator;
 	readonly listWrapper: Locator;
@@ -32,6 +33,7 @@ export class DataSetFragmentPage {
 	readonly selectDataSetModalFrame: FrameLocator;
 	readonly selectDataSetButton: Locator;
 	readonly selectedDataSetInput: Locator;
+	readonly selectionListContainer: Locator;
 	readonly sidePanel: Locator;
 	readonly sidePanelFrame: FrameLocator;
 	readonly table: {
@@ -59,6 +61,9 @@ export class DataSetFragmentPage {
 			exact: true,
 			name: 'Filter',
 		});
+		this.filterConfirmButton = page.getByRole('button', {
+			name: /add filter|edit filter|delete filter/i,
+		});
 		this.filterResumeButton = page.locator('.filter-resume');
 		this.fragmentWidgetSearchInput = page.getByLabel(
 			'Search Fragments and Widgets'
@@ -84,6 +89,10 @@ export class DataSetFragmentPage {
 		this.selectedDataSetInput = page
 			.getByLabel('Configuration Panel')
 			.getByLabel('Data Set View', {exact: true});
+
+		this.selectionListContainer = this.selectDataSetModalFrame.locator(
+			'.fds-admin-item-selector'
+		);
 
 		this.sidePanel = page.locator('.fds-side-panel');
 		this.sidePanelFrame = this.sidePanel.frameLocator('iframe');

@@ -4,7 +4,7 @@
  */
 
 import {ClaySelectWithOption} from '@clayui/form';
-import {useLiferayState} from '@liferay/frontend-js-state-web';
+import {useLiferayState} from '@liferay/frontend-js-state-web/react';
 import classnames from 'classnames';
 import PropTypes from 'prop-types';
 import React, {useCallback, useEffect, useState} from 'react';
@@ -58,6 +58,9 @@ function UnitOfMeasureSelector({
 				channelId,
 				productId,
 				accountId,
+				Liferay.CommerceContext
+					? Liferay.CommerceContext.currency.currencyCode
+					: '',
 				quantity,
 				skuUnitOfMeasureKey,
 				options || skuOptionsAtomState.skuOptions
@@ -88,7 +91,10 @@ function UnitOfMeasureSelector({
 				channelId,
 				productId,
 				cpInstanceId,
-				accountId
+				accountId,
+				Liferay.CommerceContext
+					? Liferay.CommerceContext.currency.currencyCode
+					: ''
 			).then((cpInstance) => {
 				const skuUnitOfMeasures = cpInstance.skuUnitOfMeasures || [];
 

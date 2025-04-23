@@ -415,6 +415,13 @@ export class ApplicationsMenuPage {
 		await this.objectsMenuItem.click();
 	}
 
+	async goToObjectDefinition(objectDefinitionName: string) {
+		await this.goToControlPanel();
+		await this.page
+			.getByRole('menuitem', {name: objectDefinitionName})
+			.click();
+	}
+
 	async goToPicklists() {
 		await this.goToControlPanel();
 		await this.picklistsMenuItem.click();
@@ -578,8 +585,8 @@ export class ApplicationsMenuPage {
 		await this.resultRankingsItem.click();
 	}
 
-	async goToRoles() {
-		await this.goto();
+	async goToRoles(checkTabVisibility = true) {
+		await this.goto(checkTabVisibility);
 		await this.controlPanelButton.click();
 		await this.rolesItem.click();
 	}

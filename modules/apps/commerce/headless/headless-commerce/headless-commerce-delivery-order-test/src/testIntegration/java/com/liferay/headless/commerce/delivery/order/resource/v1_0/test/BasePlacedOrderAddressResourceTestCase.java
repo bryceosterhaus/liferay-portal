@@ -30,7 +30,7 @@ import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
-import com.liferay.portal.kernel.util.DateFormatFactoryUtil;
+import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.odata.entity.EntityField;
@@ -42,7 +42,7 @@ import com.liferay.portal.vulcan.resource.EntityModelResource;
 
 import java.lang.reflect.Method;
 
-import java.text.DateFormat;
+import java.text.Format;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -81,7 +81,7 @@ public abstract class BasePlacedOrderAddressResourceTestCase {
 
 	@BeforeClass
 	public static void setUpClass() throws Exception {
-		_dateFormat = DateFormatFactoryUtil.getSimpleDateFormat(
+		_format = FastDateFormatFactoryUtil.getSimpleDateFormat(
 			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 	}
 
@@ -95,12 +95,12 @@ public abstract class BasePlacedOrderAddressResourceTestCase {
 
 		_placedOrderAddressResource.setContextCompany(testCompany);
 
-		com.liferay.portal.kernel.model.User testCompanyAdminUser =
-			UserTestUtil.getAdminUser(testCompany.getCompanyId());
+		_testCompanyAdminUser = UserTestUtil.getAdminUser(
+			testCompany.getCompanyId());
 
 		placedOrderAddressResource = PlacedOrderAddressResource.builder(
 		).authentication(
-			testCompanyAdminUser.getEmailAddress(),
+			_testCompanyAdminUser.getEmailAddress(),
 			PropsValues.DEFAULT_ADMIN_PASSWORD
 		).endpoint(
 			testCompany.getVirtualHostname(), 8080, "http"
@@ -178,6 +178,7 @@ public abstract class BasePlacedOrderAddressResourceTestCase {
 		placedOrderAddress.setStreet1(regex);
 		placedOrderAddress.setStreet2(regex);
 		placedOrderAddress.setStreet3(regex);
+		placedOrderAddress.setSubtype(regex);
 		placedOrderAddress.setType(regex);
 		placedOrderAddress.setVatNumber(regex);
 		placedOrderAddress.setZip(regex);
@@ -201,6 +202,7 @@ public abstract class BasePlacedOrderAddressResourceTestCase {
 		Assert.assertEquals(regex, placedOrderAddress.getStreet1());
 		Assert.assertEquals(regex, placedOrderAddress.getStreet2());
 		Assert.assertEquals(regex, placedOrderAddress.getStreet3());
+		Assert.assertEquals(regex, placedOrderAddress.getSubtype());
 		Assert.assertEquals(regex, placedOrderAddress.getType());
 		Assert.assertEquals(regex, placedOrderAddress.getVatNumber());
 		Assert.assertEquals(regex, placedOrderAddress.getZip());
@@ -1014,6 +1016,14 @@ public abstract class BasePlacedOrderAddressResourceTestCase {
 				continue;
 			}
 
+			if (Objects.equals("subtype", additionalAssertFieldName)) {
+				if (placedOrderAddress.getSubtype() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
 			if (Objects.equals("type", additionalAssertFieldName)) {
 				if (placedOrderAddress.getType() == null) {
 					valid = false;
@@ -1327,6 +1337,17 @@ public abstract class BasePlacedOrderAddressResourceTestCase {
 				if (!Objects.deepEquals(
 						placedOrderAddress1.getStreet3(),
 						placedOrderAddress2.getStreet3())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("subtype", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						placedOrderAddress1.getSubtype(),
+						placedOrderAddress2.getSubtype())) {
 
 					return false;
 				}
@@ -2055,6 +2076,52 @@ public abstract class BasePlacedOrderAddressResourceTestCase {
 			return sb.toString();
 		}
 
+		if (entityFieldName.equals("subtype")) {
+			Object object = placedOrderAddress.getSubtype();
+
+			String value = String.valueOf(object);
+
+			if (operator.equals("contains")) {
+				sb = new StringBundler();
+
+				sb.append("contains(");
+				sb.append(entityFieldName);
+				sb.append(",'");
+
+				if ((object != null) && (value.length() > 2)) {
+					sb.append(value.substring(1, value.length() - 1));
+				}
+				else {
+					sb.append(value);
+				}
+
+				sb.append("')");
+			}
+			else if (operator.equals("startswith")) {
+				sb = new StringBundler();
+
+				sb.append("startswith(");
+				sb.append(entityFieldName);
+				sb.append(",'");
+
+				if ((object != null) && (value.length() > 1)) {
+					sb.append(value.substring(0, value.length() - 1));
+				}
+				else {
+					sb.append(value);
+				}
+
+				sb.append("')");
+			}
+			else {
+				sb.append("'");
+				sb.append(value);
+				sb.append("'");
+			}
+
+			return sb.toString();
+		}
+
 		if (entityFieldName.equals("type")) {
 			Object object = placedOrderAddress.getType();
 
@@ -2264,6 +2331,7 @@ public abstract class BasePlacedOrderAddressResourceTestCase {
 				street1 = StringUtil.toLowerCase(RandomTestUtil.randomString());
 				street2 = StringUtil.toLowerCase(RandomTestUtil.randomString());
 				street3 = StringUtil.toLowerCase(RandomTestUtil.randomString());
+				subtype = StringUtil.toLowerCase(RandomTestUtil.randomString());
 				type = StringUtil.toLowerCase(RandomTestUtil.randomString());
 				typeId = RandomTestUtil.randomInt();
 				vatNumber = StringUtil.toLowerCase(
@@ -2489,7 +2557,9 @@ public abstract class BasePlacedOrderAddressResourceTestCase {
 	private static final com.liferay.portal.kernel.log.Log _log =
 		LogFactoryUtil.getLog(BasePlacedOrderAddressResourceTestCase.class);
 
-	private static DateFormat _dateFormat;
+	private static Format _format;
+
+	private com.liferay.portal.kernel.model.User _testCompanyAdminUser;
 
 	@Inject
 	private com.liferay.headless.commerce.delivery.order.resource.v1_0.

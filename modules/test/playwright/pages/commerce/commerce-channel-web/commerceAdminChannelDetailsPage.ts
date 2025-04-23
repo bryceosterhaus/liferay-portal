@@ -31,6 +31,7 @@ export class CommerceAdminChannelDetailsPage {
 		pageName: string
 	) => Promise<Locator>;
 	readonly countryTab: Locator;
+	readonly currencyTab: Locator;
 	readonly detailsButton: (tableName: string) => Promise<Locator>;
 	readonly eligibilityTab: (
 		isNestedFrame: boolean,
@@ -54,6 +55,7 @@ export class CommerceAdminChannelDetailsPage {
 	) => Promise<Locator>;
 	readonly guestCheckoutToggle: Locator;
 	readonly isActive: (tableName: string) => Promise<Locator>;
+	readonly maxOpenOrderAccountInput: Locator;
 	readonly page: Page;
 	readonly placeHolderTerm: (
 		isNestedFrame: boolean,
@@ -153,6 +155,7 @@ export class CommerceAdminChannelDetailsPage {
 			throw new Error(`Cannot locate table row with name ${pageName}`);
 		};
 		this.countryTab = page.getByRole('link', {name: 'Countries'});
+		this.currencyTab = page.getByRole('link', {name: 'Currencies'});
 		this.generalCommerceAdminChannelTableLink = async (name: string) => {
 			return page.getByRole('link', {exact: true, name});
 		};
@@ -238,6 +241,9 @@ export class CommerceAdminChannelDetailsPage {
 		this.isActive = async (tableName: string) => {
 			return (await this.sidePanelFrame(tableName)).getByLabel('Active');
 		};
+		this.maxOpenOrderAccountInput = page.getByLabel(
+			'Maximum Number of Open Orders per Account'
+		);
 		this.saveButton = page.getByRole('link', {name: 'Save'});
 		this.selectButton = async (
 			isNestedFrame: boolean,
@@ -568,5 +574,9 @@ export class CommerceAdminChannelDetailsPage {
 
 	async goToCountries() {
 		await this.countryTab.click();
+	}
+
+	async goToCurrencies() {
+		await this.currencyTab.click();
 	}
 }

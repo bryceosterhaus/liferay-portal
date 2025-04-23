@@ -4,9 +4,8 @@
  */
 
 import {
-	ObjectActionApi,
-	ObjectDefinitionApi,
-	ObjectField,
+	ObjectActionAPI,
+	ObjectDefinitionAPI,
 } from '@liferay/object-admin-rest-client-js';
 import {expect, mergeTests} from '@playwright/test';
 
@@ -192,7 +191,7 @@ test('Allows selecting specific repeatable collection provider', async ({
 
 	await page.getByText('Select a collection to display.').first().click();
 
-	await pageEditorPage.chooseCollectionDisplayOption(
+	await pageEditorPage.chooseCollectionDisplayCollection(
 		'Repeatable Fields Collection Providers',
 		'Species'
 	);
@@ -572,7 +571,7 @@ test(
 		// Create student object definition
 
 		const objectDefinitionAPIClient =
-			await apiHelpers.buildRestClient(ObjectDefinitionApi);
+			await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 		const {body: potatoProviderObjectDefinition} =
 			await objectDefinitionAPIClient.postObjectDefinition({
@@ -584,8 +583,8 @@ test(
 				name: 'PotatoProvider',
 				objectFields: [
 					{
-						DBType: ObjectField.DBTypeEnum.String,
-						businessType: ObjectField.BusinessTypeEnum.Text,
+						DBType: 'String',
+						businessType: 'Text',
 						externalReferenceCode: 'nameERC',
 						indexed: true,
 						indexedAsKeyword: false,
@@ -597,8 +596,8 @@ test(
 						required: false,
 					},
 					{
-						DBType: ObjectField.DBTypeEnum.String,
-						businessType: ObjectField.BusinessTypeEnum.Text,
+						DBType: 'String',
+						businessType: 'Text',
 						externalReferenceCode: 'locationERC',
 						indexed: true,
 						indexedAsKeyword: false,
@@ -647,10 +646,10 @@ test(
 
 		// Add object action
 
-		const objectActionApiClient =
-			await apiHelpers.buildRestClient(ObjectActionApi);
+		const objectActionAPIClient =
+			await apiHelpers.buildRestClient(ObjectActionAPI);
 
-		await objectActionApiClient.postObjectDefinitionByExternalReferenceCodeObjectAction(
+		await objectActionAPIClient.postObjectDefinitionByExternalReferenceCodeObjectAction(
 			potatoProviderObjectDefinition.externalReferenceCode,
 			{
 				active: true,
@@ -734,12 +733,12 @@ test(
 
 		// Map standalone action to buttons
 
-		await pageEditorPage.mapAction({
+		await pageEditorPage.mapObjectAction({
 			entry: String(firstObjectEntry.id),
 			fragmentId: firstButtonId,
 		});
 
-		await pageEditorPage.mapAction({
+		await pageEditorPage.mapObjectAction({
 			entry: String(secondObjectEntry.id),
 			fragmentId: secondButtonId,
 		});

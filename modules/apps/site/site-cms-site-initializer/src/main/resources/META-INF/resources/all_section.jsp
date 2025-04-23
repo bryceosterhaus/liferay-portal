@@ -8,10 +8,10 @@
 <%@ include file="/init.jsp" %>
 
 <%
-AllSectionDisplayContext allSectionDisplayContext = new AllSectionDisplayContext(request);
+AllSectionDisplayContext allSectionDisplayContext = (AllSectionDisplayContext)request.getAttribute(AllSectionDisplayContext.class.getName());
 %>
 
-<div class="cms-section">
+<div class="cms-section custom-empty-state">
 	<frontend-data-set:headless-display
 		apiURL="<%= allSectionDisplayContext.getAPIURL() %>"
 		bulkActionDropdownItems="<%= allSectionDisplayContext.getBulkActionDropdownItems() %>"
@@ -21,6 +21,7 @@ AllSectionDisplayContext allSectionDisplayContext = new AllSectionDisplayContext
 		formName="fm"
 		id="<%= CMSSiteInitializerFDSNames.ALL_SECTION %>"
 		itemsPerPage="<%= 10 %>"
+		propsTransformer="{AllFDSPropsTransformer} from site-cms-site-initializer"
 		selectedItemsKey="id"
 		selectionType="multiple"
 		style="fluid"

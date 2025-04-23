@@ -31,7 +31,6 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.configuration.module.configuration.ConfigurationProvider;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.RoleConstants;
@@ -290,24 +289,20 @@ public class CommerceAccountHelperImpl implements CommerceAccountHelper {
 			long commerceChannelGroupId, HttpServletRequest httpServletRequest)
 		throws PortalException {
 
-		if (FeatureFlagManagerUtil.isEnabled("LPD-35678")) {
-			HttpServletRequest originalHttpServletRequest =
-				_portal.getOriginalServletRequest(httpServletRequest);
+		HttpServletRequest originalHttpServletRequest =
+			_portal.getOriginalServletRequest(httpServletRequest);
 
-			HttpSession httpSession = originalHttpServletRequest.getSession();
+		HttpSession httpSession = originalHttpServletRequest.getSession();
 
-			CommerceOrder commerceOrder =
-				(CommerceOrder)httpSession.getAttribute(
-					CommerceCheckoutWebKeys.
-						COMMERCE_ORDER_ON_ACCOUNT_SELECTION);
+		CommerceOrder commerceOrder = (CommerceOrder)httpSession.getAttribute(
+			CommerceCheckoutWebKeys.COMMERCE_ORDER_ON_ACCOUNT_SELECTION);
 
-			if (commerceOrder != null) {
-				setCurrentCommerceAccount(
-					httpServletRequest, commerceChannelGroupId,
-					AccountConstants.ACCOUNT_ENTRY_ID_DEFAULT);
+		if (commerceOrder != null) {
+			setCurrentCommerceAccount(
+				httpServletRequest, commerceChannelGroupId,
+				AccountConstants.ACCOUNT_ENTRY_ID_DEFAULT);
 
-				return null;
-			}
+			return null;
 		}
 
 		int commerceSiteType = getCommerceSiteType(commerceChannelGroupId);
@@ -349,7 +344,7 @@ public class CommerceAccountHelperImpl implements CommerceAccountHelper {
 
 						accountEntry =
 							_accountEntryLocalService.addAccountEntry(
-								userId,
+								StringPool.BLANK, userId,
 								AccountConstants.ACCOUNT_ENTRY_ID_DEFAULT,
 								user.getFullName(), null, null,
 								user.getEmailAddress(), null, StringPool.BLANK,

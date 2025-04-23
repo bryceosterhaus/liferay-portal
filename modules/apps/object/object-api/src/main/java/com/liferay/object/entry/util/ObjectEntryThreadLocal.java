@@ -6,8 +6,12 @@
 package com.liferay.object.entry.util;
 
 import com.liferay.petra.lang.CentralizedThreadLocal;
+import com.liferay.petra.lang.SafeCloseable;
+
+import java.io.Serializable;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -19,6 +23,14 @@ public class ObjectEntryThreadLocal {
 		Set<Long> validatedObjectEntryIds = _validatedObjectEntryIds.get();
 
 		validatedObjectEntryIds.add(objectEntryId);
+	}
+
+	public static void clearExpandoBridgeAttributes() {
+		_expandoBridgeAttributes.remove();
+	}
+
+	public static Map<String, Serializable> getExpandoBridgeAttributes() {
+		return _expandoBridgeAttributes.get();
 	}
 
 	public static boolean isDisassociateRelatedModels() {
@@ -43,10 +55,17 @@ public class ObjectEntryThreadLocal {
 		return validatedObjectEntryIds.contains(objectEntryId);
 	}
 
-	public static void setDisassociateRelatedModels(
+	public static SafeCloseable setDisassociateRelatedModelsWithSafeCloseable(
 		boolean disassociateRelatedModels) {
 
-		_disassociateRelatedModels.set(disassociateRelatedModels);
+		return _disassociateRelatedModels.setWithSafeCloseable(
+			disassociateRelatedModels);
+	}
+
+	public static void setExpandoBridgeAttributes(
+		Map<String, Serializable> expandoValues) {
+
+		_expandoBridgeAttributes.set(expandoValues);
 	}
 
 	public static void setSkipObjectEntryResourcePermission(
@@ -68,10 +87,13 @@ public class ObjectEntryThreadLocal {
 		_skipReadOnlyObjectFieldsValidation.set(skipReadOnlyValidation);
 	}
 
-	private static final ThreadLocal<Boolean> _disassociateRelatedModels =
-		new CentralizedThreadLocal<>(
+	private static final CentralizedThreadLocal<Boolean>
+		_disassociateRelatedModels = new CentralizedThreadLocal<>(
 			ObjectEntryThreadLocal.class + "._disassociateRelatedModels",
 			() -> false);
+	private static final ThreadLocal<Map<String, Serializable>>
+		_expandoBridgeAttributes = new CentralizedThreadLocal<>(
+			ObjectEntryThreadLocal.class + "._expandoBridgeAttributes");
 	private static final ThreadLocal<Boolean>
 		_skipObjectEntryResourcePermission = new CentralizedThreadLocal<>(
 			ObjectEntryThreadLocal.class +

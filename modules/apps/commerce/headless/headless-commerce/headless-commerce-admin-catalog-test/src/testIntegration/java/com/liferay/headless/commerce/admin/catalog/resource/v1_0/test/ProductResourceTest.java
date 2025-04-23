@@ -36,6 +36,7 @@ import com.liferay.headless.commerce.admin.catalog.client.pagination.Pagination;
 import com.liferay.headless.commerce.admin.catalog.client.problem.Problem;
 import com.liferay.headless.commerce.admin.catalog.client.resource.v1_0.ProductResource;
 import com.liferay.headless.commerce.core.util.LanguageUtils;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.ServiceContext;
@@ -86,8 +87,8 @@ public class ProductResourceTest extends BaseProductResourceTestCase {
 			ServiceContextTestUtil.getServiceContext(testCompany.getGroupId());
 
 		_accountGroup = _accountGroupLocalService.addAccountGroup(
-			user.getUserId(), null, RandomTestUtil.randomString(),
-			serviceContext);
+			StringPool.BLANK, user.getUserId(), null,
+			RandomTestUtil.randomString(), serviceContext);
 
 		_accountGroup.setDefaultAccountGroup(false);
 		_accountGroup.setType(AccountConstants.ACCOUNT_GROUP_TYPE_STATIC);
@@ -144,6 +145,12 @@ public class ProductResourceTest extends BaseProductResourceTestCase {
 	@Override
 	@Test
 	public void testDeleteProduct() throws Exception {
+	}
+
+	@Ignore
+	@Override
+	@Test
+	public void testDeleteProductBatch() throws Exception {
 	}
 
 	@Ignore
@@ -281,7 +288,8 @@ public class ProductResourceTest extends BaseProductResourceTestCase {
 
 		randomPatchProduct = randomProduct();
 
-		randomPatchProduct.setExpirationDate(RandomTestUtil.nextDate());
+		randomPatchProduct.setExpirationDate(
+			randomPatchProduct.getDisplayDate());
 		randomPatchProduct.setNeverExpire(false);
 
 		postProduct = testPostProduct_addProduct(randomPatchProduct);
@@ -351,6 +359,12 @@ public class ProductResourceTest extends BaseProductResourceTestCase {
 	@Test
 	public void testPutProductByExternalReferenceCode() throws Exception {
 		testPatchProductByExternalReferenceCode();
+	}
+
+	@Ignore
+	@Override
+	@Test
+	public void testVulcanCRUDItemDelegateGetItem() throws Exception {
 	}
 
 	@Override

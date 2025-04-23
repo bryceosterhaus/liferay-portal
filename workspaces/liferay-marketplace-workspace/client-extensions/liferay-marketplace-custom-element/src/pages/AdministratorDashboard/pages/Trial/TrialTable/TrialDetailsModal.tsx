@@ -9,7 +9,7 @@ import {formatDistance} from 'date-fns';
 import {z} from 'zod';
 
 import QATable from '../../../../../components/QATable';
-import {ORDER_CUSTOM_FIELDS} from '../../../../../enums/Order';
+import {OrderCustomFields} from '../../../../../enums/Order';
 import i18n from '../../../../../i18n';
 import zodSchema from '../../../../../schema/zod';
 import {safeJSONParse} from '../../../../../utils/util';
@@ -39,10 +39,12 @@ const TrialDetails: React.FC<TrialDetailsProps> = ({order}) => {
 			TrialFormSchema,
 			'consoleInviteEmailAddresses' | 'sendNotificationEmail'
 		>
-	>(customFields[ORDER_CUSTOM_FIELDS.TRIAL_SETTINGS], {
+	>(customFields[OrderCustomFields.TRIAL_SETTINGS], {
 		consoleInviteEmailAddresses: [],
 		sendNotificationEmail: true,
 	});
+
+	const trialError = customFields[OrderCustomFields.TRIAL_ERROR];
 
 	return (
 		<QATable
@@ -58,7 +60,7 @@ const TrialDetails: React.FC<TrialDetailsProps> = ({order}) => {
 				{
 					title: i18n.translate('trial-url'),
 					value:
-						customFields[ORDER_CUSTOM_FIELDS.VIRTUAL_HOST] || 'N/A',
+						customFields[OrderCustomFields.VIRTUAL_HOST] || 'N/A',
 				},
 				{
 					title: i18n.translate('trial-status'),
@@ -83,13 +85,13 @@ const TrialDetails: React.FC<TrialDetailsProps> = ({order}) => {
 				{
 					title: i18n.translate('start-date'),
 					value: getDateOrDefault(
-						customFields[ORDER_CUSTOM_FIELDS.START_DATE]
+						customFields[OrderCustomFields.START_DATE]
 					),
 				},
 				{
 					title: i18n.translate('trial-end-date'),
 					value: getDateOrDefault(
-						customFields[ORDER_CUSTOM_FIELDS.END_DATE]
+						customFields[OrderCustomFields.END_DATE]
 					),
 				},
 				{
@@ -103,6 +105,26 @@ const TrialDetails: React.FC<TrialDetailsProps> = ({order}) => {
 					value: i18n.translate(
 						trialSettings.sendNotificationEmail ? 'yes' : 'no'
 					),
+				},
+				{
+					title: 'Error',
+					value: (
+						<span
+							className="cursor-pointer text-secondary"
+							onClick={() =>
+								alert(
+									JSON.stringify(
+										safeJSONParse(trialError, {}),
+										null,
+										2
+									)
+								)
+							}
+						>
+							{i18n.translate('details')}
+						</span>
+					),
+					visible: !!trialError,
 				},
 			]}
 		/>

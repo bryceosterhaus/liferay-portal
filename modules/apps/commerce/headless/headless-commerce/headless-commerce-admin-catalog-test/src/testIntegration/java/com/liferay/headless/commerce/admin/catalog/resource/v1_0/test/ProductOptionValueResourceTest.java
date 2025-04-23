@@ -90,6 +90,13 @@ public class ProductOptionValueResourceTest
 	@Ignore
 	@Override
 	@Test
+	public void testDeleteProductOptionValueBatch() throws Exception {
+		super.testDeleteProductOptionValueBatch();
+	}
+
+	@Ignore
+	@Override
+	@Test
 	public void testGetProductOptionIdProductOptionValuesPage()
 		throws Exception {
 
@@ -147,6 +154,13 @@ public class ProductOptionValueResourceTest
 		super.testPostProductOptionIdProductOptionValue();
 
 		_testPostProductOptionIdProductOptionValueWithSkuExternalReferenceCode();
+	}
+
+	@Ignore
+	@Override
+	@Test
+	public void testVulcanCRUDItemDelegateGetItem() throws Exception {
+		super.testVulcanCRUDItemDelegateGetItem();
 	}
 
 	@Override

@@ -3,39 +3,25 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-import {openSimpleInputModal} from 'frontend-js-web';
+import {openSimpleInputModal} from 'frontend-js-components-web';
 
 const ACTIONS = {
 	taskAssign({assignURL, namespace, title}) {
-		Liferay.Util.openWindow({
-			dialog: {
-				destroyOnHide: true,
-				height: 430,
-				resizable: false,
-				width: 896,
-			},
-			dialogIframe: {
-				bodyCssClass: 'task-dialog',
-			},
+		Liferay.Util.openModal({
+			containerProps: {},
 			id: namespace + 'assignToDialog',
+			iframeBodyCssClass: 'task-dialog',
 			title,
-			uri: assignURL,
+			url: assignURL,
 		});
 	},
 	taskAssignToMe({assignToMeURL, namespace, title}) {
-		Liferay.Util.openWindow({
-			dialog: {
-				destroyOnHide: true,
-				height: 340,
-				resizable: false,
-				width: 896,
-			},
-			dialogIframe: {
-				bodyCssClass: 'task-dialog',
-			},
+		Liferay.Util.openModal({
+			containerProps: {},
 			id: namespace + 'assignToDialog',
+			iframeBodyCssClass: 'task-dialog',
 			title,
-			uri: assignToMeURL,
+			url: assignToMeURL,
 		});
 	},
 	taskEditWorkflowTask({formSubmitURL, namespace, title}) {
@@ -55,19 +41,12 @@ const ACTIONS = {
 		});
 	},
 	updateDueDate({namespace, title, updateDueDateURL}) {
-		Liferay.Util.openWindow({
-			dialog: {
-				destroyOnHide: true,
-				height: 430,
-				resizable: false,
-				width: 896,
-			},
-			dialogIframe: {
-				bodyCssClass: 'task-dialog',
-			},
+		Liferay.Util.openModal({
+			containerProps: {},
 			id: namespace + 'updateDialog',
+			iframeBodyCssClass: 'task-dialog',
 			title,
-			uri: updateDueDateURL,
+			url: updateDueDateURL,
 		});
 	},
 };

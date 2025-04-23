@@ -54,8 +54,9 @@ export class CommerceLayoutsPage {
 	readonly labelField: Locator;
 	readonly markAsDefaultMenuItem: Locator;
 	readonly moreActionsButton: Locator;
-	readonly orderActionsButton: (orderActionName: string) => Locator;
 	readonly openProductMenuButton: Locator;
+	readonly orderActionsButton: (orderActionName: string) => Locator;
+	readonly orderActionDropDownButton: Locator;
 	readonly orderItemCardButton: Locator;
 	readonly page: Page;
 	readonly pageEditorCollectionItem: Locator;
@@ -211,12 +212,17 @@ export class CommerceLayoutsPage {
 		});
 		this.labelField = page.getByLabel('Field', {exact: true});
 		this.moreActionsButton = page.getByLabel('More actions');
-		this.orderActionsButton = (orderActionName: string) =>
-			page.getByRole('button', {exact: true, name: orderActionName});
 		this.openProductMenuButton = page.getByRole('tab', {
 			exact: true,
 			name: 'Open Product Menu',
 		});
+		this.orderActionsButton = (orderActionName: string) =>
+			page.getByRole('button', {exact: true, name: orderActionName});
+		this.orderActionDropDownButton = page
+			.locator(
+				'.lfr-layout-structure-item-com-liferay-commerce-order-content-web-internal-fragment-renderer-orderactionsfragmentrenderer'
+			)
+			.locator('.dropdown-toggle');
 		this.orderItemCardButton = page
 			.frameLocator('iframe[title="Select"]')
 			.getByRole('button', {name: 'Select Order Items'});
@@ -357,15 +363,6 @@ export class CommerceLayoutsPage {
 		await this.addWidgetButton.click();
 		await this.searchFormInput.fill(widgetName);
 		await this.addWidgetLabel(widgetName).click();
-	}
-
-	async checkValueOrderSummary(nameValue: string, value: string) {
-		await expect(
-			this.page.getByText(nameValue, {exact: true})
-		).toBeVisible();
-		await expect(
-			this.page.locator('span').filter({hasText: value})
-		).toBeVisible();
 	}
 
 	async createDisplayPageTemplate(
@@ -540,13 +537,22 @@ export class CommerceLayoutsPage {
 		}
 	}
 
-	async selectDisplayPageTemplatePreviewItem(itemName: string) {
+	async selectDisplayPageTemplatePreviewItem(
+		itemName: string,
+		visible: boolean = true
+	) {
 		await this.previewItemSelectorButton.click();
 		await this.selectOtherItemDropdownItem.click();
 
 		const itemButton = await this.page
 			.frameLocator('iframe[title="Select"]')
 			.getByRole('button', {name: itemName});
+
+		if (!visible) {
+			await expect(itemButton).toHaveCount(0);
+
+			return;
+		}
 
 		await expect(itemButton).toBeVisible();
 

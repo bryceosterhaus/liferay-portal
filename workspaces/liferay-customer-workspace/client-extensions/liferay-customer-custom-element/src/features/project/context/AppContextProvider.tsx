@@ -6,9 +6,11 @@
 import {createContext, useContext, useEffect, useMemo, useReducer} from 'react';
 import {useAppPropertiesContext} from '~/contexts/AppPropertiesContext';
 import {Liferay} from '~/services/liferay';
+import {fetcher} from '~/services/liferay/fetcher';
 import {
 	getAccountByExternalReferenceCode,
 	getAccountSubscriptionGroups,
+	getAccountSubscriptions,
 	getKoroneikiAccounts,
 	getStructuredContentFolders,
 	getUserAccount,
@@ -19,7 +21,9 @@ import {isValidPage} from '~/utils/page.validation';
 import routerPath from '~/utils/routerPath';
 import {
 	IAccountBrief,
+	IAccountSubscription,
 	IAccountSubscriptionGroup,
+	IBusinessEvent,
 	IProject,
 	IUserAccount,
 } from '~/utils/types';
@@ -28,12 +32,14 @@ import reducer, {ActionPayload, IAction, IState, actionTypes} from './reducer';
 
 const AppContext = createContext<[IState, React.Dispatch<IAction>]>([
 	{
+		businessEvents: undefined,
 		isQuickLinksExpanded: true,
 		page: undefined,
 		project: undefined,
 		quickLinks: undefined,
 		structuredContents: undefined,
 		subscriptionGroups: undefined,
+		subscriptions: undefined,
 		userAccount: undefined,
 		userProjectAccess: undefined,
 	},
@@ -45,12 +51,14 @@ const AppContextProvider = ({children}: {children: React.ReactNode}) => {
 	const [state, dispatch] = useReducer<React.Reducer<IState, IAction>>(
 		reducer,
 		{
+			businessEvents: undefined,
 			isQuickLinksExpanded: true,
 			page: undefined,
 			project: undefined,
 			quickLinks: undefined,
 			structuredContents: undefined,
 			subscriptionGroups: undefined,
+			subscriptions: undefined,
 			userAccount: undefined,
 			userProjectAccess: undefined,
 		}
@@ -59,6 +67,35 @@ const AppContextProvider = ({children}: {children: React.ReactNode}) => {
 	const pageRoutes = useMemo(() => routerPath(), []);
 
 	useEffect(() => {
+		const getBusinessEvents = async (filterQuery: string) => {
+			const HEADLESS_BASE_URL = `${window.location.origin}/o/`;
+
+			try {
+				const businessEventsResponse = await fetcher(
+					`${HEADLESS_BASE_URL}c/businessevents?${filterQuery}`,
+					{
+						headers: {
+							'Accept-Language':
+								Liferay.ThemeDisplay.getBCP47LanguageId(),
+							'Content-Type': 'application/json',
+							'x-csrf-token': Liferay.authToken,
+						},
+						method: 'GET',
+					}
+				);
+
+				const items = businessEventsResponse.items as IBusinessEvent[];
+
+				dispatch({
+					payload: items,
+					type: actionTypes.UPDATE_BUSINESS_EVENTS as keyof typeof actionTypes,
+				});
+			}
+			catch (error) {
+				console.error('Error', error);
+			}
+		};
+
 		const getUser = async (
 			projectExternalReferenceCode: string
 		): Promise<IUserAccount | undefined> => {
@@ -83,13 +120,11 @@ const AppContextProvider = ({children}: {children: React.ReactNode}) => {
 				);
 
 				const isAccountProvisioning = Boolean(
-					data.userAccount.accountBriefs
-						?.find(
-							({externalReferenceCode}) =>
-								externalReferenceCode ===
-								projectExternalReferenceCode
-						)
-						?.roleBriefs?.find(({name}) => name === 'Provisioning')
+					data.userAccount.roleBriefs?.some(
+						(role) =>
+							role.name === 'Provisioning Admin' ||
+							role.name === 'Provisioning Member'
+					)
 				);
 
 				const isOmniAdmin = Boolean(
@@ -196,6 +231,30 @@ const AppContextProvider = ({children}: {children: React.ReactNode}) => {
 			}
 		};
 
+		const getSubscriptions = async (accountKey: string) => {
+			const {data: dataSubscriptions} = await client.query<{
+				c: {
+					accountSubscriptions: {
+						items: IAccountSubscription[];
+					};
+				};
+			}>({
+				query: getAccountSubscriptions,
+				variables: {
+					filter: `accountKey eq '${accountKey}'`,
+				},
+			});
+
+			if (dataSubscriptions) {
+				const items = dataSubscriptions?.c?.accountSubscriptions?.items;
+
+				dispatch({
+					payload: items as unknown as IAccountSubscription[],
+					type: actionTypes.UPDATE_SUBSCRIPTIONS as keyof typeof actionTypes,
+				});
+			}
+		};
+
 		const getSubscriptionGroups = async (accountKey: string) => {
 			const {data: dataSubscriptionGroups} = await client.query<{
 				c: {
@@ -291,10 +350,18 @@ const AppContextProvider = ({children}: {children: React.ReactNode}) => {
 								projectExternalReferenceCode,
 								accountBrief
 							);
+							getSubscriptions(
+								accountBrief.externalReferenceCode
+							);
 							getSubscriptionGroups(projectExternalReferenceCode);
 						}
 
 						getStructuredContents();
+
+						const businessEventsFilterQuery = accountBrief?.id
+							? `filter=r_accountEntryToBusinessEvents_accountEntryId eq '${accountBrief.id}'`
+							: '';
+						getBusinessEvents(businessEventsFilterQuery);
 					}
 				}
 			}

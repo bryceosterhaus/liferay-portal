@@ -175,10 +175,25 @@ public class LayoutSetLocalServiceImpl extends LayoutSetLocalServiceBaseImpl {
 	}
 
 	@Override
-	public LayoutSet fetchLayoutSetByLogoId(boolean privateLayout, long logoId)
-		throws PortalException {
+	public LayoutSet fetchLayoutSetByLogoId(
+		boolean privateLayout, long logoId) {
 
-		return layoutSetPersistence.fetchByP_L(privateLayout, logoId);
+		if (logoId <= 0) {
+			return null;
+		}
+
+		List<LayoutSet> layoutSets = layoutSetPersistence.findByP_L(
+			privateLayout, logoId);
+
+		if (layoutSets.isEmpty()) {
+			return null;
+		}
+
+		if ((layoutSets.size() > 1) && _log.isWarnEnabled()) {
+			_log.error("More than one layout set uses logo ID " + logoId);
+		}
+
+		return layoutSets.get(layoutSets.size() - 1);
 	}
 
 	@Override

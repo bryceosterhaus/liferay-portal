@@ -39,42 +39,6 @@ export async function addExpandoValue({
 	});
 }
 
-// HeadlessCommerceAdminCatalog.createProduct
-
-export function createApp({
-	appCategories,
-	appDescription,
-	appName,
-	catalogId,
-	productSpecifications,
-}: {
-	appCategories: Categories[];
-	appDescription: string;
-	appName: string;
-	catalogId: number;
-	productSpecifications?: ProductSpecification[];
-}) {
-	return fetch(
-		`${baseURL}/o/headless-commerce-admin-catalog/v1.0/products?nestedFields=productVirtualSettings`,
-		{
-			body: JSON.stringify({
-				active: true,
-				catalogId,
-				categories: appCategories,
-				description: {en_US: appDescription},
-				name: {en_US: appName},
-				productConfiguration: {allowBackOrder: true},
-				productSpecifications,
-				productStatus: 2,
-				productType: 'virtual',
-				productVirtualSettings: {},
-			}),
-			headers,
-			method: 'POST',
-		}
-	);
-}
-
 export async function getTierPrice(
 	channelId: number,
 	productId: number | undefined,
@@ -398,20 +362,6 @@ export async function getOptions() {
 	return items as CommerceOption[];
 }
 
-export async function getOrderTypes() {
-	const response = await fetch(
-		`${baseURL}/o/headless-commerce-admin-order/v1.0/order-types`,
-		{
-			headers,
-			method: 'GET',
-		}
-	);
-
-	const {items} = (await response.json()) as {items: OrderType[]};
-
-	return items;
-}
-
 export async function getProductById({
 	nestedFields,
 	productId,
@@ -684,29 +634,6 @@ export async function postProductOption(
 	} = (await response.json()) as {items: ProductOptionItem[]};
 
 	return id;
-}
-
-export async function updateApp({
-	appDescription,
-	appERC,
-	appName,
-}: {
-	appDescription: string;
-	appERC: string;
-	appName: string;
-}) {
-	return fetch(
-		`${baseURL}/o/headless-commerce-admin-catalog/v1.0/products/by-externalReferenceCode/${appERC}`,
-		{
-			body: JSON.stringify({
-				description: {en_US: appDescription},
-				name: {en_US: appName},
-				productStatus: 2,
-			}),
-			headers,
-			method: 'PATCH',
-		}
-	);
 }
 
 export async function updateProductSpecification({

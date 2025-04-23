@@ -39,6 +39,8 @@ import com.liferay.commerce.test.util.context.TestCommerceContext;
 import com.liferay.document.library.kernel.model.DLFolderConstants;
 import com.liferay.document.library.kernel.service.DLAppLocalService;
 import com.liferay.headless.commerce.delivery.order.client.dto.v1_0.PlacedOrderItem;
+import com.liferay.headless.commerce.delivery.order.client.pagination.Page;
+import com.liferay.headless.commerce.delivery.order.client.pagination.Pagination;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.model.User;
@@ -84,8 +86,8 @@ public class PlacedOrderItemResourceTest
 			_user.getUserId());
 
 		_accountEntry = _accountEntryLocalService.addAccountEntry(
-			_user.getUserId(), 0, RandomTestUtil.randomString(),
-			RandomTestUtil.randomString(), null,
+			StringPool.BLANK, _user.getUserId(), 0,
+			RandomTestUtil.randomString(), RandomTestUtil.randomString(), null,
 			RandomTestUtil.randomString() + "@liferay.com", null,
 			RandomTestUtil.randomString(), "business", 1, _serviceContext);
 
@@ -119,8 +121,8 @@ public class PlacedOrderItemResourceTest
 
 		_commercePriceList =
 			_commercePriceListLocalService.addCommercePriceList(
-				RandomTestUtil.randomString(), testGroup.getGroupId(),
-				_user.getUserId(), _commerceCurrency.getCode(), true,
+				RandomTestUtil.randomString(), _user.getUserId(),
+				testGroup.getGroupId(), _commerceCurrency.getCode(), true,
 				CommercePriceListConstants.TYPE_PRICE_LIST, 0, true,
 				RandomTestUtil.randomString(), RandomTestUtil.nextDouble(), 1,
 				1, 2022, 12, 0, 0, 0, 0, 0, 0, true, _serviceContext);
@@ -128,8 +130,12 @@ public class PlacedOrderItemResourceTest
 
 	@Override
 	@Test
-	public void testGetPlacedOrderItem() throws Exception {
-		super.testGetPlacedOrderItem();
+	public void testGetPlacedOrderByExternalReferenceCodePlacedOrderItemsPage()
+		throws Exception {
+
+		super.testGetPlacedOrderByExternalReferenceCodePlacedOrderItemsPage();
+
+		_testGetPlacedOrderByExternalReferenceCodePlacedOrderItemsPage();
 	}
 
 	@Test
@@ -189,6 +195,14 @@ public class PlacedOrderItemResourceTest
 
 		Assert.assertEquals(
 			virtualItemURLs, getPlacedOrderItem.getVirtualItemURLs());
+	}
+
+	@Override
+	@Test
+	public void testGetPlacedOrderPlacedOrderItemsPage() throws Exception {
+		super.testGetPlacedOrderPlacedOrderItemsPage();
+
+		_testGetPlacedOrderPlacedOrderItemsPage();
 	}
 
 	@Override
@@ -348,6 +362,17 @@ public class PlacedOrderItemResourceTest
 							return null;
 						}
 
+						commerceVirtualOrderItem =
+							_commerceVirtualOrderItemLocalService.
+								updateCommerceVirtualOrderItem(
+									commerceVirtualOrderItem.
+										getCommerceVirtualOrderItemId(),
+									commerceVirtualOrderItem.
+										getActivationStatus(),
+									commerceVirtualOrderItem.getDuration(),
+									commerceVirtualOrderItem.getMaxUsages(),
+									true);
+
 						List<CommerceVirtualOrderItemFileEntry>
 							commerceVirtualOrderItemFileEntries =
 								commerceVirtualOrderItem.
@@ -363,6 +388,93 @@ public class PlacedOrderItemResourceTest
 					});
 			}
 		};
+	}
+
+	private void _testGetPlacedOrderByExternalReferenceCodePlacedOrderItemsPage()
+		throws Exception {
+
+		CPInstance cPInstance = CPTestUtil.addCPInstanceWithRandomSku(
+			_commerceCatalog.getGroupId());
+
+		CPDefinition cpDefinition = cPInstance.getCPDefinition();
+
+		_commerceCPDefinitions.add(cpDefinition);
+
+		PlacedOrderItem postPlacedOrderItem = _addPlacedOrderItem(
+			_toPlacedOrderItem(cpDefinition));
+
+		_addPlacedOrderItem(randomPlacedOrderItem());
+
+		Page<PlacedOrderItem> placedOrderItemsPage =
+			placedOrderItemResource.
+				getPlacedOrderByExternalReferenceCodePlacedOrderItemsPage(
+					testGetPlacedOrderByExternalReferenceCodePlacedOrderItemsPage_getExternalReferenceCode(),
+					RandomTestUtil.randomString(), null, Pagination.of(1, 10),
+					null);
+
+		List<PlacedOrderItem> placedOrderItems =
+			(List<PlacedOrderItem>)placedOrderItemsPage.getItems();
+
+		Assert.assertEquals(
+			placedOrderItems.toString(), 0, placedOrderItems.size());
+
+		placedOrderItemsPage =
+			placedOrderItemResource.
+				getPlacedOrderByExternalReferenceCodePlacedOrderItemsPage(
+					testGetPlacedOrderByExternalReferenceCodePlacedOrderItemsPage_getExternalReferenceCode(),
+					postPlacedOrderItem.getSku(), null, Pagination.of(1, 10),
+					null);
+
+		placedOrderItems =
+			(List<PlacedOrderItem>)placedOrderItemsPage.getItems();
+
+		Assert.assertEquals(
+			placedOrderItems.toString(), 1, placedOrderItems.size());
+
+		PlacedOrderItem placedOrderItem = placedOrderItems.get(0);
+
+		assertEquals(postPlacedOrderItem, placedOrderItem);
+	}
+
+	private void _testGetPlacedOrderPlacedOrderItemsPage() throws Exception {
+		CPInstance cPInstance = CPTestUtil.addCPInstanceWithRandomSku(
+			_commerceCatalog.getGroupId());
+
+		CPDefinition cpDefinition = cPInstance.getCPDefinition();
+
+		_commerceCPDefinitions.add(cpDefinition);
+
+		PlacedOrderItem postPlacedOrderItem = _addPlacedOrderItem(
+			_toPlacedOrderItem(cpDefinition));
+
+		_addPlacedOrderItem(randomPlacedOrderItem());
+
+		Page<PlacedOrderItem> placedOrderItemsPage =
+			placedOrderItemResource.getPlacedOrderPlacedOrderItemsPage(
+				_commerceOrder.getCommerceOrderId(),
+				RandomTestUtil.randomString(), null, Pagination.of(1, 10),
+				null);
+
+		List<PlacedOrderItem> placedOrderItems =
+			(List<PlacedOrderItem>)placedOrderItemsPage.getItems();
+
+		Assert.assertEquals(
+			placedOrderItems.toString(), 0, placedOrderItems.size());
+
+		placedOrderItemsPage =
+			placedOrderItemResource.getPlacedOrderPlacedOrderItemsPage(
+				_commerceOrder.getCommerceOrderId(),
+				postPlacedOrderItem.getSku(), null, Pagination.of(1, 10), null);
+
+		placedOrderItems =
+			(List<PlacedOrderItem>)placedOrderItemsPage.getItems();
+
+		Assert.assertEquals(
+			placedOrderItems.toString(), 1, placedOrderItems.size());
+
+		PlacedOrderItem placedOrderItem = placedOrderItems.get(0);
+
+		assertEquals(postPlacedOrderItem, placedOrderItem);
 	}
 
 	private PlacedOrderItem _toPlacedOrderItem(CPDefinition cpDefinition) {

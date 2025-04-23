@@ -58,10 +58,16 @@ public interface ObjectEntry
 	public long getNonzeroGroupId()
 		throws com.liferay.portal.kernel.exception.PortalException;
 
+	public java.util.Map<java.util.Locale, String> getTitleMap()
+		throws com.liferay.portal.kernel.exception.PortalException;
+
 	public String getTitleValue()
 		throws com.liferay.portal.kernel.exception.PortalException;
 
 	public String getTitleValue(String languageId)
+		throws com.liferay.portal.kernel.exception.PortalException;
+
+	public String getTitleValue(String languageId, boolean useDefault)
 		throws com.liferay.portal.kernel.exception.PortalException;
 
 	public String getURLTitle(java.util.Locale locale);

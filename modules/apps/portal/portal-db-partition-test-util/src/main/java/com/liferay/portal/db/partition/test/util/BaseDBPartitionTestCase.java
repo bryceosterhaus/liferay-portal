@@ -190,6 +190,14 @@ public abstract class BaseDBPartitionTestCase {
 		db.runSQL("drop table if exists " + tableName + " cascade");
 	}
 
+	protected static void extractCompany(long companyId) throws Exception {
+		_executeOnDBPartitions(
+			new long[] {companyId},
+			currentCompanyId -> ReflectionTestUtil.invoke(
+				DBPartitionUtil.class, "_extractCompany",
+				new Class<?>[] {long.class}, companyId));
+	}
+
 	protected static void extractDBPartitions() throws Exception {
 		extractDBPartitions(COMPANY_IDS);
 	}
@@ -209,6 +217,12 @@ public abstract class BaseDBPartitionTestCase {
 	protected static String getCreateTableSQL(String tableName) {
 		return "create table " + tableName +
 			" (testColumn bigint primary key, companyId bigint)";
+	}
+
+	protected static String getExtractedPartitionName(long companyId) {
+		return ReflectionTestUtil.invoke(
+			DBPartitionUtil.class, "_getExtractedPartitionName",
+			new Class<?>[] {long.class}, companyId);
 	}
 
 	protected static String getPartitionName(long companyId) {

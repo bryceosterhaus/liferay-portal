@@ -199,7 +199,7 @@ const AccountSubscriptionCard = ({
 						/>
 					) : (
 						IconSVG && (
-							<div className="align-items-center cp-account-subscription-card-iconSvg d-flex">
+							<div className="align-items-center d-flex">
 								<IconSVG height={45} width={45} />
 							</div>
 						)
@@ -289,8 +289,8 @@ const AccountSubscriptionCard = ({
 										isValidPerpetualStartDate
 										? i18n.translate('not-applicable')
 										: getDateCustomFormat(
-											accountSubscription.startDate,
-											FORMAT_DATE_TYPES.day2DMonthSYearN
+											FORMAT_DATE_TYPES.day2DMonthSYearN,
+											accountSubscription.startDate
 										)}
 								</p>
 							</div>
@@ -311,8 +311,8 @@ const AccountSubscriptionCard = ({
 										isValidPerpetualStartDate
 										? i18n.translate('not-applicable')
 										: getDateCustomFormat(
-											accountSubscription.endDate,
-											FORMAT_DATE_TYPES.day2DMonthSYearN
+											FORMAT_DATE_TYPES.day2DMonthSYearN,
+											accountSubscription.endDate
 										)}
 								</p>
 							</div>

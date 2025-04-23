@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-import {Locator, Page} from '@playwright/test';
+import {Locator, Page, expect} from '@playwright/test';
 import path from 'path';
 
 import {ApplicationsMenuPage} from '../../../pages/product-navigation-applications-menu/ApplicationsMenuPage';
@@ -13,6 +13,7 @@ import {ExportImportPage} from './ExportImportPage';
 export class CompanyExportImportPage {
 	readonly page: Page;
 	readonly applicationsMenuPage: ApplicationsMenuPage;
+	readonly deletionsLabel: Locator;
 	readonly exportImportPage: ExportImportPage;
 	readonly rangeDateRangeEndDate: Locator;
 	readonly rangeDateRangeEndTime: Locator;
@@ -25,6 +26,9 @@ export class CompanyExportImportPage {
 	constructor(page: Page) {
 		this.page = page;
 		this.applicationsMenuPage = new ApplicationsMenuPage(page);
+		this.deletionsLabel = page
+			.getByLabel('Deletions', {exact: true})
+			.locator('label');
 		this.exportImportPage = new ExportImportPage(page);
 		this.rangeDateRangeEndDate = page.locator(
 			'[id="_com_liferay_exportimport_web_portlet_CompanyExportPortlet_endDate"]'
@@ -57,7 +61,7 @@ export class CompanyExportImportPage {
 
 		await this.page.getByTestId('creationMenuNewButton').nth(1).click();
 
-		await this.page.getByLabel(itemLabel).click();
+		await this.page.getByLabel(itemLabel, {exact: true}).click();
 
 		taskName
 			? await this.exportImportPage.title.fill(taskName)
@@ -116,7 +120,9 @@ export class CompanyExportImportPage {
 
 	async import(
 		filePath: string,
-		includePermissions: boolean = false
+		includePermissions: boolean = false,
+		expectedErrorMessage?: string,
+		useCurrentUser: boolean = false
 	): Promise<void> {
 		await this.applicationsMenuPage.goToImport();
 
@@ -124,10 +130,34 @@ export class CompanyExportImportPage {
 
 		await this.page.locator('input[type="file"]').setInputFiles(filePath);
 
+		if (expectedErrorMessage) {
+			await expect(
+				this.page.getByText(expectedErrorMessage)
+			).toBeVisible();
+
+			return;
+		}
+
 		await this.exportImportPage.continueButton.click();
 
 		if (includePermissions) {
 			await this.exportImportPage.importPermissionsButton.click();
+		}
+
+		if (useCurrentUser) {
+			if (
+				!(await this.exportImportPage.useCurrentUserAsAuthorCheckbox.isVisible())
+			) {
+				await this.page
+					.getByRole('button', {name: 'Authorship of the Content'})
+					.click();
+
+				await this.exportImportPage.useCurrentUserAsAuthorCheckbox.waitFor(
+					{state: 'visible'}
+				);
+			}
+
+			await this.exportImportPage.useCurrentUserAsAuthorCheckbox.check();
 		}
 
 		await this.exportImportPage.importButton.click();

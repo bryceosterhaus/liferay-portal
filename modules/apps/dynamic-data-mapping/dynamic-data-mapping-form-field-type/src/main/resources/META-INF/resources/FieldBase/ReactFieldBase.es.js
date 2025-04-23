@@ -14,6 +14,7 @@ import {
 	FieldFeedback,
 	Layout,
 	PagesVisitor,
+	useConfig,
 	useForm,
 	useFormState,
 } from 'data-engine-js-components-web';
@@ -107,7 +108,7 @@ const FieldInformation = ({popover, tooltip}) => {
 		<Popover {...popover} />
 	) : (
 		<span
-			className="c-ml-2 text-4 text-secondary"
+			className="c-ml-2 ddm-field-information text-4 text-secondary"
 			data-testid="tooltip"
 			tabIndex={0}
 			title={tooltip}
@@ -178,6 +179,7 @@ export default function FieldBase({
 	hideEditedFlag,
 	id,
 	instanceId,
+	isLocalizationSupported,
 	itemPath,
 	label,
 	localizedValue = {},
@@ -200,6 +202,7 @@ export default function FieldBase({
 	visible,
 	warningMessage,
 }) {
+	const {disableFieldRepetition} = useConfig();
 	const {editingLanguageId, pages} = useFormState();
 	const [disabledRepeatableButton, setDisabledRepeatableButton] =
 		useState(false);
@@ -255,6 +258,15 @@ export default function FieldBase({
 		name,
 		type,
 	]);
+
+	const nonLocalizableFieldMessage =
+		isLocalizationSupported === undefined
+			? Liferay.Language.get('this-field-cannot-be-localized')
+			: isLocalizationSupported
+				? Liferay.Language.get('translation-is-disabled-for-this-field')
+				: Liferay.Language.get(
+						'this-field-does-not-support-translations'
+					);
 
 	const renderLabel =
 		(label && showLabel) || hideField || repeatable || required || tooltip;
@@ -465,12 +477,20 @@ export default function FieldBase({
 	);
 
 	useEffect(() => {
-		Liferay.on('disableRepeatableButton', disableRepeatableButton);
+		if (disableFieldRepetition) {
+			setDisabledRepeatableButton(true);
+		}
+		else {
+			Liferay.on('disableRepeatableButton', disableRepeatableButton);
 
-		return () => {
-			Liferay.detach('disableRepeatableButton', disableRepeatableButton);
-		};
-	}, []);
+			return () => {
+				Liferay.detach(
+					'disableRepeatableButton',
+					disableRepeatableButton
+				);
+			};
+		}
+	}, [disableFieldRepetition]);
 
 	const markAsTranslated = useCallback(() => {
 		const pagesVisitor = new PagesVisitor(pages);
@@ -660,9 +680,7 @@ export default function FieldBase({
 
 							{showDisabledFieldIcon && (
 								<FieldInformation
-									tooltip={Liferay.Language.get(
-										'this-field-cannot-be-localized'
-									)}
+									tooltip={nonLocalizableFieldMessage}
 								/>
 							)}
 
@@ -701,9 +719,7 @@ export default function FieldBase({
 
 							{showDisabledFieldIcon && (
 								<FieldInformation
-									tooltip={Liferay.Language.get(
-										'this-field-cannot-be-localized'
-									)}
+									tooltip={nonLocalizableFieldMessage}
 								/>
 							)}
 

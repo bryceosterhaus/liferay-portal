@@ -5,15 +5,17 @@
 
 package com.liferay.site.cms.site.initializer.internal.display.context;
 
-import com.liferay.frontend.data.set.model.FDSActionDropdownItem;
+import com.liferay.depot.service.DepotEntryLocalService;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenu;
-import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenuBuilder;
-import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
+import com.liferay.object.constants.ObjectFolderConstants;
+import com.liferay.object.service.ObjectDefinitionService;
+import com.liferay.object.service.ObjectDefinitionSettingLocalService;
+import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -21,77 +23,55 @@ import javax.servlet.http.HttpServletRequest;
 /**
  * @author Jürgen Kappler
  */
-public class AllSectionDisplayContext {
+public class AllSectionDisplayContext extends BaseSectionDisplayContext {
 
-	public AllSectionDisplayContext(HttpServletRequest httpServletRequest) {
-		_httpServletRequest = httpServletRequest;
+	public AllSectionDisplayContext(
+		DepotEntryLocalService depotEntryLocalService,
+		GroupLocalService groupLocalService,
+		HttpServletRequest httpServletRequest, Language language,
+		ObjectDefinitionService objectDefinitionService,
+		ObjectDefinitionSettingLocalService
+			objectDefinitionSettingLocalService) {
+
+		super(
+			depotEntryLocalService, groupLocalService, httpServletRequest,
+			language, objectDefinitionService,
+			objectDefinitionSettingLocalService);
 	}
 
-	public String getAPIURL() {
-		return "/o/search/v1.0/search?emptySearch=true&nestedFields=embedded";
-	}
-
-	public List<DropdownItem> getBulkActionDropdownItems() {
-		return new ArrayList<>();
-	}
-
+	@Override
 	public CreationMenu getCreationMenu() {
-		return CreationMenuBuilder.addPrimaryDropdownItem(
-			dropdownItem -> {
-				dropdownItem.setIcon("forms");
-				dropdownItem.setLabel(
-					LanguageUtil.get(_httpServletRequest, "basic-content"));
+		return new CreationMenu() {
+			{
+				addStructureContentDropdownItems(this);
 			}
-		).addPrimaryDropdownItem(
-			dropdownItem -> {
-				dropdownItem.setIcon("upload");
-				dropdownItem.setLabel(
-					LanguageUtil.get(_httpServletRequest, "single-file"));
-			}
-		).addPrimaryDropdownItem(
-			dropdownItem -> {
-				dropdownItem.setIcon("upload-multiple");
-				dropdownItem.setLabel(
-					LanguageUtil.get(_httpServletRequest, "multiple-files"));
-			}
-		).addPrimaryDropdownItem(
-			dropdownItem -> {
-				dropdownItem.setIcon("blogs");
-				dropdownItem.setLabel(
-					LanguageUtil.get(_httpServletRequest, "blog"));
-			}
-		).addPrimaryDropdownItem(
-			dropdownItem -> {
-				dropdownItem.setIcon("wiki");
-				dropdownItem.setLabel(
-					LanguageUtil.get(_httpServletRequest, "knowledge-base"));
-			}
-		).addPrimaryDropdownItem(
-			dropdownItem -> {
-				dropdownItem.setIcon("video");
-				dropdownItem.setLabel(
-					LanguageUtil.get(
-						_httpServletRequest, "external-video-shortcut"));
-			}
-		).build();
+		};
 	}
 
+	@Override
 	public Map<String, Object> getEmptyState() {
 		return HashMapBuilder.<String, Object>put(
 			"description",
 			LanguageUtil.get(
-				_httpServletRequest, "click-new-to-create-your-first-asset")
+				httpServletRequest, "click-new-to-create-your-first-asset")
 		).put(
 			"image", "/states/cms_empty_state.svg"
 		).put(
-			"title", LanguageUtil.get(_httpServletRequest, "no-assets-yet")
+			"title", LanguageUtil.get(httpServletRequest, "no-assets-yet")
 		).build();
 	}
 
-	public List<FDSActionDropdownItem> getFDSActionDropdownItems() {
-		return new ArrayList<>();
+	@Override
+	public String[] getObjectFolderExternalReferenceCodes() {
+		return new String[] {
+			ObjectFolderConstants.EXTERNAL_REFERENCE_CODE_CONTENT_STRUCTURES,
+			ObjectFolderConstants.EXTERNAL_REFERENCE_CODE_FILE_TYPES
+		};
 	}
 
-	private final HttpServletRequest _httpServletRequest;
+	@Override
+	protected String getCMSSectionFilterString() {
+		return StringPool.BLANK;
+	}
 
 }

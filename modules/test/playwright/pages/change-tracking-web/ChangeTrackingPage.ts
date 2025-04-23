@@ -13,7 +13,6 @@ import {waitForAlert} from '../../utils/waitForAlert';
 import {InstanceSettingsPage} from '../configuration-admin-web/InstanceSettingsPage';
 
 export class ChangeTrackingPage {
-	readonly bulkDeleteButton: Locator;
 	readonly frontendDataSetEntries: Locator;
 	readonly instanceSettingsPage: InstanceSettingsPage;
 	readonly page: Page;
@@ -21,11 +20,6 @@ export class ChangeTrackingPage {
 	readonly tabsContainer: Locator;
 
 	constructor(page: Page) {
-		this.bulkDeleteButton = page
-			.locator('[data-testid="visualization-mode-table"]')
-			.locator('.bulk-actions')
-			.getByRole('button')
-			.nth(1);
 		this.frontendDataSetEntries = page.locator(
 			'[data-testid="visualization-mode-table"]'
 		);
@@ -199,11 +193,7 @@ export class ChangeTrackingPage {
 	}
 
 	async enablePublications(check: boolean) {
-		await this.page.getByLabel('Open Applications MenuCtrl+Alt+A').click();
-
-		await this.page.getByRole('menuitem', {name: 'Publications'}).click();
-
-		await expect(this.page.getByText('Enable Publications')).toBeVisible();
+		await this.goToPublicationsViaApplicationMenu();
 
 		const checkBox = this.page.getByRole('checkbox', {
 			name: 'Enable Publications',
@@ -239,6 +229,14 @@ export class ChangeTrackingPage {
 		}
 	}
 
+	async goToPublicationsViaApplicationMenu() {
+		await this.page.getByLabel('Open Applications MenuCtrl+Alt+A').click();
+
+		await this.page.getByRole('menuitem', {name: 'Publications'}).click();
+
+		await expect(this.page.getByText('Enable Publications')).toBeVisible();
+	}
+
 	async goToPublicationHistory() {
 		await this.goto();
 
@@ -272,6 +270,27 @@ export class ChangeTrackingPage {
 			.filter({hasText: 'History'})
 			.first()
 			.click();
+
+		await this.page
+			.locator('#fnsd___table-id div')
+			.filter({hasText: title})
+			.first()
+			.waitFor();
+
+		await this.page.getByRole('link', {exact: true, name: title}).click();
+
+		await this.page
+			.locator(
+				'#_com_liferay_change_tracking_web_portlet_PublicationsPortlet_controlMenu'
+			)
+			.filter({hasText: 'Review Changes'})
+			.waitFor();
+	}
+
+	async goToReviewChangesScheduled(title: string) {
+		await this.goto();
+
+		await this.selectTab('Scheduled');
 
 		await this.page
 			.locator('#fnsd___table-id div')

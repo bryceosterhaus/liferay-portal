@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-import {defineConfig, devices} from '@playwright/test';
+import {ReporterDescription, defineConfig, devices} from '@playwright/test';
 
 import 'dotenv/config';
 
@@ -52,6 +52,7 @@ import {config as dynamicDataMappingFormWebConfig} from './tests/dynamic-data-ma
 import {config as exportImportWebConfig} from './tests/export-import-web/config';
 import {config as featureFlagWebConfig} from './tests/feature-flag-web/config';
 import {config as fragmentWebConfig} from './tests/fragment-web/config';
+import {config as friendlyURLConfig} from './tests/friendly-url-web/config';
 import {config as frontendDataSetAdminWebConfig} from './tests/frontend-data-set-admin-web/config';
 import {config as frontendDataSetWebConfig} from './tests/frontend-data-set-web/config';
 import {config as frontendEditorCKEditorWebConfig} from './tests/frontend-editor-ckeditor-web/config';
@@ -88,6 +89,8 @@ import {config as portalLanguageOverrideWebConfig} from './tests/portal-language
 import {config as portalSearchAdminWebConfig} from './tests/portal-search-admin-web/config';
 import {config as portalSearchWebConfig} from './tests/portal-search-web/config';
 import {config as portalSecurityAuditWebConfig} from './tests/portal-security-audit-web/config';
+import {config as portalSecurityContentSecurityPolicyConfig} from './tests/portal-security-content-security-policy/config';
+import {config as portalSecurityLdapConfig} from './tests/portal-security-ldap/config';
 import {config as portalSecurityScriptManagementWebConfig} from './tests/portal-security-script-management-web/config';
 import {config as portalSecurityServiceAccessPolicyService} from './tests/portal-security-service-access-policy-service/config';
 import {config as portalToolsRestBuilderTestImpl} from './tests/portal-tools-rest-builder-test-impl/config';
@@ -100,6 +103,7 @@ import {config as portletConfigurationWebConfig} from './tests/portlet-configura
 import {config as productNavigationProductMenuWeb} from './tests/product-navigation-product-menu-web/config';
 import {config as productNavigationUserPersonalBarWebConfig} from './tests/product-navigation-user-personal-bar-web/config';
 import {config as questionsWebConfig} from './tests/questions-web/config';
+import {config as redirectWebConfig} from './tests/redirect-web/config';
 import {config as rolesAdminWebConfig} from './tests/roles-admin-web/config';
 import {config as rssWebConfig} from './tests/rss-web/config';
 import {config as samlWebConfig} from './tests/saml-web/config';
@@ -112,10 +116,13 @@ import {
 	pageManagementSiteTeardown,
 } from './tests/setup/page-management-site/config';
 import {config as siteAdminWebConfig} from './tests/site-admin-web/config';
+import {config as siteCmsSiteInitializerConfig} from './tests/site-cms-site-initializer/config';
 import {config as siteNavigationAdminWebConfig} from './tests/site-navigation-admin-web/config';
 import {config as siteNavigationBreadcrumbWebConfig} from './tests/site-navigation-breadcrumb-web/config';
+import {config as siteNavigationDirectoryWebConfig} from './tests/site-navigation-directory-web/config';
 import {config as siteNavigationLanguageWebConfig} from './tests/site-navigation-language-web/config';
-import {config as stableConfig} from './tests/stable/config';
+import {config as siteNavigationMenuWebConfig} from './tests/site-navigation-menu-web/config';
+import {config as smokeConfig} from './tests/smoke/config';
 import {config as stagingConfig} from './tests/staging-configuration-web/config';
 import {config as stylebookWebConfig} from './tests/style-book-web/config';
 import {config as templateWebConfig} from './tests/template-web/config';
@@ -125,7 +132,10 @@ import {config as customerConfig} from './tests/workspaces/liferay-customer-work
 import {config as commerceWorkspaceConfig} from './tests/workspaces/liferay-workspace-commerce/config';
 import {config as jethr0Config} from './tests/workspaces/liferay-workspace-jethr0/config';
 import {config as marketplaceConfig} from './tests/workspaces/liferay-workspace-marketplace/config';
+
 const setupProjects = [pageManagementSiteSetup, pageManagementSiteTeardown];
+
+const resultsPath = 'test-results/TEST-playwright.xml';
 
 export default defineConfig({
 	expect: {
@@ -181,6 +191,7 @@ export default defineConfig({
 		exportImportWebConfig,
 		featureFlagWebConfig,
 		fragmentWebConfig,
+		friendlyURLConfig,
 		frontendDataSetAdminWebConfig,
 		frontendDataSetWebConfig,
 		frontendEditorCKEditorWebConfig,
@@ -219,6 +230,8 @@ export default defineConfig({
 		portalSearchAdminWebConfig,
 		portalSearchWebConfig,
 		portalSecurityAuditWebConfig,
+		portalSecurityContentSecurityPolicyConfig,
+		portalSecurityLdapConfig,
 		portalSecurityScriptManagementWebConfig,
 		portalSecurityServiceAccessPolicyService,
 		portalToolsRestBuilderTestImpl,
@@ -231,6 +244,7 @@ export default defineConfig({
 		productNavigationProductMenuWeb,
 		productNavigationUserPersonalBarWebConfig,
 		questionsWebConfig,
+		redirectWebConfig,
 		rolesAdminWebConfig,
 		rssWebConfig,
 		samlWebConfig,
@@ -239,10 +253,13 @@ export default defineConfig({
 		segmentExperimentWebConfig,
 		segmentsWebConfig,
 		siteAdminWebConfig,
+		siteCmsSiteInitializerConfig,
 		siteNavigationAdminWebConfig,
 		siteNavigationBreadcrumbWebConfig,
+		siteNavigationDirectoryWebConfig,
 		siteNavigationLanguageWebConfig,
-		stableConfig,
+		siteNavigationMenuWebConfig,
+		smokeConfig,
 		stagingConfig,
 		stylebookWebConfig,
 		templateWebConfig,
@@ -263,9 +280,19 @@ export default defineConfig({
 		[
 			'junit',
 			{
-				outputFile: 'test-results/TEST-playwright.xml',
+				outputFile: resultsPath,
 			},
 		],
+		...(process.env.ci
+			? ([
+					[
+						'./reporters/FlakyTestReporter',
+						{
+							resultsPath,
+						},
+					],
+				] as ReporterDescription[])
+			: []),
 	],
 	retries: process.env.CI ? 1 : 0,
 	testDir: './tests',

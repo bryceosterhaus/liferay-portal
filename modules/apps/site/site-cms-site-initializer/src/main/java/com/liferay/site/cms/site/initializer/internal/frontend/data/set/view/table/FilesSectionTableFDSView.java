@@ -34,16 +34,22 @@ public class FilesSectionTableFDSView extends BaseTableFDSView {
 		return fdsTableSchemaBuilder.add(
 			"embedded.title", "title",
 			fdsTableSchemaField -> fdsTableSchemaField.setContentRenderer(
-				"embedded.title"
+				"title"
 			).setSortable(
 				true
 			)
 		).add(
-			"embedded.creator.name", "author"
+			"embedded.objectDefinitionName", "type",
+			fdsTableSchemaField -> fdsTableSchemaField.setContentRenderer(
+				"typeTableCellRenderer")
 		).add(
-			"embedded.documentType.name", "type"
+			"embedded.scopeKey", "space",
+			fdsTableSchemaField -> fdsTableSchemaField.setContentRenderer(
+				"spaceTableCellRenderer")
 		).add(
-			"embedded.siteId", "space"
+			"embedded.creator.name", "author",
+			fdsTableSchemaField -> fdsTableSchemaField.setContentRenderer(
+				"authorTableCellRenderer")
 		).add(
 			"dateModified", "modified",
 			fdsTableSchemaField -> fdsTableSchemaField.setContentRenderer(
@@ -52,9 +58,9 @@ public class FilesSectionTableFDSView extends BaseTableFDSView {
 				true
 			)
 		).add(
-			"embedded.status", "status"
-		).add(
-			"embdedded.actions", "actions"
+			"embedded.status", "status",
+			fdsTableSchemaField -> fdsTableSchemaField.setContentRenderer(
+				"status")
 		).build();
 	}
 

@@ -37,10 +37,10 @@ import com.liferay.fragment.model.FragmentCollection;
 import com.liferay.fragment.model.FragmentEntry;
 import com.liferay.fragment.service.FragmentCollectionLocalService;
 import com.liferay.fragment.service.FragmentEntryLocalService;
+import com.liferay.headless.delivery.client.custom.field.CustomField;
+import com.liferay.headless.delivery.client.custom.field.CustomValue;
 import com.liferay.headless.delivery.client.dto.v1_0.ClientExtension;
 import com.liferay.headless.delivery.client.dto.v1_0.ContentDocument;
-import com.liferay.headless.delivery.client.dto.v1_0.CustomField;
-import com.liferay.headless.delivery.client.dto.v1_0.CustomValue;
 import com.liferay.headless.delivery.client.dto.v1_0.OpenGraphSettings;
 import com.liferay.headless.delivery.client.dto.v1_0.PageDefinition;
 import com.liferay.headless.delivery.client.dto.v1_0.PageElement;
@@ -216,15 +216,15 @@ public class SitePageResourceTest extends BaseSitePageResourceTestCase {
 
 		Layout layout = LayoutTestUtil.addTypeContentLayout(testGroup);
 
-		String friendlyURL = layout.getFriendlyURL();
-
 		Layout draftLayout = layout.fetchDraftLayout();
+
+		ContentLayoutTestUtil.publishLayout(draftLayout, layout);
+
+		String friendlyURL = layout.getFriendlyURL();
 
 		SegmentsExperience segmentsExperience =
 			SegmentsTestUtil.addSegmentsExperience(
 				testGroup.getGroupId(), draftLayout.getPlid());
-
-		ContentLayoutTestUtil.publishLayout(draftLayout, layout);
 
 		Assert.assertNotNull(
 			sitePageResource.getSiteSitePageExperienceExperienceKeyRenderedPage(
@@ -839,7 +839,7 @@ public class SitePageResourceTest extends BaseSitePageResourceTestCase {
 				RandomTestUtil.randomString(), StringPool.BLANK,
 				"<lfr-editable id=\"fragmentEditableId\" type=\"text\">" +
 					"Default Fragment Text</lfr-editable>",
-				StringPool.BLANK, false, null, null, 0, false,
+				StringPool.BLANK, false, null, null, 0, false, false,
 				FragmentConstants.TYPE_COMPONENT, null,
 				WorkflowConstants.STATUS_APPROVED, serviceContext);
 

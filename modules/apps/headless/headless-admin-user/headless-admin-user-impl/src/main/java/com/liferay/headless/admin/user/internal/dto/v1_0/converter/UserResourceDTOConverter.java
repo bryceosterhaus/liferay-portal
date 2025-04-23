@@ -29,12 +29,11 @@ import com.liferay.headless.admin.user.dto.v1_0.UserAccount;
 import com.liferay.headless.admin.user.dto.v1_0.UserAccountContactInformation;
 import com.liferay.headless.admin.user.dto.v1_0.UserGroupBrief;
 import com.liferay.headless.admin.user.dto.v1_0.WebUrl;
+import com.liferay.headless.admin.user.internal.dto.v1_0.converter.constants.DTOConverterConstants;
 import com.liferay.headless.admin.user.internal.dto.v1_0.util.CreatorUtil;
-import com.liferay.headless.admin.user.internal.dto.v1_0.util.CustomFieldsUtil;
 import com.liferay.headless.admin.user.internal.dto.v1_0.util.EmailAddressUtil;
 import com.liferay.headless.admin.user.internal.dto.v1_0.util.PermissionUtil;
 import com.liferay.headless.admin.user.internal.dto.v1_0.util.PhoneUtil;
-import com.liferay.headless.admin.user.internal.dto.v1_0.util.PostalAddressUtil;
 import com.liferay.headless.admin.user.internal.dto.v1_0.util.RoleBriefUtil;
 import com.liferay.headless.admin.user.internal.dto.v1_0.util.ServiceBuilderListTypeUtil;
 import com.liferay.headless.admin.user.internal.dto.v1_0.util.TaxonomyCategoryBriefUtil;
@@ -42,6 +41,7 @@ import com.liferay.headless.admin.user.internal.dto.v1_0.util.WebUrlUtil;
 import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.model.Address;
 import com.liferay.portal.kernel.model.Contact;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.GroupConstants;
@@ -54,7 +54,6 @@ import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.security.permission.UserBag;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
-import com.liferay.portal.kernel.service.ContactService;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.PermissionService;
 import com.liferay.portal.kernel.service.ResourceActionLocalService;
@@ -71,8 +70,11 @@ import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.security.permission.UserBagFactoryUtil;
+import com.liferay.portal.vulcan.custom.field.CustomFieldsUtil;
 import com.liferay.portal.vulcan.dto.converter.DTOConverter;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterContext;
+import com.liferay.portal.vulcan.dto.converter.DTOConverterRegistry;
+import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
 import com.liferay.portal.vulcan.fields.NestedFieldsSupplier;
 import com.liferay.portal.vulcan.util.LocalizedMapUtil;
 
@@ -158,8 +160,9 @@ public class UserResourceDTOConverter
 					});
 				setCreator(
 					() -> {
-						Contact contact = _contactService.getContact(
-							user.getContactId());
+						if (contact == null) {
+							return null;
+						}
 
 						return NestedFieldsSupplier.supply(
 							"creator",
@@ -366,12 +369,15 @@ public class UserResourceDTOConverter
 							setPostalAddresses(
 								() -> TransformUtil.transformToArray(
 									user.getAddresses(),
-									address ->
-										PostalAddressUtil.toPostalAddress(
+									address -> _postalAddressDTOConverter.toDTO(
+										new DefaultDTOConverterContext(
 											dtoConverterContext.
 												isAcceptAllLanguages(),
-											address, user.getCompanyId(),
-											dtoConverterContext.getLocale()),
+											null, _dtoConverterRegistry,
+											address.getAddressId(),
+											dtoConverterContext.getLocale(),
+											dtoConverterContext.getUriInfo(),
+											dtoConverterContext.getUser())),
 									PostalAddress.class));
 							setSkype(
 								() -> {
@@ -456,6 +462,7 @@ public class UserResourceDTOConverter
 						accountRole -> _toRoleBrief(
 							accountRole, dtoConverterContext),
 						RoleBrief.class));
+				setType(accountEntry::getType);
 			}
 		};
 	}
@@ -584,7 +591,7 @@ public class UserResourceDTOConverter
 	private AssetTagLocalService _assetTagLocalService;
 
 	@Reference
-	private ContactService _contactService;
+	private DTOConverterRegistry _dtoConverterRegistry;
 
 	@Reference
 	private GroupLocalService _groupLocalService;
@@ -594,6 +601,9 @@ public class UserResourceDTOConverter
 
 	@Reference
 	private Portal _portal;
+
+	@Reference(target = DTOConverterConstants.POSTAL_ADDRESS_DTO_CONVERTER)
+	private DTOConverter<Address, PostalAddress> _postalAddressDTOConverter;
 
 	@Reference
 	private ResourceActionLocalService _resourceActionLocalService;

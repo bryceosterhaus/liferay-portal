@@ -1,10 +1,18 @@
 {
-	"friendlyURL": "/spaces",
-	"hidden": false,
+	"friendlyURL": "/all-spaces",
+	"hidden": true,
 	"name_i18n": {
-		"en_US": "Spaces"
+		"en_US": "All Spaces"
 	},
+	"permissions": [
+		{
+			"actionIds": [
+			],
+			"roleName": "Guest",
+			"scope": 4
+		}
+	],
 	"private": false,
 	"system": false,
-	"type": "node"
+	"type": "Content"
 }

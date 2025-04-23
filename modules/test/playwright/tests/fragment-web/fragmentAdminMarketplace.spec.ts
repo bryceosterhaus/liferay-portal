@@ -12,6 +12,7 @@ import {isolatedSiteTest} from '../../fixtures/isolatedSiteTest';
 import {loginTest} from '../../fixtures/loginTest';
 import {pageEditorPagesTest} from '../../fixtures/pageEditorPagesTest';
 import {pageManagementSiteTest} from '../../fixtures/pageManagementSiteTest';
+import getRandomString from '../../utils/getRandomString';
 import performLogin, {performLogout, userData} from '../../utils/performLogin';
 
 const test = mergeTests(
@@ -62,7 +63,7 @@ test(
 
 		await fragmentsPage.goto(site.friendlyUrlPath);
 
-		await expect(page.locator('[id$="marketplaceBadge"]')).toBeVisible();
+		await expect(page.locator('.notification')).toBeVisible();
 
 		// Click the marketplace button and wait for the modal
 
@@ -78,9 +79,7 @@ test(
 
 		await page.getByRole('button', {name: 'Cancel'}).click();
 
-		await expect(
-			page.locator('[id$="marketplaceBadge"]')
-		).not.toBeVisible();
+		await expect(page.locator('.notification')).not.toBeVisible();
 	}
 );
 
@@ -89,7 +88,31 @@ test(
 	{
 		tag: ['@LPD-48223'],
 	},
-	async ({fragmentsPage, page, site}) => {
+	async ({apiHelpers, fragmentsPage, page, site}) => {
+
+		// Create a new user with admin role
+
+		const user = await apiHelpers.headlessAdminUser.postUserAccount();
+
+		userData[user.alternateName] = {
+			name: user.givenName,
+			password: 'test',
+			surname: user.familyName,
+		};
+
+		const role =
+			await apiHelpers.headlessAdminUser.getRoleByName('Administrator');
+
+		await apiHelpers.headlessAdminUser.assignUserToRole(
+			role.externalReferenceCode,
+			user.id
+		);
+
+		// Log in with the new user
+
+		await performLogout(page);
+
+		await performLogin(page, user.alternateName);
 
 		// Go to fragment administration and click the marketplace button
 
@@ -104,18 +127,72 @@ test(
 				.getByRole('dialog')
 				.getByRole('heading', {name: 'Marketplace is now in'})
 		).toBeVisible();
+	}
+);
+
+test(
+	'Check available actions of marketplace fragment',
+	{
+		tag: '@LPD-34938',
+	},
+	async ({apiHelpers, fragmentsPage, page, site}) => {
+
+		// Create new fragment collection
+
+		const fragmentCollectionName = getRandomString();
+
+		const {fragmentCollectionId} =
+			await apiHelpers.jsonWebServicesFragmentCollection.addFragmentCollection(
+				{
+					groupId: site.id,
+					name: fragmentCollectionName,
+				}
+			);
+
+		const fragmentName = getRandomString();
+
+		await apiHelpers.jsonWebServicesFragmentEntry.addFragmentEntry({
+			fragmentCollectionId,
+			groupId: site.id,
+			html: `<div class="fragment-example">
+				  Example marketplace fragment
+				</div>`,
+			marketplace: true,
+			name: fragmentName,
+			type: 'component',
+		});
+
+		// Go to fragment administration
+
+		await fragmentsPage.goto(site.friendlyUrlPath);
+
+		// Click the More Actions button to open the actions
 
 		await page
-			.getByRole('dialog')
-			.getByLabel('Explore Marketplace')
+			.locator('.card-row')
+			.filter({hasText: fragmentName})
+			.getByLabel('More actions')
 			.click();
 
-		// Wait for the modal with fragments to appear
+		// Check available actions
 
-		await expect(
-			page
-				.getByRole('dialog')
-				.getByRole('heading', {name: 'Add from Marketplace'})
-		).toBeVisible();
+		['View Usages', 'Move', 'Delete'].forEach(async (action) => {
+			await expect(
+				page.getByRole('menuitem', {name: action})
+			).toBeVisible();
+		});
+
+		[
+			'Edit',
+			'Change Thumbnail',
+			'Mark as Cacheable',
+			'Export',
+			'Make a Copy',
+			'Rename',
+		].forEach(async (action) => {
+			await expect(
+				page.getByRole('menuitem', {name: action})
+			).not.toBeVisible();
+		});
 	}
 );

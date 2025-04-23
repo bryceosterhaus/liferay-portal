@@ -174,7 +174,6 @@ test('LPD-22768 Add options to interact with the same entity in other publicatio
 
 test('LPD-38392 Assert View Entity Modification History sorting', async ({
 	apiHelpers,
-	changeTrackingPage,
 	journalPage,
 	page,
 }) => {
@@ -184,7 +183,6 @@ test('LPD-38392 Assert View Entity Modification History sorting', async ({
 
 	date = moment().format('ll');
 
-	await changeTrackingPage.workOnProduction();
 	await goToPublicationTimelineModal(page, journalPage);
 	const entityHistoryModalLocator = getEntityHistoryTableLocator(page);
 

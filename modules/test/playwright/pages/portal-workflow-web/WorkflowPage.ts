@@ -24,10 +24,10 @@ export class WorkflowPage {
 
 	async changeWorkflow(
 		asset: string,
-		value: 'Single Approver' | 'No Workflow',
+		value: string,
 		{disable} = {disable: false}
 	) {
-		const row = await this.page.getByRole('row').filter({hasText: asset});
+		const row = this.page.getByRole('row').filter({hasText: asset});
 
 		await clickAndExpectToBeVisible({
 			target: row.getByRole('button', {name: 'Save'}),

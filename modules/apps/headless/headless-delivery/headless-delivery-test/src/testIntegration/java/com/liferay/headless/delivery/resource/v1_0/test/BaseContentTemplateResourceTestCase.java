@@ -37,7 +37,7 @@ import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
-import com.liferay.portal.kernel.util.DateFormatFactoryUtil;
+import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -52,7 +52,7 @@ import com.liferay.portal.vulcan.resource.EntityModelResource;
 
 import java.lang.reflect.Method;
 
-import java.text.DateFormat;
+import java.text.Format;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -91,7 +91,7 @@ public abstract class BaseContentTemplateResourceTestCase {
 
 	@BeforeClass
 	public static void setUpClass() throws Exception {
-		_dateFormat = DateFormatFactoryUtil.getSimpleDateFormat(
+		_format = FastDateFormatFactoryUtil.getSimpleDateFormat(
 			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 	}
 
@@ -116,12 +116,12 @@ public abstract class BaseContentTemplateResourceTestCase {
 
 		_contentTemplateResource.setContextCompany(testCompany);
 
-		com.liferay.portal.kernel.model.User testCompanyAdminUser =
-			UserTestUtil.getAdminUser(testCompany.getCompanyId());
+		_testCompanyAdminUser = UserTestUtil.getAdminUser(
+			testCompany.getCompanyId());
 
 		contentTemplateResource = ContentTemplateResource.builder(
 		).authentication(
-			testCompanyAdminUser.getEmailAddress(),
+			_testCompanyAdminUser.getEmailAddress(),
 			PropsValues.DEFAULT_ADMIN_PASSWORD
 		).endpoint(
 			testCompany.getVirtualHostname(), 8080, "http"
@@ -658,6 +658,165 @@ public abstract class BaseContentTemplateResourceTestCase {
 	}
 
 	@Test
+	public void testGetSiteContentTemplate() throws Exception {
+		ContentTemplate postContentTemplate =
+			testGetSiteContentTemplate_addContentTemplate();
+
+		ContentTemplate getContentTemplate =
+			contentTemplateResource.getSiteContentTemplate(
+				testGetSiteContentTemplate_getSiteId(postContentTemplate),
+				postContentTemplate.getId());
+
+		assertEquals(postContentTemplate, getContentTemplate);
+		assertValid(getContentTemplate);
+	}
+
+	protected Long testGetSiteContentTemplate_getSiteId(
+			ContentTemplate contentTemplate)
+		throws Exception {
+
+		return contentTemplate.getSiteId();
+	}
+
+	protected ContentTemplate testGetSiteContentTemplate_addContentTemplate()
+		throws Exception {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	@Test
+	public void testGraphQLGetSiteContentTemplate() throws Exception {
+		ContentTemplate contentTemplate =
+			testGraphQLGetSiteContentTemplate_addContentTemplate();
+
+		// No namespace
+
+		Assert.assertTrue(
+			equals(
+				contentTemplate,
+				ContentTemplateSerDes.toDTO(
+					JSONUtil.getValueAsString(
+						invokeGraphQLQuery(
+							new GraphQLField(
+								"contentTemplate",
+								new HashMap<String, Object>() {
+									{
+										put(
+											"siteKey",
+											"\"" +
+												testGraphQLGetSiteContentTemplate_getSiteId(
+													contentTemplate) + "\"");
+
+										put(
+											"contentTemplateId",
+											"\"" + contentTemplate.getId() +
+												"\"");
+									}
+								},
+								getGraphQLFields())),
+						"JSONObject/data", "Object/contentTemplate"))));
+
+		// Using the namespace headlessDelivery_v1_0
+
+		Assert.assertTrue(
+			equals(
+				contentTemplate,
+				ContentTemplateSerDes.toDTO(
+					JSONUtil.getValueAsString(
+						invokeGraphQLQuery(
+							new GraphQLField(
+								"headlessDelivery_v1_0",
+								new GraphQLField(
+									"contentTemplate",
+									new HashMap<String, Object>() {
+										{
+											put(
+												"siteKey",
+												"\"" +
+													testGraphQLGetSiteContentTemplate_getSiteId(
+														contentTemplate) +
+															"\"");
+
+											put(
+												"contentTemplateId",
+												"\"" + contentTemplate.getId() +
+													"\"");
+										}
+									},
+									getGraphQLFields()))),
+						"JSONObject/data", "JSONObject/headlessDelivery_v1_0",
+						"Object/contentTemplate"))));
+	}
+
+	protected Long testGraphQLGetSiteContentTemplate_getSiteId(
+			ContentTemplate contentTemplate)
+		throws Exception {
+
+		return contentTemplate.getSiteId();
+	}
+
+	@Test
+	public void testGraphQLGetSiteContentTemplateNotFound() throws Exception {
+		String irrelevantContentTemplateId =
+			"\"" + RandomTestUtil.randomString() + "\"";
+
+		// No namespace
+
+		Assert.assertEquals(
+			"Not Found",
+			JSONUtil.getValueAsString(
+				invokeGraphQLQuery(
+					new GraphQLField(
+						"contentTemplate",
+						new HashMap<String, Object>() {
+							{
+								put(
+									"siteKey",
+									"\"" + irrelevantGroup.getGroupId() + "\"");
+								put(
+									"contentTemplateId",
+									irrelevantContentTemplateId);
+							}
+						},
+						getGraphQLFields())),
+				"JSONArray/errors", "Object/0", "JSONObject/extensions",
+				"Object/code"));
+
+		// Using the namespace headlessDelivery_v1_0
+
+		Assert.assertEquals(
+			"Not Found",
+			JSONUtil.getValueAsString(
+				invokeGraphQLQuery(
+					new GraphQLField(
+						"headlessDelivery_v1_0",
+						new GraphQLField(
+							"contentTemplate",
+							new HashMap<String, Object>() {
+								{
+									put(
+										"siteKey",
+										"\"" + irrelevantGroup.getGroupId() +
+											"\"");
+									put(
+										"contentTemplateId",
+										irrelevantContentTemplateId);
+								}
+							},
+							getGraphQLFields()))),
+				"JSONArray/errors", "Object/0", "JSONObject/extensions",
+				"Object/code"));
+	}
+
+	protected ContentTemplate
+			testGraphQLGetSiteContentTemplate_addContentTemplate()
+		throws Exception {
+
+		return testGraphQLContentTemplate_addContentTemplate();
+	}
+
+	@Test
 	public void testGetSiteContentTemplatesPage() throws Exception {
 		Long siteId = testGetSiteContentTemplatesPage_getSiteId();
 		Long irrelevantSiteId =
@@ -1167,165 +1326,6 @@ public abstract class BaseContentTemplateResourceTestCase {
 
 	protected ContentTemplate
 			testGraphQLGetSiteContentTemplatesPage_addContentTemplate()
-		throws Exception {
-
-		return testGraphQLContentTemplate_addContentTemplate();
-	}
-
-	@Test
-	public void testGetSiteContentTemplate() throws Exception {
-		ContentTemplate postContentTemplate =
-			testGetSiteContentTemplate_addContentTemplate();
-
-		ContentTemplate getContentTemplate =
-			contentTemplateResource.getSiteContentTemplate(
-				testGetSiteContentTemplate_getSiteId(postContentTemplate),
-				postContentTemplate.getId());
-
-		assertEquals(postContentTemplate, getContentTemplate);
-		assertValid(getContentTemplate);
-	}
-
-	protected Long testGetSiteContentTemplate_getSiteId(
-			ContentTemplate contentTemplate)
-		throws Exception {
-
-		return contentTemplate.getSiteId();
-	}
-
-	protected ContentTemplate testGetSiteContentTemplate_addContentTemplate()
-		throws Exception {
-
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
-	}
-
-	@Test
-	public void testGraphQLGetSiteContentTemplate() throws Exception {
-		ContentTemplate contentTemplate =
-			testGraphQLGetSiteContentTemplate_addContentTemplate();
-
-		// No namespace
-
-		Assert.assertTrue(
-			equals(
-				contentTemplate,
-				ContentTemplateSerDes.toDTO(
-					JSONUtil.getValueAsString(
-						invokeGraphQLQuery(
-							new GraphQLField(
-								"contentTemplate",
-								new HashMap<String, Object>() {
-									{
-										put(
-											"siteKey",
-											"\"" +
-												testGraphQLGetSiteContentTemplate_getSiteId(
-													contentTemplate) + "\"");
-
-										put(
-											"contentTemplateId",
-											"\"" + contentTemplate.getId() +
-												"\"");
-									}
-								},
-								getGraphQLFields())),
-						"JSONObject/data", "Object/contentTemplate"))));
-
-		// Using the namespace headlessDelivery_v1_0
-
-		Assert.assertTrue(
-			equals(
-				contentTemplate,
-				ContentTemplateSerDes.toDTO(
-					JSONUtil.getValueAsString(
-						invokeGraphQLQuery(
-							new GraphQLField(
-								"headlessDelivery_v1_0",
-								new GraphQLField(
-									"contentTemplate",
-									new HashMap<String, Object>() {
-										{
-											put(
-												"siteKey",
-												"\"" +
-													testGraphQLGetSiteContentTemplate_getSiteId(
-														contentTemplate) +
-															"\"");
-
-											put(
-												"contentTemplateId",
-												"\"" + contentTemplate.getId() +
-													"\"");
-										}
-									},
-									getGraphQLFields()))),
-						"JSONObject/data", "JSONObject/headlessDelivery_v1_0",
-						"Object/contentTemplate"))));
-	}
-
-	protected Long testGraphQLGetSiteContentTemplate_getSiteId(
-			ContentTemplate contentTemplate)
-		throws Exception {
-
-		return contentTemplate.getSiteId();
-	}
-
-	@Test
-	public void testGraphQLGetSiteContentTemplateNotFound() throws Exception {
-		String irrelevantContentTemplateId =
-			"\"" + RandomTestUtil.randomString() + "\"";
-
-		// No namespace
-
-		Assert.assertEquals(
-			"Not Found",
-			JSONUtil.getValueAsString(
-				invokeGraphQLQuery(
-					new GraphQLField(
-						"contentTemplate",
-						new HashMap<String, Object>() {
-							{
-								put(
-									"siteKey",
-									"\"" + irrelevantGroup.getGroupId() + "\"");
-								put(
-									"contentTemplateId",
-									irrelevantContentTemplateId);
-							}
-						},
-						getGraphQLFields())),
-				"JSONArray/errors", "Object/0", "JSONObject/extensions",
-				"Object/code"));
-
-		// Using the namespace headlessDelivery_v1_0
-
-		Assert.assertEquals(
-			"Not Found",
-			JSONUtil.getValueAsString(
-				invokeGraphQLQuery(
-					new GraphQLField(
-						"headlessDelivery_v1_0",
-						new GraphQLField(
-							"contentTemplate",
-							new HashMap<String, Object>() {
-								{
-									put(
-										"siteKey",
-										"\"" + irrelevantGroup.getGroupId() +
-											"\"");
-									put(
-										"contentTemplateId",
-										irrelevantContentTemplateId);
-								}
-							},
-							getGraphQLFields()))),
-				"JSONArray/errors", "Object/0", "JSONObject/extensions",
-				"Object/code"));
-	}
-
-	protected ContentTemplate
-			testGraphQLGetSiteContentTemplate_addContentTemplate()
 		throws Exception {
 
 		return testGraphQLContentTemplate_addContentTemplate();
@@ -1990,13 +1990,11 @@ public abstract class BaseContentTemplateResourceTestCase {
 				sb.append("(");
 				sb.append(entityFieldName);
 				sb.append(" gt ");
-				sb.append(
-					_dateFormat.format(date.getTime() - (2 * Time.SECOND)));
+				sb.append(_format.format(date.getTime() - (2 * Time.SECOND)));
 				sb.append(" and ");
 				sb.append(entityFieldName);
 				sb.append(" lt ");
-				sb.append(
-					_dateFormat.format(date.getTime() + (2 * Time.SECOND)));
+				sb.append(_format.format(date.getTime() + (2 * Time.SECOND)));
 				sb.append(")");
 			}
 			else {
@@ -2006,7 +2004,7 @@ public abstract class BaseContentTemplateResourceTestCase {
 				sb.append(operator);
 				sb.append(" ");
 
-				sb.append(_dateFormat.format(contentTemplate.getDateCreated()));
+				sb.append(_format.format(contentTemplate.getDateCreated()));
 			}
 
 			return sb.toString();
@@ -2021,13 +2019,11 @@ public abstract class BaseContentTemplateResourceTestCase {
 				sb.append("(");
 				sb.append(entityFieldName);
 				sb.append(" gt ");
-				sb.append(
-					_dateFormat.format(date.getTime() - (2 * Time.SECOND)));
+				sb.append(_format.format(date.getTime() - (2 * Time.SECOND)));
 				sb.append(" and ");
 				sb.append(entityFieldName);
 				sb.append(" lt ");
-				sb.append(
-					_dateFormat.format(date.getTime() + (2 * Time.SECOND)));
+				sb.append(_format.format(date.getTime() + (2 * Time.SECOND)));
 				sb.append(")");
 			}
 			else {
@@ -2037,8 +2033,7 @@ public abstract class BaseContentTemplateResourceTestCase {
 				sb.append(operator);
 				sb.append(" ");
 
-				sb.append(
-					_dateFormat.format(contentTemplate.getDateModified()));
+				sb.append(_format.format(contentTemplate.getDateModified()));
 			}
 
 			return sb.toString();
@@ -2569,7 +2564,9 @@ public abstract class BaseContentTemplateResourceTestCase {
 	private static final com.liferay.portal.kernel.log.Log _log =
 		LogFactoryUtil.getLog(BaseContentTemplateResourceTestCase.class);
 
-	private static DateFormat _dateFormat;
+	private static Format _format;
+
+	private com.liferay.portal.kernel.model.User _testCompanyAdminUser;
 
 	@Inject
 	private com.liferay.headless.delivery.resource.v1_0.ContentTemplateResource

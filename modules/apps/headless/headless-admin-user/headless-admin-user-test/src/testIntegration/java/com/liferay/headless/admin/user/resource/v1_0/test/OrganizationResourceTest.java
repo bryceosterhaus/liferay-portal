@@ -24,9 +24,9 @@ import com.liferay.expando.kernel.model.ExpandoColumnConstants;
 import com.liferay.expando.kernel.model.ExpandoTable;
 import com.liferay.expando.kernel.service.ExpandoColumnLocalService;
 import com.liferay.expando.kernel.service.ExpandoTableLocalService;
+import com.liferay.headless.admin.user.client.custom.field.CustomField;
+import com.liferay.headless.admin.user.client.custom.field.CustomValue;
 import com.liferay.headless.admin.user.client.dto.v1_0.Creator;
-import com.liferay.headless.admin.user.client.dto.v1_0.CustomField;
-import com.liferay.headless.admin.user.client.dto.v1_0.CustomValue;
 import com.liferay.headless.admin.user.client.dto.v1_0.Organization;
 import com.liferay.headless.admin.user.client.pagination.Page;
 import com.liferay.headless.admin.user.client.pagination.Pagination;
@@ -83,7 +83,6 @@ import java.util.Objects;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -326,32 +325,6 @@ public class OrganizationResourceTest extends BaseOrganizationResourceTestCase {
 		super.testGetOrganizationsPage();
 
 		_testGetOrganizationsPageWithFilter();
-	}
-
-	@Ignore
-	@Override
-	@Test
-	public void testGraphQLGetAccountByExternalReferenceCodeOrganization()
-		throws Exception {
-	}
-
-	@Ignore
-	@Override
-	@Test
-	public void testGraphQLGetAccountByExternalReferenceCodeOrganizationNotFound()
-		throws Exception {
-	}
-
-	@Ignore
-	@Override
-	@Test
-	public void testGraphQLGetAccountOrganization() throws Exception {
-	}
-
-	@Ignore
-	@Override
-	@Test
-	public void testGraphQLGetAccountOrganizationNotFound() throws Exception {
 	}
 
 	@Override
@@ -726,6 +699,43 @@ public class OrganizationResourceTest extends BaseOrganizationResourceTestCase {
 	}
 
 	@Override
+	protected Organization
+			testGraphQLGetAccountByExternalReferenceCodeOrganization_addOrganization()
+		throws Exception {
+
+		return testGraphQLGetAccountOrganization_addOrganization();
+	}
+
+	@Override
+	protected String
+			testGraphQLGetAccountByExternalReferenceCodeOrganization_getExternalReferenceCode(
+				Organization organization)
+		throws Exception {
+
+		return _accountEntry.getExternalReferenceCode();
+	}
+
+	@Override
+	protected Organization testGraphQLGetAccountOrganization_addOrganization()
+		throws Exception {
+
+		Organization organization = testGraphQLOrganization_addOrganization();
+
+		_accountEntryOrganizationRelLocalService.addAccountEntryOrganizationRel(
+			_accountEntry.getAccountEntryId(),
+			GetterUtil.getLong(organization.getId()));
+
+		return organization;
+	}
+
+	@Override
+	protected Long testGraphQLGetAccountOrganization_getAccountId()
+		throws Exception {
+
+		return _accountEntry.getAccountEntryId();
+	}
+
+	@Override
 	protected Organization testGraphQLOrganization_addOrganization()
 		throws Exception {
 
@@ -896,7 +906,7 @@ public class OrganizationResourceTest extends BaseOrganizationResourceTestCase {
 		Organization postOrganization = testGetOrganization_addOrganization();
 
 		AccountEntry accountEntry1 = _accountEntryLocalService.addAccountEntry(
-			TestPropsValues.getUserId(),
+			StringPool.BLANK, TestPropsValues.getUserId(),
 			AccountConstants.ACCOUNT_ENTRY_ID_DEFAULT,
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(), null,
 			null, null, null, AccountConstants.ACCOUNT_ENTRY_TYPE_BUSINESS,
@@ -907,7 +917,7 @@ public class OrganizationResourceTest extends BaseOrganizationResourceTestCase {
 			accountEntry1.getAccountEntryId(), postOrganization.getId());
 
 		AccountEntry accountEntry2 = _accountEntryLocalService.addAccountEntry(
-			TestPropsValues.getUserId(),
+			StringPool.BLANK, TestPropsValues.getUserId(),
 			AccountConstants.ACCOUNT_ENTRY_ID_DEFAULT,
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(), null,
 			null, null, null, AccountConstants.ACCOUNT_ENTRY_TYPE_BUSINESS,

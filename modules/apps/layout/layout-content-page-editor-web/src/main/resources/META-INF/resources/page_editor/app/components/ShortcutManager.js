@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-import {openToast} from 'frontend-js-web';
+import {openToast} from 'frontend-js-components-web';
 import React, {useEffect, useRef, useState} from 'react';
 
 import {ITEM_ACTIVATION_ORIGINS} from '../config/constants/itemActivationOrigins';
@@ -35,6 +35,7 @@ import {
 } from '../contexts/ShortcutContext';
 import {useDispatch, useSelector} from '../contexts/StoreContext';
 import {useGetWidgets} from '../contexts/WidgetsContext';
+import selectCanManageFragmentEntries from '../selectors/selectCanManageFragmentEntries';
 import selectCanUpdatePageStructure from '../selectors/selectCanUpdatePageStructure';
 import deleteItem from '../thunks/deleteItem';
 import duplicateItem from '../thunks/duplicateItem';
@@ -72,6 +73,7 @@ export default function ShortcutManager() {
 
 	const {onRedo, onUndo} = useUndoRedoActions();
 
+	const canManageFragments = useSelector(selectCanManageFragmentEntries);
 	const canUpdatePageStructure = useSelector(selectCanUpdatePageStructure);
 	const fragmentEntryLinks = useSelector((state) => state.fragmentEntryLinks);
 	const layoutData = useSelector((state) => state.layoutData);
@@ -291,6 +293,7 @@ export default function ShortcutManager() {
 		save: {
 			action: () => setOpenSaveModal(true),
 			canBeExecuted: () =>
+				canManageFragments &&
 				!multiSelection &&
 				canUpdatePageStructure &&
 				!!layoutData.items[activeItemIds[0]] &&

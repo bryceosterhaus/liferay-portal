@@ -11,7 +11,7 @@
 FilesSectionDisplayContext filesSectionDisplayContext = (FilesSectionDisplayContext)request.getAttribute(FilesSectionDisplayContext.class.getName());
 %>
 
-<div class="cms-section">
+<div class="cms-section custom-empty-state">
 	<frontend-data-set:headless-display
 		apiURL="<%= filesSectionDisplayContext.getAPIURL() %>"
 		bulkActionDropdownItems="<%= filesSectionDisplayContext.getBulkActionDropdownItems() %>"
@@ -21,6 +21,7 @@ FilesSectionDisplayContext filesSectionDisplayContext = (FilesSectionDisplayCont
 		formName="fm"
 		id="<%= CMSSiteInitializerFDSNames.FILES_SECTION %>"
 		itemsPerPage="<%= 10 %>"
+		propsTransformer="{FilesFDSPropsTransformer} from site-cms-site-initializer"
 		selectedItemsKey="id"
 		selectionType="multiple"
 		style="fluid"

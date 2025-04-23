@@ -8,7 +8,9 @@ import {expect, mergeTests} from '@playwright/test';
 import {apiHelpersTest} from '../../fixtures/apiHelpersTest';
 import {loginTest} from '../../fixtures/loginTest';
 import {clickAndExpectToBeVisible} from '../../utils/clickAndExpectToBeVisible';
-import {membershipsPagesTest} from '../site-admin-web/fixtures/membershipsPagesTest';
+import getRandomString from '../../utils/getRandomString';
+import {waitForAlert} from '../../utils/waitForAlert';
+import {membershipsPagesTest} from './fixtures/membershipsPagesTest';
 
 export const test = mergeTests(
 	apiHelpersTest,
@@ -89,7 +91,15 @@ test(
 
 		await page.getByRole('link', {name: 'User Groups'}).click();
 
+		await expect(
+			page.getByText(
+				' No user group was found that is a member of this site.'
+			)
+		).toBeVisible();
+
 		await page.getByRole('button', {name: 'Add'}).click();
+
+		await page.waitForTimeout(500);
 
 		await page
 			.frameLocator('iframe[title="Assign User Groups to This Site"]')
@@ -98,7 +108,7 @@ test(
 
 		await page.getByRole('button', {name: 'Done'}).click();
 
-		await page.waitForTimeout(500);
+		await waitForAlert(page);
 
 		await membershipsPage.assignSiteAdministratorRole();
 		await membershipsPage.filterBySiteAdministratorRole();
@@ -212,5 +222,86 @@ test(
 		await apiHelpers.headlessAdminUser.deleteUserAccount(
 			Number(userAccount.id)
 		);
+	}
+);
+
+test(
+	'Able to remove membership after assigning role to user',
+	{
+		tag: '@LPD-50734',
+	},
+	async ({apiHelpers, membershipsPage, page}) => {
+		const user = await apiHelpers.headlessAdminUser.postUserAccount();
+
+		const siteId = await page.evaluate(() => {
+			return String(Liferay.ThemeDisplay.getSiteGroupId());
+		});
+
+		const siteRole =
+			await apiHelpers.headlessAdminUser.getRoleByName('Site Member');
+
+		await apiHelpers.headlessAdminUser.assignUserToSite(
+			siteRole.id,
+			siteId,
+			user.id
+		);
+
+		await membershipsPage.goto();
+		await membershipsPage.assignAllRolesToUser(user.alternateName);
+		await membershipsPage.removeSiteMembershipFromUser(user.alternateName);
+
+		await expect(page.getByText(user.name)).not.toBeVisible();
+
+		await apiHelpers.headlessAdminUser.deleteUserAccount(Number(user.id));
+	}
+);
+
+test(
+	'Filter roles that are assigned to the user based on the current group',
+	{
+		tag: '@LPD-53010',
+	},
+	async ({apiHelpers, membershipsPage, page}) => {
+		const user = await apiHelpers.headlessAdminUser.postUserAccount();
+
+		const currentSiteId = await page.evaluate(() => {
+			return String(Liferay.ThemeDisplay.getSiteGroupId());
+		});
+
+		const site2 = await apiHelpers.headlessSite.createSite({
+			name: getRandomString(),
+		});
+
+		const siteRole =
+			await apiHelpers.headlessAdminUser.getRoleByName('Site Member');
+
+		await apiHelpers.headlessAdminUser.assignUserToSite(
+			siteRole.id,
+			currentSiteId,
+			user.id
+		);
+
+		await apiHelpers.headlessAdminUser.assignUserToSite(
+			siteRole.id,
+			site2.id,
+			user.id
+		);
+
+		await membershipsPage.goto();
+		await membershipsPage.assignSiteAdministratorRole();
+
+		await page.goto(`/group/${site2.name}/~/control_panel/manage`);
+
+		await membershipsPage.goto();
+		await membershipsPage.openAssignRoles(user.alternateName);
+
+		await expect(
+			page
+				.frameLocator('iframe[title="Assign Roles"]')
+				.getByText('Site Administrator')
+		).toBeVisible();
+
+		await apiHelpers.headlessAdminUser.deleteUserAccount(Number(user.id));
+		await apiHelpers.headlessSite.deleteSite(site2.id);
 	}
 );

@@ -19,6 +19,9 @@ import com.liferay.headless.admin.workflow.client.pagination.Page;
 import com.liferay.headless.admin.workflow.client.pagination.Pagination;
 import com.liferay.headless.admin.workflow.client.resource.v1_0.WorkflowInstanceResource;
 import com.liferay.headless.admin.workflow.client.serdes.v1_0.WorkflowInstanceSerDes;
+import com.liferay.headless.batch.engine.client.dto.v1_0.ImportTask;
+import com.liferay.headless.batch.engine.client.resource.v1_0.ImportTaskResource;
+import com.liferay.oauth2.provider.scope.ScopeChecker;
 import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.petra.string.StringBundler;
@@ -28,11 +31,17 @@ import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.service.CompanyLocalServiceUtil;
+import com.liferay.portal.kernel.service.GroupLocalService;
+import com.liferay.portal.kernel.service.ResourceActionLocalService;
+import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
+import com.liferay.portal.kernel.service.RoleLocalService;
+import com.liferay.portal.kernel.service.UserLocalService;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
-import com.liferay.portal.kernel.util.DateFormatFactoryUtil;
+import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -41,12 +50,18 @@ import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
 import com.liferay.portal.util.PropsValues;
+import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
+import com.liferay.portal.vulcan.crud.VulcanCRUDItemDelegate;
+import com.liferay.portal.vulcan.crud.VulcanCRUDItemDelegateBuilderRegistry;
 import com.liferay.portal.vulcan.resource.EntityModelResource;
 
 import java.lang.reflect.Method;
 
-import java.text.DateFormat;
+import java.net.URI;
+
+import java.text.Format;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -55,13 +70,20 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
 import javax.annotation.Generated;
 
+import javax.servlet.http.HttpServletRequest;
+
 import javax.ws.rs.core.MultivaluedHashMap;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.PathSegment;
+import javax.ws.rs.core.UriBuilder;
+import javax.ws.rs.core.UriInfo;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -70,6 +92,9 @@ import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockHttpServletResponse;
 
 /**
  * @author Javier Gamarra
@@ -80,12 +105,14 @@ public abstract class BaseWorkflowInstanceResourceTestCase {
 
 	@ClassRule
 	@Rule
-	public static final LiferayIntegrationTestRule liferayIntegrationTestRule =
-		new LiferayIntegrationTestRule();
+	public static final AggregateTestRule aggregateTestRule =
+		new AggregateTestRule(
+			new LiferayIntegrationTestRule(),
+			PermissionCheckerMethodTestRule.INSTANCE);
 
 	@BeforeClass
 	public static void setUpClass() throws Exception {
-		_dateFormat = DateFormatFactoryUtil.getSimpleDateFormat(
+		_format = FastDateFormatFactoryUtil.getSimpleDateFormat(
 			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 	}
 
@@ -99,12 +126,22 @@ public abstract class BaseWorkflowInstanceResourceTestCase {
 
 		_workflowInstanceResource.setContextCompany(testCompany);
 
-		com.liferay.portal.kernel.model.User testCompanyAdminUser =
-			UserTestUtil.getAdminUser(testCompany.getCompanyId());
+		_testCompanyAdminUser = UserTestUtil.getAdminUser(
+			testCompany.getCompanyId());
 
 		workflowInstanceResource = WorkflowInstanceResource.builder(
 		).authentication(
-			testCompanyAdminUser.getEmailAddress(),
+			_testCompanyAdminUser.getEmailAddress(),
+			PropsValues.DEFAULT_ADMIN_PASSWORD
+		).endpoint(
+			testCompany.getVirtualHostname(), 8080, "http"
+		).locale(
+			LocaleUtil.getDefault()
+		).build();
+
+		importTaskResource = ImportTaskResource.builder(
+		).authentication(
+			_testCompanyAdminUser.getEmailAddress(),
 			PropsValues.DEFAULT_ADMIN_PASSWORD
 		).endpoint(
 			testCompany.getVirtualHostname(), 8080, "http"
@@ -182,6 +219,474 @@ public abstract class BaseWorkflowInstanceResourceTestCase {
 			regex, workflowInstance.getWorkflowDefinitionName());
 		Assert.assertEquals(
 			regex, workflowInstance.getWorkflowDefinitionVersion());
+	}
+
+	@Test
+	public void testDeleteWorkflowInstance() throws Exception {
+		@SuppressWarnings("PMD.UnusedLocalVariable")
+		WorkflowInstance workflowInstance =
+			testDeleteWorkflowInstance_addWorkflowInstance();
+
+		assertHttpResponseStatusCode(
+			204,
+			workflowInstanceResource.deleteWorkflowInstanceHttpResponse(
+				workflowInstance.getId()));
+
+		assertHttpResponseStatusCode(
+			404,
+			workflowInstanceResource.getWorkflowInstanceHttpResponse(
+				workflowInstance.getId()));
+		assertHttpResponseStatusCode(
+			404, workflowInstanceResource.getWorkflowInstanceHttpResponse(0L));
+	}
+
+	protected WorkflowInstance testDeleteWorkflowInstance_addWorkflowInstance()
+		throws Exception {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	@Test
+	public void testGraphQLDeleteWorkflowInstance() throws Exception {
+
+		// No namespace
+
+		WorkflowInstance workflowInstance1 =
+			testGraphQLDeleteWorkflowInstance_addWorkflowInstance();
+
+		Assert.assertTrue(
+			JSONUtil.getValueAsBoolean(
+				invokeGraphQLMutation(
+					new GraphQLField(
+						"deleteWorkflowInstance",
+						new HashMap<String, Object>() {
+							{
+								put(
+									"workflowInstanceId",
+									workflowInstance1.getId());
+							}
+						})),
+				"JSONObject/data", "Object/deleteWorkflowInstance"));
+
+		JSONArray errorsJSONArray1 = JSONUtil.getValueAsJSONArray(
+			invokeGraphQLQuery(
+				new GraphQLField(
+					"workflowInstance",
+					new HashMap<String, Object>() {
+						{
+							put(
+								"workflowInstanceId",
+								workflowInstance1.getId());
+						}
+					},
+					new GraphQLField("id"))),
+			"JSONArray/errors");
+
+		Assert.assertTrue(errorsJSONArray1.length() > 0);
+
+		// Using the namespace headlessAdminWorkflow_v1_0
+
+		WorkflowInstance workflowInstance2 =
+			testGraphQLDeleteWorkflowInstance_addWorkflowInstance();
+
+		Assert.assertTrue(
+			JSONUtil.getValueAsBoolean(
+				invokeGraphQLMutation(
+					new GraphQLField(
+						"headlessAdminWorkflow_v1_0",
+						new GraphQLField(
+							"deleteWorkflowInstance",
+							new HashMap<String, Object>() {
+								{
+									put(
+										"workflowInstanceId",
+										workflowInstance2.getId());
+								}
+							}))),
+				"JSONObject/data", "JSONObject/headlessAdminWorkflow_v1_0",
+				"Object/deleteWorkflowInstance"));
+
+		JSONArray errorsJSONArray2 = JSONUtil.getValueAsJSONArray(
+			invokeGraphQLQuery(
+				new GraphQLField(
+					"headlessAdminWorkflow_v1_0",
+					new GraphQLField(
+						"workflowInstance",
+						new HashMap<String, Object>() {
+							{
+								put(
+									"workflowInstanceId",
+									workflowInstance2.getId());
+							}
+						},
+						new GraphQLField("id")))),
+			"JSONArray/errors");
+
+		Assert.assertTrue(errorsJSONArray2.length() > 0);
+	}
+
+	protected WorkflowInstance
+			testGraphQLDeleteWorkflowInstance_addWorkflowInstance()
+		throws Exception {
+
+		return testGraphQLWorkflowInstance_addWorkflowInstance();
+	}
+
+	@Test
+	public void testDeleteWorkflowInstanceBatch() throws Exception {
+		WorkflowInstance workflowInstance1 =
+			testDeleteWorkflowInstanceBatch_addWorkflowInstance();
+
+		testDeleteWorkflowInstanceBatch_deleteWorkflowInstance(
+			"COMPLETED", null, workflowInstance1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			workflowInstanceResource.getWorkflowInstanceHttpResponse(
+				workflowInstance1.getId()));
+	}
+
+	protected WorkflowInstance
+			testDeleteWorkflowInstanceBatch_addWorkflowInstance()
+		throws Exception {
+
+		return testDeleteWorkflowInstance_addWorkflowInstance();
+	}
+
+	protected void testDeleteWorkflowInstanceBatch_deleteWorkflowInstance(
+			String expectedExecuteStatus, String externalReferenceCode, Long id)
+		throws Exception {
+
+		HttpInvoker.HttpResponse httpResponse =
+			workflowInstanceResource.deleteWorkflowInstanceBatchHttpResponse(
+				null,
+				JSONUtil.putAll(
+					JSONUtil.put(
+						"externalReferenceCode", () -> externalReferenceCode
+					).put(
+						"id", () -> id
+					)));
+
+		Assert.assertEquals(202, httpResponse.getStatusCode());
+
+		waitForFinish(
+			expectedExecuteStatus,
+			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+	}
+
+	@Test
+	public void testGetWorkflowInstance() throws Exception {
+		WorkflowInstance postWorkflowInstance =
+			testGetWorkflowInstance_addWorkflowInstance();
+
+		WorkflowInstance getWorkflowInstance =
+			workflowInstanceResource.getWorkflowInstance(
+				postWorkflowInstance.getId());
+
+		assertEquals(postWorkflowInstance, getWorkflowInstance);
+		assertValid(getWorkflowInstance);
+	}
+
+	@Test
+	public void testVulcanCRUDItemDelegateGetItem() throws Exception {
+		WorkflowInstance postWorkflowInstance =
+			testGetWorkflowInstance_addWorkflowInstance();
+
+		WorkflowInstance getWorkflowInstance =
+			workflowInstanceResource.getWorkflowInstance(
+				postWorkflowInstance.getId());
+
+		VulcanCRUDItemDelegate vulcanCRUDItemDelegate =
+			_vulcanCRUDItemDelegateBuilderRegistry.builder(
+				testCompany,
+				"com.liferay.headless.admin.workflow.dto.v1_0.WorkflowInstance"
+			).acceptLanguage(
+				new AcceptLanguage() {
+
+					@Override
+					public List<Locale> getLocales() {
+						return Arrays.asList(LocaleUtil.getDefault());
+					}
+
+					@Override
+					public String getPreferredLanguageId() {
+						return LocaleUtil.toLanguageId(LocaleUtil.getDefault());
+					}
+
+					@Override
+					public Locale getPreferredLocale() {
+						return LocaleUtil.getDefault();
+					}
+
+				}
+			).groupLocalService(
+				_groupLocalService
+			).httpServletRequest(
+				testVulcanCRUDItemDelegate_getHttpServletRequest()
+			).httpServletResponse(
+				new MockHttpServletResponse()
+			).resourceActionLocalService(
+				_resourceActionLocalService
+			).resourcePermissionLocalService(
+				_resourcePermissionLocalService
+			).roleLocalService(
+				_roleLocalService
+			).scopeChecker(
+				_scopeChecker
+			).uriInfo(
+				testVulcanCRUDItemDelegate_getUriInfo()
+			).user(
+				testVulcanCRUDItemDelegate_getUser()
+			).build();
+
+		Object item = vulcanCRUDItemDelegate.getItem(
+			postWorkflowInstance.getId());
+
+		assertEquals(
+			getWorkflowInstance, WorkflowInstanceSerDes.toDTO(item.toString()));
+	}
+
+	protected HttpServletRequest
+		testVulcanCRUDItemDelegate_getHttpServletRequest() {
+
+		return new MockHttpServletRequest() {
+
+			@Override
+			public StringBuffer getRequestURL() {
+				return new StringBuffer(
+					StringBundler.concat(
+						"http://localhost:8080/o/v1.0/",
+						RandomTestUtil.randomString(), "/",
+						RandomTestUtil.randomString()));
+			}
+
+		};
+	}
+
+	protected UriInfo testVulcanCRUDItemDelegate_getUriInfo() {
+		String applicationPath = RandomTestUtil.randomString() + "/";
+		String resourcePath = RandomTestUtil.randomString();
+
+		return new UriInfo() {
+
+			@Override
+			public String getPath() {
+				return resourcePath;
+			}
+
+			@Override
+			public String getPath(boolean decode) {
+				return getPath();
+			}
+
+			@Override
+			public List<PathSegment> getPathSegments() {
+				return Collections.emptyList();
+			}
+
+			@Override
+			public List<PathSegment> getPathSegments(boolean decode) {
+				return getPathSegments();
+			}
+
+			@Override
+			public URI getRequestUri() {
+				return URI.create(
+					"http://localhost:8080/o/" + applicationPath +
+						resourcePath);
+			}
+
+			@Override
+			public UriBuilder getRequestUriBuilder() {
+				return UriBuilder.fromUri(getRequestUri());
+			}
+
+			@Override
+			public URI getAbsolutePath() {
+				return getRequestUri();
+			}
+
+			@Override
+			public UriBuilder getAbsolutePathBuilder() {
+				return getRequestUriBuilder();
+			}
+
+			@Override
+			public URI getBaseUri() {
+				return URI.create("http://localhost:8080/o/" + applicationPath);
+			}
+
+			@Override
+			public UriBuilder getBaseUriBuilder() {
+				return UriBuilder.fromUri(getBaseUri());
+			}
+
+			@Override
+			public MultivaluedMap<String, String> getPathParameters() {
+				return new MultivaluedHashMap<>();
+			}
+
+			@Override
+			public MultivaluedMap<String, String> getPathParameters(
+				boolean decode) {
+
+				return getPathParameters();
+			}
+
+			@Override
+			public MultivaluedMap<String, String> getQueryParameters() {
+				return new MultivaluedHashMap<>();
+			}
+
+			@Override
+			public MultivaluedMap<String, String> getQueryParameters(
+				boolean decode) {
+
+				return getQueryParameters();
+			}
+
+			@Override
+			public List<String> getMatchedURIs() {
+				return Collections.emptyList();
+			}
+
+			@Override
+			public List<String> getMatchedURIs(boolean decode) {
+				return getMatchedURIs();
+			}
+
+			@Override
+			public List<Object> getMatchedResources() {
+				return Collections.emptyList();
+			}
+
+			@Override
+			public URI resolve(URI requestUri) {
+				return getBaseUri().resolve(requestUri);
+			}
+
+			@Override
+			public URI relativize(URI uri) {
+				return getBaseUri().relativize(uri);
+			}
+
+		};
+	}
+
+	protected com.liferay.portal.kernel.model.User
+		testVulcanCRUDItemDelegate_getUser() {
+
+		return _testCompanyAdminUser;
+	}
+
+	protected WorkflowInstance testGetWorkflowInstance_addWorkflowInstance()
+		throws Exception {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	@Test
+	public void testGraphQLGetWorkflowInstance() throws Exception {
+		WorkflowInstance workflowInstance =
+			testGraphQLGetWorkflowInstance_addWorkflowInstance();
+
+		// No namespace
+
+		Assert.assertTrue(
+			equals(
+				workflowInstance,
+				WorkflowInstanceSerDes.toDTO(
+					JSONUtil.getValueAsString(
+						invokeGraphQLQuery(
+							new GraphQLField(
+								"workflowInstance",
+								new HashMap<String, Object>() {
+									{
+										put(
+											"workflowInstanceId",
+											workflowInstance.getId());
+									}
+								},
+								getGraphQLFields())),
+						"JSONObject/data", "Object/workflowInstance"))));
+
+		// Using the namespace headlessAdminWorkflow_v1_0
+
+		Assert.assertTrue(
+			equals(
+				workflowInstance,
+				WorkflowInstanceSerDes.toDTO(
+					JSONUtil.getValueAsString(
+						invokeGraphQLQuery(
+							new GraphQLField(
+								"headlessAdminWorkflow_v1_0",
+								new GraphQLField(
+									"workflowInstance",
+									new HashMap<String, Object>() {
+										{
+											put(
+												"workflowInstanceId",
+												workflowInstance.getId());
+										}
+									},
+									getGraphQLFields()))),
+						"JSONObject/data",
+						"JSONObject/headlessAdminWorkflow_v1_0",
+						"Object/workflowInstance"))));
+	}
+
+	@Test
+	public void testGraphQLGetWorkflowInstanceNotFound() throws Exception {
+		Long irrelevantWorkflowInstanceId = RandomTestUtil.randomLong();
+
+		// No namespace
+
+		Assert.assertEquals(
+			"Not Found",
+			JSONUtil.getValueAsString(
+				invokeGraphQLQuery(
+					new GraphQLField(
+						"workflowInstance",
+						new HashMap<String, Object>() {
+							{
+								put(
+									"workflowInstanceId",
+									irrelevantWorkflowInstanceId);
+							}
+						},
+						getGraphQLFields())),
+				"JSONArray/errors", "Object/0", "JSONObject/extensions",
+				"Object/code"));
+
+		// Using the namespace headlessAdminWorkflow_v1_0
+
+		Assert.assertEquals(
+			"Not Found",
+			JSONUtil.getValueAsString(
+				invokeGraphQLQuery(
+					new GraphQLField(
+						"headlessAdminWorkflow_v1_0",
+						new GraphQLField(
+							"workflowInstance",
+							new HashMap<String, Object>() {
+								{
+									put(
+										"workflowInstanceId",
+										irrelevantWorkflowInstanceId);
+								}
+							},
+							getGraphQLFields()))),
+				"JSONArray/errors", "Object/0", "JSONObject/extensions",
+				"Object/code"));
+	}
+
+	protected WorkflowInstance
+			testGraphQLGetWorkflowInstance_addWorkflowInstance()
+		throws Exception {
+
+		return testGraphQLWorkflowInstance_addWorkflowInstance();
 	}
 
 	@Test
@@ -406,262 +911,6 @@ public abstract class BaseWorkflowInstanceResourceTestCase {
 	}
 
 	@Test
-	public void testPostWorkflowInstanceSubmit() throws Exception {
-		WorkflowInstance randomWorkflowInstance = randomWorkflowInstance();
-
-		WorkflowInstance postWorkflowInstance =
-			testPostWorkflowInstanceSubmit_addWorkflowInstance(
-				randomWorkflowInstance);
-
-		assertEquals(randomWorkflowInstance, postWorkflowInstance);
-		assertValid(postWorkflowInstance);
-	}
-
-	protected WorkflowInstance
-			testPostWorkflowInstanceSubmit_addWorkflowInstance(
-				WorkflowInstance workflowInstance)
-		throws Exception {
-
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
-	}
-
-	@Test
-	public void testDeleteWorkflowInstance() throws Exception {
-		@SuppressWarnings("PMD.UnusedLocalVariable")
-		WorkflowInstance workflowInstance =
-			testDeleteWorkflowInstance_addWorkflowInstance();
-
-		assertHttpResponseStatusCode(
-			204,
-			workflowInstanceResource.deleteWorkflowInstanceHttpResponse(
-				workflowInstance.getId()));
-
-		assertHttpResponseStatusCode(
-			404,
-			workflowInstanceResource.getWorkflowInstanceHttpResponse(
-				workflowInstance.getId()));
-
-		assertHttpResponseStatusCode(
-			404, workflowInstanceResource.getWorkflowInstanceHttpResponse(0L));
-	}
-
-	protected WorkflowInstance testDeleteWorkflowInstance_addWorkflowInstance()
-		throws Exception {
-
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
-	}
-
-	@Test
-	public void testGraphQLDeleteWorkflowInstance() throws Exception {
-
-		// No namespace
-
-		WorkflowInstance workflowInstance1 =
-			testGraphQLDeleteWorkflowInstance_addWorkflowInstance();
-
-		Assert.assertTrue(
-			JSONUtil.getValueAsBoolean(
-				invokeGraphQLMutation(
-					new GraphQLField(
-						"deleteWorkflowInstance",
-						new HashMap<String, Object>() {
-							{
-								put(
-									"workflowInstanceId",
-									workflowInstance1.getId());
-							}
-						})),
-				"JSONObject/data", "Object/deleteWorkflowInstance"));
-
-		JSONArray errorsJSONArray1 = JSONUtil.getValueAsJSONArray(
-			invokeGraphQLQuery(
-				new GraphQLField(
-					"workflowInstance",
-					new HashMap<String, Object>() {
-						{
-							put(
-								"workflowInstanceId",
-								workflowInstance1.getId());
-						}
-					},
-					new GraphQLField("id"))),
-			"JSONArray/errors");
-
-		Assert.assertTrue(errorsJSONArray1.length() > 0);
-
-		// Using the namespace headlessAdminWorkflow_v1_0
-
-		WorkflowInstance workflowInstance2 =
-			testGraphQLDeleteWorkflowInstance_addWorkflowInstance();
-
-		Assert.assertTrue(
-			JSONUtil.getValueAsBoolean(
-				invokeGraphQLMutation(
-					new GraphQLField(
-						"headlessAdminWorkflow_v1_0",
-						new GraphQLField(
-							"deleteWorkflowInstance",
-							new HashMap<String, Object>() {
-								{
-									put(
-										"workflowInstanceId",
-										workflowInstance2.getId());
-								}
-							}))),
-				"JSONObject/data", "JSONObject/headlessAdminWorkflow_v1_0",
-				"Object/deleteWorkflowInstance"));
-
-		JSONArray errorsJSONArray2 = JSONUtil.getValueAsJSONArray(
-			invokeGraphQLQuery(
-				new GraphQLField(
-					"headlessAdminWorkflow_v1_0",
-					new GraphQLField(
-						"workflowInstance",
-						new HashMap<String, Object>() {
-							{
-								put(
-									"workflowInstanceId",
-									workflowInstance2.getId());
-							}
-						},
-						new GraphQLField("id")))),
-			"JSONArray/errors");
-
-		Assert.assertTrue(errorsJSONArray2.length() > 0);
-	}
-
-	protected WorkflowInstance
-			testGraphQLDeleteWorkflowInstance_addWorkflowInstance()
-		throws Exception {
-
-		return testGraphQLWorkflowInstance_addWorkflowInstance();
-	}
-
-	@Test
-	public void testGetWorkflowInstance() throws Exception {
-		WorkflowInstance postWorkflowInstance =
-			testGetWorkflowInstance_addWorkflowInstance();
-
-		WorkflowInstance getWorkflowInstance =
-			workflowInstanceResource.getWorkflowInstance(
-				postWorkflowInstance.getId());
-
-		assertEquals(postWorkflowInstance, getWorkflowInstance);
-		assertValid(getWorkflowInstance);
-	}
-
-	protected WorkflowInstance testGetWorkflowInstance_addWorkflowInstance()
-		throws Exception {
-
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
-	}
-
-	@Test
-	public void testGraphQLGetWorkflowInstance() throws Exception {
-		WorkflowInstance workflowInstance =
-			testGraphQLGetWorkflowInstance_addWorkflowInstance();
-
-		// No namespace
-
-		Assert.assertTrue(
-			equals(
-				workflowInstance,
-				WorkflowInstanceSerDes.toDTO(
-					JSONUtil.getValueAsString(
-						invokeGraphQLQuery(
-							new GraphQLField(
-								"workflowInstance",
-								new HashMap<String, Object>() {
-									{
-										put(
-											"workflowInstanceId",
-											workflowInstance.getId());
-									}
-								},
-								getGraphQLFields())),
-						"JSONObject/data", "Object/workflowInstance"))));
-
-		// Using the namespace headlessAdminWorkflow_v1_0
-
-		Assert.assertTrue(
-			equals(
-				workflowInstance,
-				WorkflowInstanceSerDes.toDTO(
-					JSONUtil.getValueAsString(
-						invokeGraphQLQuery(
-							new GraphQLField(
-								"headlessAdminWorkflow_v1_0",
-								new GraphQLField(
-									"workflowInstance",
-									new HashMap<String, Object>() {
-										{
-											put(
-												"workflowInstanceId",
-												workflowInstance.getId());
-										}
-									},
-									getGraphQLFields()))),
-						"JSONObject/data",
-						"JSONObject/headlessAdminWorkflow_v1_0",
-						"Object/workflowInstance"))));
-	}
-
-	@Test
-	public void testGraphQLGetWorkflowInstanceNotFound() throws Exception {
-		Long irrelevantWorkflowInstanceId = RandomTestUtil.randomLong();
-
-		// No namespace
-
-		Assert.assertEquals(
-			"Not Found",
-			JSONUtil.getValueAsString(
-				invokeGraphQLQuery(
-					new GraphQLField(
-						"workflowInstance",
-						new HashMap<String, Object>() {
-							{
-								put(
-									"workflowInstanceId",
-									irrelevantWorkflowInstanceId);
-							}
-						},
-						getGraphQLFields())),
-				"JSONArray/errors", "Object/0", "JSONObject/extensions",
-				"Object/code"));
-
-		// Using the namespace headlessAdminWorkflow_v1_0
-
-		Assert.assertEquals(
-			"Not Found",
-			JSONUtil.getValueAsString(
-				invokeGraphQLQuery(
-					new GraphQLField(
-						"headlessAdminWorkflow_v1_0",
-						new GraphQLField(
-							"workflowInstance",
-							new HashMap<String, Object>() {
-								{
-									put(
-										"workflowInstanceId",
-										irrelevantWorkflowInstanceId);
-								}
-							},
-							getGraphQLFields()))),
-				"JSONArray/errors", "Object/0", "JSONObject/extensions",
-				"Object/code"));
-	}
-
-	protected WorkflowInstance
-			testGraphQLGetWorkflowInstance_addWorkflowInstance()
-		throws Exception {
-
-		return testGraphQLWorkflowInstance_addWorkflowInstance();
-	}
-
-	@Test
 	public void testPostWorkflowInstanceChangeTransition() throws Exception {
 		WorkflowInstance randomWorkflowInstance = randomWorkflowInstance();
 
@@ -675,6 +924,27 @@ public abstract class BaseWorkflowInstanceResourceTestCase {
 
 	protected WorkflowInstance
 			testPostWorkflowInstanceChangeTransition_addWorkflowInstance(
+				WorkflowInstance workflowInstance)
+		throws Exception {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	@Test
+	public void testPostWorkflowInstanceSubmit() throws Exception {
+		WorkflowInstance randomWorkflowInstance = randomWorkflowInstance();
+
+		WorkflowInstance postWorkflowInstance =
+			testPostWorkflowInstanceSubmit_addWorkflowInstance(
+				randomWorkflowInstance);
+
+		assertEquals(randomWorkflowInstance, postWorkflowInstance);
+		assertValid(postWorkflowInstance);
+	}
+
+	protected WorkflowInstance
+			testPostWorkflowInstanceSubmit_addWorkflowInstance(
 				WorkflowInstance workflowInstance)
 		throws Exception {
 
@@ -1195,13 +1465,11 @@ public abstract class BaseWorkflowInstanceResourceTestCase {
 				sb.append("(");
 				sb.append(entityFieldName);
 				sb.append(" gt ");
-				sb.append(
-					_dateFormat.format(date.getTime() - (2 * Time.SECOND)));
+				sb.append(_format.format(date.getTime() - (2 * Time.SECOND)));
 				sb.append(" and ");
 				sb.append(entityFieldName);
 				sb.append(" lt ");
-				sb.append(
-					_dateFormat.format(date.getTime() + (2 * Time.SECOND)));
+				sb.append(_format.format(date.getTime() + (2 * Time.SECOND)));
 				sb.append(")");
 			}
 			else {
@@ -1211,8 +1479,7 @@ public abstract class BaseWorkflowInstanceResourceTestCase {
 				sb.append(operator);
 				sb.append(" ");
 
-				sb.append(
-					_dateFormat.format(workflowInstance.getDateCompletion()));
+				sb.append(_format.format(workflowInstance.getDateCompletion()));
 			}
 
 			return sb.toString();
@@ -1227,13 +1494,11 @@ public abstract class BaseWorkflowInstanceResourceTestCase {
 				sb.append("(");
 				sb.append(entityFieldName);
 				sb.append(" gt ");
-				sb.append(
-					_dateFormat.format(date.getTime() - (2 * Time.SECOND)));
+				sb.append(_format.format(date.getTime() - (2 * Time.SECOND)));
 				sb.append(" and ");
 				sb.append(entityFieldName);
 				sb.append(" lt ");
-				sb.append(
-					_dateFormat.format(date.getTime() + (2 * Time.SECOND)));
+				sb.append(_format.format(date.getTime() + (2 * Time.SECOND)));
 				sb.append(")");
 			}
 			else {
@@ -1243,8 +1508,7 @@ public abstract class BaseWorkflowInstanceResourceTestCase {
 				sb.append(operator);
 				sb.append(" ");
 
-				sb.append(
-					_dateFormat.format(workflowInstance.getDateCreated()));
+				sb.append(_format.format(workflowInstance.getDateCreated()));
 			}
 
 			return sb.toString();
@@ -1422,7 +1686,30 @@ public abstract class BaseWorkflowInstanceResourceTestCase {
 		return randomWorkflowInstance();
 	}
 
+	protected final JSONObject waitForFinish(
+			String expectedExecuteStatus, JSONObject jsonObject)
+		throws Exception {
+
+		while (true) {
+			ImportTask importTask = importTaskResource.getImportTask(
+				jsonObject.getLong("id"));
+
+			ImportTask.ExecuteStatus executeStatus =
+				importTask.getExecuteStatus();
+
+			if (StringUtil.equals(executeStatus.getValue(), "COMPLETED") ||
+				StringUtil.equals(executeStatus.getValue(), "FAILED")) {
+
+				Assert.assertEquals(
+					expectedExecuteStatus, executeStatus.getValue());
+
+				return jsonObject;
+			}
+		}
+	}
+
 	protected WorkflowInstanceResource workflowInstanceResource;
+	protected ImportTaskResource importTaskResource;
 	protected com.liferay.portal.kernel.model.Group irrelevantGroup;
 	protected com.liferay.portal.kernel.model.Company testCompany;
 	protected com.liferay.portal.kernel.model.Group testGroup;
@@ -1623,11 +1910,35 @@ public abstract class BaseWorkflowInstanceResourceTestCase {
 	private static final com.liferay.portal.kernel.log.Log _log =
 		LogFactoryUtil.getLog(BaseWorkflowInstanceResourceTestCase.class);
 
-	private static DateFormat _dateFormat;
+	private static Format _format;
+
+	private com.liferay.portal.kernel.model.User _testCompanyAdminUser;
 
 	@Inject
 	private
 		com.liferay.headless.admin.workflow.resource.v1_0.
 			WorkflowInstanceResource _workflowInstanceResource;
+
+	@Inject
+	private GroupLocalService _groupLocalService;
+
+	@Inject
+	private ResourceActionLocalService _resourceActionLocalService;
+
+	@Inject
+	private ResourcePermissionLocalService _resourcePermissionLocalService;
+
+	@Inject
+	private RoleLocalService _roleLocalService;
+
+	@Inject
+	private ScopeChecker _scopeChecker;
+
+	@Inject
+	private UserLocalService _userLocalService;
+
+	@Inject
+	private VulcanCRUDItemDelegateBuilderRegistry
+		_vulcanCRUDItemDelegateBuilderRegistry;
 
 }

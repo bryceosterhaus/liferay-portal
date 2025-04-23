@@ -286,9 +286,13 @@ public interface PortletDataHandler {
 
 	public boolean isDisplayPortlet();
 
+	public boolean isEmptyControlsAllowed();
+
 	public default boolean isEnabled(long companyId) {
 		return true;
 	}
+
+	public boolean isModelCountSupported();
 
 	/**
 	 * Returns whether the data exported by this handler should be included by

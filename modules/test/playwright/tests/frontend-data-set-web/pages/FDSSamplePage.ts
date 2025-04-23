@@ -13,15 +13,22 @@ import getWidgetDefinition from '../../layout-content-page-editor-web/utils/getW
 
 export class FDSSamplePage {
 	private readonly apiHelpers: ApiHelpers;
+	readonly bulkActions: {
+		actionsDropdownButton: Locator;
+		container: Locator;
+	};
 	readonly customViewsActionsButton: Locator;
 	readonly customViewsDeleteAlert: Locator;
 	readonly customViewsSaveModal: Locator;
 	readonly customViewsSelectorButton: Locator;
+	readonly itemActionButton: Locator;
+	readonly managementToolbar: Locator;
 	readonly page: Page;
 	readonly sidePanel: Locator;
 	readonly sidePanelFrame: FrameLocator;
 	readonly tablist: Locator;
 	readonly table: {
+		bodyRows: Locator;
 		container: Locator;
 		headerCells: Locator;
 		itemActionsCells: Locator;
@@ -30,6 +37,12 @@ export class FDSSamplePage {
 
 	constructor(page: Page) {
 		this.apiHelpers = new ApiHelpers(page);
+		this.bulkActions = {
+			actionsDropdownButton: page
+				.locator('.bulk-actions')
+				.getByLabel('Actions'),
+			container: page.locator('.bulk-actions'),
+		};
 		this.customViewsActionsButton = page.getByLabel('Show View Actions', {
 			exact: true,
 		});
@@ -42,6 +55,7 @@ export class FDSSamplePage {
 		this.customViewsSelectorButton = page.getByLabel('Views', {
 			exact: true,
 		});
+		this.managementToolbar = page.getByTestId('management-toolbar');
 		this.page = page;
 		this.sidePanel = page.locator('.fds-side-panel');
 		this.sidePanelFrame = this.sidePanel.frameLocator('iframe');
@@ -50,6 +64,7 @@ export class FDSSamplePage {
 		const tableContainer = page.locator('.fds table');
 
 		this.table = {
+			bodyRows: tableContainer.locator('tbody tr'),
 			container: tableContainer,
 			headerCells: tableContainer.locator('th'),
 			itemActionsCells: tableContainer.locator('.cell-item-actions'),
@@ -57,6 +72,45 @@ export class FDSSamplePage {
 				'Manage Columns Visibility'
 			),
 		};
+
+		const itemActionsCell = this.table.itemActionsCells.first();
+
+		this.itemActionButton = itemActionsCell.getByRole('button', {
+			exact: true,
+			name: 'Actions',
+		});
+	}
+
+	async clickItemAction(itemAction: string) {
+		const dropdownId =
+			await this.itemActionButton.getAttribute('aria-controls');
+
+		await this.itemActionButton.click();
+
+		await this.page
+			.locator(`#${dropdownId}`)
+			.filter({has: this.page.getByRole('menu')})
+			.waitFor();
+
+		await this.page
+			.locator(`#${dropdownId}`)
+			.getByRole('menuitem', {
+				exact: true,
+				name: itemAction,
+			})
+			.click();
+	}
+
+	selectItemActionsByRow(text: string) {
+		return this.table.bodyRows
+			.filter({
+				hasText: text,
+			})
+			.locator('.cell-item-actions')
+			.getByRole('button', {
+				exact: true,
+				name: 'Actions',
+			});
 	}
 
 	async selectTab(label: string) {
@@ -67,7 +121,7 @@ export class FDSSamplePage {
 		await expect(navLink).toHaveClass(/active/);
 	}
 
-	async setupFDSSampleWidget({site}) {
+	async setupFDSSampleWidget({locale = 'en', site}) {
 		const widgetDefinition = getWidgetDefinition({
 			id: getRandomString(),
 			widgetName:
@@ -80,10 +134,10 @@ export class FDSSamplePage {
 			title: getRandomString(),
 		});
 
-		const url = `${liferayConfig.environment.baseUrl}/web${site.friendlyUrlPath}${layout.friendlyUrlPath}`;
+		const url = `${liferayConfig.environment.baseUrl}/${locale}/web${site.friendlyUrlPath}${layout.friendlyUrlPath}`;
 
 		await this.page.goto(url);
 
-		return {url};
+		return {layout, url};
 	}
 }

@@ -25,6 +25,7 @@ const ROW_DRAGGABLE = 'rowDraggable';
 
 interface IAction {
 	icon: string;
+	isVisible?: ({item}: {item: any}) => boolean;
 	label: string;
 	onClick: Function;
 }
@@ -248,45 +249,59 @@ const Row = ({
 				);
 			})}
 
-			{actions && (
-				<ClayTable.Cell className="actions-cell">
-					<ClayDropDown
-						trigger={
-							<ClayButton
-								className="component-action"
-								displayType="unstyled"
-							>
-								<ClayIcon symbol="ellipsis-v" />
-
-								<span className="sr-only">
-									{Liferay.Language.get('actions')}
-								</span>
-							</ClayButton>
-						}
-					>
-						<ClayDropDown.ItemList>
-							{actions.map(({icon, label, onClick}) => (
-								<ClayDropDown.Item
-									key={label}
-									onClick={() =>
-										onClick({
-											item,
-										})
-									}
+			<ClayTable.Cell className="actions-cell">
+				{actions &&
+					!!actions.filter(
+						(action) =>
+							!action.isVisible || action.isVisible({item})
+					).length && (
+						<ClayDropDown
+							trigger={
+								<ClayButton
+									className="component-action"
+									displayType="unstyled"
 								>
-									{icon && (
-										<span className="pr-2">
-											<ClayIcon symbol={icon} />
-										</span>
-									)}
+									<ClayIcon symbol="ellipsis-v" />
 
-									{label}
-								</ClayDropDown.Item>
-							))}
-						</ClayDropDown.ItemList>
-					</ClayDropDown>
-				</ClayTable.Cell>
-			)}
+									<span className="sr-only">
+										{Liferay.Language.get('actions')}
+									</span>
+								</ClayButton>
+							}
+						>
+							<ClayDropDown.ItemList>
+								{actions.map(
+									({icon, isVisible, label, onClick}) => {
+										if (isVisible && !isVisible({item})) {
+											return;
+										}
+
+										return (
+											<ClayDropDown.Item
+												key={label}
+												onClick={() =>
+													onClick({
+														item,
+													})
+												}
+											>
+												{icon && (
+													<span className="pr-2">
+														<ClayIcon
+															symbol={icon}
+														/>
+													</span>
+												)}
+
+												{label}
+											</ClayDropDown.Item>
+										);
+									}
+								)}
+							</ClayDropDown.ItemList>
+						</ClayDropDown>
+					)}
+			</ClayTable.Cell>
 		</ClayTable.Row>
 	);
 };
@@ -320,7 +335,11 @@ const Table = ({
 					<ClayTable.Cell className="drag-handle-cell" />
 
 					{fields.map((field) => (
-						<ClayTable.Cell headingCell key={field.name}>
+						<ClayTable.Cell
+							className={`cell-${field.name}`}
+							headingCell
+							key={field.name}
+						>
 							{field.label}
 						</ClayTable.Cell>
 					))}

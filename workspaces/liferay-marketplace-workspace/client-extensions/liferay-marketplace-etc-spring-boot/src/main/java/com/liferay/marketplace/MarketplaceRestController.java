@@ -65,8 +65,12 @@ public class MarketplaceRestController extends BaseRestController {
 		JSONObject commerceOrderJSONObject = jsonObject.getJSONObject(
 			"commerceOrder");
 
-		if (commerceOrderJSONObject.getInt("paymentStatus") !=
-				MarketplaceConstants.ORDER_PAYMENT_STATUS_COMPLETED) {
+		int paymentStatus = commerceOrderJSONObject.getInt("paymentStatus");
+
+		if ((paymentStatus !=
+				MarketplaceConstants.ORDER_PAYMENT_STATUS_COMPLETED) &&
+			(paymentStatus !=
+				MarketplaceConstants.ORDER_PAYMENT_STATUS_NOT_REQUIRED)) {
 
 			if (_log.isInfoEnabled()) {
 				_log.info(
@@ -91,9 +95,23 @@ public class MarketplaceRestController extends BaseRestController {
 			);
 
 		if (Objects.equals(
+				order.getOrderTypeExternalReferenceCode(),
+				"CLIENT_EXTENSION") ||
+			Objects.equals(
 				order.getOrderTypeExternalReferenceCode(), "CLOUDAPP")) {
 
 			_setUpCloudProductPurchase(order, orderItemPage);
+		}
+
+		if (Objects.equals(
+				order.getOrderTypeExternalReferenceCode(), "COMPOSITE_APP") ||
+			Objects.equals(
+				order.getOrderTypeExternalReferenceCode(),
+				"LOW_CODE_CONFIGURATION")) {
+
+			_marketplaceService.updateOrder(
+				null, order.getId(),
+				MarketplaceConstants.ORDER_STATUS_COMPLETED);
 		}
 
 		if (Objects.equals(

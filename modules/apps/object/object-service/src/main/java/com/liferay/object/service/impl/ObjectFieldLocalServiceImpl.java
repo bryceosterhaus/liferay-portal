@@ -63,6 +63,7 @@ import com.liferay.object.service.persistence.ObjectLayoutColumnPersistence;
 import com.liferay.object.service.persistence.ObjectRelationshipPersistence;
 import com.liferay.object.system.SystemObjectDefinitionManager;
 import com.liferay.object.system.SystemObjectDefinitionManagerRegistry;
+import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.petra.sql.dsl.Column;
 import com.liferay.petra.sql.dsl.Table;
@@ -367,33 +368,33 @@ public class ObjectFieldLocalServiceImpl
 			List<ObjectField> objectFields)
 		throws PortalException {
 
-		List<ObjectField> activeObjectFields = new ArrayList<>();
+		return TransformUtil.transform(
+			objectFields,
+			objectField -> {
+				long objectFieldId = objectField.getObjectFieldId();
 
-		for (ObjectField objectField : objectFields) {
-			objectField.setObjectFieldSettings(
-				_objectFieldSettingLocalService.
-					getObjectFieldObjectFieldSettings(
-						objectField.getObjectFieldId()));
+				objectField.setObjectFieldSettings(
+					_objectFieldSettingLocalService.
+						getObjectFieldObjectFieldSettings(objectFieldId));
 
-			if (Validator.isNotNull(objectField.getRelationshipType())) {
+				if (Validator.isNull(objectField.getRelationshipType())) {
+					return objectField;
+				}
+
 				ObjectRelationship objectRelationship =
 					_objectRelationshipPersistence.fetchByObjectFieldId2(
-						objectField.getObjectFieldId());
+						objectFieldId);
 
 				ObjectDefinition objectDefinition =
 					_objectDefinitionPersistence.findByPrimaryKey(
 						objectRelationship.getObjectDefinitionId1());
 
 				if (objectDefinition.isActive()) {
-					activeObjectFields.add(objectField);
+					return objectField;
 				}
-			}
-			else {
-				activeObjectFields.add(objectField);
-			}
-		}
 
-		return activeObjectFields;
+				return null;
+			});
 	}
 
 	@Override
@@ -419,9 +420,6 @@ public class ObjectFieldLocalServiceImpl
 			}
 
 			if (Objects.equals(
-					objectField.getBusinessType(),
-					ObjectFieldConstants.BUSINESS_TYPE_ATTACHMENT) ||
-				Objects.equals(
 					objectField.getBusinessType(),
 					ObjectFieldConstants.BUSINESS_TYPE_RICH_TEXT)) {
 
@@ -855,7 +853,8 @@ public class ObjectFieldLocalServiceImpl
 				objectField.getBusinessType());
 
 		_validateLocalized(
-			localized, objectDefinition, objectFieldBusinessType, required);
+			localized, objectDefinition, objectField, objectFieldBusinessType,
+			required);
 
 		User user = _userLocalService.getUser(userId);
 
@@ -1403,7 +1402,7 @@ public class ObjectFieldLocalServiceImpl
 				businessType);
 
 		_validateLocalized(
-			localized, oldObjectField.getObjectDefinition(),
+			localized, oldObjectField.getObjectDefinition(), newObjectField,
 			objectFieldBusinessType, required);
 
 		ObjectDefinition objectDefinition =
@@ -1647,6 +1646,7 @@ public class ObjectFieldLocalServiceImpl
 
 	private void _validateLocalized(
 			boolean localized, ObjectDefinition objectDefinition,
+			ObjectField objectField,
 			ObjectFieldBusinessType objectFieldBusinessType, boolean required)
 		throws PortalException {
 
@@ -1666,7 +1666,7 @@ public class ObjectFieldLocalServiceImpl
 				 ObjectFieldConstants.BUSINESS_TYPE_TEXT)) ||
 			(FeatureFlagManagerUtil.isEnabled(
 				objectDefinition.getCompanyId(), "LPD-32050") &&
-			 !objectFieldBusinessType.isLocalizable())) {
+			 !objectFieldBusinessType.isLocalizationSupported(objectField))) {
 
 			if (FeatureFlagManagerUtil.isEnabled(
 					objectDefinition.getCompanyId(), "LPD-32050")) {

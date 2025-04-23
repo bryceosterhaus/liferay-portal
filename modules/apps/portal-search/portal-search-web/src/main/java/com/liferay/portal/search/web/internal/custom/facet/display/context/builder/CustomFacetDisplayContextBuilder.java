@@ -31,6 +31,7 @@ import com.liferay.portal.search.web.internal.custom.facet.display.context.Custo
 import com.liferay.portal.search.web.internal.custom.facet.util.CustomFacetUtil;
 import com.liferay.portal.search.web.internal.facet.display.context.BucketDisplayContext;
 import com.liferay.portal.search.web.internal.util.DateRangeFactoryUtil;
+import com.liferay.portal.search.web.internal.util.DisplayContextHelperUtil;
 import com.liferay.portal.search.web.internal.util.comparator.BucketDisplayContextComparatorFactoryUtil;
 
 import java.text.DateFormat;
@@ -505,14 +506,10 @@ public class CustomFacetDisplayContextBuilder {
 	}
 
 	private long _getDisplayStyleGroupId() {
-		long displayStyleGroupId =
-			_customFacetPortletInstanceConfiguration.displayStyleGroupId();
-
-		if (displayStyleGroupId <= 0) {
-			displayStyleGroupId = _themeDisplay.getScopeGroupId();
-		}
-
-		return displayStyleGroupId;
+		return DisplayContextHelperUtil.getDisplayStyleGroupId(
+			_customFacetPortletInstanceConfiguration.
+				displayStyleGroupExternalReferenceCode(),
+			_themeDisplay);
 	}
 
 	private List<BucketDisplayContext> _getEmptyBucketDisplayContexts() {

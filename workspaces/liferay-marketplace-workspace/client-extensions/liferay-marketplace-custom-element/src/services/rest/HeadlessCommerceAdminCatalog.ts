@@ -7,8 +7,8 @@ import {UploadedImage} from '../../components/FileList/FileList';
 import {axios} from '../../utils/axios';
 import fetcher from '../fetcher';
 
-class HeadlessCommerceAdminCatalog {
-	async addOrUpdateProductImageByExternalReferenceCode(
+export default class HeadlessCommerceAdminCatalog {
+	static async addOrUpdateProductImageByExternalReferenceCode(
 		externalReferenceCode: string,
 		image: UploadedImage
 	) {
@@ -18,7 +18,7 @@ class HeadlessCommerceAdminCatalog {
 		);
 	}
 
-	async createProductImageByExternalReferenceCodeAxios(
+	static async createProductImageByExternalReferenceCodeAxios(
 		externalReferenceCode: string,
 		body: unknown,
 		onUploadProgressCallback: (progress: number) => void = () => null
@@ -35,11 +35,26 @@ class HeadlessCommerceAdminCatalog {
 		);
 	}
 
-	async createVirtualProduct({
+	static async createProductOption(body: unknown[], productId: number) {
+		return fetcher.post<APIResponse<ProductOption>>(
+			`/o/headless-commerce-admin-catalog/v1.0/products/${productId}/productOptions?nestedFields=productOptionValues`,
+			body
+		);
+	}
+
+	static async createProductOptionValue(body: unknown, optionId: number) {
+		return fetcher.post(
+			`/o/headless-commerce-admin-catalog/v1.0/productOptions/${optionId}/productOptionValues`,
+			body
+		);
+	}
+
+	static async createVirtualProduct({
 		catalogId,
 		categories,
 		description,
 		name,
+		productSpecifications,
 		productStatus,
 		workflowStatusInfo,
 	}: {
@@ -47,11 +62,12 @@ class HeadlessCommerceAdminCatalog {
 		categories: Partial<Categories>[];
 		description: string;
 		name: string;
+		productSpecifications?: any;
 		productStatus?: number;
 		workflowStatusInfo?: number;
 	}) {
 		return fetcher.post(
-			`/o/headless-commerce-admin-catalog/v1.0/products`,
+			`/o/headless-commerce-admin-catalog/v1.0/products?nestedFields=productVirtualSettings`,
 			{
 				active: true,
 				catalogId,
@@ -62,11 +78,19 @@ class HeadlessCommerceAdminCatalog {
 					allowBackOrder: true,
 					maxOrderQuantity: 1,
 				},
+				productSpecifications,
 				productStatus,
 				productType: 'virtual',
 				productVirtualSettings: {},
 				workflowStatusInfo,
 			}
+		);
+	}
+
+	static async createProductSKU(body: unknown, productId: string | number) {
+		return fetcher.post<SKU>(
+			`/o/headless-commerce-admin-catalog/v1.0/products/${productId}/skus`,
+			body
 		);
 	}
 
@@ -76,14 +100,14 @@ class HeadlessCommerceAdminCatalog {
 		);
 	}
 
-	async updateProduct(productId: number, body: unknown) {
+	static async updateProduct(productId: number, body: unknown) {
 		return fetcher.patch(
 			`/o/headless-commerce-admin-catalog/v1.0/products/${productId}`,
 			body
 		);
 	}
 
-	async createProductSpecification(
+	static async createProductSpecification(
 		productId: number | string,
 		productSpecification: ProductSpecification
 	) {
@@ -93,13 +117,13 @@ class HeadlessCommerceAdminCatalog {
 		);
 	}
 
-	async deleteProduct(productId: string | number) {
+	static async deleteProduct(productId: string | number) {
 		return fetcher.delete(
 			`/o/headless-commerce-admin-catalog/v1.0/products/${productId}`
 		);
 	}
 
-	async getCatalog(
+	static async getCatalog(
 		catalogId: string | number,
 		searchParams = new URLSearchParams()
 	) {
@@ -108,15 +132,21 @@ class HeadlessCommerceAdminCatalog {
 		);
 	}
 
-	async getCatalogs(searchParams = new URLSearchParams()) {
+	static async getCatalogs(searchParams = new URLSearchParams()) {
 		return fetcher<APIResponse<Catalog>>(
 			`/o/headless-commerce-admin-catalog/v1.0/catalogs?${searchParams.toString()}`
 		);
 	}
 
-	async getSpecifications(searchParams = new URLSearchParams()) {
+	static async getSpecifications(searchParams = new URLSearchParams()) {
 		return fetcher<APIResponse>(
 			`/o/headless-commerce-admin-catalog/v1.0/specifications?${searchParams}`
+		);
+	}
+
+	async getOptions() {
+		return fetcher<APIResponse<CommerceOption>>(
+			'/o/headless-commerce-admin-catalog/v1.0/options'
 		);
 	}
 
@@ -129,7 +159,7 @@ class HeadlessCommerceAdminCatalog {
 		);
 	}
 
-	async getProductByExternalReferenceCode(
+	static async getProductByExternalReferenceCode(
 		externalReferenceCode: string,
 		searchParams = new URLSearchParams()
 	): Promise<Product> {
@@ -138,9 +168,15 @@ class HeadlessCommerceAdminCatalog {
 		);
 	}
 
-	async getProducts(searchParams = new URLSearchParams()) {
+	static async getProducts(searchParams = new URLSearchParams()) {
 		return fetcher(
 			`/o/headless-commerce-admin-catalog/v1.0/products?${searchParams.toString()}`
+		);
+	}
+
+	async getProductOptions(productId: number) {
+		return fetcher<APIResponse<ProductOption>>(
+			`/o/headless-commerce-admin-catalog/v1.0/products/${productId}/productOptions?nestedFields=productOptionValues`
 		);
 	}
 
@@ -150,7 +186,7 @@ class HeadlessCommerceAdminCatalog {
 		);
 	}
 
-	async getProductSpecifications(productId: string | number) {
+	static async getProductSpecifications(productId: string | number) {
 		const response = await fetcher(
 			`/o/headless-commerce-admin-catalog/v1.0/products/${productId}/productSpecifications`
 		);
@@ -158,7 +194,7 @@ class HeadlessCommerceAdminCatalog {
 		return (response?.items ?? []) as ProductSpecification[];
 	}
 
-	async updateProductByExternalReferenceCode(
+	static async updateProductByExternalReferenceCode(
 		externalReferenceCode: string,
 		body: unknown
 	) {
@@ -168,7 +204,7 @@ class HeadlessCommerceAdminCatalog {
 		);
 	}
 
-	async updateProductSpecification(
+	static async updateProductSpecification(
 		id: number | string,
 		productSpecification: ProductSpecification
 	) {
@@ -178,7 +214,3 @@ class HeadlessCommerceAdminCatalog {
 		);
 	}
 }
-
-const HeadlessCommerceAdminCatalogImpl = new HeadlessCommerceAdminCatalog();
-
-export default HeadlessCommerceAdminCatalogImpl;

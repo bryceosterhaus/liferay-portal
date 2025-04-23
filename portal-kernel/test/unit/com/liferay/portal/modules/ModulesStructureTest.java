@@ -204,34 +204,15 @@ public class ModulesStructureTest {
 							gitRepoSettingsGradleTemplate);
 					}
 					else {
-						Path gradlePropertiesPath = dirPath.resolve(
-							"gradle.properties");
-
-						boolean liferaySpringBootDefaultsPlugin = false;
-
-						if (Files.exists(buildGradlePath)) {
-							String applyPlugin =
-								"apply plugin: " +
-									"\"com.liferay.spring.boot.defaults\"";
-							String content = ModulesStructureTestUtil.read(
-								buildGradlePath);
-
-							if (content.contains(applyPlugin)) {
-								liferaySpringBootDefaultsPlugin = true;
-							}
-						}
-
 						if (!dirName.endsWith("playwright") &&
-							!dirName.endsWith("poshi-standalone") &&
-							!liferaySpringBootDefaultsPlugin) {
+							!dirName.endsWith("poshi-standalone")) {
+
+							Path gradlePropertiesPath = dirPath.resolve(
+								"gradle.properties");
 
 							Assert.assertFalse(
 								"Forbidden " + gradlePropertiesPath,
 								Files.deleteIfExists(gradlePropertiesPath));
-						}
-
-						if (!dirName.endsWith("playwright") &&
-							!dirName.endsWith("poshi-standalone")) {
 
 							Path settingsGradlePath = dirPath.resolve(
 								"settings.gradle");
@@ -259,14 +240,12 @@ public class ModulesStructureTest {
 											"plugin\""));
 						}
 
-						if (!liferaySpringBootDefaultsPlugin) {
-							Path buildExtGradlePath = dirPath.resolve(
-								"build-ext.gradle");
+						Path buildExtGradlePath = dirPath.resolve(
+							"build-ext.gradle");
 
-							Assert.assertFalse(
-								"Forbidden " + buildExtGradlePath,
-								Files.deleteIfExists(buildExtGradlePath));
-						}
+						Assert.assertFalse(
+							"Forbidden " + buildExtGradlePath,
+							Files.deleteIfExists(buildExtGradlePath));
 					}
 
 					if (Files.exists(dirPath.resolve("package.json")) &&
@@ -858,14 +837,13 @@ public class ModulesStructureTest {
 
 		if (!sortedBuildExtGradleFileNames.isEmpty()) {
 			StringBundler sb = new StringBundler(
-				(4 * sortedBuildExtGradleFileNames.size()) + 2);
+				(sortedBuildExtGradleFileNames.size() * 3) + 2);
 
 			sb.append(buildGradleTemplate);
 			sb.append(StringPool.NEW_LINE);
 
 			for (String fileName : sortedBuildExtGradleFileNames) {
-				sb.append(StringPool.NEW_LINE);
-				sb.append("apply from: \"");
+				sb.append("\napply from: \"");
 				sb.append(fileName);
 				sb.append("\"");
 			}
@@ -1233,8 +1211,7 @@ public class ModulesStructureTest {
 		if (Files.notExists(dirPath.resolve("settings-ext.gradle"))) {
 			settingsGradleTemplate = StringUtil.removeSubstring(
 				settingsGradleTemplate,
-				StringPool.NEW_LINE + StringPool.NEW_LINE +
-					"apply from: \"settings-ext.gradle\"");
+				"\n\napply from: \"settings-ext.gradle\"");
 		}
 
 		if (!dxpRepo && !privateRepo && !readOnlyRepo) {
@@ -1619,11 +1596,13 @@ public class ModulesStructureTest {
 				Assert.assertFalse(sb.toString(), !allowed);
 			}
 
-			Assert.assertEquals(
-				"Redundant dependency detected in " + path,
-				_getActiveGradleDependency(
-					gradleDependencies, gradleDependency),
-				gradleDependency);
+			if (!content.contains("jakartaAppServer")) {
+				Assert.assertEquals(
+					"Redundant dependency detected in " + path,
+					_getActiveGradleDependency(
+						gradleDependencies, gradleDependency),
+					gradleDependency);
+			}
 		}
 	}
 

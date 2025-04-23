@@ -17,7 +17,6 @@ export const test = mergeTests(
 	accountSettingsPagesTest,
 	dataSetManagerApiHelpersTest,
 	featureFlagsTest({
-		'LPD-37531': {enabled: true},
 		'LPS-178052': {enabled: true},
 	}),
 	isolatedLayoutTest({publish: false}),
@@ -335,7 +334,7 @@ test('When the current page language is changed, the current translation is used
 		});
 
 		await test.step('Check that the correct translations are displayed in the dropdown', async () => {
-			await page.getByRole('button', {name: 'Pedido'}).click();
+			await page.getByRole('button', {name: 'Ordenar'}).click();
 
 			await expect(
 				page.getByRole('menuitem', {name: 'ID'})

@@ -10,6 +10,7 @@ import com.liferay.account.model.AccountEntry;
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.commerce.account.test.util.CommerceAccountTestUtil;
 import com.liferay.commerce.constants.CommerceOrderConstants;
+import com.liferay.commerce.constants.CommerceOrderPaymentConstants;
 import com.liferay.commerce.constants.CommerceShipmentConstants;
 import com.liferay.commerce.context.CommerceContext;
 import com.liferay.commerce.currency.model.CommerceCurrency;
@@ -44,6 +45,7 @@ import com.liferay.commerce.test.util.order.status.Test1CommerceOrderStatusImpl;
 import com.liferay.commerce.test.util.order.status.Test2CommerceOrderStatusImpl;
 import com.liferay.commerce.test.util.order.status.Test3CommerceOrderStatusImpl;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.security.RandomUtil;
@@ -52,6 +54,7 @@ import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionCheckerFactoryUtil;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
+import com.liferay.portal.kernel.service.CompanyLocalServiceUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
@@ -102,32 +105,27 @@ public class CommerceOrderEngineTest {
 	public void setUp() throws Exception {
 		_group = GroupTestUtil.addGroup();
 
-		_user = UserTestUtil.addUser();
+		_company = CompanyLocalServiceUtil.getCompany(_group.getCompanyId());
 
-		_permissionChecker = PermissionThreadLocal.getPermissionChecker();
-
-		PrincipalThreadLocal.setName(_user.getUserId());
-
-		PermissionThreadLocal.setPermissionChecker(
-			PermissionCheckerFactoryUtil.create(_user));
-
-		_commerceCurrency = CommerceCurrencyTestUtil.addCommerceCurrency(
-			_group.getCompanyId());
+		_user = UserTestUtil.addUser(_company);
 
 		_serviceContext = ServiceContextTestUtil.getServiceContext(
 			_group.getGroupId());
-
-		_commerceChannel = CommerceChannelLocalServiceUtil.addCommerceChannel(
-			null, AccountConstants.ACCOUNT_ENTRY_ID_DEFAULT,
-			_group.getGroupId(), "Test Channel",
-			CommerceChannelConstants.CHANNEL_TYPE_SITE, null,
-			_commerceCurrency.getCode(), _serviceContext);
 
 		_accountEntry = CommerceAccountTestUtil.addBusinessAccountEntry(
 			_user.getUserId(), RandomTestUtil.randomString(),
 			RandomTestUtil.randomString() + "@liferay.com",
 			RandomTestUtil.randomString(), new long[] {_user.getUserId()}, null,
 			_serviceContext);
+
+		_commerceCurrency = CommerceCurrencyTestUtil.addCommerceCurrency(
+			_group.getCompanyId());
+
+		_commerceChannel = CommerceChannelLocalServiceUtil.addCommerceChannel(
+			null, AccountConstants.ACCOUNT_ENTRY_ID_DEFAULT,
+			_group.getGroupId(), "Test Channel",
+			CommerceChannelConstants.CHANNEL_TYPE_SITE, null,
+			_commerceCurrency.getCode(), _serviceContext);
 
 		_commerceOrder = CommerceTestUtil.addB2BCommerceOrder(
 			_group.getGroupId(), _user.getUserId(),
@@ -137,19 +135,25 @@ public class CommerceOrderEngineTest {
 		_commerceOrder = CommerceTestUtil.addCheckoutDetailsToCommerceOrder(
 			_commerceOrder, _user.getUserId(), false);
 
+		_commerceContext = new TestCommerceContext(
+			_commerceOrder.getAccountEntry(), _commerceCurrency,
+			_commerceChannel, _user, _group, _commerceOrder);
 		_commerceShipment1 = _commerceShipmentLocalService.addCommerceShipment(
 			_commerceOrder.getCommerceOrderId(), _serviceContext);
 		_commerceShipment2 = _commerceShipmentLocalService.addCommerceShipment(
 			_commerceOrder.getCommerceOrderId(), _serviceContext);
 
-		_commerceContext = new TestCommerceContext(
-			_commerceOrder.getAccountEntry(), _commerceCurrency,
-			_commerceChannel, _user, _group, _commerceOrder);
+		_originalName = PrincipalThreadLocal.getName();
+		_originalPermissionChecker =
+			PermissionThreadLocal.getPermissionChecker();
 	}
 
 	@After
 	public void tearDown() throws PortalException {
 		_commerceOrderLocalService.deleteCommerceOrder(_commerceOrder);
+
+		PermissionThreadLocal.setPermissionChecker(_originalPermissionChecker);
+		PrincipalThreadLocal.setName(_originalName);
 	}
 
 	@Test
@@ -678,6 +682,25 @@ public class CommerceOrderEngineTest {
 	}
 
 	@Test
+	public void testCheckoutOrderWithTotal0() throws Exception {
+		_commerceOrder.setManuallyAdjusted(true);
+		_commerceOrder.setTotal(BigDecimal.ZERO);
+
+		_commerceOrder = _commerceOrderLocalService.updateCommerceOrder(
+			_commerceOrder);
+
+		_commerceOrder = _commerceOrderEngine.checkoutCommerceOrder(
+			_commerceOrder, _user.getUserId());
+
+		Assert.assertEquals(
+			CommerceOrderConstants.ORDER_STATUS_PENDING,
+			_commerceOrder.getOrderStatus());
+		Assert.assertEquals(
+			CommerceOrderPaymentConstants.STATUS_NOT_REQUIRED,
+			_commerceOrder.getPaymentStatus());
+	}
+
+	@Test
 	public void testCustomOrderStatusOrderFlow() throws Exception {
 		frutillaRule.scenario(
 			"Use the Order Engine to transition an Order to one of two " +
@@ -1168,8 +1191,6 @@ public class CommerceOrderEngineTest {
 	@Rule
 	public FrutillaRule frutillaRule = new FrutillaRule();
 
-	private static User _user;
-
 	private AccountEntry _accountEntry;
 
 	@DeleteAfterTestRun
@@ -1204,12 +1225,15 @@ public class CommerceOrderEngineTest {
 	@Inject
 	private CommerceShipmentLocalService _commerceShipmentLocalService;
 
+	private Company _company;
 	private Group _group;
-	private PermissionChecker _permissionChecker;
+	private String _originalName;
+	private PermissionChecker _originalPermissionChecker;
 
 	@Inject
 	private ServiceComponentRuntime _serviceComponentRuntime;
 
 	private ServiceContext _serviceContext;
+	private User _user;
 
 }

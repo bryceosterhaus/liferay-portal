@@ -14,15 +14,14 @@ import {
 
 import Navbar, {NavbarProps} from '../../../../../components/Navbar';
 import {PageRenderer} from '../../../../../components/Page';
-import {ORDER_WORKFLOW_STATUS_CODE} from '../../../../../enums/Order';
-import {OrderType} from '../../../../../enums/OrderType';
+import {OrderTypes, OrderWorkflowStatusCode} from '../../../../../enums/Order';
 import useGetProductByOrderId from '../../../../../hooks/useGetProductByOrderId';
 import i18n from '../../../../../i18n';
 import getProductPriceModel from '../../../../GetApp/utils/getProductPriceModel';
 import OrderDetailsHeader from '../../../components/OrderDetailsHeader';
 
 import './App.scss';
-import {PRODUCT_SPECIFICATION_KEY} from '../../../../../enums/Product';
+import {ProductSpecificationKey} from '../../../../../enums/Product';
 import {safeJSONParse} from '../../../../../utils/util';
 
 type ProductAndOrderPayload = NonNullable<
@@ -91,6 +90,9 @@ const BaseOutlet: React.FC<BaseOutletProps> = ({
 };
 
 const AppOutlet = () => {
+	const {orderId} = useParams();
+	const {data} = useGetProductByOrderId(orderId as string);
+
 	return (
 		<BaseOutlet
 			backTitle={i18n.translate('back-to-my-apps')}
@@ -99,7 +101,7 @@ const AppOutlet = () => {
 
 				const isCompletedOrderWithVirtualItems =
 					placedOrder.workflowStatusInfo.code ===
-						ORDER_WORKFLOW_STATUS_CODE.COMPLETED &&
+						OrderWorkflowStatusCode.COMPLETED &&
 					placedOrder.placedOrderItems.some(
 						(item: PlacedOrderItems) => item.virtualItems?.length
 					);
@@ -113,13 +115,13 @@ const AppOutlet = () => {
 
 				if (
 					placedOrder.orderTypeExternalReferenceCode ===
-					OrderType.CLOUD
+					OrderTypes.CLOUDAPP
 				) {
 					const isDownloadableCloud =
 						product?.productSpecifications.some((specification) => {
 							if (
 								specification.specificationKey ===
-								PRODUCT_SPECIFICATION_KEY.APP_SETTINGS
+								ProductSpecificationKey.APP_SETTINGS
 							) {
 								return safeJSONParse(specification.value, {
 									downloadableCloud: true,
@@ -143,9 +145,7 @@ const AppOutlet = () => {
 					];
 				}
 
-				if (
-					placedOrder.orderTypeExternalReferenceCode === OrderType.DXP
-				) {
+				if (data?.marketplaceDeliveryOrder.isDownloadable) {
 					return [
 						...tabs,
 						{

@@ -323,6 +323,8 @@ public class PortalUpgradeProcess extends UpgradeProcess {
 			}
 
 			doUpgrade();
+
+			closeConnections();
 		}
 		catch (Exception exception) {
 			message = "Failed upgrade process ";

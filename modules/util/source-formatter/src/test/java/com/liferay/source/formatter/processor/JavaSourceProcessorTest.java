@@ -110,6 +110,32 @@ public class JavaSourceProcessorTest extends BaseSourceProcessorTestCase {
 	}
 
 	@Test
+	public void testCompanyThreadLocalUsage() throws Exception {
+		test(
+			SourceProcessorTestParameters.create(
+				"CompanyThreadLocalUsage.testjava"
+			).addExpectedMessage(
+				StringBundler.concat(
+					"Do not use \"CompanyThreadLocal.setCompanyId\", use ",
+					"\"CompanyThreadLocal.setCompanyIdWithSafeCloseable\" ",
+					"instead"),
+				16
+			).addExpectedMessage(
+				StringBundler.concat(
+					"Missing calling \"close\" to variable ",
+					"\"_safeCloseable1\", use \"_safeCloseable1.close\" or ",
+					"try-with-resources statement instead"),
+				28
+			).addExpectedMessage(
+				StringBundler.concat(
+					"Missing calling \"close\" to variable ",
+					"\"_safeCloseable2\", use \"_safeCloseable2.close\" or ",
+					"try-with-resources statement instead"),
+				29
+			));
+	}
+
+	@Test
 	public void testConstructorParameterOrder() throws Exception {
 		test("ConstructorParameterOrder.testjava");
 	}
@@ -727,6 +753,11 @@ public class JavaSourceProcessorTest extends BaseSourceProcessorTestCase {
 	}
 
 	@Test
+	public void testRecordClass() throws Exception {
+		test("RecordClass.testjava", "Do not declare record class", 11);
+	}
+
+	@Test
 	public void testRedundantCommas() throws Exception {
 		test("RedundantCommas.testjava");
 	}
@@ -860,6 +891,18 @@ public class JavaSourceProcessorTest extends BaseSourceProcessorTestCase {
 					"than 3 elements",
 				41
 			));
+	}
+
+	@Test
+	public void testSwitchExpression() throws Exception {
+		test(
+			"SwitchExpression.testjava",
+			"Use \"if/else\" statement instead of \"switch\"", 14);
+	}
+
+	@Test
+	public void testTextBlock() throws Exception {
+		test("TextBlock.testjava", "Do not use text block", 14);
 	}
 
 	@Test

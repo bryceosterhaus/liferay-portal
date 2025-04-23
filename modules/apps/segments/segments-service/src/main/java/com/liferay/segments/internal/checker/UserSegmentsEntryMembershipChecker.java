@@ -282,14 +282,14 @@ public class UserSegmentsEntryMembershipChecker {
 	};
 
 	private static final Pattern _containsOperationPattern = Pattern.compile(
-		"contains\\((customField\\/){0,1}\\w*, '\\w*'\\)");
+		"contains\\((customField/){0,1}\\w*, '([^')]*)'\\)");
 	private static final DateFormat _dateTimeFormat = new SimpleDateFormat(
 		"yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 	private static final Pattern _dateTimePattern = Pattern.compile(
 		"\\d{4}-\\d{2}-\\d{2}(T\\d{2}:\\d{2}:\\d{2}.\\d{3}){0,1}((Z)|" +
-			"((\\+|\\-)(\\d*))){0,1}");
+			"((\\+|-)(\\d*))){0,1}");
 	private static final Pattern _fieldNameContainsPattern = Pattern.compile(
-		"(?<=contains\\()(customField\\/){0,1}\\w*");
+		"(?<=contains\\()(customField/){0,1}\\w*");
 	private static final Pattern _fieldNamePattern = Pattern.compile(
 		"(customField\\/){0,1}\\w*\\s+(?=eq|ge|gt|in|le|lt)");
 	private static final Map<String, String> _fieldNames = HashMapBuilder.put(
@@ -300,9 +300,11 @@ public class UserSegmentsEntryMembershipChecker {
 	private static final Pattern _notOperationPattern = Pattern.compile(
 		"not(?=\\s*\\()");
 	private static final Pattern _operationPattern = Pattern.compile(
-		"(customField\\/){0,1}\\w*\\s+(eq|ge|gt|in|le|lt)\\s+('\\w*'|" +
-			"\\('\\w*'\\)|\\d{4}-\\d{2}-\\d{2}(T\\d{2}:\\d{2}:\\d{2}.\\d{3})" +
-				"{0,1}((Z)|((\\+|\\-)(\\d*))){0,1})");
+		StringBundler.concat(
+			"(customField\\/){0,1}\\w*\\s+(eq|ge|gt|in|le|lt)\\s+",
+			"('([^')]*)'|\\('([^')]*)'\\)|",
+			"\\d{4}-\\d{2}-\\d{2}(T\\d{2}:\\d{2}:\\d{2}.\\d{3}){0,1}((Z)|",
+			"((\\+|\\-)(\\d*))){0,1})"));
 	private static final Pattern _operatorPattern = Pattern.compile(
 		"\\s+(eq|ge|gt|in|le|lt)(?=\\w*\\s+)");
 	private static final Map<String, String> _operators = HashMapBuilder.put(
@@ -323,7 +325,7 @@ public class UserSegmentsEntryMembershipChecker {
 		"or", "||"
 	).build();
 	private static final Pattern _valuePattern = Pattern.compile(
-		"'\\w*'|'{0,1}\\d{4}-\\d{2}-\\d{2}(T\\d{2}:\\d{2}:\\d{2}.\\d{3}){0,1}" +
-			"((Z)|((\\+|\\-)(\\d*))){0,1}'{0,1}");
+		"'([^')]*)'|'{0,1}\\d{4}-\\d{2}-\\d{2}(T\\d{2}:\\d{2}:\\d{2}.\\d{3})" +
+			"{0,1}((Z)|((\\+|-)(\\d*))){0,1}'{0,1}");
 
 }

@@ -11,7 +11,7 @@ import {Link, Outlet} from 'react-router-dom';
 import AppPublish from '../../../../components/AppPublish';
 import Modal from '../../../../components/Modal';
 import {useNewAppContext} from '../../../../context/NewAppContext';
-import {PRODUCT_WORKFLOW_STATUS_CODE} from '../../../../enums/Product';
+import {ProductWorkflowStatusCode} from '../../../../enums/Product';
 import {useAccount} from '../../../../hooks/data/useAccounts';
 import i18n from '../../../../i18n';
 import usePublishHeader from '../../hooks/usePublishHeader';
@@ -35,7 +35,7 @@ const PublishAppOutlet = () => {
 		onClickPrevious,
 		onExit,
 		steps,
-	} = usePublishNavigation({exitLink: '/apps', flowItems: APP_FLOW_ITEMS});
+	} = usePublishNavigation({exitLink: '/', flowItems: APP_FLOW_ITEMS});
 
 	const {onSave, onSaveAsDraft} = usePublishAppSubmission(context, dispatch);
 
@@ -55,7 +55,7 @@ const PublishAppOutlet = () => {
 	const isDisabled = parsedSchema ? !parsedSchema.success : false;
 
 	const isDraft = (status: number) =>
-		status === PRODUCT_WORKFLOW_STATUS_CODE.DRAFT;
+		status === ProductWorkflowStatusCode.DRAFT;
 
 	const isSaveAsDraft =
 		!context._product || isDraft(context._product.productStatus);
@@ -89,18 +89,34 @@ const PublishAppOutlet = () => {
 					disabled: isDisabled,
 					onClick: onSaveAsDraft,
 				}}
+				submitProps={{
+					onClick: onSave,
+				}}
 			/>
 
 			<AppPublish.Body>
 				<AppPublish.Sidebar activeIndex={activeIndex} items={steps} />
 
 				<AppPublish.Content>
-					<details>
-						<pre>{JSON.stringify(context, null, 2)}</pre>
-					</details>
-
 					<h1 className="header-title mb-4">{activeRoute.title}</h1>
 					{activeRoute.description}
+
+					<details>
+						<pre>
+							{JSON.stringify(
+								(function () {
+									const _context = {...context};
+
+									delete _context.references;
+									delete _context._product;
+
+									return _context;
+								})(),
+								null,
+								4
+							)}
+						</pre>
+					</details>
 
 					<div className="mt-6 new-app-form">
 						<Outlet />

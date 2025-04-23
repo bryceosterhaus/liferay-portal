@@ -33,6 +33,7 @@ import com.liferay.object.constants.ObjectActionExecutorConstants;
 import com.liferay.object.constants.ObjectActionKeys;
 import com.liferay.object.constants.ObjectActionTriggerConstants;
 import com.liferay.object.constants.ObjectDefinitionConstants;
+import com.liferay.object.constants.ObjectEntryFolderConstants;
 import com.liferay.object.constants.ObjectFieldSettingConstants;
 import com.liferay.object.constants.ObjectFieldValidationConstants;
 import com.liferay.object.constants.ObjectFilterConstants;
@@ -70,6 +71,8 @@ import com.liferay.object.rest.dto.v1_0.Link;
 import com.liferay.object.rest.dto.v1_0.ListEntry;
 import com.liferay.object.rest.dto.v1_0.ObjectEntry;
 import com.liferay.object.rest.dto.v1_0.Status;
+import com.liferay.object.rest.dto.v1_0.SystemProperties;
+import com.liferay.object.rest.dto.v1_0.Version;
 import com.liferay.object.rest.manager.v1_0.DefaultObjectEntryManager;
 import com.liferay.object.rest.manager.v1_0.ObjectEntryManager;
 import com.liferay.object.rest.test.util.BaseObjectEntryManagerImplTestCase;
@@ -144,6 +147,7 @@ import com.liferay.portal.kernel.util.MimeTypesUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.TempFileEntryUtil;
 import com.liferay.portal.kernel.util.UnicodePropertiesBuilder;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.search.document.Document;
 import com.liferay.portal.search.hits.SearchHit;
@@ -396,6 +400,8 @@ public class DefaultObjectEntryManagerImplTest
 		_objectDefinition2 = _createObjectDefinition(
 			Arrays.asList(
 				new AttachmentObjectFieldBuilder(
+				).indexed(
+					true
 				).labelMap(
 					LocalizedMapUtil.getLocalizedMap(
 						RandomTestUtil.randomString())
@@ -694,11 +700,13 @@ public class DefaultObjectEntryManagerImplTest
 		_objectDefinition3 =
 			objectDefinitionLocalService.addCustomObjectDefinition(
 				adminUser.getUserId(), 0, null, false, false, true, true, false,
+				false,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				ObjectDefinitionTestUtil.getRandomName(), null, null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				true, ObjectDefinitionConstants.SCOPE_COMPANY,
 				ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
+				Collections.emptyList(),
 				ListUtil.fromArray(
 					new TextObjectFieldBuilder(
 					).indexed(
@@ -1298,6 +1306,140 @@ public class DefaultObjectEntryManagerImplTest
 						"a" + RandomTestUtil.randomString()
 					).build()),
 				ObjectDefinitionConstants.SCOPE_SITE));
+	}
+
+	@Test
+	public void testAddObjectEntryWithDefaultValue() throws Exception {
+		ObjectDefinition objectDefinition = _createObjectDefinition(
+			Arrays.asList(
+				new BooleanObjectFieldBuilder(
+				).labelMap(
+					LocalizedMapUtil.getLocalizedMap(
+						RandomTestUtil.randomString())
+				).localized(
+					true
+				).name(
+					"localizedBooleanObjectFieldName"
+				).build(),
+				new PicklistObjectFieldBuilder(
+				).indexed(
+					true
+				).labelMap(
+					LocalizedMapUtil.getLocalizedMap(
+						RandomTestUtil.randomString())
+				).listTypeDefinitionId(
+					listTypeDefinition.getListTypeDefinitionId()
+				).localized(
+					true
+				).name(
+					"localizedPicklistObjectFieldName"
+				).build()));
+
+		ObjectEntry objectEntry = _addObjectEntry(
+			objectDefinition,
+			HashMapBuilder.<String, Object>put(
+				"localizedBooleanObjectFieldName_i18n", () -> null
+			).put(
+				"localizedPicklistObjectFieldName_i18n", () -> null
+			).build());
+
+		Map<String, Object> properties = objectEntry.getProperties();
+
+		Assert.assertNull(
+			properties.get("localizedBooleanObjectFieldName_i18n"));
+		Assert.assertNull(
+			properties.get("localizedPicklistObjectFieldName_i18n"));
+
+		Map<String, Object> localizedObjectFieldI18nValues =
+			HashMapBuilder.<String, Object>put(
+				"localizedBooleanObjectFieldName_i18n",
+				HashMapBuilder.<String, Object>put(
+					"en_US", RandomTestUtil.randomBoolean()
+				).put(
+					"pt_BR", RandomTestUtil.randomBoolean()
+				).build()
+			).put(
+				"localizedPicklistObjectFieldName_i18n",
+				HashMapBuilder.<String, Object>put(
+					"en_US", _listTypeEntryKey1
+				).put(
+					"pt_BR", _listTypeEntryKey2
+				).build()
+			).build();
+
+		assertEquals(
+			_addObjectEntry(objectDefinition, localizedObjectFieldI18nValues),
+			new ObjectEntry() {
+				{
+					properties = localizedObjectFieldI18nValues;
+				}
+			});
+
+		_addObjectFieldSettingWithDefaultValue(
+			StringPool.TRUE, objectDefinition,
+			"localizedBooleanObjectFieldName");
+		_addObjectFieldSettingWithDefaultValue(
+			_listTypeEntryKey1, objectDefinition,
+			"localizedPicklistObjectFieldName");
+
+		assertEquals(
+			_addObjectEntry(
+				objectDefinition,
+				HashMapBuilder.<String, Object>put(
+					"localizedBooleanObjectFieldName_i18n", () -> null
+				).put(
+					"localizedPicklistObjectFieldName_i18n", () -> null
+				).build()),
+			new ObjectEntry() {
+				{
+					properties = HashMapBuilder.<String, Object>put(
+						"localizedBooleanObjectFieldName_i18n",
+						HashMapBuilder.<String, Object>put(
+							"en_US", true
+						).build()
+					).put(
+						"localizedPicklistObjectFieldName_i18n",
+						HashMapBuilder.<String, Object>put(
+							"en_US", _listTypeEntryKey1
+						).build()
+					).build();
+				}
+			});
+		assertEquals(
+			_addObjectEntry(
+				objectDefinition,
+				HashMapBuilder.<String, Object>put(
+					"localizedBooleanObjectFieldName_i18n",
+					HashMapBuilder.<String, Object>put(
+						"pt_BR", true
+					).build()
+				).put(
+					"localizedPicklistObjectFieldName_i18n",
+					HashMapBuilder.<String, Object>put(
+						"pt_BR", _listTypeEntryKey2
+					).build()
+				).build()),
+			new ObjectEntry() {
+				{
+					properties = HashMapBuilder.<String, Object>put(
+						"localizedBooleanObjectFieldName_i18n",
+						HashMapBuilder.<String, Object>put(
+							"en_US", true
+						).put(
+							"pt_BR", true
+						).build()
+					).put(
+						"localizedPicklistObjectFieldName_i18n",
+						HashMapBuilder.<String, Object>put(
+							"en_US", _listTypeEntryKey1
+						).put(
+							"pt_BR", _listTypeEntryKey2
+						).build()
+					).build();
+				}
+			});
+
+		objectDefinitionLocalService.deleteObjectDefinition(objectDefinition);
 	}
 
 	@Test
@@ -2220,18 +2362,9 @@ public class DefaultObjectEntryManagerImplTest
 				_addAndAssertObjectEntryWithPicklistObjectField(
 					"listTypeEntryKey2", "listTypeEntryKey2", objectDefinition);
 
-			ObjectField objectField = _objectFieldLocalService.fetchObjectField(
-				objectDefinition.getObjectDefinitionId(),
+			_addObjectFieldSettingWithDefaultValue(
+				"listTypeEntryKey1", objectDefinition,
 				"picklistObjectFieldName");
-
-			_objectFieldSettingLocalService.addObjectFieldSetting(
-				TestPropsValues.getUserId(), objectField.getObjectFieldId(),
-				ObjectFieldSettingConstants.NAME_DEFAULT_VALUE,
-				"listTypeEntryKey1");
-			_objectFieldSettingLocalService.addObjectFieldSetting(
-				TestPropsValues.getUserId(), objectField.getObjectFieldId(),
-				ObjectFieldSettingConstants.NAME_DEFAULT_VALUE_TYPE,
-				ObjectFieldSettingConstants.VALUE_INPUT_AS_VALUE);
 
 			Assert.assertEquals(
 				StringPool.BLANK,
@@ -2723,6 +2856,9 @@ public class DefaultObjectEntryManagerImplTest
 							_objectRelationshipFieldName,
 							parentObjectEntry1.getId()
 						).put(
+							"attachmentObjectFieldName",
+							_getAttachmentObjectFieldValue()
+						).put(
 							"localizedDateObjectFieldName", "2024-01-01"
 						).put(
 							"longIntegerObjectFieldName", 21394167160L
@@ -2746,6 +2882,9 @@ public class DefaultObjectEntryManagerImplTest
 						Arrays.asList(_listTypeEntryKey3, _listTypeEntryKey4)
 					).put(
 						_objectRelationshipFieldName, parentObjectEntry1.getId()
+					).put(
+						"attachmentObjectFieldName",
+						_getFileEntryId(childObjectEntry1)
 					).put(
 						"localizedBooleanObjectFieldName", true
 					).put(
@@ -2896,6 +3035,8 @@ public class DefaultObjectEntryManagerImplTest
 							"localizedLongTextObjectFieldName",
 							"en_US localizedLongTextObjectFieldValue"
 						).put(
+							"longIntegerObjectFieldName", 200L
+						).put(
 							"picklistObjectFieldName", picklistObjectFieldValue2
 						).put(
 							"textObjectFieldName", "aab"
@@ -3011,6 +3152,13 @@ public class DefaultObjectEntryManagerImplTest
 				_buildContainsExpressionFilterString(
 					"textObjectFieldName", RandomTestUtil.randomString())
 			).build());
+		testGetObjectEntries(
+			HashMapBuilder.put(
+				"filter",
+				_buildContainsExpressionFilterString(
+					"textObjectFieldName", "Aab")
+			).build(),
+			childObjectEntry2);
 		testGetObjectEntries(
 			HashMapBuilder.put(
 				"filter",
@@ -3473,6 +3621,24 @@ public class DefaultObjectEntryManagerImplTest
 			).build(),
 			childObjectEntry1);
 
+		objectField = objectFieldLocalService.fetchObjectField(
+			_objectDefinition2.getObjectDefinitionId(),
+			"attachmentObjectFieldName");
+
+		_objectDefinition2.setTitleObjectFieldId(
+			objectField.getObjectFieldId());
+
+		objectDefinitionLocalService.updateObjectDefinition(_objectDefinition2);
+
+		com.liferay.portal.kernel.repository.model.FileEntry fileEntry =
+			_dlAppLocalService.getFileEntry(_getFileEntryId(childObjectEntry1));
+
+		testGetObjectEntries(
+			HashMapBuilder.put(
+				"search", fileEntry.getTitle()
+			).build(),
+			childObjectEntry1);
+
 		// "Starts with" expression
 
 		testGetObjectEntries(
@@ -3932,11 +4098,82 @@ public class DefaultObjectEntryManagerImplTest
 			1, String.valueOf(parentObjectEntry2.getId()), page);
 	}
 
+	@FeatureFlags("LPD-17564")
+	@Test
+	public void testGetObjectEntryByVersion() throws Exception {
+		_objectDefinition1.setEnableObjectEntryVersioning(true);
+
+		_objectDefinition1 =
+			objectDefinitionLocalService.updateObjectDefinition(
+				_objectDefinition1);
+
+		ObjectEntry objectEntry1 = new ObjectEntry() {
+			{
+				externalReferenceCode = RandomTestUtil.randomString();
+				keywords = new String[] {RandomTestUtil.randomString()};
+				properties = HashMapBuilder.<String, Object>put(
+					"textObjectFieldName", RandomTestUtil.randomString()
+				).build();
+				systemProperties = new SystemProperties() {
+					{
+						version = new Version() {
+							{
+								number = 1;
+							}
+						};
+					}
+				};
+			}
+		};
+
+		_defaultObjectEntryManager.addObjectEntry(
+			dtoConverterContext, _objectDefinition1, objectEntry1,
+			ObjectDefinitionConstants.SCOPE_COMPANY);
+
+		assertEquals(
+			_defaultObjectEntryManager.getObjectEntryByVersion(
+				dtoConverterContext, objectEntry1.getExternalReferenceCode(),
+				_objectDefinition1, 1),
+			objectEntry1);
+
+		ObjectEntry objectEntry2 = new ObjectEntry() {
+			{
+				externalReferenceCode = RandomTestUtil.randomString();
+				keywords = new String[] {RandomTestUtil.randomString()};
+				properties = HashMapBuilder.<String, Object>put(
+					"textObjectFieldName", RandomTestUtil.randomString()
+				).build();
+				systemProperties = new SystemProperties() {
+					{
+						version = new Version() {
+							{
+								number = 2;
+							}
+						};
+					}
+				};
+			}
+		};
+
+		_defaultObjectEntryManager.updateObjectEntry(
+			TestPropsValues.getCompanyId(), dtoConverterContext,
+			objectEntry1.getExternalReferenceCode(), _objectDefinition1,
+			objectEntry2, ObjectDefinitionConstants.SCOPE_COMPANY);
+
+		assertEquals(
+			_defaultObjectEntryManager.getObjectEntryByVersion(
+				dtoConverterContext, objectEntry2.getExternalReferenceCode(),
+				_objectDefinition1, 2),
+			objectEntry2);
+	}
+
 	@Test
 	public void testGetObjectEntryDocument() throws Exception {
 		_objectEntryLocalService.addObjectEntry(
 			adminUser.getUserId(), 0,
-			_objectDefinition1.getObjectDefinitionId(), null,
+			_objectDefinition1.getObjectDefinitionId(),
+			ObjectEntryFolderConstants.PARENT_OBJECT_ENTRY_FOLDER_ID_DEFAULT,
+			null,
 			HashMapBuilder.<String, Serializable>put(
 				"textObjectFieldName", StringUtil.randomId()
 			).put(
@@ -4232,6 +4469,62 @@ public class DefaultObjectEntryManagerImplTest
 		objectEntries = page.getItems();
 
 		Assert.assertEquals(objectEntries.toString(), 1, objectEntries.size());
+	}
+
+	@FeatureFlags("LPD-17564")
+	@Test
+	public void testGetVersionedObjectEntries() throws Exception {
+		_objectDefinition1.setEnableObjectEntryVersioning(true);
+
+		_objectDefinition1 =
+			objectDefinitionLocalService.updateObjectDefinition(
+				_objectDefinition1);
+
+		ObjectEntry objectEntry1 = new ObjectEntry() {
+			{
+				externalReferenceCode = RandomTestUtil.randomString();
+				keywords = new String[] {RandomTestUtil.randomString()};
+				properties = HashMapBuilder.<String, Object>put(
+					"textObjectFieldName", RandomTestUtil.randomString()
+				).build();
+			}
+		};
+
+		_defaultObjectEntryManager.addObjectEntry(
+			dtoConverterContext, _objectDefinition1, objectEntry1,
+			ObjectDefinitionConstants.SCOPE_COMPANY);
+
+		Page<ObjectEntry> page =
+			_defaultObjectEntryManager.getVersionedObjectEntries(
+				dtoConverterContext, objectEntry1.getExternalReferenceCode(),
+				_objectDefinition1, null);
+
+		assertEquals(
+			(List<ObjectEntry>)page.getItems(),
+			ListUtil.fromArray(objectEntry1));
+
+		ObjectEntry objectEntry2 = new ObjectEntry() {
+			{
+				externalReferenceCode = RandomTestUtil.randomString();
+				keywords = new String[] {RandomTestUtil.randomString()};
+				properties = HashMapBuilder.<String, Object>put(
+					"textObjectFieldName", RandomTestUtil.randomString()
+				).build();
+			}
+		};
+
+		_defaultObjectEntryManager.updateObjectEntry(
+			TestPropsValues.getCompanyId(), dtoConverterContext,
+			objectEntry1.getExternalReferenceCode(), _objectDefinition1,
+			objectEntry2, ObjectDefinitionConstants.SCOPE_COMPANY);
+
+		page = _defaultObjectEntryManager.getVersionedObjectEntries(
+			dtoConverterContext, objectEntry2.getExternalReferenceCode(),
+			_objectDefinition1, null);
+
+		assertEquals(
+			(List<ObjectEntry>)page.getItems(),
+			ListUtil.fromArray(objectEntry1, objectEntry2));
 	}
 
 	@Test
@@ -4701,6 +4994,99 @@ public class DefaultObjectEntryManagerImplTest
 			"Edited", objectEntry.getPropertyValue("textObjectFieldName"));
 	}
 
+	@FeatureFlags("LPD-17564")
+	@Test
+	public void testRestoreObjectEntryByVersion() throws Exception {
+		_objectDefinition1.setEnableObjectEntryVersioning(true);
+
+		_objectDefinition1 =
+			objectDefinitionLocalService.updateObjectDefinition(
+				_objectDefinition1);
+
+		ObjectEntry objectEntry1 = new ObjectEntry() {
+			{
+				externalReferenceCode = RandomTestUtil.randomString();
+				keywords = new String[] {RandomTestUtil.randomString()};
+				properties = HashMapBuilder.<String, Object>put(
+					"textObjectFieldName", RandomTestUtil.randomString()
+				).build();
+				systemProperties = new SystemProperties() {
+					{
+						version = new Version() {
+							{
+								number = 1;
+							}
+						};
+					}
+				};
+			}
+		};
+
+		_defaultObjectEntryManager.addObjectEntry(
+			dtoConverterContext, _objectDefinition1, objectEntry1,
+			ObjectDefinitionConstants.SCOPE_COMPANY);
+
+		assertEquals(
+			_defaultObjectEntryManager.getObjectEntryByVersion(
+				dtoConverterContext, objectEntry1.getExternalReferenceCode(),
+				_objectDefinition1, 1),
+			objectEntry1);
+
+		ObjectEntry objectEntry2 = new ObjectEntry() {
+			{
+				externalReferenceCode = RandomTestUtil.randomString();
+				keywords = new String[] {RandomTestUtil.randomString()};
+				properties = HashMapBuilder.<String, Object>put(
+					"textObjectFieldName", RandomTestUtil.randomString()
+				).build();
+				systemProperties = new SystemProperties() {
+					{
+						version = new Version() {
+							{
+								number = 2;
+							}
+						};
+					}
+				};
+			}
+		};
+
+		_defaultObjectEntryManager.updateObjectEntry(
+			TestPropsValues.getCompanyId(), dtoConverterContext,
+			objectEntry1.getExternalReferenceCode(), _objectDefinition1,
+			objectEntry2, ObjectDefinitionConstants.SCOPE_COMPANY);
+
+		assertEquals(
+			_defaultObjectEntryManager.getObjectEntryByVersion(
+				dtoConverterContext, objectEntry2.getExternalReferenceCode(),
+				_objectDefinition1, 2),
+			objectEntry2);
+
+		assertEquals(
+			_defaultObjectEntryManager.restoreObjectEntryByVersion(
+				dtoConverterContext, objectEntry2.getExternalReferenceCode(),
+				_objectDefinition1, 1),
+			new ObjectEntry() {
+				{
+					setExternalReferenceCode(
+						objectEntry1::getExternalReferenceCode);
+					setKeywords(objectEntry1::getKeywords);
+					setProperties(objectEntry1::getProperties);
+					setSystemProperties(
+						() -> new SystemProperties() {
+							{
+								setVersion(
+									() -> new Version() {
+										{
+											number = 3;
+										}
+									});
+							}
+						});
+				}
+			});
+	}
+
 	@Test
 	public void testSearchObjectEntriesWithAccountEntryRestricted()
 		throws Exception {
@@ -4709,7 +5095,9 @@ public class DefaultObjectEntryManagerImplTest
 
 		_objectEntryLocalService.addObjectEntry(
 			adminUser.getUserId(), 0,
-			_objectDefinition3.getObjectDefinitionId(), null,
+			_objectDefinition3.getObjectDefinitionId(),
+			ObjectEntryFolderConstants.PARENT_OBJECT_ENTRY_FOLDER_ID_DEFAULT,
+			null,
 			HashMapBuilder.<String, Serializable>put(
 				"r_oneToManyRelationshipName1_accountEntryId",
 				accountEntry1.getAccountEntryId()
@@ -4724,7 +5112,9 @@ public class DefaultObjectEntryManagerImplTest
 
 		_objectEntryLocalService.addObjectEntry(
 			adminUser.getUserId(), 0,
-			_objectDefinition3.getObjectDefinitionId(), null,
+			_objectDefinition3.getObjectDefinitionId(),
+			ObjectEntryFolderConstants.PARENT_OBJECT_ENTRY_FOLDER_ID_DEFAULT,
+			null,
 			HashMapBuilder.<String, Serializable>put(
 				"r_oneToManyRelationshipName1_accountEntryId",
 				accountEntry2.getAccountEntryId()
@@ -5475,14 +5865,23 @@ public class DefaultObjectEntryManagerImplTest
 		else if (Objects.equals(
 					expectedEntry.getKey(), "attachmentObjectFieldName")) {
 
+			Object expectedValue = expectedEntry.getValue();
 			FileEntry fileEntry = (FileEntry)actualObjectEntryProperties.get(
 				expectedEntry.getKey());
 
-			if ((fileEntry == null) && (expectedEntry.getValue() == null)) {
+			if ((expectedValue == null) && (fileEntry == null)) {
 				return;
 			}
 
-			Assert.assertEquals(expectedEntry.getValue(), fileEntry.getId());
+			if (Validator.isNumber(expectedValue.toString())) {
+				Assert.assertEquals(expectedValue, fileEntry.getId());
+			}
+			else {
+				FileEntry expectedEntryFileEntry = (FileEntry)expectedValue;
+
+				Assert.assertEquals(
+					expectedEntryFileEntry.getId(), fileEntry.getId());
+			}
 
 			DLFileEntry dlFileEntry = _dlFileEntryLocalService.getFileEntry(
 				fileEntry.getId());
@@ -5630,9 +6029,9 @@ public class DefaultObjectEntryManagerImplTest
 
 	private AccountEntry _addAccountEntry() throws Exception {
 		return _accountEntryLocalService.addAccountEntry(
-			adminUser.getUserId(), 0L, RandomTestUtil.randomString(),
-			RandomTestUtil.randomString(), null, null, null,
-			RandomTestUtil.randomString(),
+			StringPool.BLANK, adminUser.getUserId(), 0L,
+			RandomTestUtil.randomString(), RandomTestUtil.randomString(), null,
+			null, null, RandomTestUtil.randomString(),
 			AccountConstants.ACCOUNT_ENTRY_TYPE_BUSINESS,
 			WorkflowConstants.STATUS_APPROVED,
 			ServiceContextTestUtil.getServiceContext());
@@ -5793,6 +6192,23 @@ public class DefaultObjectEntryManagerImplTest
 				}
 			},
 			ObjectDefinitionConstants.SCOPE_COMPANY);
+	}
+
+	private void _addObjectFieldSettingWithDefaultValue(
+			String defaultValue, ObjectDefinition objectDefinition,
+			String objectFieldName)
+		throws Exception {
+
+		ObjectField objectField = _objectFieldLocalService.fetchObjectField(
+			objectDefinition.getObjectDefinitionId(), objectFieldName);
+
+		_objectFieldSettingLocalService.addObjectFieldSetting(
+			TestPropsValues.getUserId(), objectField.getObjectFieldId(),
+			ObjectFieldSettingConstants.NAME_DEFAULT_VALUE, defaultValue);
+		_objectFieldSettingLocalService.addObjectFieldSetting(
+			TestPropsValues.getUserId(), objectField.getObjectFieldId(),
+			ObjectFieldSettingConstants.NAME_DEFAULT_VALUE_TYPE,
+			ObjectFieldSettingConstants.VALUE_INPUT_AS_VALUE);
 	}
 
 	private void _addRelatedObjectEntries(
@@ -6209,11 +6625,12 @@ public class DefaultObjectEntryManagerImplTest
 		ObjectDefinition objectDefinition =
 			objectDefinitionLocalService.addCustomObjectDefinition(
 				adminUser.getUserId(), 0, null, false, false, true, true, false,
+				false,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				ObjectDefinitionTestUtil.getRandomName(), null, null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				true, scope, ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
-				objectFields);
+				Collections.emptyList(), objectFields);
 
 		return objectDefinitionLocalService.publishCustomObjectDefinition(
 			adminUser.getUserId(), objectDefinition.getObjectDefinitionId());

@@ -7,11 +7,11 @@ import {filesize} from 'filesize';
 
 import {DropzoneUpload} from '../../../../../../../components/DropzoneUpload/DropzoneUpload';
 import {FileList} from '../../../../../../../components/FileList/FileList';
-import {ProductType} from '../../../../../../../enums/ProductType';
+import {ProductType} from '../../../../../../../enums/Product';
 import i18n from '../../../../../../../i18n';
 import {getRandomID} from '../../../../../../../utils/string';
 import {useAppContext} from '../../AppContext/AppManageState';
-import {TYPES} from '../../AppContext/actionTypes';
+import {ActionTypes} from '../../AppContext/actionTypes';
 
 type UploadAppPackagesComponentProps = {
 	isProcessing: boolean;
@@ -19,12 +19,21 @@ type UploadAppPackagesComponentProps = {
 };
 
 export const acceptFileTypes = {
+	[ProductType.CLIENT_EXTENSION]: {
+		'application/java-archive': ['.zip'],
+	},
 	[ProductType.CLOUD]: {
+		'application/java-archive': ['.zip'],
+	},
+	[ProductType.COMPOSITE_APP]: {
 		'application/java-archive': ['.zip'],
 	},
 	[ProductType.DXP]: {
 		'application/java-archive': ['.jar'],
 		'application/octet-stream': ['.war'],
+	},
+	[ProductType.LOW_CODE_CONFIGURATION]: {
+		'application/java-archive': ['.zip'],
 	},
 };
 
@@ -67,7 +76,7 @@ export function UploadAppPackagesComponent({
 					: newUploadedPackage,
 				versionName,
 			},
-			type: TYPES.UPLOAD_BUILD_PACKAGE_FILES,
+			type: ActionTypes.UPLOAD_BUILD_PACKAGE_FILES,
 		});
 	};
 
@@ -79,7 +88,7 @@ export function UploadAppPackagesComponent({
 				),
 				versionName,
 			},
-			type: TYPES.UPLOAD_BUILD_PACKAGE_FILES,
+			type: ActionTypes.UPLOAD_BUILD_PACKAGE_FILES,
 		});
 
 	return (
@@ -103,12 +112,12 @@ export function UploadAppPackagesComponent({
 					}
 					buttonText={i18n.translate('select-a-file')}
 					description={
-						appType.value === ProductType.CLOUD
+						appType.value === ProductType.DXP
 							? i18n.translate(
-									'only-zip-files-are-allowed-max-file-size-is-500-mb'
+									'only-jar-war-files-are-allowed-max-file-size-is-500mb'
 								)
 							: i18n.translate(
-									'only-jar-war-files-are-allowed-max-file-size-is-500mb'
+									'only-zip-files-are-allowed-max-file-size-is-500-mb'
 								)
 					}
 					maxFiles={1}

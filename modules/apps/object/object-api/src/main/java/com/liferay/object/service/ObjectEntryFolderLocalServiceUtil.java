@@ -124,11 +124,12 @@ public class ObjectEntryFolderLocalServiceUtil {
 		return getService().deleteObjectEntryFolder(objectEntryFolder);
 	}
 
-	public static ObjectEntryFolder deleteObjectEntryFolder(
-			String externalReferenceCode, long groupId, long companyId)
+	public static ObjectEntryFolder
+			deleteObjectEntryFolderByExternalReferenceCode(
+				String externalReferenceCode, long groupId, long companyId)
 		throws PortalException {
 
-		return getService().deleteObjectEntryFolder(
+		return getService().deleteObjectEntryFolderByExternalReferenceCode(
 			externalReferenceCode, groupId, companyId);
 	}
 
@@ -233,6 +234,14 @@ public class ObjectEntryFolderLocalServiceUtil {
 		return getService().fetchObjectEntryFolder(objectEntryFolderId);
 	}
 
+	public static ObjectEntryFolder
+		fetchObjectEntryFolderByExternalReferenceCode(
+			String externalReferenceCode, long groupId, long companyId) {
+
+		return getService().fetchObjectEntryFolderByExternalReferenceCode(
+			externalReferenceCode, groupId, companyId);
+	}
+
 	/**
 	 * Returns the object entry folder matching the UUID and group.
 	 *
@@ -280,6 +289,14 @@ public class ObjectEntryFolderLocalServiceUtil {
 		throws PortalException {
 
 		return getService().getObjectEntryFolder(objectEntryFolderId);
+	}
+
+	public static ObjectEntryFolder getObjectEntryFolderByExternalReferenceCode(
+			String externalReferenceCode, long groupId, long companyId)
+		throws PortalException {
+
+		return getService().getObjectEntryFolderByExternalReferenceCode(
+			externalReferenceCode, groupId, companyId);
 	}
 
 	/**
@@ -392,12 +409,13 @@ public class ObjectEntryFolderLocalServiceUtil {
 	public static ObjectEntryFolder updateObjectEntryFolder(
 			long userId, long objectEntryFolderId,
 			long parentObjectEntryFolderId,
-			Map<java.util.Locale, String> labelMap, String name)
+			Map<java.util.Locale, String> labelMap, String name,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws PortalException {
 
 		return getService().updateObjectEntryFolder(
 			userId, objectEntryFolderId, parentObjectEntryFolderId, labelMap,
-			name);
+			name, serviceContext);
 	}
 
 	/**

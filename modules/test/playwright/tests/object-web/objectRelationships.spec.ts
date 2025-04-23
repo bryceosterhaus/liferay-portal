@@ -4,11 +4,11 @@
  */
 
 import {
-	ObjectDefinitionApi,
+	ObjectDefinitionAPI,
 	ObjectField,
-	ObjectFieldApi,
+	ObjectFieldAPI,
 	ObjectRelationship,
-	ObjectRelationshipApi,
+	ObjectRelationshipAPI,
 } from '@liferay/object-admin-rest-client-js';
 import {expect, mergeTests} from '@playwright/test';
 
@@ -74,15 +74,15 @@ test.describe('Manage object relationships through Model Builder', () => {
 			objectDefinitionId1: objectDefinition1.id,
 			objectDefinitionId2: objectDefinition2.id,
 			objectDefinitionName2: objectDefinition2.name,
-			type: ObjectRelationship.TypeEnum.OneToMany,
+			type: 'oneToMany',
 		};
 
-		const objectRelationshipApiClient = await apiHelpers.buildRestClient(
-			ObjectRelationshipApi
+		const objectRelationshipAPIClient = await apiHelpers.buildRestClient(
+			ObjectRelationshipAPI
 		);
 
 		const {body: objectRelationship} =
-			await objectRelationshipApiClient.postObjectDefinitionByExternalReferenceCodeObjectRelationship(
+			await objectRelationshipAPIClient.postObjectDefinitionByExternalReferenceCodeObjectRelationship(
 				objectDefinition1.externalReferenceCode,
 				objectRelationshipData
 			);
@@ -493,15 +493,15 @@ test.describe('Manage object relationships through Model Builder', () => {
 			objectDefinitionId1: objectDefinition1.id,
 			objectDefinitionId2: objectDefinition2.id,
 			objectDefinitionName2: objectDefinition2.name,
-			type: ObjectRelationship.TypeEnum.OneToMany,
+			type: 'oneToMany',
 		};
 
-		const objectRelationshipApiClient = await apiHelpers.buildRestClient(
-			ObjectRelationshipApi
+		const objectRelationshipAPIClient = await apiHelpers.buildRestClient(
+			ObjectRelationshipAPI
 		);
 
 		const {body: objectRelationship} =
-			await objectRelationshipApiClient.postObjectDefinitionByExternalReferenceCodeObjectRelationship(
+			await objectRelationshipAPIClient.postObjectDefinitionByExternalReferenceCodeObjectRelationship(
 				objectDefinition1.externalReferenceCode,
 				objectRelationshipData
 			);
@@ -586,15 +586,15 @@ test.describe('Manage object relationships through Model Builder', () => {
 
 		const objectRelationshipDetails: {
 			label: string;
-			type: ObjectRelationship.TypeEnum;
+			type: 'oneToMany' | 'oneToOne' | 'manyToMany';
 		}[] = [
 			{
 				label: 'objectRelationshipLabel' + getRandomInt(),
-				type: ObjectRelationship.TypeEnum.OneToMany,
+				type: 'oneToMany',
 			},
 			{
 				label: 'objectRelationshipLabel' + getRandomInt(),
-				type: ObjectRelationship.TypeEnum.ManyToMany,
+				type: 'manyToMany',
 			},
 		];
 
@@ -616,11 +616,11 @@ test.describe('Manage object relationships through Model Builder', () => {
 				type,
 			};
 
-			const objectRelationshipApiClient =
-				await apiHelpers.buildRestClient(ObjectRelationshipApi);
+			const objectRelationshipAPIClient =
+				await apiHelpers.buildRestClient(ObjectRelationshipAPI);
 
 			const {body: objectRelationship} =
-				await objectRelationshipApiClient.postObjectDefinitionByExternalReferenceCodeObjectRelationship(
+				await objectRelationshipAPIClient.postObjectDefinitionByExternalReferenceCodeObjectRelationship(
 					objectRelationshipData.objectDefinitionExternalReferenceCode1,
 					objectRelationshipData
 				);
@@ -705,12 +705,12 @@ test.describe('Manage object relationships through Model Builder', () => {
 		const objectRelationshipName =
 			'objectRelationshipName' + Math.floor(Math.random() * 99);
 
-		const objectRelationshipApiClient = await apiHelpers.buildRestClient(
-			ObjectRelationshipApi
+		const objectRelationshipAPIClient = await apiHelpers.buildRestClient(
+			ObjectRelationshipAPI
 		);
 
 		const {body: objectRelationship} =
-			await objectRelationshipApiClient.postObjectDefinitionByExternalReferenceCodeObjectRelationship(
+			await objectRelationshipAPIClient.postObjectDefinitionByExternalReferenceCodeObjectRelationship(
 				objectDefinition1.externalReferenceCode,
 				{
 					label: {
@@ -724,7 +724,7 @@ test.describe('Manage object relationships through Model Builder', () => {
 					objectDefinitionId1: objectDefinition1.id,
 					objectDefinitionId2: objectDefinition2.id,
 					objectDefinitionName2: objectDefinition2.name,
-					type: ObjectRelationship.TypeEnum.OneToMany,
+					type: 'oneToMany',
 				}
 			);
 
@@ -835,15 +835,15 @@ test.describe('Manage object relationships through Model Builder', () => {
 			objectDefinitionId1: objectDefinition1.id,
 			objectDefinitionId2: objectDefinition2.id,
 			objectDefinitionName2: objectDefinition2.name,
-			type: ObjectRelationship.TypeEnum.OneToMany,
+			type: 'oneToMany',
 		};
 
-		const objectRelationshipApiClient = await apiHelpers.buildRestClient(
-			ObjectRelationshipApi
+		const objectRelationshipAPIClient = await apiHelpers.buildRestClient(
+			ObjectRelationshipAPI
 		);
 
 		const {body: objectRelationship} =
-			await objectRelationshipApiClient.postObjectDefinitionByExternalReferenceCodeObjectRelationship(
+			await objectRelationshipAPIClient.postObjectDefinitionByExternalReferenceCodeObjectRelationship(
 				objectRelationshipData.objectDefinitionExternalReferenceCode1,
 				objectRelationshipData
 			);
@@ -895,11 +895,11 @@ test.describe('Manage object relationships through Model Builder', () => {
 				status: {code: 0},
 			});
 
-		const objectDefinitionApiClient =
-			await apiHelpers.buildRestClient(ObjectDefinitionApi);
+		const objectDefinitionAPIClient =
+			await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 		const {body: postalAddress} =
-			await objectDefinitionApiClient.getObjectDefinitionByExternalReferenceCode(
+			await objectDefinitionAPIClient.getObjectDefinitionByExternalReferenceCode(
 				'L_POSTAL_ADDRESS'
 			);
 
@@ -983,12 +983,12 @@ test.describe('Manage object relationships through Model Builder', () => {
 		const objectRelationshipName =
 			'objectRelationshipName' + Math.floor(Math.random() * 99);
 
-		const objectRelationshipApiClient = await apiHelpers.buildRestClient(
-			ObjectRelationshipApi
+		const objectRelationshipAPIClient = await apiHelpers.buildRestClient(
+			ObjectRelationshipAPI
 		);
 
 		const {body: objectRelationship} =
-			await objectRelationshipApiClient.postObjectDefinitionByExternalReferenceCodeObjectRelationship(
+			await objectRelationshipAPIClient.postObjectDefinitionByExternalReferenceCodeObjectRelationship(
 				objectDefinition1.externalReferenceCode,
 				{
 					label: {
@@ -1002,7 +1002,7 @@ test.describe('Manage object relationships through Model Builder', () => {
 					objectDefinitionId1: objectDefinition1.id,
 					objectDefinitionId2: objectDefinition2.id,
 					objectDefinitionName2: objectDefinition2.name,
-					type: ObjectRelationship.TypeEnum.OneToMany,
+					type: 'oneToMany',
 				}
 			);
 
@@ -1012,7 +1012,7 @@ test.describe('Manage object relationships through Model Builder', () => {
 		});
 
 		const objectDefinitionAPIClient =
-			await apiHelpers.buildRestClient(ObjectDefinitionApi);
+			await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 		const {body: publishedObjectDefinition2} =
 			await objectDefinitionAPIClient.postObjectDefinitionPublish(
@@ -1042,8 +1042,7 @@ test.describe('Manage object relationships through Model Builder', () => {
 		const objectFieldObjectRelationship =
 			publishedObjectDefinition2.objectFields.find(
 				(objectField: ObjectField) =>
-					objectField.businessType ===
-					ObjectField.BusinessTypeEnum.Relationship
+					objectField.businessType === 'Relationship'
 			);
 
 		await expect(
@@ -1052,13 +1051,13 @@ test.describe('Manage object relationships through Model Builder', () => {
 			)
 		).toBeVisible();
 
-		const objectFieldApiClient =
-			await apiHelpers.buildRestClient(ObjectFieldApi);
-		await objectFieldApiClient.postObjectDefinitionByExternalReferenceCodeObjectField(
+		const objectFieldAPIClient =
+			await apiHelpers.buildRestClient(ObjectFieldAPI);
+		await objectFieldAPIClient.postObjectDefinitionByExternalReferenceCodeObjectField(
 			publishedObjectDefinition2.externalReferenceCode,
 			{
-				DBType: ObjectField.DBTypeEnum.String,
-				businessType: ObjectField.BusinessTypeEnum.Text,
+				DBType: 'String',
+				businessType: 'Text',
 				indexed: true,
 				indexedAsKeyword: false,
 				indexedLanguageId: '',
@@ -1066,7 +1065,7 @@ test.describe('Manage object relationships through Model Builder', () => {
 				listTypeDefinitionId: 0,
 				localized: false,
 				name: 'textField',
-				readOnly: ObjectField.ReadOnlyEnum.False,
+				readOnly: 'false',
 				required: false,
 				state: false,
 				system: false,
@@ -1085,7 +1084,7 @@ test.describe('Manage object relationships through Objects Admin UI', () => {
 	}) => {
 		const objectDefinition =
 			await apiHelpers.objectAdmin.postRandomObjectDefinition({
-				objectFolderExternalReferenceCode: 'Default',
+				objectFolderExternalReferenceCode: 'default',
 				status: {code: 0},
 			});
 
@@ -1101,15 +1100,15 @@ test.describe('Manage object relationships through Objects Admin UI', () => {
 			name: 'objectRelationshipName' + Math.floor(Math.random() * 99),
 			objectDefinitionExternalReferenceCode2:
 				objectDefinition.externalReferenceCode,
-			type: ObjectRelationship.TypeEnum.OneToMany,
+			type: 'oneToMany',
 		};
 
-		const objectRelationshipApiClient = await apiHelpers.buildRestClient(
-			ObjectRelationshipApi
+		const objectRelationshipAPIClient = await apiHelpers.buildRestClient(
+			ObjectRelationshipAPI
 		);
 
 		const {body: objectRelationship1} =
-			await objectRelationshipApiClient.postObjectDefinitionByExternalReferenceCodeObjectRelationship(
+			await objectRelationshipAPIClient.postObjectDefinitionByExternalReferenceCodeObjectRelationship(
 				'L_ACCOUNT',
 				objectRelationshipData
 			);

@@ -266,7 +266,9 @@ test('LPD-43390 Create child configuration list', async ({
 		{label: 'Master'}
 	);
 	await commerceAdminProductConfigurationListsPage.addConfigurationListParentList.click();
-	await commerceAdminProductConfigurationListsPage.addConfigurationListParentListElement.click();
+	await commerceAdminProductConfigurationListsPage
+		.addConfigurationListParentListElement()
+		.click();
 	await commerceAdminProductConfigurationListsPage.addConfigurationListSaveButton.click();
 
 	await expect(
@@ -328,7 +330,7 @@ test('LPD-43013 Configuration Entry form in side panel', async ({
 
 	await (
 		await commerceAdminProductConfigurationEntriesPage.tableRowLink({
-			colIndex: 0,
+			colIndex: 1,
 			rowValue: product.name['en_US'],
 		})
 	).click();
@@ -400,7 +402,7 @@ test('LPD-43013 Configuration Entry form in side panel', async ({
 
 	await (
 		await commerceAdminProductConfigurationEntriesPage.tableRowLink({
-			colIndex: 0,
+			colIndex: 1,
 			rowValue: product.name['en_US'],
 		})
 	).click();
@@ -525,7 +527,7 @@ test('LPD-43013 Configuration Entry form in side panel for virtual products', as
 
 	await (
 		await commerceAdminProductConfigurationEntriesPage.tableRowLink({
-			colIndex: 0,
+			colIndex: 1,
 			rowValue: product.name['en_US'],
 		})
 	).click();
@@ -783,218 +785,105 @@ test('LPD-37882 Show purchasable field', async ({
 	expect(product.skus[0].purchasable).toBeFalsy();
 });
 
-test('LPD-37886 Can filter configuration entries dataset', async ({
-	apiHelpers,
-	applicationsMenuPage,
-	commerceAdminProductConfigurationEntriesPage,
-	commerceAdminProductConfigurationListsPage,
-}) => {
-	const catalog = await apiHelpers.headlessCommerceAdminCatalog.postCatalog({
-		name: 'Catalog',
-	});
-
-	const categoryName = getRandomString();
-
-	const siteId = await getGlobalSiteId(apiHelpers);
-
-	const categories: Array<any> = await createCategories({
+test(
+	'Can filter configuration entries dataset',
+	{tag: '@LPD-37886'},
+	async ({
 		apiHelpers,
-		categoryNames: [{name: categoryName}],
-		siteId,
-		vocabularyName: getRandomString(),
-	});
+		applicationsMenuPage,
+		commerceAdminProductConfigurationEntriesPage,
+		commerceAdminProductConfigurationListsPage,
+	}) => {
+		const catalog =
+			await apiHelpers.headlessCommerceAdminCatalog.postCatalog({
+				name: 'Catalog',
+			});
 
-	apiHelpers.data.push({
-		id: categories[0].vocabularyId,
-		type: 'taxonomyVocabulary',
-	});
+		const categoryName = getRandomString();
 
-	const product1 = await apiHelpers.headlessCommerceAdminCatalog.postProduct({
-		catalogId: catalog.id,
-		categories,
-		name: {
-			en_US: 'Product 1',
-		},
-	});
-	const product2 = await apiHelpers.headlessCommerceAdminCatalog.postProduct({
-		catalogId: catalog.id,
-		name: {
-			en_US: 'Product 2',
-		},
-	});
+		const siteId = await getGlobalSiteId(apiHelpers);
 
-	const productConfigurationList =
-		await apiHelpers.headlessCommerceAdminCatalog.postProductConfigurationList(
-			{
+		const categories: Array<any> = await createCategories({
+			apiHelpers,
+			categoryNames: [{name: categoryName}],
+			siteId,
+			vocabularyName: getRandomString(),
+		});
+
+		apiHelpers.data.push({
+			id: categories[0].vocabularyId,
+			type: 'taxonomyVocabulary',
+		});
+
+		const product1 =
+			await apiHelpers.headlessCommerceAdminCatalog.postProduct({
 				catalogId: catalog.id,
-				name: getRandomString(),
-				productConfigurations: [
-					{
-						allowBackOrder: true,
-						entityId: product1.id,
-						maxOrderQuantity: 10000,
-						minOrderQuantity: 1,
-						multipleOrderQuantity: 1,
-						productShippingConfiguration: {
-							shippable: true,
+				categories,
+				name: {
+					en_US: 'Product 1',
+				},
+			});
+		const product2 =
+			await apiHelpers.headlessCommerceAdminCatalog.postProduct({
+				catalogId: catalog.id,
+				name: {
+					en_US: 'Product 2',
+				},
+			});
+
+		const productConfigurationList =
+			await apiHelpers.headlessCommerceAdminCatalog.postProductConfigurationList(
+				{
+					catalogId: catalog.id,
+					name: getRandomString(),
+					productConfigurations: [
+						{
+							allowBackOrder: true,
+							entityId: product1.id,
+							maxOrderQuantity: 10000,
+							minOrderQuantity: 1,
+							multipleOrderQuantity: 1,
+							productShippingConfiguration: {
+								shippable: true,
+							},
+							purchasable: true,
+							visible: true,
 						},
-						purchasable: true,
-						visible: true,
-					},
-					{
-						allowBackOrder: true,
-						entityId: product2.id,
-						maxOrderQuantity: 10000,
-						minOrderQuantity: 1,
-						multipleOrderQuantity: 1,
-						productShippingConfiguration: {
-							shippable: false,
+						{
+							allowBackOrder: true,
+							entityId: product2.id,
+							maxOrderQuantity: 10000,
+							minOrderQuantity: 1,
+							multipleOrderQuantity: 1,
+							productShippingConfiguration: {
+								shippable: false,
+							},
+							purchasable: false,
+							visible: false,
 						},
-						purchasable: false,
-						visible: false,
-					},
-				],
-			}
-		);
+					],
+				}
+			);
 
-	await applicationsMenuPage.goToCommerceProductConfigurationLists(false);
+		await applicationsMenuPage.goToCommerceProductConfigurationLists(false);
 
-	await (
-		await commerceAdminProductConfigurationListsPage.tableRowLink({
-			colIndex: 0,
-			rowValue: productConfigurationList.name,
-		})
-	).click();
-	await commerceAdminProductConfigurationListsPage.entriesLink.click();
+		await (
+			await commerceAdminProductConfigurationListsPage.tableRowLink({
+				colIndex: 0,
+				rowValue: productConfigurationList.name,
+			})
+		).click();
+		await commerceAdminProductConfigurationListsPage.entriesLink.click();
 
-	await expect(
-		(
-			await commerceAdminProductConfigurationEntriesPage.tableRow(
-				1,
-				product1.name['en_US'],
-				true
-			)
-		).row
-	).toBeVisible();
-	await expect(
-		(
-			await commerceAdminProductConfigurationEntriesPage.tableRow(
-				1,
-				product2.name['en_US'],
-				true
-			)
-		).row
-	).toBeVisible();
-
-	await commerceAdminProductConfigurationEntriesPage.addDataSetFilter(
-		'Category',
-		categories[0].name
-	);
-
-	await expect(
-		(
-			await commerceAdminProductConfigurationEntriesPage.tableRow(
-				1,
-				product1.name['en_US'],
-				true
-			)
-		).row
-	).toBeVisible();
-
-	try {
 		await expect(
 			(
 				await commerceAdminProductConfigurationEntriesPage.tableRow(
-					0,
-					product2.name['en_US'],
-					true
-				)
-			).row
-		).toHaveCount(0);
-	}
-	catch (error) {
-		expect(error).toBeDefined();
-	}
-
-	await commerceAdminProductConfigurationEntriesPage.resetFiltersButton.click();
-	await commerceAdminProductConfigurationEntriesPage.addDataSetFilter(
-		'Product Type',
-		'Simple',
-		true
-	);
-
-	try {
-		await expect(
-			(
-				await commerceAdminProductConfigurationEntriesPage.tableRow(
-					0,
+					1,
 					product1.name['en_US'],
 					true
 				)
 			).row
-		).toHaveCount(0);
-		await expect(
-			(
-				await commerceAdminProductConfigurationEntriesPage.tableRow(
-					0,
-					product2.name['en_US'],
-					true
-				)
-			).row
-		).toHaveCount(0);
-	}
-	catch (error) {
-		expect(error).toBeDefined();
-	}
-
-	await commerceAdminProductConfigurationEntriesPage.resetFiltersButton.click();
-	await commerceAdminProductConfigurationEntriesPage.addDataSetFilter(
-		'Purchasable',
-		'Yes'
-	);
-
-	await expect(
-		(
-			await commerceAdminProductConfigurationEntriesPage.tableRow(
-				1,
-				product1.name['en_US'],
-				true
-			)
-		).row
-	).toBeVisible();
-
-	try {
-		await expect(
-			(
-				await commerceAdminProductConfigurationEntriesPage.tableRow(
-					0,
-					product2.name['en_US'],
-					true
-				)
-			).row
-		).toHaveCount(0);
-	}
-	catch (error) {
-		expect(error).toBeDefined();
-	}
-
-	await commerceAdminProductConfigurationEntriesPage.resetFiltersButton.click();
-	await commerceAdminProductConfigurationEntriesPage.addDataSetFilter(
-		'Shippable',
-		'Yes'
-	);
-
-	await expect(
-		(
-			await commerceAdminProductConfigurationEntriesPage.tableRow(
-				1,
-				product1.name['en_US'],
-				true
-			)
-		).row
-	).toBeVisible();
-
-	try {
+		).toBeVisible();
 		await expect(
 			(
 				await commerceAdminProductConfigurationEntriesPage.tableRow(
@@ -1003,43 +892,150 @@ test('LPD-37886 Can filter configuration entries dataset', async ({
 					true
 				)
 			).row
-		).toHaveCount(0);
-	}
-	catch (error) {
-		expect(error).toBeDefined();
-	}
+		).toBeVisible();
 
-	await commerceAdminProductConfigurationEntriesPage.resetFiltersButton.click();
-	await commerceAdminProductConfigurationEntriesPage.addDataSetFilter(
-		'Visible',
-		'Yes'
-	);
+		await commerceAdminProductConfigurationEntriesPage.addDataSetFilter(
+			'Category',
+			categories[0].name
+		);
 
-	await expect(
-		(
-			await commerceAdminProductConfigurationEntriesPage.tableRow(
-				1,
-				product1.name['en_US'],
-				true
-			)
-		).row
-	).toBeVisible();
-
-	try {
 		await expect(
 			(
 				await commerceAdminProductConfigurationEntriesPage.tableRow(
 					1,
-					product2.name['en_US'],
+					product1.name['en_US'],
 					true
 				)
 			).row
-		).toHaveCount(0);
+		).toBeVisible();
+
+		try {
+			await expect(
+				(
+					await commerceAdminProductConfigurationEntriesPage.tableRow(
+						1,
+						product2.name['en_US'],
+						true
+					)
+				).row
+			).toHaveCount(0);
+		}
+		catch (error) {
+			expect(error).toBeDefined();
+		}
+
+		await commerceAdminProductConfigurationEntriesPage.resetFiltersButton.click();
+		await commerceAdminProductConfigurationEntriesPage.addDataSetFilter(
+			'Product Type',
+			'Simple',
+			true,
+			true
+		);
+
+		await expect(
+			commerceAdminProductConfigurationEntriesPage.noResultsText
+		).toBeVisible();
+
+		await commerceAdminProductConfigurationEntriesPage.resetFiltersButton.click();
+		await commerceAdminProductConfigurationEntriesPage.addDataSetFilter(
+			'Purchasable',
+			'Yes',
+			false,
+			true
+		);
+
+		await expect(
+			(
+				await commerceAdminProductConfigurationEntriesPage.tableRow(
+					1,
+					product1.name['en_US'],
+					true
+				)
+			).row
+		).toBeVisible();
+
+		try {
+			await expect(
+				(
+					await commerceAdminProductConfigurationEntriesPage.tableRow(
+						1,
+						product2.name['en_US'],
+						true
+					)
+				).row
+			).toHaveCount(0);
+		}
+		catch (error) {
+			expect(error).toBeDefined();
+		}
+
+		await commerceAdminProductConfigurationEntriesPage.resetFiltersButton.click();
+		await commerceAdminProductConfigurationEntriesPage.addDataSetFilter(
+			'Shippable',
+			'Yes',
+			false,
+			true
+		);
+
+		await expect(
+			(
+				await commerceAdminProductConfigurationEntriesPage.tableRow(
+					1,
+					product1.name['en_US'],
+					true
+				)
+			).row
+		).toBeVisible();
+
+		try {
+			await expect(
+				(
+					await commerceAdminProductConfigurationEntriesPage.tableRow(
+						1,
+						product2.name['en_US'],
+						true
+					)
+				).row
+			).toHaveCount(0);
+		}
+		catch (error) {
+			expect(error).toBeDefined();
+		}
+
+		await commerceAdminProductConfigurationEntriesPage.resetFiltersButton.click();
+		await commerceAdminProductConfigurationEntriesPage.addDataSetFilter(
+			'Visible',
+			'Yes',
+			false,
+			true
+		);
+
+		await expect(
+			(
+				await commerceAdminProductConfigurationEntriesPage.tableRow(
+					1,
+					product1.name['en_US'],
+					true
+				)
+			).row
+		).toBeVisible();
+
+		try {
+			await expect(
+				(
+					await commerceAdminProductConfigurationEntriesPage.tableRow(
+						1,
+						product2.name['en_US'],
+						true
+					)
+				).row
+			).toHaveCount(0);
+		}
+		catch (error) {
+			expect(error).toBeDefined();
+		}
 	}
-	catch (error) {
-		expect(error).toBeDefined();
-	}
-});
+);
 
 test('LPD-43013 Edit child configuration list', async ({
 	applicationsMenuPage,
@@ -1069,7 +1065,9 @@ test('LPD-43013 Edit child configuration list', async ({
 		{label: 'Master'}
 	);
 	await commerceAdminProductConfigurationListsPage.addConfigurationListParentList.click();
-	await commerceAdminProductConfigurationListsPage.addConfigurationListParentListElement.click();
+	await commerceAdminProductConfigurationListsPage
+		.addConfigurationListParentListElement()
+		.click();
 	await commerceAdminProductConfigurationListsPage.addConfigurationListSaveButton.click();
 
 	await expect(
@@ -1329,12 +1327,35 @@ test('LPD-44818 Show difference icons', async ({
 
 	await applicationsMenuPage.goToCommerceProductConfigurationLists();
 
-	await (
-		await commerceAdminProductConfigurationListsPage.tableRowLink({
-			colIndex: 0,
-			rowValue: configurationList.name,
-		})
-	).click();
+	await commerceAdminProductConfigurationListsPage.addConfigurationList.click();
+
+	await expect(
+		commerceAdminProductConfigurationListsPage.addConfigurationListParentList
+	).toBeVisible();
+
+	await commerceAdminProductConfigurationListsPage.addConfigurationListName.fill(
+		`Child Configuration ${catalog.name}`
+	);
+	await commerceAdminProductConfigurationListsPage.addConfigurationListPriority.fill(
+		'1'
+	);
+	await commerceAdminProductConfigurationListsPage.addConfigurationListCatalog.selectOption(
+		{label: catalog.name}
+	);
+	await commerceAdminProductConfigurationListsPage.addConfigurationListParentList.click();
+	await commerceAdminProductConfigurationListsPage
+		.addConfigurationListParentListElement(
+			`Master Configuration ${catalog.name}`
+		)
+		.click();
+	await commerceAdminProductConfigurationListsPage.addConfigurationListSaveButton.click();
+
+	await expect(
+		commerceAdminProductConfigurationListPage.parentCPConfigurationListNameInput
+	).toBeDisabled();
+	await expect(
+		commerceAdminProductConfigurationListPage.parentCPConfigurationListNameInput
+	).toHaveValue(`Master Configuration ${catalog.name}`);
 
 	await commerceAdminProductConfigurationListPage.entriesMenuItem.click();
 
@@ -1351,7 +1372,7 @@ test('LPD-44818 Show difference icons', async ({
 
 	await (
 		await commerceAdminProductConfigurationEntriesPage.tableRowLink({
-			colIndex: 0,
+			colIndex: 1,
 			rowValue: product.name['en_US'],
 		})
 	).click();
@@ -1363,6 +1384,32 @@ test('LPD-44818 Show difference icons', async ({
 	await commerceAdminProductConfigurationEntryPage.maxOrderQuantityInput.fill(
 		'400'
 	);
+
+	await commerceAdminProductConfigurationEntryPage.saveButton.click();
+
+	await waitForAlert(page);
+
+	await page.reload();
+
+	await expect(
+		commerceAdminProductConfigurationEntriesPage.differenceIcon()
+	).toHaveCount(0);
+
+	await (
+		await commerceAdminProductConfigurationEntriesPage.tableRowLink({
+			colIndex: 1,
+			rowValue: product.name['en_US'],
+		})
+	).click();
+
+	await expect(
+		commerceAdminProductConfigurationEntryPage.sidePanelTitle
+	).toBeVisible();
+
+	await commerceAdminProductConfigurationEntryPage.maxOrderQuantityInput.fill(
+		'500'
+	);
+
 	await commerceAdminProductConfigurationEntryPage.visibleInput.click();
 
 	await commerceAdminProductConfigurationEntryPage.saveButton.click();
@@ -1376,7 +1423,7 @@ test('LPD-44818 Show difference icons', async ({
 		commerceAdminProductConfigurationEntriesPage.differenceIcon(
 			(
 				await commerceAdminProductConfigurationEntriesPage.tableRow(
-					0,
+					1,
 					product.name['en_US']
 				)
 			).column
@@ -1386,7 +1433,7 @@ test('LPD-44818 Show difference icons', async ({
 		commerceAdminProductConfigurationEntriesPage.differenceIcon(
 			(
 				await commerceAdminProductConfigurationEntriesPage.tableRow(
-					1,
+					2,
 					'no'
 				)
 			).column
@@ -1396,7 +1443,7 @@ test('LPD-44818 Show difference icons', async ({
 		commerceAdminProductConfigurationEntriesPage.differenceIcon(
 			(
 				await commerceAdminProductConfigurationEntriesPage.tableRow(
-					2,
+					3,
 					'yes'
 				)
 			).column
@@ -1405,13 +1452,13 @@ test('LPD-44818 Show difference icons', async ({
 
 	await (
 		await commerceAdminProductConfigurationEntriesPage.tableRowLink({
-			colIndex: 0,
+			colIndex: 1,
 			rowValue: product.name['en_US'],
 		})
 	).click();
 
 	await commerceAdminProductConfigurationEntryPage.maxOrderQuantityInput.fill(
-		'10000'
+		'400'
 	);
 	await commerceAdminProductConfigurationEntryPage.visibleInput.click();
 

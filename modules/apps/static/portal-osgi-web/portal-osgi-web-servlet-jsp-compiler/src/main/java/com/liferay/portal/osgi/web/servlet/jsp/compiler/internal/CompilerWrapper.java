@@ -7,6 +7,7 @@ package com.liferay.portal.osgi.web.servlet.jsp.compiler.internal;
 
 import com.liferay.petra.concurrent.ConcurrentReferenceKeyHashMap;
 import com.liferay.petra.concurrent.ConcurrentReferenceValueHashMap;
+import com.liferay.petra.io.StreamUtil;
 import com.liferay.petra.memory.FinalizeManager;
 import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.petra.string.CharPool;
@@ -15,19 +16,21 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.FileUtil;
-import com.liferay.portal.kernel.util.HashMapBuilder;
-import com.liferay.portal.kernel.util.StreamUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.URLUtil;
 import com.liferay.portal.osgi.web.servlet.jsp.compiler.internal.util.ClassPathUtil;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
 import java.lang.reflect.Field;
 
 import java.net.URL;
+
+import java.nio.file.Files;
+import java.nio.file.StandardOpenOption;
 
 import java.security.CodeSource;
 import java.security.ProtectionDomain;
@@ -41,6 +44,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.BiFunction;
 
 import javax.servlet.ServletContext;
 
@@ -67,7 +71,6 @@ import org.apache.jasper.compiler.TldCache;
 import org.apache.jasper.servlet.JspServletWrapper;
 import org.apache.tomcat.util.descriptor.DigesterFactory;
 import org.apache.tomcat.util.descriptor.LocalResolver;
-import org.apache.tomcat.util.descriptor.XmlIdentifiers;
 import org.apache.tomcat.util.descriptor.tld.TaglibXml;
 import org.apache.tomcat.util.descriptor.tld.TldParser;
 import org.apache.tomcat.util.descriptor.tld.TldResourcePath;
@@ -156,7 +159,7 @@ public class CompilerWrapper extends Compiler {
 	}
 
 	@Override
-	protected void generateClass(Map<String, SmapStratum> smaps)
+	protected void generateClass(Map<String, SmapStratum> smapStratums)
 		throws Exception {
 
 		DiagnosticCollector<JavaFileObject> diagnosticCollector = _compile(
@@ -199,8 +202,32 @@ public class CompilerWrapper extends Compiler {
 		}
 
 		if (!options.isSmapSuppressed()) {
-			SmapUtil.installSmap(smaps);
+			SmapUtil.installSmap(smapStratums);
 		}
+	}
+
+	@Override
+	protected Map<String, SmapStratum> generateJava() throws Exception {
+		Map<String, SmapStratum> smapStratums = super.generateJava();
+
+		if (_textReplacerBiFunction == null) {
+			return smapStratums;
+		}
+
+		File javaFile = new File(ctxt.getServletJavaFileName());
+
+		String content = StreamUtil.toString(new FileInputStream(javaFile));
+
+		String newContent = _textReplacerBiFunction.apply(
+			"ModuleJspCJava#" + javaFile, content);
+
+		if (!newContent.equals(content)) {
+			Files.write(
+				javaFile.toPath(), newContent.getBytes(StringPool.UTF8),
+				StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
+		}
+
+		return smapStratums;
 	}
 
 	private static Set<String> _collectPackageNames(BundleWiring bundleWiring) {
@@ -230,33 +257,6 @@ public class CompilerWrapper extends Compiler {
 		_bundleWiringPackageNamesCache.put(bundleWiring, packageNames);
 
 		return packageNames;
-	}
-
-	private static void _resolveId(
-		Map<String, String> ids, String id, String name, boolean addSelf) {
-
-		if (ids.containsKey(id)) {
-			return;
-		}
-
-		Class<?> clazz = CompilerWrapper.class;
-
-		URL url = clazz.getResource(
-			"/javax/servlet/jsp/resources/".concat(name));
-
-		String location = null;
-
-		if (url != null) {
-			location = url.toExternalForm();
-		}
-
-		if (location != null) {
-			ids.put(id, location);
-
-			if (addSelf) {
-				ids.put(location, location);
-			}
-		}
 	}
 
 	private void _addDependenciesToClassPath() {
@@ -642,7 +642,8 @@ public class CompilerWrapper extends Compiler {
 
 			digester.setEntityResolver(
 				new LocalResolver(
-					_servletApiPublicIdsMap, _servletApiSystemIdsMap, true));
+					DigesterFactory.SERVLET_API_PUBLIC_IDS,
+					DigesterFactory.SERVLET_API_SYSTEM_IDS, true));
 
 			taglibXmls.put(tldResourcePath, tldParser.parse(tldResourcePath));
 		}
@@ -706,8 +707,8 @@ public class CompilerWrapper extends Compiler {
 	private static final Field _digesterField;
 	private static final Map<BundleWiring, Set<String>>
 		_jspBundleWiringPackageNames = new HashMap<>();
-	private static final Map<String, String> _servletApiPublicIdsMap;
-	private static final Map<String, String> _servletApiSystemIdsMap;
+	private static final BiFunction<String, String, String>
+		_textReplacerBiFunction;
 
 	static {
 		Bundle jspBundle = FrameworkUtil.getBundle(CompilerWrapper.class);
@@ -732,35 +733,27 @@ public class CompilerWrapper extends Compiler {
 			throw new ExceptionInInitializerError(exception);
 		}
 
-		Map<String, String> publicIdsMap = HashMapBuilder.putAll(
-			DigesterFactory.SERVLET_API_PUBLIC_IDS
-		).build();
+		ClassLoader classLoader = ClassLoader.getSystemClassLoader();
 
-		_resolveId(
-			publicIdsMap, XmlIdentifiers.TLD_11_PUBLIC,
-			"web-jsptaglibrary_1_1.dtd", false);
-		_resolveId(
-			publicIdsMap, XmlIdentifiers.TLD_12_PUBLIC,
-			"web-jsptaglibrary_1_2.dtd", false);
+		Object instance = null;
 
-		_servletApiPublicIdsMap = Collections.unmodifiableMap(publicIdsMap);
+		try {
+			Class<?> clazz = classLoader.loadClass(
+				"com.liferay.portal.tools.jakarta.ee.transformer.function." +
+					"TextReplacerBiFunction");
 
-		Map<String, String> systemIdsMap = HashMapBuilder.putAll(
-			DigesterFactory.SERVLET_API_SYSTEM_IDS
-		).build();
+			instance = clazz.newInstance();
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			if (!(reflectiveOperationException instanceof
+					ClassNotFoundException)) {
 
-		_resolveId(
-			systemIdsMap, XmlIdentifiers.TLD_20_XSD,
-			"web-jsptaglibrary_2_0.xsd", false);
-		_resolveId(
-			systemIdsMap, XmlIdentifiers.TLD_21_XSD,
-			"web-jsptaglibrary_2_1.xsd", false);
-		_resolveId(systemIdsMap, "jsp_2_0.xsd", "jsp_2_0.xsd", true);
-		_resolveId(systemIdsMap, "jsp_2_1.xsd", "jsp_2_1.xsd", true);
-		_resolveId(systemIdsMap, "jsp_2_2.xsd", "jsp_2_2.xsd", true);
-		_resolveId(systemIdsMap, "jsp_2_3.xsd", "jsp_2_3.xsd", true);
+				throw new ExceptionInInitializerError(
+					reflectiveOperationException);
+			}
+		}
 
-		_servletApiSystemIdsMap = Collections.unmodifiableMap(systemIdsMap);
+		_textReplacerBiFunction = (BiFunction<String, String, String>)instance;
 	}
 
 	private Bundle[] _allParticipatingBundles;

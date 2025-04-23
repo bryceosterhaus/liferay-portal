@@ -29,10 +29,9 @@ import {
 	STATUS_TAG_TYPE_NAMES,
 } from '~/features/project/utils/constants';
 import AnalyticsCloudModal from '../../AnalyticsCloudModal';
-import PopoverIcon from '../DXPCloud/components/PopoverIcon';
 import ActivationStatusLayout from '../Layout';
 import AnalyticsCloudStatusModal from './AnalyticsCloudStatusModal';
-import ActivationCardLink from '../index';
+import ActivationCardLink from '../ActivationCardLink';
 
 const ActivationStatusAnalyticsCloud = () => {
 	const [{project, subscriptionGroups, userAccount}, dispatch] =
@@ -112,7 +111,7 @@ const ActivationStatusAnalyticsCloud = () => {
 			title: i18n.translate('analytics-cloud-activation'),
 		},
 		[STATUS_TAG_TYPE_NAMES.inProgress]: {
-			dropdownIcon: (userAccount.isStaff ||
+			dropdownIcon: (userAccount.isStaff &&
 				userAccount.isProvisioning) && (
 				<ButtonDropDown
 					align={Align.BottomRight}
@@ -121,6 +120,7 @@ const ActivationStatusAnalyticsCloud = () => {
 							aria-label={i18n.translate('set-to-active')}
 							displayType="null"
 							small
+							spritemap={Liferay.Icons.spritemap}
 							symbol="caret-bottom"
 						/>
 					}

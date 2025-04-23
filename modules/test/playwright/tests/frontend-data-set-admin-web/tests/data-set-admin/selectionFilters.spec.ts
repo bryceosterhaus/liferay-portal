@@ -18,16 +18,19 @@ import {dataSetManagerSetupTest} from './fixtures/dataSetManagerSetupTest';
 import {filtersPageTest} from './fixtures/filtersPageTest';
 
 const SELECTION_API_HEADLESS_FILTER_NAME = 'Selection API Headless filter';
+const SELECTION_DISPLAY_TYPE = 'Selection Filter';
 const SELECTION_PICKLIST_FILTER_NAME = 'Selection Picklist filter';
 const SELECTION_PICKLIST_NO_PRESELECTED_VALUES_FILTER_NAME =
 	'Selection Picklist filter without preselected values';
+
+// @ts-ignore
+
 const PICKLIST_VALUE_KEY = uuidv4().replaceAll('-', '');
 const PICKLIST_VALUE_NAME = getRandomString();
 
 const test = mergeTests(
 	dataSetManagerApiHelpersTest,
 	featureFlagsTest({
-		'LPD-37531': {enabled: true},
 		'LPS-178052': {enabled: true},
 	}),
 	filtersPageTest,
@@ -407,6 +410,13 @@ test(
 				page.getByRole('cell', {
 					exact: true,
 					name: SELECTION_API_HEADLESS_FILTER_NAME,
+				})
+			).toBeVisible();
+
+			await expect(
+				page.getByRole('cell', {
+					exact: true,
+					name: SELECTION_DISPLAY_TYPE,
 				})
 			).toBeVisible();
 		});

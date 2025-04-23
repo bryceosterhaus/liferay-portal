@@ -45,10 +45,11 @@ public class PortalWorkspaceGitRepository extends BaseWorkspaceGitRepository {
 			return testBatches.isEmpty();
 		}
 
-		String ciTestRelevantBypassFilePathPatterns =
-			JenkinsResultsParserUtil.getCIProperty(
-				getUpstreamBranchName(),
-				"ci.test.relevant.bypass.file.path.patterns", getName());
+		Properties ciProperties = JenkinsResultsParserUtil.getProperties(
+			new File(getDirectory(), "ci.properties"));
+
+		String ciTestRelevantBypassFilePathPatterns = ciProperties.getProperty(
+			"ci.test.relevant.bypass.file.path.patterns", getName());
 
 		if (JenkinsResultsParserUtil.isNullOrEmpty(
 				ciTestRelevantBypassFilePathPatterns)) {
@@ -73,11 +74,7 @@ public class PortalWorkspaceGitRepository extends BaseWorkspaceGitRepository {
 				JenkinsResultsParserUtil.getCanonicalPath(deletedFile));
 		}
 
-		if (!multiPattern.matchesAll(filePaths.toArray(new String[0]))) {
-			return false;
-		}
-
-		return true;
+		return multiPattern.matchesAll(filePaths.toArray(new String[0]));
 	}
 
 	public String getLiferayFacesAlloyURL() {

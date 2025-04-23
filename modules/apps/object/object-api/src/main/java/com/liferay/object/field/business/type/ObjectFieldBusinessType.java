@@ -15,8 +15,10 @@ import com.liferay.object.model.ObjectField;
 import com.liferay.object.model.ObjectFieldSetting;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.security.auth.GuestOrUserUtil;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleThreadLocal;
 import com.liferay.portal.kernel.util.LocaleUtil;
@@ -92,6 +94,13 @@ public interface ObjectFieldBusinessType {
 		throws PortalException {
 
 		return HashMapBuilder.<String, Object>put(
+			"editOnlyInDefaultLanguage",
+			FeatureFlagManagerUtil.isEnabled("LPD-32050") &&
+			!GetterUtil.getBoolean(objectField.getReadOnly()) &&
+			!objectField.isLocalized()
+		).put(
+			"isLocalizationSupported", isLocalizationSupported(objectField)
+		).put(
 			"localizedObjectField", objectField.isLocalized()
 		).build();
 	}
@@ -151,8 +160,14 @@ public interface ObjectFieldBusinessType {
 		return StringPool.BLANK;
 	}
 
-	public default boolean isLocalizable() {
-		return false;
+	public default boolean isLocalizationSupported(ObjectField objectField) {
+		if (!FeatureFlagManagerUtil.isEnabled("LPD-32050") ||
+			objectField.isMetadata()) {
+
+			return false;
+		}
+
+		return true;
 	}
 
 	public default boolean isVisible(ObjectDefinition objectDefinition) {

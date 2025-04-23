@@ -397,8 +397,9 @@ public class SegmentsExperimentLocalServiceImpl
 		return dynamicQuery;
 	}
 
-	private SegmentsExperience _publishSegmentsExperienceVariant(
+	private void _publishSegmentsExperienceVariant(
 		SegmentsExperience controlSegmentsExperience,
+		String newSegmentsExperienceKey,
 		SegmentsExperience variantSegmentsExperience) {
 
 		int originalPriority = controlSegmentsExperience.getPriority();
@@ -421,9 +422,7 @@ public class SegmentsExperimentLocalServiceImpl
 			_setSegmentsExperienceKeyProperty(controlSegmentsExperience);
 
 			controlSegmentsExperience.setSegmentsExperienceKey(
-				String.valueOf(
-					counterLocalService.increment(
-						SegmentsExperience.class.getName())));
+				newSegmentsExperienceKey);
 		}
 
 		_segmentsExperienceLocalService.updateSegmentsExperience(
@@ -456,8 +455,6 @@ public class SegmentsExperimentLocalServiceImpl
 
 				return null;
 			});
-
-		return variantSegmentsExperience;
 	}
 
 	private void _sendNotificationEvent(SegmentsExperiment segmentsExperiment)
@@ -532,7 +529,7 @@ public class SegmentsExperimentLocalServiceImpl
 		return segmentsExperiment;
 	}
 
-	private SegmentsExperiment _updateWinnerSegmentsExperienceId(
+	private void _updateWinnerSegmentsExperienceId(
 			SegmentsExperiment segmentsExperiment,
 			long winnerSegmentsExperienceId, int status)
 		throws PortalException {
@@ -576,14 +573,33 @@ public class SegmentsExperimentLocalServiceImpl
 			(winnerSegmentsExperienceId !=
 				segmentsExperiment.getSegmentsExperienceId())) {
 
+			Layout layout = _layoutLocalService.fetchLayout(
+				segmentsExperiment.getPlid());
+
+			Layout draftLayout = layout.fetchDraftLayout();
+
+			String newSegmentsExperienceKey = String.valueOf(
+				counterLocalService.increment(
+					SegmentsExperience.class.getName()));
+
+			_publishSegmentsExperienceVariant(
+				_segmentsExperienceLocalService.getSegmentsExperience(
+					draftLayout.getGroupId(),
+					segmentsExperiment.getSegmentsExperienceKey(),
+					draftLayout.getPlid()),
+				newSegmentsExperienceKey,
+				_segmentsExperienceLocalService.getSegmentsExperience(
+					draftLayout.getGroupId(),
+					winnerSegmentsExperience.getSegmentsExperienceKey(),
+					draftLayout.getPlid()));
+
 			_publishSegmentsExperienceVariant(
 				_segmentsExperienceLocalService.getSegmentsExperience(
 					segmentsExperiment.getSegmentsExperienceId()),
+				newSegmentsExperienceKey,
 				_segmentsExperienceLocalService.getSegmentsExperience(
 					winnerSegmentsExperienceId));
 		}
-
-		return segmentsExperiment;
 	}
 
 	private void _validate(

@@ -194,17 +194,6 @@ public class DBCopyTablesProcess {
 		String valueString = null;
 
 		if ((sourceType == Types.BIGINT) || (sourceType == Types.NUMERIC)) {
-			if ((targetType == Types.BINARY) ||
-				(targetType == Types.LONGVARBINARY) ||
-				(targetType == Types.BLOB)) {
-
-				preparedStatement.setBytes(
-					index,
-					PostgreSQLJDBCUtil.getLargeObject(resultSet, columnName));
-
-				return;
-			}
-
 			long value = resultSet.getLong(columnName);
 
 			if ((value == 0L) && resultSet.wasNull()) {
@@ -266,6 +255,12 @@ public class DBCopyTablesProcess {
 				PostgreSQLJDBCUtil.setLargeObject(
 					preparedStatement, index,
 					value.getBytes(1, (int)value.length()));
+
+				return;
+			}
+			else if (targetType == Types.BINARY) {
+				preparedStatement.setBinaryStream(
+					index, value.getBinaryStream());
 
 				return;
 			}
@@ -332,7 +327,9 @@ public class DBCopyTablesProcess {
 				return;
 			}
 
-			if (targetType == Types.DECIMAL) {
+			if ((targetType == Types.DECIMAL) ||
+				(targetType == Types.NUMERIC)) {
+
 				preparedStatement.setBigDecimal(index, value);
 
 				return;
@@ -340,7 +337,9 @@ public class DBCopyTablesProcess {
 
 			valueString = value.toString();
 		}
-		else if (sourceType == Types.DOUBLE) {
+		else if ((sourceType == Types.DOUBLE) ||
+				 (sourceType == _SQL_TYPE_ORACLE_BINARY_DOUBLE)) {
+
 			double value = resultSet.getDouble(columnName);
 
 			if ((value == 0.0) && resultSet.wasNull()) {
@@ -392,6 +391,7 @@ public class DBCopyTablesProcess {
 			valueString = String.valueOf(value);
 		}
 		else if ((sourceType == Types.LONGVARCHAR) ||
+				 (sourceType == Types.NVARCHAR) ||
 				 (sourceType == Types.VARCHAR)) {
 
 			String value = resultSet.getString(columnName);
@@ -521,7 +521,7 @@ public class DBCopyTablesProcess {
 			String value)
 		throws Exception {
 
-		if ((targetType == Types.BIGINT) || (targetType == Types.NUMERIC)) {
+		if (targetType == Types.BIGINT) {
 			preparedStatement.setLong(index, GetterUtil.getLong(value));
 		}
 		else if ((targetType == Types.BIT) || (targetType == Types.BOOLEAN)) {
@@ -552,6 +552,17 @@ public class DBCopyTablesProcess {
 		else if (targetType == Types.INTEGER) {
 			preparedStatement.setInt(index, GetterUtil.getInteger(value));
 		}
+		else if (targetType == Types.NUMERIC) {
+			Number number = GetterUtil.getNumber(value);
+
+			if (number instanceof Long) {
+				preparedStatement.setLong(index, (Long)number);
+			}
+			else {
+				preparedStatement.setBigDecimal(
+					index, (BigDecimal)GetterUtil.get(value, BigDecimal.ZERO));
+			}
+		}
 		else if ((targetType == Types.SMALLINT) ||
 				 (targetType == Types.TINYINT)) {
 
@@ -569,6 +580,8 @@ public class DBCopyTablesProcess {
 			throw new PortalException("Invalid type: " + targetType);
 		}
 	}
+
+	private static final int _SQL_TYPE_ORACLE_BINARY_DOUBLE = 101;
 
 	private final Map<String, List<String>> _sourceColumnNamesMap =
 		new TreeMap<>(String.CASE_INSENSITIVE_ORDER);

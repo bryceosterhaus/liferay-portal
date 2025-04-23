@@ -24,7 +24,6 @@ export const test = mergeTests(
 	actionsPageTest,
 	dataSetManagerApiHelpersTest,
 	featureFlagsTest({
-		'LPD-37531': {enabled: true},
 		'LPS-164563': {enabled: true},
 		'LPS-178052': {enabled: true},
 	}),
@@ -177,7 +176,6 @@ test(
 			});
 
 			await expect(actionRow.getByRole('cell')).toContainText([
-				icon,
 				label,
 				type,
 			]);
@@ -293,7 +291,6 @@ test(
 			});
 
 			await expect(actionRow.getByRole('cell')).toContainText([
-				icon,
 				label,
 				type,
 			]);
@@ -413,7 +410,6 @@ test(
 			});
 
 			await expect(actionRow.getByRole('cell')).toContainText([
-				icon,
 				label,
 				type,
 			]);
@@ -643,7 +639,6 @@ test(
 			});
 
 			await expect(actionRow.getByRole('cell')).toContainText([
-				icon,
 				label,
 				type,
 				'Active',
@@ -664,7 +659,6 @@ test(
 			await waitForAlert(page);
 
 			await expect(actionRow.getByRole('cell')).toContainText([
-				icon,
 				label,
 				type,
 				'Inactive',
@@ -685,7 +679,6 @@ test(
 			await waitForAlert(page);
 
 			await expect(actionRow.getByRole('cell')).toContainText([
-				icon,
 				label,
 				type,
 				'Active',

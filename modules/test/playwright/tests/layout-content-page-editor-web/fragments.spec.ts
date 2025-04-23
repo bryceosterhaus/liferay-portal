@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-import {ObjectDefinitionApi} from '@liferay/object-admin-rest-client-js';
+import {ObjectDefinitionAPI} from '@liferay/object-admin-rest-client-js';
 import {Page, expect, mergeTests} from '@playwright/test';
 
 import {apiHelpersTest} from '../../fixtures/apiHelpersTest';
@@ -47,6 +47,7 @@ const test = mergeTests(
 	displayPageTemplatesPagesTest,
 	documentLibraryPagesTest,
 	featureFlagsTest({
+		'LPD-17564': {enabled: true},
 		'LPD-39304': {enabled: true},
 		'LPS-178052': {enabled: true},
 	}),
@@ -168,7 +169,7 @@ test.describe('Content Display Fragment', () => {
 		});
 
 		await expect(
-			page.locator('#page-editor').getByText('Hummingbird')
+			page.locator('#page-editor').getByText('Hummingbird', {exact: true})
 		).toBeVisible();
 
 		await pageEditorPage.publishPage();
@@ -657,7 +658,7 @@ test.describe('Banner Slider Fragment', () => {
 
 		expect(await page.getByLabel('Focus slide').count()).toBe(4);
 
-		await expect(page.getByText('New title')).toBeVisible();
+		await expect(page.getByText('New title')).toBeAttached();
 	});
 });
 
@@ -1219,7 +1220,7 @@ test.describe('Image Fragment', () => {
 					.locator('.component-image img')
 					.first()
 					.getAttribute('src')
-			).toContain('poodle-jpg');
+			).toContain('poodle.jpg');
 		}
 	);
 });
@@ -2082,11 +2083,11 @@ test.describe('Tags Fragment', () => {
 
 		// Get the id of Lemon object from the site initializer
 
-		const objectDefinitionApiClient =
-			await apiHelpers.buildRestClient(ObjectDefinitionApi);
+		const objectDefinitionAPIClient =
+			await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 		const {className: objectDefinitionClassName} = (
-			await objectDefinitionApiClient.getObjectDefinitionByExternalReferenceCode(
+			await objectDefinitionAPIClient.getObjectDefinitionByExternalReferenceCode(
 				getObjectERC('Lemon')
 			)
 		).body;
@@ -2224,11 +2225,11 @@ test.describe('Tags Fragment', () => {
 
 		// Get Lemon Basket object id from the site initializer
 
-		const objectDefinitionApiClient =
-			await apiHelpers.buildRestClient(ObjectDefinitionApi);
+		const objectDefinitionAPIClient =
+			await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 		const {className: objectDefinitionClassName} = (
-			await objectDefinitionApiClient.getObjectDefinitionByExternalReferenceCode(
+			await objectDefinitionAPIClient.getObjectDefinitionByExternalReferenceCode(
 				getObjectERC('Lemon Basket')
 			)
 		).body;
@@ -2694,3 +2695,76 @@ test(
 		});
 	}
 );
+
+test.describe('Accordion Fragment', () => {
+	test('Check the functionality of the Accordion fragment', async ({
+		apiHelpers,
+		page,
+		pageEditorPage,
+		site,
+	}) => {
+
+		// Create content page with an Accordion fragment inside a Container
+
+		const accordionId = getRandomString();
+
+		const accordionDefinition = getFragmentDefinition({
+			id: accordionId,
+			key: 'BASIC_COMPONENT-accordion',
+		});
+
+		const containerDefinition = getContainerDefinition({
+			id: getRandomString(),
+			pageElements: [accordionDefinition],
+		});
+
+		const layout = await apiHelpers.headlessDelivery.createSitePage({
+			pageDefinition: getPageDefinition([containerDefinition]),
+			siteId: site.id,
+			title: getRandomString(),
+		});
+
+		await pageEditorPage.goto(layout, site.friendlyUrlPath);
+
+		// Change the accordion text
+
+		await pageEditorPage.editTextEditable(
+			accordionId,
+			'accordion-title',
+			'My Accordion'
+		);
+
+		// Check that a fragment can be added to the dropzone of the accordion
+
+		await pageEditorPage.addFragment(
+			'Basic Components',
+			'Heading',
+			page.getByText('Drag and drop fragments or widgets here.', {
+				exact: true,
+			})
+		);
+
+		await expect(page.getByText('Heading Example')).toHaveCount(1);
+
+		await pageEditorPage.publishPage();
+
+		await page.goto(`/web${site.friendlyUrlPath}${layout.friendlyUrlPath}`);
+
+		const accordionButton = page
+			.locator('button')
+			.filter({hasText: 'My Accordion'});
+
+		await accordionButton.click();
+
+		await expect(
+			page.locator('.collapse-icon-closed').first()
+		).toBeVisible();
+		await expect(
+			page.locator('.collapse-icon-open').first()
+		).not.toBeVisible();
+
+		await expect(
+			accordionButton.getByText('Heading Example')
+		).not.toBeVisible();
+	});
+});

@@ -9,7 +9,7 @@ import ClayLoadingIndicator from '@clayui/loading-indicator';
 import {AccountAndAppCard} from '../../components/Card/AccountAndAppCard';
 import {Header} from '../../components/Header/Header';
 import {NewAppPageFooterButtons} from '../../components/NewAppPageFooterButtons/NewAppPageFooterButtons';
-import {ORDER_TYPES} from '../../enums/Order';
+import {OrderTypes, PaymentStatus} from '../../enums/Order';
 import withProviders from '../../hoc/withProviders';
 import i18n from '../../i18n';
 import {Liferay} from '../../liferay/liferay';
@@ -19,7 +19,6 @@ import {
 	getThumbnailByProductAttachment,
 	showAppImage,
 } from '../../utils/util';
-import {PaymentStatus} from '../GetApp/enums/PaymentStatus';
 import getProductPriceModel from '../GetApp/utils/getProductPriceModel';
 import useNextSteps from './useNextSteps';
 
@@ -30,18 +29,12 @@ export function NextSteps() {
 	const urlParams = new URLSearchParams(queryString);
 	const orderId = urlParams.get('orderId');
 
-	const {
-		accountCommerce,
-		cart,
-		cartItems,
-		firstCartItem,
-		isLoading,
-		product,
-	} = useNextSteps(orderId as string);
+	const {accountCommerce, firstPlacedOrder, isLoading, placedOrder, product} =
+		useNextSteps(orderId as string);
 
-	const {name: appName = ''} = firstCartItem ?? {};
+	const {name: appName = ''} = firstPlacedOrder ?? {};
 
-	const isTrial = cartItems?.items?.some(
+	const isTrial = placedOrder?.placedOrderItems?.some(
 		(item: any) =>
 			item.sku.endsWith('ts') || item.sku.toLowerCase().includes('trial')
 	);
@@ -53,11 +46,11 @@ export function NextSteps() {
 		baseURL
 	);
 
-	const paymentStatus = cart?.paymentStatusLabel;
-	const orderTypeExternalReferenceCode = cart?.orderTypeExternalReferenceCode;
+	const paymentStatus = placedOrder?.paymentStatus;
+	const orderTypeExternalReferenceCode =
+		placedOrder?.orderTypeExternalReferenceCode;
 
-	const isCloudApp = orderTypeExternalReferenceCode === ORDER_TYPES.CLOUDAPP;
-	const isDxpApp = orderTypeExternalReferenceCode === ORDER_TYPES.DXPAPP;
+	const isCloudApp = orderTypeExternalReferenceCode === OrderTypes.CLOUDAPP;
 
 	const {isPaidApp} = getProductPriceModel(product);
 
@@ -199,7 +192,7 @@ export function NextSteps() {
 						isCloudApp ? 'go-to-my-apps' : 'go-to-dashboard'
 					)}
 					continueButtonText={i18n.translate(
-						isDxpApp ? 'download-app' : 'continue-to-install'
+						isCloudApp ? 'continue-to-install' : 'download-app'
 					)}
 					onClickBack={() => {
 						Liferay.Util.navigate(
@@ -219,7 +212,7 @@ export function NextSteps() {
 							);
 						}
 
-						if (isDxpApp) {
+						if (!isCloudApp) {
 							Liferay.Util.navigate(
 								Liferay.ThemeDisplay.getLayoutURL().replace(
 									'/next-steps',

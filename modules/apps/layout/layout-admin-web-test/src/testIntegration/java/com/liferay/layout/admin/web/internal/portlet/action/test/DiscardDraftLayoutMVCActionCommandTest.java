@@ -27,6 +27,8 @@ import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.test.TestInfo;
+import com.liferay.portal.kernel.test.portlet.MockActionRequest;
+import com.liferay.portal.kernel.test.portlet.MockActionResponse;
 import com.liferay.portal.kernel.test.portlet.MockLiferayPortletActionRequest;
 import com.liferay.portal.kernel.test.portlet.MockLiferayPortletActionResponse;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
@@ -44,8 +46,6 @@ import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
-import com.liferay.portletmvc4spring.test.mock.web.portlet.MockActionRequest;
-import com.liferay.portletmvc4spring.test.mock.web.portlet.MockActionResponse;
 import com.liferay.segments.service.SegmentsExperienceLocalService;
 
 import org.junit.After;
@@ -93,19 +93,25 @@ public class DiscardDraftLayoutMVCActionCommandTest {
 
 		Layout draftLayout = layout.fetchDraftLayout();
 
-		draftLayout.setStatus(WorkflowConstants.STATUS_DRAFT);
-
-		draftLayout = _layoutLocalService.updateLayout(draftLayout);
-
 		_addSegmentsExperienceMVCActionCommand.processAction(
 			_getMockLiferayPortletActionRequest(
 				draftLayout, TestPropsValues.getUser()),
 			new MockLiferayPortletActionResponse());
 
 		Assert.assertEquals(
-			2,
+			1,
 			_segmentsExperienceLocalService.getSegmentsExperiencesCount(
 				_group.getGroupId(), layout.getPlid()));
+		Assert.assertEquals(
+			2,
+			_segmentsExperienceLocalService.getSegmentsExperiencesCount(
+				_group.getGroupId(), draftLayout.getPlid()));
+
+		draftLayout = layout.fetchDraftLayout();
+
+		draftLayout.setStatus(WorkflowConstants.STATUS_DRAFT);
+
+		draftLayout = _layoutLocalService.updateLayout(draftLayout);
 
 		_discardDraftLayoutMVCActionCommand.processAction(
 			_getMockLiferayPortletActionRequest(
@@ -116,6 +122,10 @@ public class DiscardDraftLayoutMVCActionCommandTest {
 			1,
 			_segmentsExperienceLocalService.getSegmentsExperiencesCount(
 				_group.getGroupId(), layout.getPlid()));
+		Assert.assertEquals(
+			1,
+			_segmentsExperienceLocalService.getSegmentsExperiencesCount(
+				_group.getGroupId(), draftLayout.getPlid()));
 	}
 
 	@Test

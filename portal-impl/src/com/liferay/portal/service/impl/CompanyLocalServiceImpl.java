@@ -364,6 +364,8 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 			long companyId, String name, String virtualHostname, String webId)
 		throws PortalException {
 
+		FeatureFlagManagerUtil.checkEnabled("LPD-11342");
+
 		if (!DBPartition.isPartitionEnabled()) {
 			throw new UnsupportedOperationException(
 				"Database partitioning must be enabled");
@@ -438,10 +440,16 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 				});
 		}
 		catch (Throwable throwable) {
-			try {
+			try (SafeCloseable safeCloseable3 =
+					PortalInstances.
+						setCompanyInDeletionProcessWithSafeCloseable(
+							companyId)) {
+
 				_transactionAwareInvoke(
 					() -> {
-						extractDBPartitionCompany(companyId);
+						extractCompany(companyId);
+
+						DBPartitionUtil.removeDBPartition(companyId);
 
 						return null;
 					});
@@ -510,6 +518,8 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 			long fromCompanyId, Long toCompanyId, String name,
 			String virtualHostname, String webId)
 		throws PortalException {
+
+		FeatureFlagManagerUtil.checkEnabled("LPD-11342");
 
 		if (!DBPartition.isPartitionEnabled()) {
 			throw new UnsupportedOperationException(
@@ -599,7 +609,11 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 				});
 		}
 		catch (Throwable throwable) {
-			try {
+			try (SafeCloseable safeCloseable3 =
+					PortalInstances.
+						setCompanyInDeletionProcessWithSafeCloseable(
+							companyId)) {
+
 				_transactionAwareInvoke(
 					() -> {
 						DBPartitionUtil.removeDBPartition(companyId);
@@ -678,13 +692,8 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 	}
 
 	@Override
-	public Company extractDBPartitionCompany(long companyId)
-		throws PortalException {
-
-		if (!DBPartition.isPartitionEnabled()) {
-			throw new UnsupportedOperationException(
-				"Database partitioning must be enabled");
-		}
+	public Company extractCompany(long companyId) throws PortalException {
+		FeatureFlagManagerUtil.checkEnabled("LPD-11342");
 
 		if (companyId == PortalInstancePool.getDefaultCompanyId()) {
 			throw new RequiredCompanyException(
@@ -694,35 +703,12 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 
 		Company company = companyPersistence.findByPrimaryKey(companyId);
 
-		try (SafeCloseable safeCloseable1 =
-				CompanyThreadLocal.setCompanyIdWithSafeCloseable(companyId);
-			SafeCloseable safeCloseable2 =
-				PortalInstances.setCompanyInDeletionProcessWithSafeCloseable(
-					companyId)) {
+		try {
+			if (!DBPartition.isPartitionEnabled()) {
+				DBPartitionUtil.extractCompany(companyId);
 
-			preunregisterCompany(company);
-
-			TransactionCommitCallbackUtil.registerCallback(
-				() -> {
-					_clearCache(company.getCompanyId());
-
-					PortalInstances.removeCompany(company.getCompanyId());
-
-					unregisterCompany(company);
-
-					_synchronizePortalInstances();
-
-					try (SafeCloseable safeCloseable =
-							CompanyThreadLocal.setCompanyIdWithSafeCloseable(
-								companyId)) {
-
-						CacheRegistryUtil.clear();
-					}
-
-					return null;
-				});
-
-			_clearCacheCallback(companyId, true);
+				return company;
+			}
 
 			DBPartitionUtil.extractDBPartition(companyId);
 		}
@@ -868,17 +854,6 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 	@Override
 	public Company getCompanyById(long companyId) throws PortalException {
 		return companyPersistence.findByPrimaryKey(companyId);
-	}
-
-	/**
-	 * Returns the company with the mail domain.
-	 *
-	 * @param  mx the company's mail domain
-	 * @return the company with the mail domain
-	 */
-	@Override
-	public Company getCompanyByMx(String mx) throws PortalException {
-		return companyPersistence.findByMx(mx);
 	}
 
 	/**
@@ -1613,7 +1588,7 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 
 		for (String groupName : systemGroups) {
 			if (groupName.equals(GroupConstants.CMS) &&
-				!FeatureFlagManagerUtil.isEnabled("LPD-17809")) {
+				!FeatureFlagManagerUtil.isEnabled("LPD-17564")) {
 
 				continue;
 			}
@@ -2470,8 +2445,8 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 		// Virtual host
 
 		VirtualHost companyVirtualHost =
-			_virtualHostLocalService.fetchVirtualHost(
-				company.getCompanyId(), 0);
+			_virtualHostLocalService.fetchCompanyDefaultVirtualHost(
+				company.getCompanyId());
 
 		_virtualHostLocalService.deleteVirtualHost(companyVirtualHost);
 

@@ -46,12 +46,19 @@ public class RelevantTestSuite {
 		String testBatchNamesPropertyValue =
 			JenkinsResultsParserUtil.getProperty(
 				JenkinsResultsParserUtil.getProperties(baseTestPropertiesFile),
-				"test.batch.names[relevant]");
+				"relevant.batch.names.whitelist");
 
 		if (testBatchNamesPropertyValue == null) {
-			throw new RuntimeException(
-				"Please set test.batch.names[relevant] in " +
-					baseTestPropertiesFile);
+			testBatchNamesPropertyValue = JenkinsResultsParserUtil.getProperty(
+				JenkinsResultsParserUtil.getProperties(baseTestPropertiesFile),
+				"test.batch.names[relevant]");
+
+			if (testBatchNamesPropertyValue == null) {
+				throw new RuntimeException(
+					"Please set relevant.batch.names.whitelist or " +
+						"test.batch.names[relevant] in " +
+							baseTestPropertiesFile);
+			}
 		}
 
 		List<RelevantRule> relevantRules =
@@ -73,7 +80,7 @@ public class RelevantTestSuite {
 			throw new RuntimeException(ioException);
 		}
 
-		List<String> validTestBatchNames = Arrays.asList(
+		List<String> validTestBatchRegexes = Arrays.asList(
 			testBatchNamesPropertyValue.split(","));
 
 		List<TestBatch> testBatches = new ArrayList<>();
@@ -93,8 +100,9 @@ public class RelevantTestSuite {
 					continue;
 				}
 
-				if (!validTestBatchNames.isEmpty() &&
-					validTestBatchNames.contains(testBatch.getName())) {
+				if (!validTestBatchRegexes.isEmpty() &&
+					isValidTestBatch(
+						validTestBatchRegexes, testBatch.getName())) {
 
 					testBatches.add(testBatch);
 				}
@@ -103,7 +111,7 @@ public class RelevantTestSuite {
 						JenkinsResultsParserUtil.combine(
 							testBatch.getName(),
 							" is not a valid test batch in relevant. Check ",
-							"the property \"test.batch.names[relevant]\" ",
+							"the property \"relevant.batch.names.whitelist\" ",
 							"in the base test.properties file and set the ",
 							"batch name.\n"));
 				}
@@ -120,6 +128,18 @@ public class RelevantTestSuite {
 
 	public Set<JobProperty> getTestBatchNamesJobProperties() {
 		return _testBatchNamesJobProperties;
+	}
+
+	public Boolean isValidTestBatch(
+		List<String> validTestBatchRegexes, String testBatchName) {
+
+		for (String validTestBatchRegex : validTestBatchRegexes) {
+			if (testBatchName.matches(validTestBatchRegex)) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	public void setModifiedFiles(List<File> modifiedFiles) {

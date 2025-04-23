@@ -42,7 +42,9 @@ export class FormBuilderPage {
 			name: 'Open Form',
 		});
 		this.page = page;
-		this.previewButton = page.getByRole('button', {name: 'Preview'});
+		this.previewButton = page
+			.getByRole('button', {name: 'Preview'})
+			.and(page.getByTitle('A form draft will be saved'));
 		this.publishButton = page.getByRole('button', {
 			exact: true,
 			name: 'Publish',
@@ -82,7 +84,7 @@ export class FormBuilderPage {
 
 		const formSubmissionURL = await this.page.evaluate(() => {
 			const urlInput = document.querySelector(
-				'input.form-control[readonly]'
+				'.share-form-modal-item-link input.form-control[readonly]'
 			) as HTMLInputElement;
 
 			return urlInput.value;

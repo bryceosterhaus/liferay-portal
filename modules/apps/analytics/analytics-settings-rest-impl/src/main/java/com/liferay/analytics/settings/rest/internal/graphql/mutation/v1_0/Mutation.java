@@ -7,6 +7,7 @@ package com.liferay.analytics.settings.rest.internal.graphql.mutation.v1_0;
 
 import com.liferay.analytics.settings.rest.dto.v1_0.Channel;
 import com.liferay.analytics.settings.rest.dto.v1_0.ContactConfiguration;
+import com.liferay.analytics.settings.rest.dto.v1_0.DataSourceLiferayAnalyticsURL;
 import com.liferay.analytics.settings.rest.dto.v1_0.DataSourceToken;
 import com.liferay.analytics.settings.rest.dto.v1_0.Field;
 import com.liferay.analytics.settings.rest.dto.v1_0.RecommendationConfiguration;
@@ -17,7 +18,6 @@ import com.liferay.analytics.settings.rest.resource.v1_0.FieldResource;
 import com.liferay.analytics.settings.rest.resource.v1_0.RecommendationConfigurationResource;
 import com.liferay.petra.function.UnsafeConsumer;
 import com.liferay.petra.function.UnsafeFunction;
-import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
@@ -130,17 +130,15 @@ public class Mutation {
 	}
 
 	@GraphQLField
-	public boolean createDataSource(
+	public DataSourceLiferayAnalyticsURL createDataSource(
 			@GraphQLName("dataSourceToken") DataSourceToken dataSourceToken)
 		throws Exception {
 
-		_applyVoidComponentServiceObjects(
+		return _applyComponentServiceObjects(
 			_dataSourceResourceComponentServiceObjects,
 			this::_populateResourceContext,
 			dataSourceResource -> dataSourceResource.postDataSource(
 				dataSourceToken));
-
-		return true;
 	}
 
 	@GraphQLField
@@ -338,7 +336,8 @@ public class Mutation {
 	private HttpServletRequest _httpServletRequest;
 	private HttpServletResponse _httpServletResponse;
 	private RoleLocalService _roleLocalService;
-	private BiFunction<Object, String, Sort[]> _sortsBiFunction;
+	private BiFunction<Object, String, com.liferay.portal.kernel.search.Sort[]>
+		_sortsBiFunction;
 	private UriInfo _uriInfo;
 	private com.liferay.portal.kernel.model.User _user;
 

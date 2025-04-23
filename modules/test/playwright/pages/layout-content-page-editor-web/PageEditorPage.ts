@@ -176,27 +176,6 @@ export class PageEditorPage {
 			.press('Enter');
 	}
 
-	async addWidgetToWidgetPageTemplate(category: string, name: string) {
-		await this.goToSidebarTab('Widgets');
-
-		await this.page
-			.getByRole('tab', {exact: true, name: 'Widgets'})
-			.click();
-
-		const header = this.page.getByRole('button', {
-			exact: true,
-			name: category,
-		});
-
-		await expandSection(header);
-
-		await this.page
-			.locator('li', {hasText: name})
-			.getByLabel('Add Content')
-			.first()
-			.click();
-	}
-
 	async addWidget(category: string, name: string, dropTarget?: Locator) {
 		await this.goToSidebarTab('Components');
 
@@ -415,72 +394,41 @@ export class PageEditorPage {
 		await this.waitForChangesSaved();
 	}
 
-	async chooseCollectionDisplayOption(
-		collectionType: string,
-		collectionTitle?: string
-	) {
+	async chooseCollectionDisplayCollection(type: string, title: string) {
 		await this.page.getByLabel('Select Collection', {exact: true}).click();
 
 		await this.page
 			.frameLocator('iframe[title="Select"]')
-			.getByRole('link', {name: collectionType})
+			.getByRole('link', {name: type})
 			.click();
 
 		await clickAndExpectToBeHidden({
 			target: this.page.locator('.modal-dialog'),
 			trigger: this.page
 				.frameLocator('iframe[title="Select"]')
-				.getByRole('button', {name: 'Select ' + collectionTitle}),
+				.getByRole('button', {name: 'Select ' + title}),
 		});
 	}
 
-	async chooseCollectionFilterOption(fieldName: string, option: string) {
-		await this.page.getByLabel('View Collection Options').click();
-		await this.page
-			.getByRole('menuitem', {name: 'Filter Collection'})
-			.click();
-		await this.page.getByLabel(fieldName).selectOption(option);
-		await this.page.getByRole('button', {name: 'Save'}).click();
-	}
-
-	async clickPageContentAction(
-		action: string,
+	async clickFragmentOption(
+		fragmentId: string,
 		name: string,
-		subMenuAction?: string
+		isDesktop = true
 	) {
-		await this.goToSidebarTab('Page Content');
-
-		if (subMenuAction) {
-			await clickAndExpectToBeVisible({
-				autoClick: false,
-				target: this.page.getByRole('menuitem', {name: action}),
-				trigger: this.page.getByTitle('Open Actions Menu'),
-			});
-
-			await hoverAndExpectToBeVisible({
-				autoClick: true,
-				target: this.page.locator(`[data-label="${subMenuAction}"]`),
-				trigger: this.page.getByRole('menuitem', {name: action}),
-			});
-		}
-		else {
-			await clickAndExpectToBeVisible({
-				autoClick: true,
-				target: this.page.getByRole('menuitem', {name: action}),
-				trigger: this.page.getByTitle('Open Actions Menu'),
-			});
-		}
-	}
-
-	async closeExperienceSelector() {
-		await collapseSection(this.experienceSelector);
+		await this.selectFragment(fragmentId, isDesktop);
 
 		await this.page
-			.getByText('Select Experience')
-			.waitFor({state: 'hidden'});
+			.locator('.page-editor__topper__item')
+			.getByRole('button', {name: 'Options'})
+			.click();
+
+		await this.page
+			.locator('.dropdown-menu.show')
+			.getByText(name, {exact: true})
+			.click();
 	}
 
-	async clickOnAction(action: string) {
+	async clickPageAction(action: string) {
 		await expect(async () => {
 			await clickAndExpectToBeVisible({
 				target: this.page.getByRole('menuitem', {
@@ -497,6 +445,45 @@ export class PageEditorPage {
 				})
 				.click({timeout: 1000});
 		}).toPass();
+	}
+
+	async clickPageContentAction(
+		action: string,
+		name: string,
+		subMenuAction?: string
+	) {
+		await this.goToSidebarTab('Page Content');
+
+		const content = this.page.getByLabel(name);
+
+		if (subMenuAction) {
+			await clickAndExpectToBeVisible({
+				autoClick: false,
+				target: this.page.getByRole('menuitem', {name: action}),
+				trigger: content.getByTitle('Open Actions Menu'),
+			});
+
+			await hoverAndExpectToBeVisible({
+				autoClick: true,
+				target: this.page.locator(`[data-label="${subMenuAction}"]`),
+				trigger: this.page.getByRole('menuitem', {name: action}),
+			});
+		}
+		else {
+			await clickAndExpectToBeVisible({
+				autoClick: true,
+				target: this.page.getByRole('menuitem', {name: action}),
+				trigger: content.getByTitle('Open Actions Menu'),
+			});
+		}
+	}
+
+	async closeExperienceSelector() {
+		await collapseSection(this.experienceSelector);
+
+		await this.page
+			.getByText('Select Experience')
+			.waitFor({state: 'hidden'});
 	}
 
 	async copyFragment(fragmentId: string) {
@@ -977,24 +964,6 @@ export class PageEditorPage {
 		await this.waitForChangesSaved();
 	}
 
-	async clickFragmentOption(
-		fragmentId: string,
-		name: string,
-		isDesktop = true
-	) {
-		await this.selectFragment(fragmentId, isDesktop);
-
-		await this.page
-			.locator('.page-editor__topper__item')
-			.getByRole('button', {name: 'Options'})
-			.click();
-
-		await this.page
-			.locator('.dropdown-menu.show')
-			.getByText(name, {exact: true})
-			.click();
-	}
-
 	async isActive(fragmentId: string, isDesktop = true) {
 		const editMode = await this.editModeButton.evaluate(
 			(element) => element.textContent
@@ -1019,7 +988,13 @@ export class PageEditorPage {
 		);
 	}
 
-	async mapAction({entry, fragmentId}: {entry: string; fragmentId: string}) {
+	async mapObjectAction({
+		entry,
+		fragmentId,
+	}: {
+		entry: string;
+		fragmentId: string;
+	}) {
 		await this.selectFragment(fragmentId);
 
 		await this.changeConfiguration({
@@ -1107,12 +1082,6 @@ export class PageEditorPage {
 			trigger: this.page.locator('.modal-footer').getByText('Save'),
 		});
 
-		await waitForAlert(
-			this.page,
-			'Success:Your form has been successfully loaded.',
-			{autoClose: false}
-		);
-
 		const addLocalizationSelectDialog = this.page.getByRole('dialog', {
 			name: 'Add Localization Select',
 		});
@@ -1129,6 +1098,12 @@ export class PageEditorPage {
 					.click();
 			}
 		}
+
+		await waitForAlert(
+			this.page,
+			'Success:Your form has been successfully loaded.',
+			{autoClose: true}
+		);
 	}
 
 	async mapEditableLink({
@@ -1300,6 +1275,14 @@ export class PageEditorPage {
 		}
 	}
 
+	async selectStyleBook(name: string) {
+		await this.goToSidebarTab('Page Design Options');
+
+		await this.goToConfigurationTab('Style Book');
+
+		await this.page.getByRole('button', {name}).click();
+	}
+
 	async selectVideo({
 		fragmentId,
 		isDesktop = true,
@@ -1441,7 +1424,9 @@ export class PageEditorPage {
 
 			if (hasMenuBar) {
 				await clickAndExpectToBeVisible({
-					target: iframe.locator('.sheet-title').getByText(entity),
+					target: iframe
+						.locator('.sheet-title')
+						.getByText(entity, {exact: true}),
 					trigger: iframe.getByRole('menuitem', {name: entity}),
 				});
 			}

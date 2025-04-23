@@ -21,6 +21,7 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.MapUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.vulcan.extension.PropertyDefinition;
 
 import java.util.ArrayList;
@@ -112,25 +113,27 @@ public class MultiselectPicklistObjectFieldBusinessType
 		return HashMapBuilder.<String, Object>put(
 			"defaultSearch", true
 		).put(
+			"listTypeDefinitionId", objectField.getListTypeDefinitionId()
+		).put(
 			"multiple", true
 		).put(
 			"options",
 			() -> {
 				DDMFormFieldOptions ddmFormFieldOptions =
-					new DDMFormFieldOptions();
+					new DDMFormFieldOptions(
+						objectFieldRenderingContext.getLocale());
 
 				for (ListTypeEntry listTypeEntry :
 						_listTypeEntryLocalService.getListTypeEntries(
 							objectField.getListTypeDefinitionId())) {
 
-					ddmFormFieldOptions.addOptionLabel(
-						listTypeEntry.getKey(),
-						objectFieldRenderingContext.getLocale(),
-						GetterUtil.getString(
-							listTypeEntry.getName(
-								objectFieldRenderingContext.getLocale()),
-							listTypeEntry.getName(
-								listTypeEntry.getDefaultLanguageId())));
+					Map<Locale, String> nameMap = listTypeEntry.getNameMap();
+
+					for (Map.Entry<Locale, String> entry : nameMap.entrySet()) {
+						ddmFormFieldOptions.addOptionLabel(
+							listTypeEntry.getKey(), entry.getKey(),
+							GetterUtil.getString(entry.getValue()));
+					}
 				}
 
 				return ddmFormFieldOptions;
@@ -155,11 +158,6 @@ public class MultiselectPicklistObjectFieldBusinessType
 			objectField.getName(),
 			ObjectFieldBusinessType.super.getValue(objectField, userId, values),
 			values);
-	}
-
-	@Override
-	public boolean isLocalizable() {
-		return true;
 	}
 
 	private Object _getValue(
@@ -190,7 +188,10 @@ public class MultiselectPicklistObjectFieldBusinessType
 		else if (value instanceof String) {
 			String valueString = GetterUtil.getString(value);
 
-			if (valueString.contains(StringPool.COMMA_AND_SPACE)) {
+			if (StringUtil.equals(valueString, "[]")) {
+				return StringPool.BLANK;
+			}
+			else if (valueString.contains(StringPool.COMMA_AND_SPACE)) {
 				List<String> keys = ListUtil.fromString(
 					valueString, StringPool.COMMA_AND_SPACE);
 

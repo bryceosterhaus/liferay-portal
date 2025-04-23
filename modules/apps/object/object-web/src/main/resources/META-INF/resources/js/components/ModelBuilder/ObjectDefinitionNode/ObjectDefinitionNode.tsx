@@ -131,6 +131,7 @@ export function ObjectDefinitionNode({
 						hasObjectDefinitionDeleteResourcePermission,
 						hasObjectDefinitionManagePermissionsResourcePermission,
 						hasObjectDefinitionUpdateResourcePermission,
+						isTreeStructure,
 						objectDefinitionId: id,
 						objectDefinitionName: name,
 						objectDefinitionPermissionsURL,
@@ -143,11 +144,11 @@ export function ObjectDefinitionNode({
 					isLinkedObjectDefinition={linkedObjectDefinition}
 					isRootDescendantNode={isRootDescendantNode}
 					isRootNode={isRootNode}
-					objectDefinitionLabel={stringUtils.getLocalizableLabel(
-						defaultLanguageId,
-						label,
-						name
-					)}
+					objectDefinitionLabel={stringUtils.getLocalizableLabel({
+						fallbackLabel: name,
+						fallbackLanguageId: defaultLanguageId,
+						labels: label,
+					})}
 					status={status!}
 					system={system}
 				/>

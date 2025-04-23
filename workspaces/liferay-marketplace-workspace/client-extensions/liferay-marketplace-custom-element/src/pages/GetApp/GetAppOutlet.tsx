@@ -13,8 +13,8 @@ import useCommerceRegions from '../../hooks/useCommerceRegions';
 import useGetAddresses from '../../hooks/useGetAddresses';
 import i18n from '../../i18n';
 import {Liferay} from '../../liferay/liferay';
-import CommerceSelectAccountImpl from '../../services/rest/CommerceSelectAccount';
-import HeadlessAdminUserImpl from '../../services/rest/HeadlessAdminUser';
+import CommerceSelectAccount from '../../services/rest/CommerceSelectAccount';
+import HeadlessAdminUser from '../../services/rest/HeadlessAdminUser';
 import {Region} from '../../services/rest/HeadlessCommerceAdminAddress';
 import {
 	getPaymentMethodURL,
@@ -25,7 +25,6 @@ import {useGetAppContext} from './GetAppContextProvider';
 import ProductHeader from './containers/ProductHeader';
 import ProductStepWizard from './containers/ProductStepWizard';
 import {PaymentMethod} from './enums/paymentMethod';
-import {SkuOptions} from './enums/skuOptions';
 import buildNewCart from './utils/buildNewCart';
 import {getProductOrderTypes} from './utils/getProductOrderTypes';
 import getProductPriceModel from './utils/getProductPriceModel';
@@ -34,6 +33,7 @@ import getReplaceCurrentURL from './utils/getReplaceCurrentURL';
 import {postCartByPaymentMethod} from './utils/postCartByPaymentMethod';
 
 import './styles/index.scss';
+import {SkuOptions} from '../../enums/Product';
 
 const getProductBasePriceAndTrial = (
 	product: DeliveryProduct,
@@ -187,7 +187,7 @@ const GetAppOutlet = () => {
 		setLoading(true);
 
 		if (billingAddress.saveAddress) {
-			await HeadlessAdminUserImpl.postAddress(account?.id as number, {
+			await HeadlessAdminUser.postAddress(account?.id as number, {
 				addressCountry: getCountryNameByCode(
 					regions,
 					billingAddress?.country
@@ -272,9 +272,7 @@ const GetAppOutlet = () => {
 				nextStepsCallbackURL
 			);
 
-			await CommerceSelectAccountImpl.selectAccount(
-				account?.id as number
-			);
+			await CommerceSelectAccount.selectAccount(account?.id as number);
 
 			window.location.href = paymentMethodURL || nextStepsCallbackURL;
 		}

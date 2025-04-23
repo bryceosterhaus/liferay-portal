@@ -5,8 +5,7 @@
 
 import {
 	ObjectDefinition,
-	ObjectDefinitionApi,
-	ObjectField,
+	ObjectDefinitionAPI,
 } from '@liferay/object-admin-rest-client-js';
 import {expect, mergeTests} from '@playwright/test';
 
@@ -253,7 +252,7 @@ test('can list site scoped endpoint', async ({
 	page,
 }) => {
 	const objectDefinitionAPIClient =
-		await apiHelpers.buildRestClient(ObjectDefinitionApi);
+		await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 	const {body: studentSiteDefinition} =
 		await objectDefinitionAPIClient.postObjectDefinition({
@@ -265,8 +264,8 @@ test('can list site scoped endpoint', async ({
 			name: 'Student',
 			objectFields: [
 				{
-					DBType: ObjectField.DBTypeEnum.String,
-					businessType: ObjectField.BusinessTypeEnum.Text,
+					DBType: 'String',
+					businessType: 'Text',
 					externalReferenceCode: 'student-name-field',
 					indexed: true,
 					indexedAsKeyword: false,
@@ -279,7 +278,7 @@ test('can list site scoped endpoint', async ({
 					required: true,
 					state: false,
 					system: false,
-					type: ObjectField.TypeEnum.String,
+					type: 'String',
 				},
 			],
 			pluralLabel: {

@@ -10,8 +10,6 @@ import com.liferay.petra.function.UnsafeConsumer;
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.search.Sort;
-import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.ResourceActionLocalService;
@@ -28,6 +26,8 @@ import com.liferay.portal.odata.filter.FilterParserProvider;
 import com.liferay.portal.odata.sort.SortField;
 import com.liferay.portal.odata.sort.SortParser;
 import com.liferay.portal.odata.sort.SortParserProvider;
+import com.liferay.portal.tools.rest.builder.test.dto.v1_0.Filter;
+import com.liferay.portal.tools.rest.builder.test.dto.v1_0.Sort;
 import com.liferay.portal.tools.rest.builder.test.dto.v1_0.TestEntity;
 import com.liferay.portal.tools.rest.builder.test.resource.v1_0.TestEntityResource;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
@@ -75,6 +75,147 @@ public abstract class BaseTestEntityResourceImpl
 	/**
 	 * Invoke this method with the command line:
 	 *
+	 * curl -X 'GET' 'http://localhost:8080/o/test/v1.0/test-entities'  -u 'test@liferay.com:test'
+	 */
+	@io.swagger.v3.oas.annotations.tags.Tags(
+		value = {@io.swagger.v3.oas.annotations.tags.Tag(name = "TestEntity")}
+	)
+	@javax.ws.rs.GET
+	@javax.ws.rs.Path("/test-entities")
+	@javax.ws.rs.Produces({"application/json", "application/xml"})
+	@Override
+	public Page<TestEntity> getTestEntitiesPage() throws Exception {
+		return Page.of(Collections.emptyList());
+	}
+
+	/**
+	 * Invoke this method with the command line:
+	 *
+	 * curl -X 'GET' 'http://localhost:8080/o/test/v1.0/test-entities/{testEntityId}'  -u 'test@liferay.com:test'
+	 */
+	@io.swagger.v3.oas.annotations.Parameters(
+		value = {
+			@io.swagger.v3.oas.annotations.Parameter(
+				in = io.swagger.v3.oas.annotations.enums.ParameterIn.PATH,
+				name = "testEntityId"
+			)
+		}
+	)
+	@io.swagger.v3.oas.annotations.tags.Tags(
+		value = {@io.swagger.v3.oas.annotations.tags.Tag(name = "TestEntity")}
+	)
+	@javax.ws.rs.GET
+	@javax.ws.rs.Path("/test-entities/{testEntityId}")
+	@javax.ws.rs.Produces({"application/json", "application/xml"})
+	@Override
+	public TestEntity getTestEntity(
+			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
+			@javax.validation.constraints.NotNull
+			@javax.ws.rs.PathParam("testEntityId")
+			Long testEntityId)
+		throws Exception {
+
+		return null;
+	}
+
+	/**
+	 * Invoke this method with the command line:
+	 *
+	 * curl -X 'GET' 'http://localhost:8080/o/test/v1.0/test-entities/count'  -u 'test@liferay.com:test'
+	 */
+	@io.swagger.v3.oas.annotations.Operation(
+		description = "Retrieves the count."
+	)
+	@io.swagger.v3.oas.annotations.tags.Tags(
+		value = {@io.swagger.v3.oas.annotations.tags.Tag(name = "TestEntity")}
+	)
+	@javax.ws.rs.GET
+	@javax.ws.rs.Path("/test-entities/count")
+	@javax.ws.rs.Produces("text/plain")
+	@Override
+	public Integer getTestEntityCount() throws Exception {
+		return 0;
+	}
+
+	/**
+	 * Invoke this method with the command line:
+	 *
+	 * curl -X 'PATCH' 'http://localhost:8080/o/test/v1.0/test-entities/{testEntityId}' -d $'{"dateCreated": ___, "dateModified": ___, "description": ___, "documentId": ___, "jsonProperty": ___, "name": ___, "nestedTestEntity": ___, "self": ___, "testEntities": ___, "type": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
+	 */
+	@io.swagger.v3.oas.annotations.Parameters(
+		value = {
+			@io.swagger.v3.oas.annotations.Parameter(
+				in = io.swagger.v3.oas.annotations.enums.ParameterIn.PATH,
+				name = "testEntityId"
+			),
+			@io.swagger.v3.oas.annotations.Parameter(
+				in = io.swagger.v3.oas.annotations.enums.ParameterIn.QUERY,
+				name = "optionalParameter"
+			)
+		}
+	)
+	@io.swagger.v3.oas.annotations.tags.Tags(
+		value = {@io.swagger.v3.oas.annotations.tags.Tag(name = "TestEntity")}
+	)
+	@javax.ws.rs.Consumes({"application/json", "application/xml"})
+	@javax.ws.rs.PATCH
+	@javax.ws.rs.Path("/test-entities/{testEntityId}")
+	@javax.ws.rs.Produces({"application/json", "application/xml"})
+	@Override
+	public TestEntity patchTestEntity(
+			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
+			@javax.validation.constraints.NotNull
+			@javax.ws.rs.PathParam("testEntityId")
+			Long testEntityId,
+			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
+			@javax.ws.rs.QueryParam("optionalParameter")
+			Long optionalParameter,
+			TestEntity testEntity)
+		throws Exception {
+
+		TestEntity existingTestEntity = getTestEntity(testEntityId);
+
+		if (testEntity.getDateCreated() != null) {
+			existingTestEntity.setDateCreated(testEntity.getDateCreated());
+		}
+
+		if (testEntity.getDateModified() != null) {
+			existingTestEntity.setDateModified(testEntity.getDateModified());
+		}
+
+		if (testEntity.getDescription() != null) {
+			existingTestEntity.setDescription(testEntity.getDescription());
+		}
+
+		if (testEntity.getDocumentId() != null) {
+			existingTestEntity.setDocumentId(testEntity.getDocumentId());
+		}
+
+		if (testEntity.getJsonProperty() != null) {
+			existingTestEntity.setJsonProperty(testEntity.getJsonProperty());
+		}
+
+		if (testEntity.getName() != null) {
+			existingTestEntity.setName(testEntity.getName());
+		}
+
+		if (testEntity.getSelf() != null) {
+			existingTestEntity.setSelf(testEntity.getSelf());
+		}
+
+		if (testEntity.getType() != null) {
+			existingTestEntity.setType(testEntity.getType());
+		}
+
+		preparePatch(testEntity, existingTestEntity);
+
+		return putTestEntity(
+			testEntityId, optionalParameter, existingTestEntity);
+	}
+
+	/**
+	 * Invoke this method with the command line:
+	 *
 	 * curl -X 'POST' 'http://localhost:8080/o/test/v1.0/reserved-word'  -u 'test@liferay.com:test'
 	 */
 	@io.swagger.v3.oas.annotations.tags.Tags(
@@ -88,22 +229,6 @@ public abstract class BaseTestEntityResourceImpl
 		Response.ResponseBuilder responseBuilder = Response.ok();
 
 		return responseBuilder.build();
-	}
-
-	/**
-	 * Invoke this method with the command line:
-	 *
-	 * curl -X 'GET' 'http://localhost:8080/o/test/v1.0/test-entities'  -u 'test@liferay.com:test'
-	 */
-	@io.swagger.v3.oas.annotations.tags.Tags(
-		value = {@io.swagger.v3.oas.annotations.tags.Tag(name = "TestEntity")}
-	)
-	@javax.ws.rs.GET
-	@javax.ws.rs.Path("/test-entities")
-	@javax.ws.rs.Produces({"application/json", "application/xml"})
-	@Override
-	public Page<TestEntity> getTestEntitiesPage() throws Exception {
-		return Page.of(Collections.emptyList());
 	}
 
 	/**
@@ -226,131 +351,6 @@ public abstract class BaseTestEntityResourceImpl
 			vulcanBatchEngineImportTaskResource.postImportTask(
 				TestEntity.class.getName(), callbackURL, null, object)
 		).build();
-	}
-
-	/**
-	 * Invoke this method with the command line:
-	 *
-	 * curl -X 'GET' 'http://localhost:8080/o/test/v1.0/test-entities/count'  -u 'test@liferay.com:test'
-	 */
-	@io.swagger.v3.oas.annotations.Operation(
-		description = "Retrieves the count."
-	)
-	@io.swagger.v3.oas.annotations.tags.Tags(
-		value = {@io.swagger.v3.oas.annotations.tags.Tag(name = "TestEntity")}
-	)
-	@javax.ws.rs.GET
-	@javax.ws.rs.Path("/test-entities/count")
-	@javax.ws.rs.Produces("text/plain")
-	@Override
-	public Integer getTestEntityCount() throws Exception {
-		return 0;
-	}
-
-	/**
-	 * Invoke this method with the command line:
-	 *
-	 * curl -X 'GET' 'http://localhost:8080/o/test/v1.0/test-entities/{testEntityId}'  -u 'test@liferay.com:test'
-	 */
-	@io.swagger.v3.oas.annotations.Parameters(
-		value = {
-			@io.swagger.v3.oas.annotations.Parameter(
-				in = io.swagger.v3.oas.annotations.enums.ParameterIn.PATH,
-				name = "testEntityId"
-			)
-		}
-	)
-	@io.swagger.v3.oas.annotations.tags.Tags(
-		value = {@io.swagger.v3.oas.annotations.tags.Tag(name = "TestEntity")}
-	)
-	@javax.ws.rs.GET
-	@javax.ws.rs.Path("/test-entities/{testEntityId}")
-	@javax.ws.rs.Produces({"application/json", "application/xml"})
-	@Override
-	public TestEntity getTestEntity(
-			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
-			@javax.validation.constraints.NotNull
-			@javax.ws.rs.PathParam("testEntityId")
-			Long testEntityId)
-		throws Exception {
-
-		return null;
-	}
-
-	/**
-	 * Invoke this method with the command line:
-	 *
-	 * curl -X 'PATCH' 'http://localhost:8080/o/test/v1.0/test-entities/{testEntityId}' -d $'{"dateCreated": ___, "dateModified": ___, "description": ___, "documentId": ___, "jsonProperty": ___, "name": ___, "nestedTestEntity": ___, "self": ___, "testEntities": ___, "type": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
-	 */
-	@io.swagger.v3.oas.annotations.Parameters(
-		value = {
-			@io.swagger.v3.oas.annotations.Parameter(
-				in = io.swagger.v3.oas.annotations.enums.ParameterIn.PATH,
-				name = "testEntityId"
-			),
-			@io.swagger.v3.oas.annotations.Parameter(
-				in = io.swagger.v3.oas.annotations.enums.ParameterIn.QUERY,
-				name = "optionalParameter"
-			)
-		}
-	)
-	@io.swagger.v3.oas.annotations.tags.Tags(
-		value = {@io.swagger.v3.oas.annotations.tags.Tag(name = "TestEntity")}
-	)
-	@javax.ws.rs.Consumes({"application/json", "application/xml"})
-	@javax.ws.rs.PATCH
-	@javax.ws.rs.Path("/test-entities/{testEntityId}")
-	@javax.ws.rs.Produces({"application/json", "application/xml"})
-	@Override
-	public TestEntity patchTestEntity(
-			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
-			@javax.validation.constraints.NotNull
-			@javax.ws.rs.PathParam("testEntityId")
-			Long testEntityId,
-			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
-			@javax.ws.rs.QueryParam("optionalParameter")
-			Long optionalParameter,
-			TestEntity testEntity)
-		throws Exception {
-
-		TestEntity existingTestEntity = getTestEntity(testEntityId);
-
-		if (testEntity.getDateCreated() != null) {
-			existingTestEntity.setDateCreated(testEntity.getDateCreated());
-		}
-
-		if (testEntity.getDateModified() != null) {
-			existingTestEntity.setDateModified(testEntity.getDateModified());
-		}
-
-		if (testEntity.getDescription() != null) {
-			existingTestEntity.setDescription(testEntity.getDescription());
-		}
-
-		if (testEntity.getDocumentId() != null) {
-			existingTestEntity.setDocumentId(testEntity.getDocumentId());
-		}
-
-		if (testEntity.getJsonProperty() != null) {
-			existingTestEntity.setJsonProperty(testEntity.getJsonProperty());
-		}
-
-		if (testEntity.getName() != null) {
-			existingTestEntity.setName(testEntity.getName());
-		}
-
-		if (testEntity.getSelf() != null) {
-			existingTestEntity.setSelf(testEntity.getSelf());
-		}
-
-		if (testEntity.getType() != null) {
-			existingTestEntity.setType(testEntity.getType());
-		}
-
-		preparePatch(testEntity, existingTestEntity);
-
-		return putTestEntity(
-			testEntityId, optionalParameter, existingTestEntity);
 	}
 
 	/**
@@ -524,7 +524,9 @@ public abstract class BaseTestEntityResourceImpl
 
 	@Override
 	public Page<TestEntity> read(
-			Filter filter, Pagination pagination, Sort[] sorts,
+			com.liferay.portal.kernel.search.filter.Filter filter,
+			Pagination pagination,
+			com.liferay.portal.kernel.search.Sort[] sorts,
 			Map<String, Serializable> parameters, String search)
 		throws Exception {
 
@@ -666,7 +668,8 @@ public abstract class BaseTestEntityResourceImpl
 	}
 
 	public void setExpressionConvert(
-		ExpressionConvert<Filter> expressionConvert) {
+		ExpressionConvert<com.liferay.portal.kernel.search.filter.Filter>
+			expressionConvert) {
 
 		this.expressionConvert = expressionConvert;
 	}
@@ -722,7 +725,7 @@ public abstract class BaseTestEntityResourceImpl
 	}
 
 	@Override
-	public Filter toFilter(
+	public com.liferay.portal.kernel.search.filter.Filter toFilter(
 		String filterString, Map<String, List<String>> multivaluedMap) {
 
 		try {
@@ -747,7 +750,7 @@ public abstract class BaseTestEntityResourceImpl
 	}
 
 	@Override
-	public Sort[] toSorts(String sortString) {
+	public com.liferay.portal.kernel.search.Sort[] toSorts(String sortString) {
 		if (Validator.isNull(sortString)) {
 			return null;
 		}
@@ -765,13 +768,13 @@ public abstract class BaseTestEntityResourceImpl
 					sortParser.parse(sortString));
 
 			List<SortField> sortFields = oDataSort.getSortFields();
-
-			Sort[] sorts = new Sort[sortFields.size()];
+			com.liferay.portal.kernel.search.Sort[] sorts =
+				new com.liferay.portal.kernel.search.Sort[sortFields.size()];
 
 			for (int i = 0; i < sortFields.size(); i++) {
 				SortField sortField = sortFields.get(i);
 
-				sorts[i] = new Sort(
+				sorts[i] = new com.liferay.portal.kernel.search.Sort(
 					sortField.getSortableFieldName(
 						contextAcceptLanguage.getPreferredLocale()),
 					!sortField.isAscending());
@@ -782,7 +785,7 @@ public abstract class BaseTestEntityResourceImpl
 		catch (Exception exception) {
 			_log.error("Invalid sort " + sortString, exception);
 
-			return new Sort[0];
+			return new com.liferay.portal.kernel.search.Sort[0];
 		}
 	}
 
@@ -912,7 +915,8 @@ public abstract class BaseTestEntityResourceImpl
 	protected Object contextScopeChecker;
 	protected UriInfo contextUriInfo;
 	protected com.liferay.portal.kernel.model.User contextUser;
-	protected ExpressionConvert<Filter> expressionConvert;
+	protected ExpressionConvert<com.liferay.portal.kernel.search.filter.Filter>
+		expressionConvert;
 	protected FilterParserProvider filterParserProvider;
 	protected GroupLocalService groupLocalService;
 	protected ResourceActionLocalService resourceActionLocalService;

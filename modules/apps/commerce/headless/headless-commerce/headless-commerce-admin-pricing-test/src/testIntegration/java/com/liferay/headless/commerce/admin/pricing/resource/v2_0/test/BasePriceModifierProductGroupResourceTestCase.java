@@ -13,6 +13,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
+import com.liferay.headless.batch.engine.client.dto.v1_0.ImportTask;
+import com.liferay.headless.batch.engine.client.resource.v1_0.ImportTaskResource;
 import com.liferay.headless.commerce.admin.pricing.client.dto.v2_0.PriceModifierProductGroup;
 import com.liferay.headless.commerce.admin.pricing.client.http.HttpInvoker;
 import com.liferay.headless.commerce.admin.pricing.client.pagination.Page;
@@ -32,7 +34,7 @@ import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
-import com.liferay.portal.kernel.util.DateFormatFactoryUtil;
+import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -47,7 +49,7 @@ import com.liferay.portal.vulcan.resource.EntityModelResource;
 
 import java.lang.reflect.Method;
 
-import java.text.DateFormat;
+import java.text.Format;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -86,7 +88,7 @@ public abstract class BasePriceModifierProductGroupResourceTestCase {
 
 	@BeforeClass
 	public static void setUpClass() throws Exception {
-		_dateFormat = DateFormatFactoryUtil.getSimpleDateFormat(
+		_format = FastDateFormatFactoryUtil.getSimpleDateFormat(
 			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 	}
 
@@ -100,19 +102,29 @@ public abstract class BasePriceModifierProductGroupResourceTestCase {
 
 		_priceModifierProductGroupResource.setContextCompany(testCompany);
 
-		com.liferay.portal.kernel.model.User testCompanyAdminUser =
-			UserTestUtil.getAdminUser(testCompany.getCompanyId());
+		_testCompanyAdminUser = UserTestUtil.getAdminUser(
+			testCompany.getCompanyId());
 
 		priceModifierProductGroupResource =
 			PriceModifierProductGroupResource.builder(
 			).authentication(
-				testCompanyAdminUser.getEmailAddress(),
+				_testCompanyAdminUser.getEmailAddress(),
 				PropsValues.DEFAULT_ADMIN_PASSWORD
 			).endpoint(
 				testCompany.getVirtualHostname(), 8080, "http"
 			).locale(
 				LocaleUtil.getDefault()
 			).build();
+
+		importTaskResource = ImportTaskResource.builder(
+		).authentication(
+			_testCompanyAdminUser.getEmailAddress(),
+			PropsValues.DEFAULT_ADMIN_PASSWORD
+		).endpoint(
+			testCompany.getVirtualHostname(), 8080, "http"
+		).locale(
+			LocaleUtil.getDefault()
+		).build();
 	}
 
 	@After
@@ -205,6 +217,48 @@ public abstract class BasePriceModifierProductGroupResourceTestCase {
 	@Test
 	public void testGraphQLDeletePriceModifierProductGroup() throws Exception {
 		Assert.assertTrue(false);
+	}
+
+	@Test
+	public void testDeletePriceModifierProductGroupBatch() throws Exception {
+		PriceModifierProductGroup priceModifierProductGroup1 =
+			testDeletePriceModifierProductGroupBatch_addPriceModifierProductGroup();
+
+		testDeletePriceModifierProductGroupBatch_deletePriceModifierProductGroup(
+			"COMPLETED", null,
+			priceModifierProductGroup1.getPriceModifierProductGroupId());
+	}
+
+	protected PriceModifierProductGroup
+			testDeletePriceModifierProductGroupBatch_addPriceModifierProductGroup()
+		throws Exception {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	protected void
+			testDeletePriceModifierProductGroupBatch_deletePriceModifierProductGroup(
+				String expectedExecuteStatus, String externalReferenceCode,
+				Long id)
+		throws Exception {
+
+		HttpInvoker.HttpResponse httpResponse =
+			priceModifierProductGroupResource.
+				deletePriceModifierProductGroupBatchHttpResponse(
+					null,
+					JSONUtil.putAll(
+						JSONUtil.put(
+							"externalReferenceCode", () -> externalReferenceCode
+						).put(
+							"priceModifierProductGroupId", () -> id
+						)));
+
+		Assert.assertEquals(202, httpResponse.getStatusCode());
+
+		waitForFinish(
+			expectedExecuteStatus,
+			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
 	}
 
 	@Test
@@ -423,31 +477,6 @@ public abstract class BasePriceModifierProductGroupResourceTestCase {
 		throws Exception {
 
 		return null;
-	}
-
-	@Test
-	public void testPostPriceModifierByExternalReferenceCodePriceModifierProductGroup()
-		throws Exception {
-
-		PriceModifierProductGroup randomPriceModifierProductGroup =
-			randomPriceModifierProductGroup();
-
-		PriceModifierProductGroup postPriceModifierProductGroup =
-			testPostPriceModifierByExternalReferenceCodePriceModifierProductGroup_addPriceModifierProductGroup(
-				randomPriceModifierProductGroup);
-
-		assertEquals(
-			randomPriceModifierProductGroup, postPriceModifierProductGroup);
-		assertValid(postPriceModifierProductGroup);
-	}
-
-	protected PriceModifierProductGroup
-			testPostPriceModifierByExternalReferenceCodePriceModifierProductGroup_addPriceModifierProductGroup(
-				PriceModifierProductGroup priceModifierProductGroup)
-		throws Exception {
-
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
 	}
 
 	@Test
@@ -938,6 +967,31 @@ public abstract class BasePriceModifierProductGroupResourceTestCase {
 		throws Exception {
 
 		return null;
+	}
+
+	@Test
+	public void testPostPriceModifierByExternalReferenceCodePriceModifierProductGroup()
+		throws Exception {
+
+		PriceModifierProductGroup randomPriceModifierProductGroup =
+			randomPriceModifierProductGroup();
+
+		PriceModifierProductGroup postPriceModifierProductGroup =
+			testPostPriceModifierByExternalReferenceCodePriceModifierProductGroup_addPriceModifierProductGroup(
+				randomPriceModifierProductGroup);
+
+		assertEquals(
+			randomPriceModifierProductGroup, postPriceModifierProductGroup);
+		assertValid(postPriceModifierProductGroup);
+	}
+
+	protected PriceModifierProductGroup
+			testPostPriceModifierByExternalReferenceCodePriceModifierProductGroup_addPriceModifierProductGroup(
+				PriceModifierProductGroup priceModifierProductGroup)
+		throws Exception {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
 	}
 
 	@Test
@@ -1654,8 +1708,31 @@ public abstract class BasePriceModifierProductGroupResourceTestCase {
 		return randomPriceModifierProductGroup();
 	}
 
+	protected final JSONObject waitForFinish(
+			String expectedExecuteStatus, JSONObject jsonObject)
+		throws Exception {
+
+		while (true) {
+			ImportTask importTask = importTaskResource.getImportTask(
+				jsonObject.getLong("id"));
+
+			ImportTask.ExecuteStatus executeStatus =
+				importTask.getExecuteStatus();
+
+			if (StringUtil.equals(executeStatus.getValue(), "COMPLETED") ||
+				StringUtil.equals(executeStatus.getValue(), "FAILED")) {
+
+				Assert.assertEquals(
+					expectedExecuteStatus, executeStatus.getValue());
+
+				return jsonObject;
+			}
+		}
+	}
+
 	protected PriceModifierProductGroupResource
 		priceModifierProductGroupResource;
+	protected ImportTaskResource importTaskResource;
 	protected com.liferay.portal.kernel.model.Group irrelevantGroup;
 	protected com.liferay.portal.kernel.model.Company testCompany;
 	protected com.liferay.portal.kernel.model.Group testGroup;
@@ -1857,7 +1934,9 @@ public abstract class BasePriceModifierProductGroupResourceTestCase {
 		LogFactoryUtil.getLog(
 			BasePriceModifierProductGroupResourceTestCase.class);
 
-	private static DateFormat _dateFormat;
+	private static Format _format;
+
+	private com.liferay.portal.kernel.model.User _testCompanyAdminUser;
 
 	@Inject
 	private com.liferay.headless.commerce.admin.pricing.resource.v2_0.

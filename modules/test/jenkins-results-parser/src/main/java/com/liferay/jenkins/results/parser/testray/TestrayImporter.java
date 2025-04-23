@@ -1067,6 +1067,10 @@ public class TestrayImporter {
 
 						propertiesMap.put(
 							"testray.build.name", testrayBuild.getName());
+						propertiesMap.put(
+							"testray.build.time",
+							JenkinsResultsParserUtil.toDurationString(
+								testTopLevelBuild.getDuration()));
 
 						TestrayRoutine testrayRoutine =
 							testrayBuild.getTestrayRoutine();
@@ -1091,6 +1095,11 @@ public class TestrayImporter {
 
 						propertiesMap.put(
 							"testray.run.id", testrayRun.getRunIDString());
+
+						propertiesMap.put(
+							"testray.total.cpu.use.time",
+							JenkinsResultsParserUtil.toDurationString(
+								testTopLevelBuild.getTotalDuration()));
 
 						_addPropertyElements(
 							rootElement.addElement("properties"),
@@ -1360,6 +1369,16 @@ public class TestrayImporter {
 
 				if ((dockerEnabled != null) && dockerEnabled.equals("true")) {
 					workspaceGitRepository.addPropertyOption("docker");
+				}
+
+				String osbAsahStagingEnabled = System.getenv(
+					"OSB_ASAH_STAGING_ENABLED");
+
+				if ((osbAsahStagingEnabled != null) &&
+					osbAsahStagingEnabled.equals("true")) {
+
+					workspaceGitRepository.addPropertyOption(
+						"osb-asah-staging-enabled");
 				}
 
 				if (JenkinsResultsParserUtil.isWindows()) {

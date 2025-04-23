@@ -9,8 +9,8 @@ import com.liferay.asset.display.page.portlet.AssetDisplayPageFriendlyURLProvide
 import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.asset.kernel.service.AssetEntryLocalServiceUtil;
 import com.liferay.depot.util.SiteConnectedGroupGroupProviderUtil;
+import com.liferay.dynamic.data.mapping.item.selector.DDMStructureItemSelectorCriterion;
 import com.liferay.dynamic.data.mapping.item.selector.DDMStructureItemSelectorReturnType;
-import com.liferay.dynamic.data.mapping.item.selector.criterion.DDMStructureItemSelectorCriterion;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.service.DDMStructureLocalServiceUtil;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
@@ -65,7 +65,6 @@ import com.liferay.portal.kernel.bean.BeanParamUtil;
 import com.liferay.portal.kernel.dao.search.ResultRowSplitter;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
@@ -685,7 +684,7 @@ public class JournalDisplayContext {
 
 		return _getSubtitle(
 			folder.getModifiedDate(), "modified-x-ago-by-x",
-			folder.getUserName());
+			folder.getStatusByUserName());
 	}
 
 	public long getHighlightedDDMStructureId() {
@@ -940,11 +939,7 @@ public class JournalDisplayContext {
 			return new JournalRecentArticlesResultRowSplitter(_themeDisplay);
 		}
 
-		if (Objects.equals(getDisplayStyle(), "icon")) {
-			return new JournalResultRowSplitter();
-		}
-
-		return null;
+		return new JournalResultRowSplitter();
 	}
 
 	public String getScheduledArticleMessage(JournalArticle journalArticle) {
@@ -1177,10 +1172,8 @@ public class JournalDisplayContext {
 	public boolean hasAdvancedUpdateDLFolderPermission()
 		throws PortalException {
 
-		if (!FeatureFlagManagerUtil.isEnabled(
-				_themeDisplay.getCompanyId(), "LPD-42452")) {
-
-			return hasUpdateDLFolderPermission();
+		if (getFolder() == null) {
+			return true;
 		}
 
 		if (_advancedUpdateDLFolderPermission != null) {
@@ -1242,6 +1235,10 @@ public class JournalDisplayContext {
 	}
 
 	public boolean hasUpdateDLFolderPermission() throws PortalException {
+		if (getFolder() == null) {
+			return true;
+		}
+
 		if (_updateJournalFolderPermission != null) {
 			return _updateJournalFolderPermission;
 		}

@@ -162,7 +162,7 @@ public class CPContentHelperImpl implements CPContentHelper {
 
 		return _cpDefinitionSpecificationOptionValueLocalService.
 			getCPDefinitionSpecificationOptionValues(
-				cpDefinitionId, cpOptionCategoryId);
+				cpDefinitionId, cpOptionCategoryId, true);
 	}
 
 	@Override
@@ -346,7 +346,7 @@ public class CPContentHelperImpl implements CPContentHelper {
 		return _cpDefinitionSpecificationOptionValueLocalService.
 			getCPDefinitionSpecificationOptionValues(
 				cpDefinitionId,
-				CPOptionCategoryConstants.DEFAULT_CP_OPTION_CATEGORY_ID);
+				CPOptionCategoryConstants.DEFAULT_CP_OPTION_CATEGORY_ID, true);
 	}
 
 	@Override
@@ -638,8 +638,8 @@ public class CPContentHelperImpl implements CPContentHelper {
 			cpDefinitionSpecificationOptionValues =
 				_cpDefinitionSpecificationOptionValueLocalService.
 					getCPDefinitionSpecificationOptionValues(
-						cpDefinitionId, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-						null);
+						cpDefinitionId, true, QueryUtil.ALL_POS,
+						QueryUtil.ALL_POS, null);
 
 		return !cpDefinitionSpecificationOptionValues.isEmpty();
 	}

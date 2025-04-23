@@ -17,8 +17,6 @@ import {
 	useMarketplaceContext,
 } from './index';
 
-import './style/index.scss';
-
 export default function MarketplaceViews() {
 	const [cloudUserProject, setCloudUserProject] =
 		useState<CloudUserProject>();
@@ -177,7 +175,7 @@ export default function MarketplaceViews() {
 
 			{view === MarketplaceView.PURCHASE && (
 				<Marketplace.Purchase
-					rightTitle={
+					productPurchaseChildren={
 						<small className="align-items-end d-flex flex-column">
 							<span className="font-weight-bold">
 								{cloudProject}

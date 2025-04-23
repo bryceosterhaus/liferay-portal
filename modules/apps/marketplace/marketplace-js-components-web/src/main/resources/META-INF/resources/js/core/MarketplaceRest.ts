@@ -38,9 +38,32 @@ export function safeJSONParse(value: string) {
 	}
 }
 
+async function getBaseFetch<T = any>(url: string, options?: FetchOptions) {
+	const response = await fetch(url, options);
+
+	if (!response.ok) {
+		const error = new MarketplaceRestError(
+			'An error occurred while fetching the data.'
+		);
+
+		error.info = await response.json();
+		error.status = response.status;
+		throw error;
+	}
+
+	if (options?.earlyReturn) {
+		return response as unknown as T;
+	}
+
+	return response.json() as unknown as T;
+}
+
 const sessionKey = '@marketplace/token';
 
 export class MarketplaceRest {
+	private tokenRequestPromise: Promise<MarketplaceAuthorization> | null =
+		null;
+
 	constructor(
 		protected baseResourceURL: string,
 		protected marketplaceConfiguration: MarketplaceConfiguration
@@ -60,85 +83,85 @@ export class MarketplaceRest {
 		);
 	}
 
-	public async createCart(product: Product) {
+	public async createCart(product: Product, baseCart?: Partial<Cart>) {
 		const {account, channelId} = this.settings;
 
 		const purchasableSKUs = product.skus.filter(
 			({purchasable}) => purchasable
 		);
 
-		const baseCart = {
-			accountId: account.id,
-			cartItems: [
-				{
-					price: {
-						currency: 'USD',
-						discount: 0,
-					},
-					productId: product.productId,
-					quantity: 1,
-					settings: {
-						maxQuantity: 1,
-					},
-					skuId: purchasableSKUs[0]?.id,
-				},
-			],
-			currencyCode: 'USD',
-			orderTypeExternalReferenceCode: 'CLOUDAPP',
-		} as Partial<Cart>;
-
-		let cart = await this.fetchMarketplace<Cart>(
+		const cart = await this.fetchMarketplace<Cart>(
 			`/o/headless-commerce-delivery-cart/v1.0/channels/${channelId}/carts?nestedFields=cartItems`,
 			{
-				body: JSON.stringify(baseCart),
+				body: JSON.stringify({
+					accountId: account.id,
+					cartItems: [
+						{
+							price: {
+								currency: 'USD',
+								discount: 0,
+							},
+							productId: product.productId,
+							quantity: 1,
+							settings: {
+								maxQuantity: 1,
+							},
+							skuId: purchasableSKUs[0]?.id,
+						},
+					],
+					currencyCode: 'USD',
+					...baseCart,
+				}),
 				method: 'POST',
 			}
 		);
-
-		cart = await this.checkoutCart(cart);
 
 		return cart;
 	}
 
-	private async checkoutCart(cart: Cart) {
+	public async checkoutCart(cart: Cart) {
 		return this.fetchMarketplace<Cart>(
-			`/o/headless-commerce-delivery-cart/v1.0/carts/${cart.id}/checkout?nestedFields=cartItems`,
+			`/o/headless-commerce-delivery-cart/v1.0/carts/${cart.id}/checkout`,
 			{
 				method: 'POST',
 			}
 		);
-	}
-
-	private async getBaseFetch<T = any>(url: string, options?: FetchOptions) {
-		const response = await fetch(url, options);
-
-		if (!response.ok) {
-			const error = new MarketplaceRestError(
-				'An error occurred while fetching the data.'
-			);
-
-			error.info = await response.json();
-			error.status = response.status;
-			throw error;
-		}
-
-		if (options?.earlyReturn) {
-			return response as unknown as T;
-		}
-
-		return response.json() as unknown as T;
 	}
 
 	static getBaseResourceURL() {
 		return `/group/guest/~/control_panel/manage?p_p_id=${Liferay.PortletKeys.INSTANCE_SETTINGS}`;
 	}
 
+	private static async getMarketplaceConfiguration() {
+		const configuration = await getBaseFetch<{
+			authorized: boolean;
+			data: MarketplaceConfiguration;
+		}>(
+			createResourceURL(this.getBaseResourceURL(), {
+				p_p_resource_id: '/marketplace_settings/get_configuration',
+			}).toString()
+		);
+
+		return configuration.data;
+	}
+
+	public static async getMarketplaceRestWithConfiguration() {
+		return new MarketplaceRest(
+			this.getBaseResourceURL(),
+			await this.getMarketplaceConfiguration()
+		);
+	}
+
 	public async fetchMarketplace<T>(url: string, options?: FetchOptions) {
 		const headers = {
-			...options?.headers,
 			'Authorization': '',
-			'Content-Type': 'application/json',
+			'Content-Type': 'application/json' as any,
+			...options?.headers,
 		};
+
+		if (options?.body instanceof FormData) {
+			delete headers['Content-Type'];
+		}
 
 		if (!options?.guestOperation) {
 			const {accessToken} = await this.getMarketplaceToken();
@@ -146,7 +169,7 @@ export class MarketplaceRest {
 			headers.Authorization = `Bearer ${accessToken}`;
 		}
 
-		return this.getBaseFetch<T>(`${this.marketplaceURL}${url}`, {
+		return getBaseFetch<T>(`${this.marketplaceURL}${url}`, {
 			...options,
 			headers,
 		});
@@ -158,7 +181,7 @@ export class MarketplaceRest {
 	) {
 		const {accessToken} = await this.getMarketplaceToken();
 
-		return this.getBaseFetch<T>(`${this.marketplaceServiceURL}${url}`, {
+		return getBaseFetch<T>(`${this.marketplaceServiceURL}${url}`, {
 			...options,
 			headers: {
 				'Authorization': `Bearer ${accessToken}`,
@@ -174,33 +197,51 @@ export class MarketplaceRest {
 				Liferay.Util.SessionStorage.TYPES.NECESSARY
 			) as string
 		);
-
 		if (
 			cachedToken &&
 			new Date().getTime() < Number(cachedToken.accessTokenExpirationTime)
 		) {
-			return cachedToken;
+			return cachedToken as MarketplaceAuthorization;
 		}
 
-		const authorization = await this.getBaseFetch<MarketplaceAuthorization>(
-			createResourceURL(this.baseResourceURL, {
-				p_p_resource_id: '/marketplace_settings/get_authorization',
-			}).toString()
-		);
+		// If a token request is already in progress, wait for it
 
-		Liferay.Util.SessionStorage.setItem(
-			sessionKey,
-			JSON.stringify(authorization),
-			Liferay.Util.SessionStorage.TYPES.NECESSARY
-		);
+		if (this.tokenRequestPromise) {
+			return this.tokenRequestPromise;
+		}
 
-		return authorization;
+		this.tokenRequestPromise = (async () => {
+			try {
+				const authorization =
+					await getBaseFetch<MarketplaceAuthorization>(
+						createResourceURL(this.baseResourceURL, {
+							p_p_resource_id:
+								'/marketplace_settings/get_authorization',
+						}).toString()
+					);
+
+				Liferay.Util.SessionStorage.setItem(
+					sessionKey,
+					JSON.stringify(authorization),
+					Liferay.Util.SessionStorage.TYPES.NECESSARY
+				);
+
+				return authorization;
+			}
+			finally {
+				this.tokenRequestPromise = null;
+			}
+		})();
+
+		return this.tokenRequestPromise;
 	}
 
-	public async getProducts(urlSearchParams = new URLSearchParams()) {
-		return this.fetchMarketplace<APIResponse<Product>>(
-			`/o/headless-commerce-delivery-catalog/v1.0/channels/${this.settings.channelId}/products?${urlSearchParams.toString()}`,
-			{guestOperation: true}
+	public async getPlacedOrder(
+		orderId: number,
+		urlSearchParams = new URLSearchParams()
+	) {
+		return this.fetchMarketplace<PlacedOrder>(
+			`/o/headless-commerce-delivery-order/v1.0/placed-orders/${orderId}?${urlSearchParams.toString()}`
 		);
 	}
 
@@ -212,6 +253,12 @@ export class MarketplaceRest {
 
 		return this.fetchMarketplace<APIResponse<PlacedOrder>>(
 			`/o/headless-commerce-delivery-order/v1.0/channels/${channelId}/accounts/${accountId}/placed-orders?${urlSearchParams.toString()}`
+		);
+	}
+
+	public async getProducts(urlSearchParams = new URLSearchParams()) {
+		return this.fetchMarketplace<APIResponse<Product>>(
+			`/o/headless-commerce-delivery-catalog/v1.0/channels/${this.settings.channelId}/products?${urlSearchParams.toString()}`
 		);
 	}
 

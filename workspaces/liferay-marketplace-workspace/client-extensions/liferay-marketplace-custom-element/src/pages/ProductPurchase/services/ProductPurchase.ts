@@ -4,12 +4,12 @@
  */
 
 import {Analytics} from '../../../core/Analytics';
-import {ORDER_TYPES} from '../../../enums/Order';
-import CommerceSelectAccountImpl from '../../../services/rest/CommerceSelectAccount';
+import {OrderTypes} from '../../../enums/Order';
+import CommerceSelectAccount from '../../../services/rest/CommerceSelectAccount';
 import HeadlessCommerceDeliveryCart from '../../../services/rest/HeadlessCommerceDeliveryCart';
 
 export default class ProductPurchase {
-	protected orderTypeExternalReferenceCode?: ORDER_TYPES;
+	protected orderTypeExternalReferenceCode?: OrderTypes;
 	protected HeadlessCommerceDeliveryCart = HeadlessCommerceDeliveryCart;
 
 	constructor(
@@ -51,7 +51,7 @@ export default class ProductPurchase {
 		);
 
 		await Promise.all([
-			CommerceSelectAccountImpl.selectAccount(this.account.id),
+			CommerceSelectAccount.selectAccount(this.account.id),
 			HeadlessCommerceDeliveryCart.checkoutCart(cart.id),
 		]);
 

@@ -25,12 +25,14 @@ import com.liferay.object.service.ObjectStateFlowLocalService;
 import com.liferay.object.service.ObjectStateLocalService;
 import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.vulcan.extension.PropertyDefinition;
 
 import java.util.Collections;
@@ -129,6 +131,8 @@ public class PicklistObjectFieldBusinessType
 		throws PortalException {
 
 		return HashMapBuilder.<String, Object>put(
+			"listTypeDefinitionId", objectField.getListTypeDefinitionId()
+		).put(
 			"options",
 			_getDDMFormFieldOptions(objectField, objectFieldRenderingContext)
 		).put(
@@ -137,11 +141,25 @@ public class PicklistObjectFieldBusinessType
 				LocalizedValue localizedValue = new LocalizedValue(
 					objectFieldRenderingContext.getLocale());
 
-				localizedValue.addString(
-					objectFieldRenderingContext.getLocale(),
-					String.valueOf(
-						ObjectFieldSettingUtil.getDefaultValue(
-							null, objectField, null)));
+				Locale defaultLocale = objectFieldRenderingContext.getLocale();
+				String defaultValue = String.valueOf(
+					ObjectFieldSettingUtil.getDefaultValue(
+						null, objectField, null));
+
+				if (objectField.isLocalized() &&
+					Validator.isNotNull(defaultValue)) {
+
+					localizedValue.addString(
+						defaultLocale,
+						_jsonFactory.createJSONObject(
+							HashMapBuilder.put(
+								defaultLocale, defaultValue
+							).build()
+						).toJSONString());
+				}
+				else {
+					localizedValue.addString(defaultLocale, defaultValue);
+				}
 
 				return localizedValue;
 			}
@@ -178,11 +196,6 @@ public class PicklistObjectFieldBusinessType
 			objectField.getName(),
 			ObjectFieldBusinessType.super.getValue(objectField, userId, values),
 			values);
-	}
-
-	@Override
-	public boolean isLocalizable() {
-		return true;
 	}
 
 	@Override
@@ -283,18 +296,19 @@ public class PicklistObjectFieldBusinessType
 			ObjectFieldRenderingContext objectFieldRenderingContext)
 		throws PortalException {
 
-		DDMFormFieldOptions ddmFormFieldOptions = new DDMFormFieldOptions();
+		DDMFormFieldOptions ddmFormFieldOptions = new DDMFormFieldOptions(
+			objectFieldRenderingContext.getLocale());
 
 		for (ListTypeEntry listTypeEntry :
 				_getListTypeEntries(objectField, objectFieldRenderingContext)) {
 
-			ddmFormFieldOptions.addOptionLabel(
-				listTypeEntry.getKey(), objectFieldRenderingContext.getLocale(),
-				GetterUtil.getString(
-					listTypeEntry.getName(
-						objectFieldRenderingContext.getLocale()),
-					listTypeEntry.getName(
-						listTypeEntry.getDefaultLanguageId())));
+			Map<Locale, String> nameMap = listTypeEntry.getNameMap();
+
+			for (Map.Entry<Locale, String> entry : nameMap.entrySet()) {
+				ddmFormFieldOptions.addOptionLabel(
+					listTypeEntry.getKey(), entry.getKey(),
+					GetterUtil.getString(entry.getValue()));
+			}
 		}
 
 		return ddmFormFieldOptions;
@@ -318,7 +332,7 @@ public class PicklistObjectFieldBusinessType
 				(ListEntry)objectFieldRenderingContext.getProperty(
 					objectField.getName());
 
-			if (listEntry == null) {
+			if ((listEntry == null) || Validator.isNull(listEntry.getKey())) {
 				return _listTypeEntryLocalService.getListTypeEntries(
 					objectField.getListTypeDefinitionId());
 			}
@@ -376,6 +390,9 @@ public class PicklistObjectFieldBusinessType
 
 		return value;
 	}
+
+	@Reference
+	private JSONFactory _jsonFactory;
 
 	@Reference
 	private Language _language;

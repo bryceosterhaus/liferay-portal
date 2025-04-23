@@ -9,6 +9,7 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.util.DateUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.tools.db.schema.importer.jdbc.ConnectionConfigUtil;
+import com.liferay.portal.tools.db.schema.importer.jdbc.DataSourceFactoryUtil;
 
 import java.io.File;
 import java.io.PrintWriter;
@@ -49,7 +50,29 @@ public class DBSchemaImporter {
 			_printHelpAndExit(options);
 		}
 
+		if (!DataSourceFactoryUtil.isValidSourceDatabase(
+				commandLine.getOptionValue("source-jdbc-url"))) {
+
+			System.err.println(
+				"Source database must be MariaDB, MySQL, Oracle, or SQL " +
+					"Server.");
+
+			_printHelpAndExit(options);
+		}
+
+		if (!DataSourceFactoryUtil.isValidTargetDatabase(
+				commandLine.getOptionValue("target-jdbc-url"))) {
+
+			System.err.println("Target database must be PostgreSQL.");
+
+			_printHelpAndExit(options);
+		}
+
 		try {
+			System.out.println(
+				"This tool is a beta feature. It is experimental and not " +
+					"supported.");
+
 			ConnectionConfigUtil.setBatchSize(
 				commandLine.getOptionValue("jdbc-batch-size"));
 			ConnectionConfigUtil.setFetchSize(
@@ -129,7 +152,9 @@ public class DBSchemaImporter {
 	private static void _printHelpAndExit(Options options) {
 		new HelpFormatter(
 		).printHelp(
-			"Liferay Portal Tools Database Schema Importer", options
+			"Liferay Portal Tools Database Schema Importer. This tool is a " +
+				"beta feature. It is experimental and not supported.",
+			options
 		);
 
 		System.exit(_LIFERAY_COMMON_EXIT_CODE_HELP);

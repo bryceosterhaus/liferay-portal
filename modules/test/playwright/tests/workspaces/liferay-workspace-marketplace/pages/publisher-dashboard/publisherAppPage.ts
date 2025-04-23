@@ -12,16 +12,20 @@ import {PublishProductPayload, Steps} from '../../types';
 export class PublisherAppPage {
 	readonly addPackagesButton: Locator;
 	readonly backButton: Locator;
-	readonly cloudCompatibleRadio: Locator;
+	readonly clientExtensionDropdownOption: Locator;
+	readonly cloudDropdownOption: Locator;
+	readonly compositeAppDropdownOption: Locator;
 	readonly confirmButton: Locator;
 	readonly continueButton: Locator;
+	readonly dxpDropdownOption: Locator;
 	readonly form: {
 		build: {
 			cpu: Locator;
 			ram: Locator;
 		};
 		profile: {
-			categories: Locator;
+			areas: Locator;
+			category: Locator;
 			description: Locator;
 			name: Locator;
 			tags: Locator;
@@ -38,8 +42,10 @@ export class PublisherAppPage {
 	};
 	protected publishProductPayload: PublishProductPayload;
 	readonly logoUploadButton: Locator;
+	readonly lowCodeConfigurationDropdownOption: Locator;
 	readonly page: Page;
 	readonly paidPriceModel: Locator;
+	readonly selectAppTypeDropdown: Locator;
 	readonly selectFileButton: Locator;
 	readonly standardLicenses: Locator;
 	readonly submissionCheckbox: Locator;
@@ -51,17 +57,28 @@ export class PublisherAppPage {
 			name: 'Add Package(s)',
 		});
 		this.backButton = page.getByRole('button', {name: 'Back'});
-		this.cloudCompatibleRadio = page.locator('.radio-card-button-icon');
-
+		this.clientExtensionDropdownOption = page.getByRole('menuitem', {
+			name: 'Client Extension Modular',
+		});
+		this.cloudDropdownOption = page.getByRole('menuitem', {
+			name: 'Cloud App Backend client',
+		});
+		this.compositeAppDropdownOption = page.getByRole('menuitem', {
+			name: 'Composite App Complex app',
+		});
 		this.confirmButton = page.getByRole('button', {name: 'Confirm'});
 		this.continueButton = page.getByRole('button', {name: 'Continue'});
+		this.dxpDropdownOption = page.getByRole('menuitem', {
+			name: 'DXP App Module-based apps',
+		});
 		this.form = {
 			build: {
 				cpu: page.getByPlaceholder('Enter the number of CPUs'),
 				ram: page.getByPlaceholder('Enter the required RAM'),
 			},
 			profile: {
-				categories: page.getByPlaceholder('Select categories'),
+				areas: page.getByPlaceholder('Select areas'),
+				category: page.getByLabel('Category'),
 				description: page.getByPlaceholder('Enter app description'),
 				name: page.getByPlaceholder('Enter app name'),
 				tags: page.getByPlaceholder('Select tags'),
@@ -81,11 +98,17 @@ export class PublisherAppPage {
 			},
 		};
 		this.logoUploadButton = page.getByText('Upload Image');
+		this.lowCodeConfigurationDropdownOption = page.getByRole('menuitem', {
+			name: 'Low-Code Configuration Methods',
+		});
 		this.page = page;
 		this.paidPriceModel = page
 			.locator('div')
 			.filter({hasText: /^Paid$/})
 			.first();
+		this.selectAppTypeDropdown = page.getByRole('button', {
+			name: 'Choose an option',
+		});
 		this.selectFileButton = page.getByRole('button', {
 			name: 'Select a file',
 		});
@@ -94,7 +117,6 @@ export class PublisherAppPage {
 		this.submitButton = page.getByRole('button', {
 			name: 'Submit App',
 		});
-
 		this.zipFilesContainer = page.locator(
 			'.document-file-list-item-container'
 		);
@@ -146,9 +168,12 @@ export class PublisherAppPage {
 			this.publishProductPayload.description
 		);
 
-		for (const category of this.publishProductPayload.categories ?? []) {
-			await this.form.profile.categories.click();
-			await this.page.getByText(category, {exact: true}).click();
+		const categorySelect = this.form.profile.category;
+		await categorySelect.selectOption(this.publishProductPayload.category);
+
+		for (const area of this.publishProductPayload.areas ?? []) {
+			await this.form.profile.areas.click();
+			await this.page.getByText(area, {exact: true}).click();
 		}
 
 		for (const tag of this.publishProductPayload.tags ?? []) {
@@ -165,8 +190,16 @@ export class PublisherAppPage {
 	async fillBuild() {
 		expect(this.continueButton).toBeDisabled();
 
-		if (this.publishProductPayload.cloudCompatible) {
-			await this.cloudCompatibleRadio.first().click();
+		if (this.publishProductPayload.appType === 'client extension') {
+			await this.selectAppTypeDropdown.click();
+
+			await this.clientExtensionDropdownOption.first().click();
+		}
+
+		if (this.publishProductPayload.appType === 'cloud') {
+			await this.selectAppTypeDropdown.click();
+
+			await this.cloudDropdownOption.first().click();
 
 			await this.form.build.cpu.fill(
 				this.publishProductPayload.resourceRequirements.cpus.toString()
@@ -175,15 +208,23 @@ export class PublisherAppPage {
 				this.publishProductPayload.resourceRequirements.ram.toString()
 			);
 		}
-		else {
-			await this.cloudCompatibleRadio.last().click();
+
+		if (this.publishProductPayload.appType === 'composite app') {
+			await this.selectAppTypeDropdown.click();
+
+			await this.compositeAppDropdownOption.first().click();
 		}
 
-		for (const compatibleOffering of this.publishProductPayload
-			.compatibleOfferings) {
-			await this.page
-				.getByText(compatibleOffering, {exact: true})
-				.click();
+		if (this.publishProductPayload.appType === 'dxp') {
+			await this.selectAppTypeDropdown.click();
+
+			await this.dxpDropdownOption.first().click();
+		}
+
+		if (this.publishProductPayload.appType === 'low code configuration') {
+			await this.selectAppTypeDropdown.click();
+
+			await this.lowCodeConfigurationDropdownOption.first().click();
 		}
 
 		await this.addPackagesButton.click();

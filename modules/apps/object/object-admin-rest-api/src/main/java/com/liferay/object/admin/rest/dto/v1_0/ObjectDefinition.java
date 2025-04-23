@@ -9,14 +9,13 @@ import com.fasterxml.jackson.annotation.JsonFilter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import com.liferay.headless.delivery.dto.v1_0.Creator;
 import com.liferay.petra.function.UnsafeSupplier;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLField;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLName;
 import com.liferay.portal.vulcan.util.ObjectMapperUtil;
-
-import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.io.Serializable;
 
@@ -54,7 +53,7 @@ public class ObjectDefinition implements Serializable {
 		return ObjectMapperUtil.unsafeReadValue(ObjectDefinition.class, json);
 	}
 
-	@Schema
+	@io.swagger.v3.oas.annotations.media.Schema
 	public Boolean getAccountEntryRestricted() {
 		if (_accountEntryRestrictedSupplier != null) {
 			accountEntryRestricted = _accountEntryRestrictedSupplier.get();
@@ -96,7 +95,7 @@ public class ObjectDefinition implements Serializable {
 	@JsonIgnore
 	private Supplier<Boolean> _accountEntryRestrictedSupplier;
 
-	@Schema
+	@io.swagger.v3.oas.annotations.media.Schema
 	public String getAccountEntryRestrictedObjectFieldName() {
 		if (_accountEntryRestrictedObjectFieldNameSupplier != null) {
 			accountEntryRestrictedObjectFieldName =
@@ -143,7 +142,7 @@ public class ObjectDefinition implements Serializable {
 	@JsonIgnore
 	private Supplier<String> _accountEntryRestrictedObjectFieldNameSupplier;
 
-	@Schema
+	@io.swagger.v3.oas.annotations.media.Schema
 	@Valid
 	public Map<String, Map<String, String>> getActions() {
 		if (_actionsSupplier != null) {
@@ -186,7 +185,7 @@ public class ObjectDefinition implements Serializable {
 	@JsonIgnore
 	private Supplier<Map<String, Map<String, String>>> _actionsSupplier;
 
-	@Schema
+	@io.swagger.v3.oas.annotations.media.Schema
 	public Boolean getActive() {
 		if (_activeSupplier != null) {
 			active = _activeSupplier.get();
@@ -227,7 +226,7 @@ public class ObjectDefinition implements Serializable {
 	@JsonIgnore
 	private Supplier<Boolean> _activeSupplier;
 
-	@Schema
+	@io.swagger.v3.oas.annotations.media.Schema
 	public String getClassName() {
 		if (_classNameSupplier != null) {
 			className = _classNameSupplier.get();
@@ -268,7 +267,49 @@ public class ObjectDefinition implements Serializable {
 	@JsonIgnore
 	private Supplier<String> _classNameSupplier;
 
-	@Schema
+	@io.swagger.v3.oas.annotations.media.Schema
+	@Valid
+	public Creator getCreator() {
+		if (_creatorSupplier != null) {
+			creator = _creatorSupplier.get();
+
+			_creatorSupplier = null;
+		}
+
+		return creator;
+	}
+
+	public void setCreator(Creator creator) {
+		this.creator = creator;
+
+		_creatorSupplier = null;
+	}
+
+	@JsonIgnore
+	public void setCreator(
+		UnsafeSupplier<Creator, Exception> creatorUnsafeSupplier) {
+
+		_creatorSupplier = () -> {
+			try {
+				return creatorUnsafeSupplier.get();
+			}
+			catch (RuntimeException runtimeException) {
+				throw runtimeException;
+			}
+			catch (Exception exception) {
+				throw new RuntimeException(exception);
+			}
+		};
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	protected Creator creator;
+
+	@JsonIgnore
+	private Supplier<Creator> _creatorSupplier;
+
+	@io.swagger.v3.oas.annotations.media.Schema
 	public Date getDateCreated() {
 		if (_dateCreatedSupplier != null) {
 			dateCreated = _dateCreatedSupplier.get();
@@ -309,7 +350,7 @@ public class ObjectDefinition implements Serializable {
 	@JsonIgnore
 	private Supplier<Date> _dateCreatedSupplier;
 
-	@Schema
+	@io.swagger.v3.oas.annotations.media.Schema
 	public Date getDateModified() {
 		if (_dateModifiedSupplier != null) {
 			dateModified = _dateModifiedSupplier.get();
@@ -350,7 +391,7 @@ public class ObjectDefinition implements Serializable {
 	@JsonIgnore
 	private Supplier<Date> _dateModifiedSupplier;
 
-	@Schema
+	@io.swagger.v3.oas.annotations.media.Schema
 	public String getDefaultLanguageId() {
 		if (_defaultLanguageIdSupplier != null) {
 			defaultLanguageId = _defaultLanguageIdSupplier.get();
@@ -391,7 +432,7 @@ public class ObjectDefinition implements Serializable {
 	@JsonIgnore
 	private Supplier<String> _defaultLanguageIdSupplier;
 
-	@Schema
+	@io.swagger.v3.oas.annotations.media.Schema
 	public Boolean getEnableCategorization() {
 		if (_enableCategorizationSupplier != null) {
 			enableCategorization = _enableCategorizationSupplier.get();
@@ -432,7 +473,7 @@ public class ObjectDefinition implements Serializable {
 	@JsonIgnore
 	private Supplier<Boolean> _enableCategorizationSupplier;
 
-	@Schema
+	@io.swagger.v3.oas.annotations.media.Schema
 	public Boolean getEnableComments() {
 		if (_enableCommentsSupplier != null) {
 			enableComments = _enableCommentsSupplier.get();
@@ -473,7 +514,7 @@ public class ObjectDefinition implements Serializable {
 	@JsonIgnore
 	private Supplier<Boolean> _enableCommentsSupplier;
 
-	@Schema
+	@io.swagger.v3.oas.annotations.media.Schema
 	public Boolean getEnableFriendlyURLCustomization() {
 		if (_enableFriendlyURLCustomizationSupplier != null) {
 			enableFriendlyURLCustomization =
@@ -518,7 +559,7 @@ public class ObjectDefinition implements Serializable {
 	@JsonIgnore
 	private Supplier<Boolean> _enableFriendlyURLCustomizationSupplier;
 
-	@Schema
+	@io.swagger.v3.oas.annotations.media.Schema
 	public Boolean getEnableIndexSearch() {
 		if (_enableIndexSearchSupplier != null) {
 			enableIndexSearch = _enableIndexSearchSupplier.get();
@@ -559,7 +600,7 @@ public class ObjectDefinition implements Serializable {
 	@JsonIgnore
 	private Supplier<Boolean> _enableIndexSearchSupplier;
 
-	@Schema
+	@io.swagger.v3.oas.annotations.media.Schema
 	public Boolean getEnableLocalization() {
 		if (_enableLocalizationSupplier != null) {
 			enableLocalization = _enableLocalizationSupplier.get();
@@ -600,7 +641,7 @@ public class ObjectDefinition implements Serializable {
 	@JsonIgnore
 	private Supplier<Boolean> _enableLocalizationSupplier;
 
-	@Schema
+	@io.swagger.v3.oas.annotations.media.Schema
 	public Boolean getEnableObjectEntryDraft() {
 		if (_enableObjectEntryDraftSupplier != null) {
 			enableObjectEntryDraft = _enableObjectEntryDraftSupplier.get();
@@ -642,7 +683,7 @@ public class ObjectDefinition implements Serializable {
 	@JsonIgnore
 	private Supplier<Boolean> _enableObjectEntryDraftSupplier;
 
-	@Schema
+	@io.swagger.v3.oas.annotations.media.Schema
 	public Boolean getEnableObjectEntryHistory() {
 		if (_enableObjectEntryHistorySupplier != null) {
 			enableObjectEntryHistory = _enableObjectEntryHistorySupplier.get();
@@ -684,7 +725,52 @@ public class ObjectDefinition implements Serializable {
 	@JsonIgnore
 	private Supplier<Boolean> _enableObjectEntryHistorySupplier;
 
-	@Schema
+	@io.swagger.v3.oas.annotations.media.Schema
+	public Boolean getEnableObjectEntryVersioning() {
+		if (_enableObjectEntryVersioningSupplier != null) {
+			enableObjectEntryVersioning =
+				_enableObjectEntryVersioningSupplier.get();
+
+			_enableObjectEntryVersioningSupplier = null;
+		}
+
+		return enableObjectEntryVersioning;
+	}
+
+	public void setEnableObjectEntryVersioning(
+		Boolean enableObjectEntryVersioning) {
+
+		this.enableObjectEntryVersioning = enableObjectEntryVersioning;
+
+		_enableObjectEntryVersioningSupplier = null;
+	}
+
+	@JsonIgnore
+	public void setEnableObjectEntryVersioning(
+		UnsafeSupplier<Boolean, Exception>
+			enableObjectEntryVersioningUnsafeSupplier) {
+
+		_enableObjectEntryVersioningSupplier = () -> {
+			try {
+				return enableObjectEntryVersioningUnsafeSupplier.get();
+			}
+			catch (RuntimeException runtimeException) {
+				throw runtimeException;
+			}
+			catch (Exception exception) {
+				throw new RuntimeException(exception);
+			}
+		};
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected Boolean enableObjectEntryVersioning;
+
+	@JsonIgnore
+	private Supplier<Boolean> _enableObjectEntryVersioningSupplier;
+
+	@io.swagger.v3.oas.annotations.media.Schema
 	public String getExternalReferenceCode() {
 		if (_externalReferenceCodeSupplier != null) {
 			externalReferenceCode = _externalReferenceCodeSupplier.get();
@@ -725,7 +811,7 @@ public class ObjectDefinition implements Serializable {
 	@JsonIgnore
 	private Supplier<String> _externalReferenceCodeSupplier;
 
-	@Schema
+	@io.swagger.v3.oas.annotations.media.Schema
 	public Long getId() {
 		if (_idSupplier != null) {
 			id = _idSupplier.get();
@@ -764,7 +850,7 @@ public class ObjectDefinition implements Serializable {
 	@JsonIgnore
 	private Supplier<Long> _idSupplier;
 
-	@Schema
+	@io.swagger.v3.oas.annotations.media.Schema
 	@Valid
 	public Map<String, String> getLabel() {
 		if (_labelSupplier != null) {
@@ -806,7 +892,7 @@ public class ObjectDefinition implements Serializable {
 	@JsonIgnore
 	private Supplier<Map<String, String>> _labelSupplier;
 
-	@Schema
+	@io.swagger.v3.oas.annotations.media.Schema
 	public Boolean getModifiable() {
 		if (_modifiableSupplier != null) {
 			modifiable = _modifiableSupplier.get();
@@ -847,7 +933,7 @@ public class ObjectDefinition implements Serializable {
 	@JsonIgnore
 	private Supplier<Boolean> _modifiableSupplier;
 
-	@Schema
+	@io.swagger.v3.oas.annotations.media.Schema
 	public String getName() {
 		if (_nameSupplier != null) {
 			name = _nameSupplier.get();
@@ -886,7 +972,7 @@ public class ObjectDefinition implements Serializable {
 	@JsonIgnore
 	private Supplier<String> _nameSupplier;
 
-	@Schema
+	@io.swagger.v3.oas.annotations.media.Schema
 	@Valid
 	public ObjectAction[] getObjectActions() {
 		if (_objectActionsSupplier != null) {
@@ -928,7 +1014,53 @@ public class ObjectDefinition implements Serializable {
 	@JsonIgnore
 	private Supplier<ObjectAction[]> _objectActionsSupplier;
 
-	@Schema
+	@io.swagger.v3.oas.annotations.media.Schema
+	@Valid
+	public ObjectDefinitionSetting[] getObjectDefinitionSettings() {
+		if (_objectDefinitionSettingsSupplier != null) {
+			objectDefinitionSettings = _objectDefinitionSettingsSupplier.get();
+
+			_objectDefinitionSettingsSupplier = null;
+		}
+
+		return objectDefinitionSettings;
+	}
+
+	public void setObjectDefinitionSettings(
+		ObjectDefinitionSetting[] objectDefinitionSettings) {
+
+		this.objectDefinitionSettings = objectDefinitionSettings;
+
+		_objectDefinitionSettingsSupplier = null;
+	}
+
+	@JsonIgnore
+	public void setObjectDefinitionSettings(
+		UnsafeSupplier<ObjectDefinitionSetting[], Exception>
+			objectDefinitionSettingsUnsafeSupplier) {
+
+		_objectDefinitionSettingsSupplier = () -> {
+			try {
+				return objectDefinitionSettingsUnsafeSupplier.get();
+			}
+			catch (RuntimeException runtimeException) {
+				throw runtimeException;
+			}
+			catch (Exception exception) {
+				throw new RuntimeException(exception);
+			}
+		};
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected ObjectDefinitionSetting[] objectDefinitionSettings;
+
+	@JsonIgnore
+	private Supplier<ObjectDefinitionSetting[]>
+		_objectDefinitionSettingsSupplier;
+
+	@io.swagger.v3.oas.annotations.media.Schema
 	@Valid
 	public ObjectField[] getObjectFields() {
 		if (_objectFieldsSupplier != null) {
@@ -970,7 +1102,7 @@ public class ObjectDefinition implements Serializable {
 	@JsonIgnore
 	private Supplier<ObjectField[]> _objectFieldsSupplier;
 
-	@Schema
+	@io.swagger.v3.oas.annotations.media.Schema
 	public String getObjectFolderExternalReferenceCode() {
 		if (_objectFolderExternalReferenceCodeSupplier != null) {
 			objectFolderExternalReferenceCode =
@@ -1016,7 +1148,7 @@ public class ObjectDefinition implements Serializable {
 	@JsonIgnore
 	private Supplier<String> _objectFolderExternalReferenceCodeSupplier;
 
-	@Schema
+	@io.swagger.v3.oas.annotations.media.Schema
 	@Valid
 	public ObjectLayout[] getObjectLayouts() {
 		if (_objectLayoutsSupplier != null) {
@@ -1058,7 +1190,7 @@ public class ObjectDefinition implements Serializable {
 	@JsonIgnore
 	private Supplier<ObjectLayout[]> _objectLayoutsSupplier;
 
-	@Schema
+	@io.swagger.v3.oas.annotations.media.Schema
 	@Valid
 	public ObjectRelationship[] getObjectRelationships() {
 		if (_objectRelationshipsSupplier != null) {
@@ -1103,7 +1235,7 @@ public class ObjectDefinition implements Serializable {
 	@JsonIgnore
 	private Supplier<ObjectRelationship[]> _objectRelationshipsSupplier;
 
-	@Schema
+	@io.swagger.v3.oas.annotations.media.Schema
 	@Valid
 	public ObjectValidationRule[] getObjectValidationRules() {
 		if (_objectValidationRulesSupplier != null) {
@@ -1148,7 +1280,7 @@ public class ObjectDefinition implements Serializable {
 	@JsonIgnore
 	private Supplier<ObjectValidationRule[]> _objectValidationRulesSupplier;
 
-	@Schema
+	@io.swagger.v3.oas.annotations.media.Schema
 	@Valid
 	public ObjectView[] getObjectViews() {
 		if (_objectViewsSupplier != null) {
@@ -1190,7 +1322,7 @@ public class ObjectDefinition implements Serializable {
 	@JsonIgnore
 	private Supplier<ObjectView[]> _objectViewsSupplier;
 
-	@Schema
+	@io.swagger.v3.oas.annotations.media.Schema
 	public String getPanelAppOrder() {
 		if (_panelAppOrderSupplier != null) {
 			panelAppOrder = _panelAppOrderSupplier.get();
@@ -1231,7 +1363,7 @@ public class ObjectDefinition implements Serializable {
 	@JsonIgnore
 	private Supplier<String> _panelAppOrderSupplier;
 
-	@Schema
+	@io.swagger.v3.oas.annotations.media.Schema
 	public String getPanelCategoryKey() {
 		if (_panelCategoryKeySupplier != null) {
 			panelCategoryKey = _panelCategoryKeySupplier.get();
@@ -1272,7 +1404,7 @@ public class ObjectDefinition implements Serializable {
 	@JsonIgnore
 	private Supplier<String> _panelCategoryKeySupplier;
 
-	@Schema
+	@io.swagger.v3.oas.annotations.media.Schema
 	public Boolean getParameterRequired() {
 		if (_parameterRequiredSupplier != null) {
 			parameterRequired = _parameterRequiredSupplier.get();
@@ -1313,7 +1445,7 @@ public class ObjectDefinition implements Serializable {
 	@JsonIgnore
 	private Supplier<Boolean> _parameterRequiredSupplier;
 
-	@Schema
+	@io.swagger.v3.oas.annotations.media.Schema
 	@Valid
 	public Map<String, String> getPluralLabel() {
 		if (_pluralLabelSupplier != null) {
@@ -1356,7 +1488,7 @@ public class ObjectDefinition implements Serializable {
 	@JsonIgnore
 	private Supplier<Map<String, String>> _pluralLabelSupplier;
 
-	@Schema
+	@io.swagger.v3.oas.annotations.media.Schema
 	public Boolean getPortlet() {
 		if (_portletSupplier != null) {
 			portlet = _portletSupplier.get();
@@ -1397,7 +1529,7 @@ public class ObjectDefinition implements Serializable {
 	@JsonIgnore
 	private Supplier<Boolean> _portletSupplier;
 
-	@Schema
+	@io.swagger.v3.oas.annotations.media.Schema
 	public String getRestContextPath() {
 		if (_restContextPathSupplier != null) {
 			restContextPath = _restContextPathSupplier.get();
@@ -1438,7 +1570,7 @@ public class ObjectDefinition implements Serializable {
 	@JsonIgnore
 	private Supplier<String> _restContextPathSupplier;
 
-	@Schema
+	@io.swagger.v3.oas.annotations.media.Schema
 	public String getRootObjectDefinitionExternalReferenceCode() {
 		if (_rootObjectDefinitionExternalReferenceCodeSupplier != null) {
 			rootObjectDefinitionExternalReferenceCode =
@@ -1485,7 +1617,7 @@ public class ObjectDefinition implements Serializable {
 	@JsonIgnore
 	private Supplier<String> _rootObjectDefinitionExternalReferenceCodeSupplier;
 
-	@Schema
+	@io.swagger.v3.oas.annotations.media.Schema
 	public String getScope() {
 		if (_scopeSupplier != null) {
 			scope = _scopeSupplier.get();
@@ -1526,7 +1658,7 @@ public class ObjectDefinition implements Serializable {
 	@JsonIgnore
 	private Supplier<String> _scopeSupplier;
 
-	@Schema
+	@io.swagger.v3.oas.annotations.media.Schema
 	@Valid
 	public Status getStatus() {
 		if (_statusSupplier != null) {
@@ -1568,7 +1700,7 @@ public class ObjectDefinition implements Serializable {
 	@JsonIgnore
 	private Supplier<Status> _statusSupplier;
 
-	@Schema
+	@io.swagger.v3.oas.annotations.media.Schema
 	public String getStorageType() {
 		if (_storageTypeSupplier != null) {
 			storageType = _storageTypeSupplier.get();
@@ -1609,7 +1741,7 @@ public class ObjectDefinition implements Serializable {
 	@JsonIgnore
 	private Supplier<String> _storageTypeSupplier;
 
-	@Schema
+	@io.swagger.v3.oas.annotations.media.Schema
 	public Boolean getSystem() {
 		if (_systemSupplier != null) {
 			system = _systemSupplier.get();
@@ -1650,7 +1782,7 @@ public class ObjectDefinition implements Serializable {
 	@JsonIgnore
 	private Supplier<Boolean> _systemSupplier;
 
-	@Schema
+	@io.swagger.v3.oas.annotations.media.Schema
 	public String getTitleObjectFieldName() {
 		if (_titleObjectFieldNameSupplier != null) {
 			titleObjectFieldName = _titleObjectFieldNameSupplier.get();
@@ -1790,6 +1922,18 @@ public class ObjectDefinition implements Serializable {
 			sb.append("\"");
 		}
 
+		Creator creator = getCreator();
+
+		if (creator != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"creator\": ");
+
+			sb.append(creator);
+		}
+
 		Date dateCreated = getDateCreated();
 
 		if (dateCreated != null) {
@@ -1923,6 +2067,18 @@ public class ObjectDefinition implements Serializable {
 			sb.append(enableObjectEntryHistory);
 		}
 
+		Boolean enableObjectEntryVersioning = getEnableObjectEntryVersioning();
+
+		if (enableObjectEntryVersioning != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"enableObjectEntryVersioning\": ");
+
+			sb.append(enableObjectEntryVersioning);
+		}
+
 		String externalReferenceCode = getExternalReferenceCode();
 
 		if (externalReferenceCode != null) {
@@ -2006,6 +2162,29 @@ public class ObjectDefinition implements Serializable {
 				sb.append(String.valueOf(objectActions[i]));
 
 				if ((i + 1) < objectActions.length) {
+					sb.append(", ");
+				}
+			}
+
+			sb.append("]");
+		}
+
+		ObjectDefinitionSetting[] objectDefinitionSettings =
+			getObjectDefinitionSettings();
+
+		if (objectDefinitionSettings != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"objectDefinitionSettings\": ");
+
+			sb.append("[");
+
+			for (int i = 0; i < objectDefinitionSettings.length; i++) {
+				sb.append(String.valueOf(objectDefinitionSettings[i]));
+
+				if ((i + 1) < objectDefinitionSettings.length) {
 					sb.append(", ");
 				}
 			}
@@ -2319,8 +2498,8 @@ public class ObjectDefinition implements Serializable {
 		return sb.toString();
 	}
 
-	@Schema(
-		accessMode = Schema.AccessMode.READ_ONLY,
+	@io.swagger.v3.oas.annotations.media.Schema(
+		accessMode = io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_ONLY,
 		defaultValue = "com.liferay.object.admin.rest.dto.v1_0.ObjectDefinition",
 		name = "x-class-name"
 	)

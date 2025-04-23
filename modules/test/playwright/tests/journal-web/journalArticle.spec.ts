@@ -74,6 +74,13 @@ const assetPublisherDeprecationTest = mergeTests(
 	})
 );
 
+const ckeditor5Test = mergeTests(
+	baseTest,
+	featureFlagsTest({
+		'LPD-11235': {enabled: true},
+	})
+);
+
 const keepTitlesUntranslated = mergeTests(baseTest);
 
 const prefixUrlTest = mergeTests(baseTest);
@@ -134,6 +141,24 @@ baseTest(
 				'Please enter a friendly URL that does not end with a slash'
 			)
 		).toBeVisible();
+	}
+);
+
+baseTest(
+	'Check success message on save as draft',
+	{
+		tag: '@LPD-50230',
+	},
+	async ({journalEditArticlePage, page, site}) => {
+		await journalEditArticlePage.goto({siteUrl: site.friendlyUrlPath});
+
+		const title = getRandomString();
+		await journalEditArticlePage.saveAsDraftWithPermissions(title);
+
+		await waitForAlert(
+			page,
+			`Success:${title} was successfully saved as a draft.`
+		);
 	}
 );
 
@@ -1691,6 +1716,81 @@ assetPublisherDeprecationTest(
 		await page.getByLabel('Go to page, 2').click();
 
 		await expect(page.getByText('page2')).toBeVisible();
+	}
+);
+
+ckeditor5Test(
+	'Web Content is published with multiple translations',
+	{
+		tag: '@LPD-11235',
+	},
+	async ({journalEditArticlePage, page, site}) => {
+		await ckeditor5Test.step('Open new Basic Web Content', async () => {
+			await journalEditArticlePage.goto({siteUrl: site.friendlyUrlPath});
+		});
+
+		const articleContentAR = getRandomString();
+		const articleContentEN = getRandomString();
+		const articleTitleAR = getRandomString();
+		const articleTitleEN = getRandomString();
+
+		const editable = journalEditArticlePage.page.locator(
+			'.edit-article-panel .ck-content'
+		);
+
+		await ckeditor5Test.step(
+			'Add sample English title and content',
+			async () => {
+				await journalEditArticlePage.fillTitle(articleTitleEN);
+
+				await editable.fill(articleContentEN);
+			}
+		);
+
+		await ckeditor5Test.step(
+			'Switch to Arabic locale, check content direction',
+			async () => {
+				await journalEditArticlePage.changeLanguage('ar_SA');
+
+				await expect(
+					journalEditArticlePage.page.getByLabel(
+						'Select a language, current language: Arabic.'
+					)
+				).toBeVisible();
+
+				expect(await editable.getAttribute('dir')).toEqual('rtl');
+			}
+		);
+
+		await ckeditor5Test.step(
+			'Add sample Arabic title and content',
+			async () => {
+				await journalEditArticlePage.fillTitle(articleTitleAR);
+
+				await editable.fill(articleContentAR);
+			}
+		);
+
+		await ckeditor5Test.step('Publish article', async () => {
+			await journalEditArticlePage.publishArticle();
+		});
+
+		await ckeditor5Test.step(
+			'Open saved article and assert content is correct',
+			async () => {
+				await page.getByTitle(articleTitleEN).click();
+
+				await expect(
+					editable.getByText(articleContentEN)
+				).toBeVisible();
+
+				await journalEditArticlePage.changeLanguage('ar_SA');
+
+				await expect(
+					editable.getByText(articleContentAR)
+				).toBeVisible();
+			}
+		);
 	}
 );
 

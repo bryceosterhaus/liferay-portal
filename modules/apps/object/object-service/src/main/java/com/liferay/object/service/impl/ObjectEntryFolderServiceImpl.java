@@ -14,6 +14,7 @@ import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermi
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermissionUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -63,6 +64,45 @@ public class ObjectEntryFolderServiceImpl
 	}
 
 	@Override
+	public ObjectEntryFolder deleteObjectEntryFolderByExternalReferenceCode(
+			String externalReferenceCode, long groupId, long companyId)
+		throws PortalException {
+
+		ObjectEntryFolder objectEntryFolder =
+			objectEntryFolderLocalService.
+				getObjectEntryFolderByExternalReferenceCode(
+					externalReferenceCode, groupId, companyId);
+
+		ModelResourcePermissionUtil.check(
+			_modelResourcePermission, getPermissionChecker(), groupId,
+			objectEntryFolder.getObjectEntryFolderId(), ActionKeys.DELETE);
+
+		return objectEntryFolderLocalService.deleteObjectEntryFolder(
+			objectEntryFolder);
+	}
+
+	@Override
+	public ObjectEntryFolder fetchObjectEntryFolderByExternalReferenceCode(
+			String externalReferenceCode, long groupId, long companyId)
+		throws PortalException {
+
+		ObjectEntryFolder objectEntryFolder =
+			objectEntryFolderLocalService.
+				fetchObjectEntryFolderByExternalReferenceCode(
+					externalReferenceCode, groupId, companyId);
+
+		if (objectEntryFolder == null) {
+			return null;
+		}
+
+		ModelResourcePermissionUtil.check(
+			_modelResourcePermission, getPermissionChecker(), groupId,
+			objectEntryFolder.getObjectEntryFolderId(), ActionKeys.VIEW);
+
+		return objectEntryFolder;
+	}
+
+	@Override
 	public ObjectEntryFolder getObjectEntryFolder(long objectEntryFolderId)
 		throws PortalException {
 
@@ -77,9 +117,54 @@ public class ObjectEntryFolderServiceImpl
 	}
 
 	@Override
+	public ObjectEntryFolder getObjectEntryFolderByExternalReferenceCode(
+			String externalReferenceCode, long groupId, long companyId)
+		throws PortalException {
+
+		ObjectEntryFolder objectEntryFolder =
+			objectEntryFolderLocalService.
+				getObjectEntryFolderByExternalReferenceCode(
+					externalReferenceCode, groupId, companyId);
+
+		ModelResourcePermissionUtil.check(
+			_modelResourcePermission, getPermissionChecker(), groupId,
+			objectEntryFolder.getObjectEntryFolderId(), ActionKeys.VIEW);
+
+		return objectEntryFolder;
+	}
+
+	@Override
+	public List<ObjectEntryFolder> getObjectEntryFolders(
+			long groupId, long companyId, long parentObjectEntryFolderId,
+			int start, int end)
+		throws PortalException {
+
+		ModelResourcePermissionUtil.check(
+			_modelResourcePermission, getPermissionChecker(), groupId,
+			parentObjectEntryFolderId, ActionKeys.VIEW);
+
+		return objectEntryFolderLocalService.getObjectEntryFolders(
+			groupId, companyId, parentObjectEntryFolderId, start, end);
+	}
+
+	@Override
+	public int getObjectEntryFoldersCount(
+			long groupId, long companyId, long parentObjectEntryFolderId)
+		throws PortalException {
+
+		ModelResourcePermissionUtil.check(
+			_modelResourcePermission, getPermissionChecker(), groupId,
+			parentObjectEntryFolderId, ActionKeys.VIEW);
+
+		return objectEntryFolderLocalService.getObjectEntryFoldersCount(
+			groupId, companyId, parentObjectEntryFolderId);
+	}
+
+	@Override
 	public ObjectEntryFolder updateObjectEntryFolder(
 			long objectEntryFolderId, long parentObjectEntryFolderId,
-			Map<Locale, String> labelMap, String name)
+			Map<Locale, String> labelMap, String name,
+			ServiceContext serviceContext)
 		throws PortalException {
 
 		_modelResourcePermission.check(
@@ -87,7 +172,7 @@ public class ObjectEntryFolderServiceImpl
 
 		return objectEntryFolderLocalService.updateObjectEntryFolder(
 			getUserId(), objectEntryFolderId, parentObjectEntryFolderId,
-			labelMap, name);
+			labelMap, name, serviceContext);
 	}
 
 	@Reference(

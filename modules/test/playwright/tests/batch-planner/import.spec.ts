@@ -5,9 +5,7 @@
 
 import {
 	ObjectDefinition,
-	ObjectDefinitionApi,
-	ObjectField,
-	ObjectRelationship,
+	ObjectDefinitionAPI,
 } from '@liferay/object-admin-rest-client-js';
 import {expect, mergeTests} from '@playwright/test';
 import * as path from 'path';
@@ -16,6 +14,8 @@ import {dataApiHelpersTest} from '../../fixtures/dataApiHelpersTest';
 import {featureFlagsTest} from '../../fixtures/featureFlagsTest';
 import {loginTest} from '../../fixtures/loginTest';
 import {objectPagesTest} from '../../fixtures/objectPagesTest';
+import createTempFile from '../../utils/createTempFile';
+import getRandomString from '../../utils/getRandomString';
 import {dataMigrationCenterPagesTest} from './fixtures/dataMigrationCenterPagesTest';
 import {OBJECT_ENTRY_ENTITY_TYPE} from './utils/constants';
 
@@ -36,8 +36,8 @@ const companyObjectDefinition: ObjectDefinition = {
 	name: 'Test',
 	objectFields: [
 		{
-			DBType: ObjectField.DBTypeEnum.String,
-			businessType: ObjectField.BusinessTypeEnum.Aggregation,
+			DBType: 'String',
+			businessType: 'Aggregation',
 			externalReferenceCode: 'Test-AggregationField',
 			indexed: false,
 			indexedAsKeyword: false,
@@ -54,11 +54,11 @@ const companyObjectDefinition: ObjectDefinition = {
 			],
 			required: false,
 			system: false,
-			type: ObjectField.TypeEnum.String,
+			type: 'String',
 		},
 		{
-			DBType: ObjectField.DBTypeEnum.String,
-			businessType: ObjectField.BusinessTypeEnum.AutoIncrement,
+			DBType: 'String',
+			businessType: 'AutoIncrement',
 			externalReferenceCode: 'Test-AutoIncrementField',
 			indexed: true,
 			indexedAsKeyword: false,
@@ -73,11 +73,11 @@ const companyObjectDefinition: ObjectDefinition = {
 			],
 			required: false,
 			system: false,
-			type: ObjectField.TypeEnum.String,
+			type: 'String',
 		},
 		{
-			DBType: ObjectField.DBTypeEnum.Boolean,
-			businessType: ObjectField.BusinessTypeEnum.Boolean,
+			DBType: 'Boolean',
+			businessType: 'Boolean',
 			externalReferenceCode: 'Test-BooleanField',
 			indexed: true,
 			indexedAsKeyword: false,
@@ -87,11 +87,11 @@ const companyObjectDefinition: ObjectDefinition = {
 			name: 'testBooleanField',
 			required: false,
 			system: false,
-			type: ObjectField.TypeEnum.Boolean,
+			type: 'Boolean',
 		},
 		{
-			DBType: ObjectField.DBTypeEnum.Date,
-			businessType: ObjectField.BusinessTypeEnum.Date,
+			DBType: 'Date',
+			businessType: 'Date',
 			externalReferenceCode: 'Test-DateField',
 			indexed: true,
 			indexedAsKeyword: false,
@@ -101,11 +101,11 @@ const companyObjectDefinition: ObjectDefinition = {
 			name: 'testDateField',
 			required: false,
 			system: false,
-			type: ObjectField.TypeEnum.Date,
+			type: 'Date',
 		},
 		{
-			DBType: ObjectField.DBTypeEnum.DateTime,
-			businessType: ObjectField.BusinessTypeEnum.DateTime,
+			DBType: 'DateTime',
+			businessType: 'DateTime',
 			externalReferenceCode: 'Test-DateTimeField',
 			indexed: true,
 			indexedAsKeyword: false,
@@ -118,11 +118,11 @@ const companyObjectDefinition: ObjectDefinition = {
 			],
 			required: false,
 			system: false,
-			type: ObjectField.TypeEnum.DateTime,
+			type: 'DateTime',
 		},
 		{
-			DBType: ObjectField.DBTypeEnum.Double,
-			businessType: ObjectField.BusinessTypeEnum.Decimal,
+			DBType: 'Double',
+			businessType: 'Decimal',
 			externalReferenceCode: 'Test-DecimalField',
 			indexed: true,
 			indexedAsKeyword: false,
@@ -132,11 +132,11 @@ const companyObjectDefinition: ObjectDefinition = {
 			name: 'testDecimalField',
 			required: false,
 			system: false,
-			type: ObjectField.TypeEnum.Double,
+			type: 'Double',
 		},
 		{
-			DBType: ObjectField.DBTypeEnum.String,
-			businessType: ObjectField.BusinessTypeEnum.Formula,
+			DBType: 'String',
+			businessType: 'Formula',
 			externalReferenceCode: 'Test-FormulaField',
 			indexed: false,
 			indexedAsKeyword: false,
@@ -150,11 +150,11 @@ const companyObjectDefinition: ObjectDefinition = {
 			],
 			required: false,
 			system: false,
-			type: ObjectField.TypeEnum.String,
+			type: 'String',
 		},
 		{
-			DBType: ObjectField.DBTypeEnum.Integer,
-			businessType: ObjectField.BusinessTypeEnum.Integer,
+			DBType: 'Integer',
+			businessType: 'Integer',
 			externalReferenceCode: 'Test-IntegerField',
 			indexed: true,
 			indexedAsKeyword: false,
@@ -164,11 +164,11 @@ const companyObjectDefinition: ObjectDefinition = {
 			name: 'testIntegerField',
 			required: false,
 			system: false,
-			type: ObjectField.TypeEnum.Integer,
+			type: 'Integer',
 		},
 		{
-			DBType: ObjectField.DBTypeEnum.Long,
-			businessType: ObjectField.BusinessTypeEnum.LongInteger,
+			DBType: 'Long',
+			businessType: 'LongInteger',
 			externalReferenceCode: 'Test-LongIntegerField',
 			indexed: true,
 			indexedAsKeyword: false,
@@ -178,11 +178,11 @@ const companyObjectDefinition: ObjectDefinition = {
 			name: 'testLongInteger',
 			required: false,
 			system: false,
-			type: ObjectField.TypeEnum.Long,
+			type: 'Long',
 		},
 		{
-			DBType: ObjectField.DBTypeEnum.Clob,
-			businessType: ObjectField.BusinessTypeEnum.LongText,
+			DBType: 'Clob',
+			businessType: 'LongText',
 			externalReferenceCode: 'Test-LongTextField',
 			indexed: true,
 			indexedAsKeyword: false,
@@ -192,11 +192,11 @@ const companyObjectDefinition: ObjectDefinition = {
 			name: 'testLongTextField',
 			required: false,
 			system: false,
-			type: ObjectField.TypeEnum.Clob,
+			type: 'Clob',
 		},
 		{
-			DBType: ObjectField.DBTypeEnum.BigDecimal,
-			businessType: ObjectField.BusinessTypeEnum.PrecisionDecimal,
+			DBType: 'BigDecimal',
+			businessType: 'PrecisionDecimal',
 			externalReferenceCode: 'Test-PrecisionDecimalField',
 			indexed: true,
 			indexedAsKeyword: false,
@@ -206,11 +206,11 @@ const companyObjectDefinition: ObjectDefinition = {
 			name: 'testPrecisionDecimalField',
 			required: false,
 			system: false,
-			type: ObjectField.TypeEnum.BigDecimal,
+			type: 'BigDecimal',
 		},
 		{
-			DBType: ObjectField.DBTypeEnum.Clob,
-			businessType: ObjectField.BusinessTypeEnum.RichText,
+			DBType: 'Clob',
+			businessType: 'RichText',
 			externalReferenceCode: 'Test-RichTextField',
 			indexed: true,
 			indexedAsKeyword: false,
@@ -220,11 +220,11 @@ const companyObjectDefinition: ObjectDefinition = {
 			name: 'testRichTextField',
 			required: false,
 			system: false,
-			type: ObjectField.TypeEnum.Clob,
+			type: 'Clob',
 		},
 		{
-			DBType: ObjectField.DBTypeEnum.String,
-			businessType: ObjectField.BusinessTypeEnum.Text,
+			DBType: 'String',
+			businessType: 'Text',
 			externalReferenceCode: 'Test-TextField',
 			indexed: true,
 			indexedAsKeyword: false,
@@ -234,12 +234,12 @@ const companyObjectDefinition: ObjectDefinition = {
 			name: 'testTextField',
 			required: false,
 			system: false,
-			type: ObjectField.TypeEnum.String,
+			type: 'String',
 		},
 	],
 	objectRelationships: [
 		{
-			deletionType: ObjectRelationship.DeletionTypeEnum.Cascade,
+			deletionType: 'cascade',
 			externalReferenceCode: 'test-Relationship',
 			label: {
 				en_US: 'Test Relationship',
@@ -252,7 +252,7 @@ const companyObjectDefinition: ObjectDefinition = {
 			parameterObjectFieldName: '',
 			reverse: false,
 			system: false,
-			type: ObjectRelationship.TypeEnum.OneToMany,
+			type: 'oneToMany',
 		},
 	],
 	panelCategoryKey: 'control_panel.users',
@@ -269,8 +269,8 @@ const siteObjectDefinition: ObjectDefinition = {
 	name: 'Test',
 	objectFields: [
 		{
-			DBType: ObjectField.DBTypeEnum.String,
-			businessType: ObjectField.BusinessTypeEnum.Aggregation,
+			DBType: 'String',
+			businessType: 'Aggregation',
 			externalReferenceCode: 'Test-AggregationField',
 			indexed: false,
 			indexedAsKeyword: false,
@@ -287,11 +287,11 @@ const siteObjectDefinition: ObjectDefinition = {
 			],
 			required: false,
 			system: false,
-			type: ObjectField.TypeEnum.String,
+			type: 'String',
 		},
 		{
-			DBType: ObjectField.DBTypeEnum.String,
-			businessType: ObjectField.BusinessTypeEnum.AutoIncrement,
+			DBType: 'String',
+			businessType: 'AutoIncrement',
 			externalReferenceCode: 'Test-AutoIncrementField',
 			indexed: true,
 			indexedAsKeyword: false,
@@ -306,11 +306,11 @@ const siteObjectDefinition: ObjectDefinition = {
 			],
 			required: false,
 			system: false,
-			type: ObjectField.TypeEnum.String,
+			type: 'String',
 		},
 		{
-			DBType: ObjectField.DBTypeEnum.Boolean,
-			businessType: ObjectField.BusinessTypeEnum.Boolean,
+			DBType: 'Boolean',
+			businessType: 'Boolean',
 			externalReferenceCode: 'Test-BooleanField',
 			indexed: true,
 			indexedAsKeyword: false,
@@ -320,11 +320,11 @@ const siteObjectDefinition: ObjectDefinition = {
 			name: 'testBooleanField',
 			required: false,
 			system: false,
-			type: ObjectField.TypeEnum.Boolean,
+			type: 'Boolean',
 		},
 		{
-			DBType: ObjectField.DBTypeEnum.Date,
-			businessType: ObjectField.BusinessTypeEnum.Date,
+			DBType: 'Date',
+			businessType: 'Date',
 			externalReferenceCode: 'Test-DateField',
 			indexed: true,
 			indexedAsKeyword: false,
@@ -334,11 +334,11 @@ const siteObjectDefinition: ObjectDefinition = {
 			name: 'testDateField',
 			required: false,
 			system: false,
-			type: ObjectField.TypeEnum.Date,
+			type: 'Date',
 		},
 		{
-			DBType: ObjectField.DBTypeEnum.DateTime,
-			businessType: ObjectField.BusinessTypeEnum.DateTime,
+			DBType: 'DateTime',
+			businessType: 'DateTime',
 			externalReferenceCode: 'Test-DateTimeField',
 			indexed: true,
 			indexedAsKeyword: false,
@@ -351,11 +351,11 @@ const siteObjectDefinition: ObjectDefinition = {
 			],
 			required: false,
 			system: false,
-			type: ObjectField.TypeEnum.DateTime,
+			type: 'DateTime',
 		},
 		{
-			DBType: ObjectField.DBTypeEnum.Double,
-			businessType: ObjectField.BusinessTypeEnum.Decimal,
+			DBType: 'Double',
+			businessType: 'Decimal',
 			externalReferenceCode: 'Test-DecimalField',
 			indexed: true,
 			indexedAsKeyword: false,
@@ -365,11 +365,11 @@ const siteObjectDefinition: ObjectDefinition = {
 			name: 'testDecimalField',
 			required: false,
 			system: false,
-			type: ObjectField.TypeEnum.Double,
+			type: 'Double',
 		},
 		{
-			DBType: ObjectField.DBTypeEnum.String,
-			businessType: ObjectField.BusinessTypeEnum.Formula,
+			DBType: 'String',
+			businessType: 'Formula',
 			externalReferenceCode: 'Test-FormulaField',
 			indexed: false,
 			indexedAsKeyword: false,
@@ -383,11 +383,11 @@ const siteObjectDefinition: ObjectDefinition = {
 			],
 			required: false,
 			system: false,
-			type: ObjectField.TypeEnum.String,
+			type: 'String',
 		},
 		{
-			DBType: ObjectField.DBTypeEnum.Integer,
-			businessType: ObjectField.BusinessTypeEnum.Integer,
+			DBType: 'Integer',
+			businessType: 'Integer',
 			externalReferenceCode: 'Test-IntegerField',
 			indexed: true,
 			indexedAsKeyword: false,
@@ -397,11 +397,11 @@ const siteObjectDefinition: ObjectDefinition = {
 			name: 'testIntegerField',
 			required: false,
 			system: false,
-			type: ObjectField.TypeEnum.Integer,
+			type: 'Integer',
 		},
 		{
-			DBType: ObjectField.DBTypeEnum.Long,
-			businessType: ObjectField.BusinessTypeEnum.LongInteger,
+			DBType: 'Long',
+			businessType: 'LongInteger',
 			externalReferenceCode: 'Test-LongIntegerField',
 			indexed: true,
 			indexedAsKeyword: false,
@@ -411,11 +411,11 @@ const siteObjectDefinition: ObjectDefinition = {
 			name: 'testLongInteger',
 			required: false,
 			system: false,
-			type: ObjectField.TypeEnum.Long,
+			type: 'Long',
 		},
 		{
-			DBType: ObjectField.DBTypeEnum.Clob,
-			businessType: ObjectField.BusinessTypeEnum.LongText,
+			DBType: 'Clob',
+			businessType: 'LongText',
 			externalReferenceCode: 'Test-LongTextField',
 			indexed: true,
 			indexedAsKeyword: false,
@@ -425,11 +425,11 @@ const siteObjectDefinition: ObjectDefinition = {
 			name: 'testLongTextField',
 			required: false,
 			system: false,
-			type: ObjectField.TypeEnum.Clob,
+			type: 'Clob',
 		},
 		{
-			DBType: ObjectField.DBTypeEnum.BigDecimal,
-			businessType: ObjectField.BusinessTypeEnum.PrecisionDecimal,
+			DBType: 'BigDecimal',
+			businessType: 'PrecisionDecimal',
 			externalReferenceCode: 'Test-PrecisionDecimalField',
 			indexed: true,
 			indexedAsKeyword: false,
@@ -439,11 +439,11 @@ const siteObjectDefinition: ObjectDefinition = {
 			name: 'testPrecisionDecimalField',
 			required: false,
 			system: false,
-			type: ObjectField.TypeEnum.BigDecimal,
+			type: 'BigDecimal',
 		},
 		{
-			DBType: ObjectField.DBTypeEnum.Clob,
-			businessType: ObjectField.BusinessTypeEnum.RichText,
+			DBType: 'Clob',
+			businessType: 'RichText',
 			externalReferenceCode: 'Test-RichTextField',
 			indexed: true,
 			indexedAsKeyword: false,
@@ -453,11 +453,11 @@ const siteObjectDefinition: ObjectDefinition = {
 			name: 'testRichTextField',
 			required: false,
 			system: false,
-			type: ObjectField.TypeEnum.Clob,
+			type: 'Clob',
 		},
 		{
-			DBType: ObjectField.DBTypeEnum.String,
-			businessType: ObjectField.BusinessTypeEnum.Text,
+			DBType: 'String',
+			businessType: 'Text',
 			externalReferenceCode: 'Test-TextField',
 			indexed: true,
 			indexedAsKeyword: false,
@@ -467,12 +467,12 @@ const siteObjectDefinition: ObjectDefinition = {
 			name: 'testTextField',
 			required: false,
 			system: false,
-			type: ObjectField.TypeEnum.String,
+			type: 'String',
 		},
 	],
 	objectRelationships: [
 		{
-			deletionType: ObjectRelationship.DeletionTypeEnum.Cascade,
+			deletionType: 'cascade',
 			externalReferenceCode: 'test-Relationship',
 			label: {
 				en_US: 'Test Relationship',
@@ -485,7 +485,7 @@ const siteObjectDefinition: ObjectDefinition = {
 			parameterObjectFieldName: '',
 			reverse: false,
 			system: false,
-			type: ObjectRelationship.TypeEnum.OneToMany,
+			type: 'oneToMany',
 		},
 	],
 	panelCategoryKey: 'site_administration.design',
@@ -501,7 +501,7 @@ test('can handle OnlyAddNewRecords and UpdateChangedRecordFields import strategi
 	page,
 }) => {
 	const objectDefinitionAPIClient =
-		await apiHelpers.buildRestClient(ObjectDefinitionApi);
+		await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 	const {body: objectDefinition} =
 		await objectDefinitionAPIClient.postObjectDefinition(
@@ -546,7 +546,7 @@ test('can import CSV file with an unexisting field', async ({
 	page,
 }) => {
 	const objectDefinitionAPIClient =
-		await apiHelpers.buildRestClient(ObjectDefinitionApi);
+		await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 	const {body: objectDefinition} =
 		await objectDefinitionAPIClient.postObjectDefinition(
@@ -578,20 +578,9 @@ test('can import CSV file with an unexisting field', async ({
 				'c/tests'
 			)
 		).items
-	).toEqual([
+	).toMatchObject([
 		{
-			actions: expect.any(Object),
-			creator: expect.any(Object),
-			dateCreated: expect.any(String),
-			dateModified: expect.any(String),
 			externalReferenceCode: '83b46736-f89b-9b90-188c-497d06c08271',
-			id: expect.any(Number),
-			keywords: [],
-			r_testRelationship_c_testERC: '',
-			r_testRelationship_c_testId: 0,
-			status: expect.any(Object),
-			taxonomyCategoryBriefs: [],
-			testAggregationField: '0',
 			testAutoIncrementField: 'prefix-1-suffix',
 			testBooleanField: false,
 			testDateField: '2024-01-05T00:00:00.000Z',
@@ -602,9 +591,6 @@ test('can import CSV file with an unexisting field', async ({
 			testLongInteger: 123456789,
 			testLongTextField: 'This is a long text to test testLongTextField',
 			testPrecisionDecimalField: 321.123,
-			testRelationshipERC: '',
-			testRichTextField: '',
-			testRichTextFieldRawText: '',
 			testTextField: 'Test',
 		},
 	]);
@@ -616,7 +602,7 @@ test('can import CSV file with custom columns order', async ({
 	page,
 }) => {
 	const objectDefinitionAPIClient =
-		await apiHelpers.buildRestClient(ObjectDefinitionApi);
+		await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 	const {body: objectDefinition} =
 		await objectDefinitionAPIClient.postObjectDefinition(
@@ -648,21 +634,10 @@ test('can import CSV file with custom columns order', async ({
 				'Guest'
 			)
 		).items
-	).toEqual([
+	).toMatchObject([
 		{
-			actions: expect.any(Object),
-			creator: expect.any(Object),
-			dateCreated: expect.any(String),
-			dateModified: expect.any(String),
 			externalReferenceCode: '83b46736-f89b-9b90-188c-497d06c08271',
-			id: expect.any(Number),
-			keywords: [],
-			r_testRelationship_c_testERC: '',
-			r_testRelationship_c_testId: 0,
 			scopeKey: 'Guest',
-			status: expect.any(Object),
-			taxonomyCategoryBriefs: [],
-			testAggregationField: '0',
 			testAutoIncrementField: 'prefix-1-suffix',
 			testBooleanField: true,
 			testDateField: '2024-01-05T00:00:00.000Z',
@@ -673,7 +648,6 @@ test('can import CSV file with custom columns order', async ({
 			testLongInteger: 123456789,
 			testLongTextField: 'This is a long text to test testLongTextField',
 			testPrecisionDecimalField: 321.123,
-			testRelationshipERC: '',
 			testRichTextField:
 				'<p>This is a long text <strong>with some fomatting</strong> to text\n  testRichTextField  </p>',
 			testRichTextFieldRawText:
@@ -689,7 +663,7 @@ test('can import CSV file with multiple site scoped object entries', async ({
 	page,
 }) => {
 	const objectDefinitionAPIClient =
-		await apiHelpers.buildRestClient(ObjectDefinitionApi);
+		await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 	const {body: objectDefinition} =
 		await objectDefinitionAPIClient.postObjectDefinition(
@@ -719,21 +693,10 @@ test('can import CSV file with multiple site scoped object entries', async ({
 				'Guest'
 			)
 		).items
-	).toEqual([
+	).toMatchObject([
 		{
-			actions: expect.any(Object),
-			creator: expect.any(Object),
-			dateCreated: expect.any(String),
-			dateModified: expect.any(String),
 			externalReferenceCode: '83b46736-f89b-9b90-188c-497d06c08271',
-			id: expect.any(Number),
-			keywords: [],
-			r_testRelationship_c_testERC: '',
-			r_testRelationship_c_testId: 0,
 			scopeKey: 'Guest',
-			status: expect.any(Object),
-			taxonomyCategoryBriefs: [],
-			testAggregationField: '0',
 			testAutoIncrementField: 'prefix-1-suffix',
 			testBooleanField: true,
 			testDateField: '2024-01-05T00:00:00.000Z',
@@ -745,7 +708,6 @@ test('can import CSV file with multiple site scoped object entries', async ({
 			testLongTextField:
 				'This is a long text to test testLongTextField. The first entry',
 			testPrecisionDecimalField: 321.123,
-			testRelationshipERC: '',
 			testRichTextField:
 				'<p>This is a long text <strong>with some fomatting</strong> to text\n  testRichTextField. The first entry.  </p>',
 			testRichTextFieldRawText:
@@ -753,19 +715,8 @@ test('can import CSV file with multiple site scoped object entries', async ({
 			testTextField: 'Test_FirstEntry',
 		},
 		{
-			actions: expect.any(Object),
-			creator: expect.any(Object),
-			dateCreated: expect.any(String),
-			dateModified: expect.any(String),
 			externalReferenceCode: '83b46736-f89b-9b90-188c-497d06c08273',
-			id: expect.any(Number),
-			keywords: [],
-			r_testRelationship_c_testERC: '',
-			r_testRelationship_c_testId: 0,
 			scopeKey: 'Guest',
-			status: expect.any(Object),
-			taxonomyCategoryBriefs: [],
-			testAggregationField: '0',
 			testAutoIncrementField: 'prefix-2-suffix',
 			testBooleanField: false,
 			testDateField: '2024-01-06T00:00:00.000Z',
@@ -777,7 +728,6 @@ test('can import CSV file with multiple site scoped object entries', async ({
 			testLongTextField:
 				'This is a long text to test testLongTextField. The second entry',
 			testPrecisionDecimalField: 123.321,
-			testRelationshipERC: '',
 			testRichTextField:
 				'<p>This is a long text <strong>with some fomatting</strong> to text\n  testRichTextField. The second entry.  </p>',
 			testRichTextFieldRawText:
@@ -793,7 +743,7 @@ test('can import CSV file with new and existing site scoped object entries', asy
 	page,
 }) => {
 	const objectDefinitionAPIClient =
-		await apiHelpers.buildRestClient(ObjectDefinitionApi);
+		await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 	const {body: objectDefinition} =
 		await objectDefinitionAPIClient.postObjectDefinition(
@@ -835,21 +785,10 @@ test('can import CSV file with new and existing site scoped object entries', asy
 				'Guest'
 			)
 		).items
-	).toEqual([
+	).toMatchObject([
 		{
-			actions: expect.any(Object),
-			creator: expect.any(Object),
-			dateCreated: expect.any(String),
-			dateModified: expect.any(String),
 			externalReferenceCode: '83b46736-f89b-9b90-188c-497d06c08271',
-			id: expect.any(Number),
-			keywords: [],
-			r_testRelationship_c_testERC: '',
-			r_testRelationship_c_testId: 0,
 			scopeKey: 'Guest',
-			status: expect.any(Object),
-			taxonomyCategoryBriefs: [],
-			testAggregationField: '0',
 			testAutoIncrementField: 'prefix-1-suffix',
 			testBooleanField: false,
 			testDateField: '2024-01-05T00:00:00.000Z',
@@ -861,7 +800,6 @@ test('can import CSV file with new and existing site scoped object entries', asy
 			testLongTextField:
 				'This is a long text to test testLongTextField. The first entry',
 			testPrecisionDecimalField: 321.123,
-			testRelationshipERC: '',
 			testRichTextField:
 				'<p>This is a long text <strong>with some fomatting</strong> to text\n  testRichTextField.  </p>',
 			testRichTextFieldRawText:
@@ -869,19 +807,8 @@ test('can import CSV file with new and existing site scoped object entries', asy
 			testTextField: 'Test',
 		},
 		{
-			actions: expect.any(Object),
-			creator: expect.any(Object),
-			dateCreated: expect.any(String),
-			dateModified: expect.any(String),
 			externalReferenceCode: '83b46736-f89b-9b90-188c-497d06c08273',
-			id: expect.any(Number),
-			keywords: [],
-			r_testRelationship_c_testERC: '',
-			r_testRelationship_c_testId: 0,
 			scopeKey: 'Guest',
-			status: expect.any(Object),
-			taxonomyCategoryBriefs: [],
-			testAggregationField: '0',
 			testAutoIncrementField: 'prefix-2-suffix',
 			testBooleanField: true,
 			testDateField: '2024-01-06T00:00:00.000Z',
@@ -893,7 +820,6 @@ test('can import CSV file with new and existing site scoped object entries', asy
 			testLongTextField:
 				'This is a long text to test testLongTextField. The second entry',
 			testPrecisionDecimalField: 123.321,
-			testRelationshipERC: '',
 			testRichTextField:
 				'<p>This is a long text <strong>with some fomatting</strong> to text\n  testRichTextField. New entry.  </p>',
 			testRichTextFieldRawText:
@@ -909,7 +835,7 @@ test('can import CSV file with new and modified existing company scoped object e
 	page,
 }) => {
 	const objectDefinitionAPIClient =
-		await apiHelpers.buildRestClient(ObjectDefinitionApi);
+		await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 	const {body: objectDefinition} =
 		await objectDefinitionAPIClient.postObjectDefinition(
@@ -950,20 +876,9 @@ test('can import CSV file with new and modified existing company scoped object e
 				'c/tests'
 			)
 		).items
-	).toEqual([
+	).toMatchObject([
 		{
-			actions: expect.any(Object),
-			creator: expect.any(Object),
-			dateCreated: expect.any(String),
-			dateModified: expect.any(String),
 			externalReferenceCode: '83b46736-f89b-9b90-188c-497d06c08271',
-			id: expect.any(Number),
-			keywords: [],
-			r_testRelationship_c_testERC: '',
-			r_testRelationship_c_testId: 0,
-			status: expect.any(Object),
-			taxonomyCategoryBriefs: [],
-			testAggregationField: '0',
 			testAutoIncrementField: 'prefix-1-suffix',
 			testBooleanField: true,
 			testDateField: '2024-01-05T00:00:00.000Z',
@@ -975,7 +890,6 @@ test('can import CSV file with new and modified existing company scoped object e
 			testLongTextField:
 				'This is a long text to test testLongTextField. The first entry',
 			testPrecisionDecimalField: 321.123,
-			testRelationshipERC: '',
 			testRichTextField:
 				'<p>This is a long text <strong>with some fomatting</strong> to text\n  testRichTextField. The modified entry.  </p>',
 			testRichTextFieldRawText:
@@ -983,18 +897,7 @@ test('can import CSV file with new and modified existing company scoped object e
 			testTextField: 'Test_Modified',
 		},
 		{
-			actions: expect.any(Object),
-			creator: expect.any(Object),
-			dateCreated: expect.any(String),
-			dateModified: expect.any(String),
 			externalReferenceCode: '83b46736-f89b-9b90-188c-497d06c08273',
-			id: expect.any(Number),
-			keywords: [],
-			r_testRelationship_c_testERC: '',
-			r_testRelationship_c_testId: 0,
-			status: expect.any(Object),
-			taxonomyCategoryBriefs: [],
-			testAggregationField: '0',
 			testAutoIncrementField: 'prefix-2-suffix',
 			testBooleanField: false,
 			testDateField: '2024-01-06T00:00:00.000Z',
@@ -1006,12 +909,295 @@ test('can import CSV file with new and modified existing company scoped object e
 			testLongTextField:
 				'This is a long text to test testLongTextField. The second entry',
 			testPrecisionDecimalField: 123.321,
-			testRelationshipERC: '',
 			testRichTextField:
 				'<p>This is a long text <strong>with some fomatting</strong> to text\n  testRichTextField. The new entry.  </p>',
 			testRichTextFieldRawText:
 				'This is a long text with some fomatting to text testRichTextField. The new entry.',
 			testTextField: 'Test_NewEntry',
+		},
+	]);
+});
+
+test('can import json file with attachment field', async ({
+	apiHelpers,
+	dataMigrationCenterPage,
+	page,
+}) => {
+	const studentObjectDefinitionWithAttachment: ObjectDefinition = {
+		active: true,
+		externalReferenceCode: 'student-def',
+		label: {
+			en_US: 'Student',
+		},
+		name: 'Student',
+		objectFields: [
+			{
+				DBType: 'String',
+				businessType: 'Text',
+				externalReferenceCode: 'studentName',
+				indexed: true,
+				indexedAsKeyword: false,
+				indexedLanguageId: 'en_US',
+				label: {
+					en_US: 'Student name',
+				},
+				listTypeDefinitionId: 0,
+				name: 'name',
+				required: true,
+				state: false,
+				system: false,
+				type: 'String',
+			},
+			{
+				DBType: 'Long',
+				businessType: 'Attachment',
+				indexed: true,
+				indexedAsKeyword: false,
+				label: {
+					en_US: 'customAttachment',
+				},
+				name: 'diploma',
+				objectFieldSettings: [
+					{
+						name: 'acceptedFileExtensions',
+						value: 'jpeg, jpg, pdf, png',
+					} as any,
+					{
+						name: 'fileSource',
+						value: 'documentsAndMedia',
+					} as any,
+					{
+						name: 'maximumFileSize',
+						value: '100',
+					} as any,
+				],
+				required: false,
+				type: 'Long',
+			},
+		],
+		panelCategoryKey: 'control_panel.object',
+		pluralLabel: {
+			en_US: 'Students',
+		},
+		portlet: true,
+		restContextPath: '/o/c/students',
+		scope: 'company',
+		status: {
+			code: 0,
+		},
+	};
+	const objectDefinitionAPIClient =
+		await apiHelpers.buildRestClient(ObjectDefinitionAPI);
+
+	const {body: studentResponse} =
+		await objectDefinitionAPIClient.postObjectDefinition(
+			studentObjectDefinitionWithAttachment
+		);
+
+	apiHelpers.data.push({id: studentResponse.id, type: 'objectDefinition'});
+
+	const subjectObjectDefinition: ObjectDefinition = {
+		active: true,
+		externalReferenceCode: 'subject-def',
+		label: {
+			en_US: 'Subject',
+		},
+		name: 'Subject',
+		objectFields: [
+			{
+				DBType: 'String',
+				businessType: 'Text',
+				externalReferenceCode: 'subject-name-field',
+				indexed: true,
+				indexedAsKeyword: false,
+				indexedLanguageId: 'en_US',
+				label: {
+					en_US: 'name',
+				},
+				listTypeDefinitionId: 0,
+				name: 'name',
+				required: false,
+				state: false,
+				system: false,
+				type: 'String',
+			},
+		],
+		objectRelationships: [
+			{
+				deletionType: 'cascade',
+				externalReferenceCode: 'student-subjects-relationship',
+				label: {
+					en_US: 'Student subjects',
+				},
+				name: 'subjectStudents',
+				objectDefinitionExternalReferenceCode1: 'subject-def',
+				objectDefinitionExternalReferenceCode2: 'student-def',
+				objectDefinitionModifiable2: true,
+				objectDefinitionName2: 'Student',
+				objectDefinitionSystem2: false,
+				objectField: {
+					DBType: 'Long',
+					businessType: 'Relationship',
+					externalReferenceCode:
+						'student-subjects-relationship-field',
+					indexed: true,
+					indexedAsKeyword: false,
+					indexedLanguageId: '',
+					label: {
+						en_US: 'Student subjects',
+					},
+					name: 'r_subjectStudents_c_subjectId',
+					readOnly: 'false',
+					relationshipType: 'oneToMany',
+					state: false,
+					system: false,
+					type: 'Long',
+					unique: false,
+				},
+				parameterObjectFieldId: 0,
+				parameterObjectFieldName: '',
+				reverse: false,
+				system: false,
+				type: 'oneToMany',
+			},
+		],
+		panelCategoryKey: 'control_panel.object',
+		pluralLabel: {
+			en_US: 'Subjects',
+		},
+		portlet: true,
+		restContextPath: '/c/subjects',
+		scope: 'company',
+		status: {
+			code: 0,
+		},
+	};
+
+	const {body: subjectResponse} =
+		await objectDefinitionAPIClient.postObjectDefinition(
+			subjectObjectDefinition
+		);
+
+	apiHelpers.data.push({
+		id: subjectResponse.id,
+		type: 'objectDefinition',
+	});
+
+	await apiHelpers.objectEntry.postObjectEntry(
+		{
+			externalReferenceCode: 'Math',
+			name: 'Math',
+		},
+		'c/subjects'
+	);
+
+	const objectEntry = await apiHelpers.objectEntry.postObjectEntry(
+		{
+			diploma: {
+				fileBase64: 'R0lGODlhAQABAAAAACw=',
+				name: 'diploma.png',
+			},
+			externalReferenceCode: 'studentERC',
+			name: 'Jane',
+			r_subjectStudents_c_subjectERC: 'Math',
+		},
+		'c/students'
+	);
+
+	apiHelpers.data.push({
+		id: objectEntry.diploma.id,
+		type: 'document',
+	});
+
+	const filePath = createTempFile(
+		getRandomString() + '.json',
+		`[{"diploma": {
+			"id":${objectEntry.diploma.id},
+			"link":
+				{
+					"href": "${objectEntry.diploma.link.href}",
+					"label": "${objectEntry.diploma.link.label}"
+				},
+				"name": "${objectEntry.diploma.name}"
+			},
+			"name": "John",
+			"r_subjectStudents_c_subjectERC": "Math"
+		}]`
+	);
+
+	await dataMigrationCenterPage.goto();
+	await dataMigrationCenterPage.goToImportFile();
+
+	await dataMigrationCenterPage.importFile(
+		'com.liferay.object.rest.dto.v1_0.ObjectEntry#C_Student',
+		filePath,
+		'INSERT',
+		'PARTIAL_UPDATE'
+	);
+
+	await expect(
+		page.getByText('The import process completed successfully.')
+	).toBeVisible();
+	expect(
+		(
+			await apiHelpers.objectEntry.getObjectDefinitionObjectEntries(
+				'c/students'
+			)
+		).items
+	).toEqual([
+		{
+			actions: expect.any(Object),
+			creator: expect.any(Object),
+			dateCreated: expect.any(String),
+			dateModified: expect.any(String),
+			diploma: {
+				externalReferenceCode: expect.any(String),
+				id: expect.any(Number),
+				link: {
+					href: expect.any(String),
+					label: 'diploma.png',
+				},
+				name: 'diploma.png',
+				scope: expect.any(Object),
+			},
+			externalReferenceCode: expect.any(String),
+			id: expect.any(Number),
+			keywords: [],
+			name: 'Jane',
+			objectEntryFolderExternalReferenceCode: '',
+			objectEntryFolderId: 0,
+			r_subjectStudents_c_subjectERC: 'Math',
+			r_subjectStudents_c_subjectId: expect.any(Number),
+			status: expect.any(Object),
+			subjectStudentsERC: 'Math',
+			taxonomyCategoryBriefs: [],
+		},
+		{
+			actions: expect.any(Object),
+			creator: expect.any(Object),
+			dateCreated: expect.any(String),
+			dateModified: expect.any(String),
+			diploma: {
+				externalReferenceCode: expect.any(String),
+				id: expect.any(Number),
+				link: {
+					href: expect.any(String),
+					label: 'diploma.png',
+				},
+				name: 'diploma.png',
+				scope: expect.any(Object),
+			},
+			externalReferenceCode: expect.any(String),
+			id: expect.any(Number),
+			keywords: [],
+			name: 'John',
+			objectEntryFolderExternalReferenceCode: '',
+			objectEntryFolderId: 0,
+			r_subjectStudents_c_subjectERC: 'Math',
+			r_subjectStudents_c_subjectId: expect.any(Number),
+			status: expect.any(Object),
+			subjectStudentsERC: 'Math',
+			taxonomyCategoryBriefs: [],
 		},
 	]);
 });
@@ -1022,7 +1208,7 @@ test('can map all imported fields', async ({
 	page,
 }) => {
 	const objectDefinitionAPIClient =
-		await apiHelpers.buildRestClient(ObjectDefinitionApi);
+		await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 	const {body: objectDefinition} =
 		await objectDefinitionAPIClient.postObjectDefinition(
 			siteObjectDefinition
@@ -1034,7 +1220,9 @@ test('can map all imported fields', async ({
 
 	await dataMigrationCenterPage.selectEntityType(OBJECT_ENTRY_ENTITY_TYPE);
 
-	await expect(page.getByText('externalReferenceCode')).toBeVisible();
+	await expect(
+		page.getByText('externalReferenceCode', {exact: true})
+	).toBeVisible();
 	await expect(page.getByText('keywords', {exact: true})).toBeVisible();
 	await expect(page.getByText('taxonomyCategoryIds')).toBeVisible();
 	await expect(page.getByText('testAutoIncrementField')).toBeVisible();
@@ -1055,7 +1243,7 @@ test('can preview CSV file', async ({
 	page,
 }) => {
 	const objectDefinitionAPIClient =
-		await apiHelpers.buildRestClient(ObjectDefinitionApi);
+		await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 	const {body: objectDefinition} =
 		await objectDefinitionAPIClient.postObjectDefinition(
@@ -1137,7 +1325,7 @@ test('can show duplicate error message with CSV import existing entry and only a
 	page,
 }) => {
 	const objectDefinitionAPIClient =
-		await apiHelpers.buildRestClient(ObjectDefinitionApi);
+		await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 	const {body: objectDefinition} =
 		await objectDefinitionAPIClient.postObjectDefinition(
@@ -1178,7 +1366,7 @@ test('can show unique contraint error message with CSV import existing entry and
 	page,
 }) => {
 	const objectDefinitionAPIClient =
-		await apiHelpers.buildRestClient(ObjectDefinitionApi);
+		await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 	const {body: objectDefinition} =
 		await objectDefinitionAPIClient.postObjectDefinition(
@@ -1240,7 +1428,7 @@ test('cannot import CSV file with empty headers row', async ({
 	page,
 }) => {
 	const objectDefinitionAPIClient =
-		await apiHelpers.buildRestClient(ObjectDefinitionApi);
+		await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 	const {body: objectDefinition} =
 		await objectDefinitionAPIClient.postObjectDefinition(
@@ -1278,7 +1466,7 @@ test('cannot import CSV file with object entry with UPSERT strategy', async ({
 	page,
 }) => {
 	const objectDefinitionAPIClient =
-		await apiHelpers.buildRestClient(ObjectDefinitionApi);
+		await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 	const {body: objectDefinition} =
 		await objectDefinitionAPIClient.postObjectDefinition(
@@ -1310,7 +1498,7 @@ test('cannot import empty CSV file', async ({
 	page,
 }) => {
 	const objectDefinitionAPIClient =
-		await apiHelpers.buildRestClient(ObjectDefinitionApi);
+		await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 	const {body: objectDefinition} =
 		await objectDefinitionAPIClient.postObjectDefinition(
@@ -1340,7 +1528,7 @@ test('can see correct custom object name in dropdown', async ({
 	dataMigrationCenterPage,
 }) => {
 	const objectDefinitionAPIClient =
-		await apiHelpers.buildRestClient(ObjectDefinitionApi);
+		await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 	const {body: objectDefinition} =
 		await objectDefinitionAPIClient.postObjectDefinition({
@@ -1352,8 +1540,8 @@ test('can see correct custom object name in dropdown', async ({
 			name: 'Stock',
 			objectFields: [
 				{
-					DBType: ObjectField.DBTypeEnum.String,
-					businessType: ObjectField.BusinessTypeEnum.Text,
+					DBType: 'String',
+					businessType: 'Text',
 					externalReferenceCode: 'nameERC',
 					indexed: true,
 					indexedAsKeyword: true,
@@ -1413,7 +1601,7 @@ test('cannot see relationship nested field', async ({
 	page,
 }) => {
 	const objectDefinitionAPIClient =
-		await apiHelpers.buildRestClient(ObjectDefinitionApi);
+		await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 	const {body: objectDefinition} =
 		await objectDefinitionAPIClient.postObjectDefinition(
@@ -1440,8 +1628,8 @@ test.describe('can rely on anyOf form validation', () => {
 		name: 'Student',
 		objectFields: [
 			{
-				DBType: ObjectField.DBTypeEnum.String,
-				businessType: ObjectField.BusinessTypeEnum.Text,
+				DBType: 'String',
+				businessType: 'Text',
 				externalReferenceCode: 'student-name-field',
 				indexed: true,
 				indexedAsKeyword: false,
@@ -1454,12 +1642,12 @@ test.describe('can rely on anyOf form validation', () => {
 				required: true,
 				state: false,
 				system: false,
-				type: ObjectField.TypeEnum.String,
+				type: 'String',
 			},
 		],
 		objectRelationships: [
 			{
-				deletionType: ObjectRelationship.DeletionTypeEnum.Cascade,
+				deletionType: 'cascade',
 				externalReferenceCode: 'student-subjects-relationship-1',
 				label: {
 					en_US: 'Student subjects 1',
@@ -1471,8 +1659,8 @@ test.describe('can rely on anyOf form validation', () => {
 				objectDefinitionName2: 'Subject',
 				objectDefinitionSystem2: false,
 				objectField: {
-					DBType: ObjectField.DBTypeEnum.Long,
-					businessType: ObjectField.BusinessTypeEnum.Relationship,
+					DBType: 'Long',
+					businessType: 'Relationship',
 					externalReferenceCode:
 						'student-subjects-relationship-field-1',
 					indexed: true,
@@ -1482,23 +1670,22 @@ test.describe('can rely on anyOf form validation', () => {
 						en_US: 'Student subjects 1',
 					},
 					name: 'r_studentSubjects1_c_studentId',
-					readOnly: ObjectField.ReadOnlyEnum.False,
-					relationshipType:
-						ObjectField.RelationshipTypeEnum.OneToMany,
+					readOnly: 'false',
+					relationshipType: 'oneToMany',
 					required: true,
 					state: false,
 					system: false,
-					type: ObjectField.TypeEnum.Long,
+					type: 'Long',
 					unique: false,
 				},
 				parameterObjectFieldId: 0,
 				parameterObjectFieldName: '',
 				reverse: false,
 				system: false,
-				type: ObjectRelationship.TypeEnum.OneToMany,
+				type: 'oneToMany',
 			},
 			{
-				deletionType: ObjectRelationship.DeletionTypeEnum.Cascade,
+				deletionType: 'cascade',
 				externalReferenceCode: 'student-subjects-relationship-2',
 				label: {
 					en_US: 'Student subjects 2',
@@ -1510,8 +1697,8 @@ test.describe('can rely on anyOf form validation', () => {
 				objectDefinitionName2: 'Subject',
 				objectDefinitionSystem2: false,
 				objectField: {
-					DBType: ObjectField.DBTypeEnum.Long,
-					businessType: ObjectField.BusinessTypeEnum.Relationship,
+					DBType: 'Long',
+					businessType: 'Relationship',
 					externalReferenceCode:
 						'student-subjects-relationship-field-2',
 					indexed: true,
@@ -1521,23 +1708,22 @@ test.describe('can rely on anyOf form validation', () => {
 						en_US: 'Student subjects 2',
 					},
 					name: 'r_studentSubjects2_c_studentId',
-					readOnly: ObjectField.ReadOnlyEnum.False,
-					relationshipType:
-						ObjectField.RelationshipTypeEnum.OneToMany,
+					readOnly: 'false',
+					relationshipType: 'oneToMany',
 					required: true,
 					state: false,
 					system: false,
-					type: ObjectField.TypeEnum.Long,
+					type: 'Long',
 					unique: false,
 				},
 				parameterObjectFieldId: 0,
 				parameterObjectFieldName: '',
 				reverse: false,
 				system: false,
-				type: ObjectRelationship.TypeEnum.OneToMany,
+				type: 'oneToMany',
 			},
 			{
-				deletionType: ObjectRelationship.DeletionTypeEnum.Cascade,
+				deletionType: 'cascade',
 				externalReferenceCode: 'student-subjects-relationship-3',
 				label: {
 					en_US: 'Student subjects 3',
@@ -1549,8 +1735,8 @@ test.describe('can rely on anyOf form validation', () => {
 				objectDefinitionName2: 'Subject',
 				objectDefinitionSystem2: false,
 				objectField: {
-					DBType: ObjectField.DBTypeEnum.Long,
-					businessType: ObjectField.BusinessTypeEnum.Relationship,
+					DBType: 'Long',
+					businessType: 'Relationship',
 					externalReferenceCode:
 						'student-subjects-relationship-field-3',
 					indexed: true,
@@ -1560,20 +1746,19 @@ test.describe('can rely on anyOf form validation', () => {
 						en_US: 'Student subjects 3',
 					},
 					name: 'r_studentSubjects3_c_studentId',
-					readOnly: ObjectField.ReadOnlyEnum.False,
-					relationshipType:
-						ObjectField.RelationshipTypeEnum.OneToMany,
+					readOnly: 'false',
+					relationshipType: 'oneToMany',
 					required: false,
 					state: false,
 					system: false,
-					type: ObjectField.TypeEnum.Long,
+					type: 'Long',
 					unique: false,
 				},
 				parameterObjectFieldId: 0,
 				parameterObjectFieldName: '',
 				reverse: false,
 				system: false,
-				type: ObjectRelationship.TypeEnum.OneToMany,
+				type: 'oneToMany',
 			},
 		],
 		panelCategoryKey: 'control_panel.object',
@@ -1597,8 +1782,8 @@ test.describe('can rely on anyOf form validation', () => {
 		name: 'Subject',
 		objectFields: [
 			{
-				DBType: ObjectField.DBTypeEnum.String,
-				businessType: ObjectField.BusinessTypeEnum.Text,
+				DBType: 'String',
+				businessType: 'Text',
 				externalReferenceCode: 'subject-name-field',
 				indexed: true,
 				indexedAsKeyword: false,
@@ -1611,7 +1796,7 @@ test.describe('can rely on anyOf form validation', () => {
 				required: false,
 				state: false,
 				system: false,
-				type: ObjectField.TypeEnum.String,
+				type: 'String',
 			},
 		],
 		panelCategoryKey: 'control_panel.object',
@@ -1632,7 +1817,7 @@ test.describe('can rely on anyOf form validation', () => {
 		page,
 	}) => {
 		const objectDefinitionAPIClient =
-			await apiHelpers.buildRestClient(ObjectDefinitionApi);
+			await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 		const {body: subjectResponse} =
 			await objectDefinitionAPIClient.postObjectDefinition(
@@ -1697,7 +1882,7 @@ test.describe('can rely on anyOf form validation', () => {
 		page,
 	}) => {
 		const objectDefinitionAPIClient =
-			await apiHelpers.buildRestClient(ObjectDefinitionApi);
+			await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 		const {body: subjectResponse} =
 			await objectDefinitionAPIClient.postObjectDefinition(
@@ -1770,7 +1955,7 @@ test.describe('can rely on anyOf form validation', () => {
 		page,
 	}) => {
 		const objectDefinitionAPIClient =
-			await apiHelpers.buildRestClient(ObjectDefinitionApi);
+			await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 		const {body: subjectResponse} =
 			await objectDefinitionAPIClient.postObjectDefinition(

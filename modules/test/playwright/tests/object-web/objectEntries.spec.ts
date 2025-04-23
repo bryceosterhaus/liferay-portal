@@ -5,10 +5,11 @@
 
 import {
 	ObjectDefinition,
-	ObjectDefinitionApi,
+	ObjectDefinitionAPI,
 	ObjectField,
 	ObjectRelationship,
-	ObjectRelationshipApi,
+	ObjectRelationshipAPI,
+	ObjectValidationRuleAPI,
 } from '@liferay/object-admin-rest-client-js';
 import {expect, mergeTests} from '@playwright/test';
 
@@ -18,6 +19,7 @@ import {collectionsPagesTest} from '../../fixtures/collectionsPagesTest';
 import {dataApiHelpersTest} from '../../fixtures/dataApiHelpersTest';
 import {editObjectDefinitionPagesTest} from '../../fixtures/editObjectDefinitionPagesTest';
 import {featureFlagsTest} from '../../fixtures/featureFlagsTest';
+import {formsPagesTest} from '../../fixtures/formsPagesTest';
 import {isolatedSiteTest} from '../../fixtures/isolatedSiteTest';
 import {loginTest} from '../../fixtures/loginTest';
 import {objectPagesTest} from '../../fixtures/objectPagesTest';
@@ -27,6 +29,8 @@ import {getRandomInt} from '../../utils/getRandomInt';
 import getRandomString from '../../utils/getRandomString';
 import {waitForAlert} from '../../utils/waitForAlert';
 import {journalPagesTest} from '../journal-web/fixtures/journalPagesTest';
+import getPageDefinition from '../layout-content-page-editor-web/utils/getPageDefinition';
+import getWidgetDefinition from '../layout-content-page-editor-web/utils/getWidgetDefinition';
 import {mockedObjectFields} from './dependencies/objectMockedFields';
 import {getFDSDateFormat, getPageEditorDateFormat} from './utils/dateFormat';
 import evaluateKeepCheckingAfterFound from './utils/keepCheckingAfterFound';
@@ -41,9 +45,9 @@ export const test = mergeTests(
 	editObjectDefinitionPagesTest,
 	featureFlagsTest({
 		'LPD-21926': {enabled: true},
-		'LPD-32050': {enabled: true},
 		'LPS-178052': {enabled: true},
 	}),
+	formsPagesTest,
 	journalPagesTest,
 	loginTest(),
 	objectPagesTest,
@@ -76,7 +80,7 @@ test.describe('Manage object entries through Friendly URL', () => {
 		_objectField = objectFields[0];
 
 		const objectDefinitionAPIClient =
-			await apiHelpers.buildRestClient(ObjectDefinitionApi);
+			await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 		const {body: objectDefinition} =
 			await objectDefinitionAPIClient.postObjectDefinition({
@@ -285,7 +289,7 @@ test.describe('Manage object entries through Friendly URL', () => {
 		).toBeVisible();
 
 		const objectDefinitionAPIClient =
-			await apiHelpers.buildRestClient(ObjectDefinitionApi);
+			await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 		await objectDefinitionAPIClient.patchObjectDefinition(
 			_objectDefinition.id,
@@ -326,182 +330,102 @@ test.describe('Manage object entries through Friendly URL', () => {
 	});
 });
 
-test.describe('Manage object entries through Page Templates', () => {
-	test('can view all entries related to an object in the relationship field', async ({
+test.describe('Manage object entries through Object Definition widget', () => {
+	test('verify that previous validation alerts are removed from the page when editing the entry', async ({
 		apiHelpers,
 		page,
+		pageEditorPage,
+		site,
 		viewObjectEntriesPage,
 	}) => {
-		const objectFields: ObjectField[] = [
-			{
-				DBType: ObjectField.DBTypeEnum.Boolean,
-				businessType: ObjectField.BusinessTypeEnum.Boolean,
-				externalReferenceCode: 'booleanField',
-				indexed: true,
-				indexedAsKeyword: false,
-				indexedLanguageId: '',
-				label: {en_US: 'booleanField'},
-				listTypeDefinitionId: 0,
-				localized: true,
-				name: 'booleanField',
-				required: false,
-				system: false,
-				type: ObjectField.TypeEnum.Boolean,
-			},
-			{
-				DBType: ObjectField.DBTypeEnum.String,
-				businessType: ObjectField.BusinessTypeEnum.Text,
-				externalReferenceCode: 'textField',
-				indexed: true,
-				indexedAsKeyword: false,
-				indexedLanguageId: '',
-				label: {en_US: 'textField'},
-				listTypeDefinitionId: 0,
-				localized: true,
-				name: 'textField',
-				required: false,
-				system: false,
-				type: ObjectField.TypeEnum.String,
-			},
-		];
-
-		const objectDefinitionExternalReferenceCode =
-			'ObjectDefinition' + getRandomInt();
-
-		const objectDefinitionAPIClient =
-			await apiHelpers.buildRestClient(ObjectDefinitionApi);
-
-		const {body: objectDefinition1} =
-			await objectDefinitionAPIClient.postObjectDefinition({
-				active: true,
-				enableLocalization: true,
-				externalReferenceCode: objectDefinitionExternalReferenceCode,
-				label: {
-					en_US: objectDefinitionExternalReferenceCode,
-				},
-				name: objectDefinitionExternalReferenceCode,
-				objectFields,
-				objectFolderExternalReferenceCode: 'default',
-				pluralLabel: {
-					en_US: objectDefinitionExternalReferenceCode,
-				},
-				portlet: true,
-				scope: 'company',
-				status: {code: 0},
-				titleObjectFieldName: 'booleanField',
-			});
-
-		apiHelpers.data.push({
-			id: objectDefinition1.id,
-			type: 'objectDefinition',
-		});
-
-		const objectDefinition2 =
+		const objectDefinition =
 			await apiHelpers.objectAdmin.postRandomObjectDefinition({
+				className: 'com.liferay.object.model.ObjectDefinition#1234',
 				objectFolderExternalReferenceCode: 'default',
 				status: {code: 0},
+				titleObjectFieldName: 'textField',
 			});
 
 		apiHelpers.data.push({
-			id: objectDefinition2.id,
+			id: objectDefinition.id,
 			type: 'objectDefinition',
 		});
 
-		const objectRelationshipLabel =
-			'objectRelationshipLabel' + getRandomInt();
-		const objectRelationshipName =
-			'objectRelationshipName' + Math.floor(Math.random() * 99);
-
-		const objectRelationshipApiClient = await apiHelpers.buildRestClient(
-			ObjectRelationshipApi
+		const objectValidationRuleAPIClient = await apiHelpers.buildRestClient(
+			ObjectValidationRuleAPI
 		);
 
-		await objectRelationshipApiClient.postObjectDefinitionByExternalReferenceCodeObjectRelationship(
-			objectDefinition1.externalReferenceCode,
+		await objectValidationRuleAPIClient.postObjectDefinitionByExternalReferenceCodeObjectValidationRule(
+			objectDefinition.externalReferenceCode,
 			{
-				label: {
-					en_US: objectRelationshipLabel,
+				active: true,
+				engine: 'ddm',
+				errorLabel: {
+					en_US: 'The field is empty',
 				},
-				name: objectRelationshipName,
-				objectDefinitionExternalReferenceCode1:
-					objectDefinition1.externalReferenceCode,
-				objectDefinitionExternalReferenceCode2:
-					objectDefinition2.externalReferenceCode,
-				objectDefinitionId1: objectDefinition1.id,
-				objectDefinitionId2: objectDefinition2.id,
-				objectDefinitionName2: objectDefinition2.name,
-				type: ObjectRelationship.TypeEnum.OneToMany,
+				name: {
+					en_US: 'Validation 1',
+				},
+				objectValidationRuleSettings: [],
+				script: 'not(isEmpty(textField))',
+				system: false,
+			}
+		);
+		await objectValidationRuleAPIClient.postObjectDefinitionByExternalReferenceCodeObjectValidationRule(
+			objectDefinition.externalReferenceCode,
+			{
+				active: true,
+				engine: 'ddm',
+				errorLabel: {
+					en_US: 'The URL is invalid',
+				},
+				name: {
+					en_US: 'Validation 2',
+				},
+				objectValidationRuleSettings: [],
+				script: 'isEmpty(textField) OR isURL(textField)',
+				system: false,
 			}
 		);
 
-		const applicationName =
-			'c/' + objectDefinition1.name.toLowerCase() + 's';
+		const objectDefinitionWidgetDefinition = getWidgetDefinition({
+			id: getRandomString(),
+			widgetName:
+				'com_liferay_object_web_internal_object_definitions_portlet_ObjectDefinitionsPortlet_1234',
+		});
 
-		const itemValues = [];
+		const layout = await apiHelpers.headlessDelivery.createSitePage({
+			pageDefinition: getPageDefinition([
+				objectDefinitionWidgetDefinition,
+			]),
+			siteId: site.id,
+			title: getRandomString(),
+		});
 
-		for (let i = 0; i <= 15; i++) {
-			const objectEntry = await apiHelpers.objectEntry.postObjectEntry(
-				{
-					booleanField_i18n: {
-						en_US: false,
-						pt_BR: true,
-					},
-					textField_i18n: {
-						en_US: 'entry_en_US' + i,
-						pt_BR: 'entry_pt_BR' + i,
-					},
-				},
-				applicationName
-			);
+		await pageEditorPage.goto(layout, site.friendlyUrlPath);
 
-			itemValues.push({
-				booleanField: objectEntry.booleanField_i18n['pt_BR'],
-				textField: objectEntry.textField_i18n['pt_BR'],
-			});
-		}
+		await pageEditorPage.publishPage();
 
-		await viewObjectEntriesPage.goto(objectDefinition2.className, 'pt');
-
-		siteLanguage = 'pt';
+		await page.goto(`/web${site.friendlyUrlPath}${layout.friendlyUrlPath}`);
 
 		await viewObjectEntriesPage.clickAddObjectEntry();
 
-		await page.getByPlaceholder('Buscar', {exact: true}).click();
+		await viewObjectEntriesPage.saveObjectEntryButton.click();
 
-		itemValues.forEach((itemValue, index) => {
-			expect(
-				page
-					.getByRole('menuitem', {
-						exact: true,
-						name: String(itemValue.booleanField),
-					})
-					.nth(index)
-			).toBeVisible();
-		});
+		await expect(page.getByText('The field is empty')).toBeVisible();
 
-		await objectDefinitionAPIClient.patchObjectDefinition(
-			objectDefinition1.id,
-			{
-				titleObjectFieldName: 'textField',
-			}
-		);
+		const objectFieldValue = getRandomString();
 
-		await viewObjectEntriesPage.goto(objectDefinition2.className, 'pt');
+		await page.getByLabel('textField').fill(objectFieldValue);
 
-		await viewObjectEntriesPage.clickAddObjectEntry();
+		await viewObjectEntriesPage.saveObjectEntryButton.click();
 
-		await page.getByPlaceholder('Buscar', {exact: true}).click();
-
-		itemValues.forEach((itemValue) => {
-			expect(
-				page.getByRole('menuitem', {
-					exact: true,
-					name: String(itemValue.textField),
-				})
-			).toBeVisible();
-		});
+		await expect(page.getByText('The field is empty')).not.toBeVisible();
+		await expect(page.getByText('The URL is invalid')).toBeVisible();
 	});
+});
 
+test.describe('Manage object entries through Page Templates', () => {
 	test('verify if the object entries are displayed when selecting to preview an object entry on a page template', async ({
 		apiHelpers,
 		displayPageTemplatesPage,
@@ -544,7 +468,7 @@ test.describe('Manage object entries through Page Templates', () => {
 		});
 
 		const objectDefinitionAPIClient =
-			await apiHelpers.buildRestClient(ObjectDefinitionApi);
+			await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 		const {body: objectDefinition} =
 			await objectDefinitionAPIClient.postObjectDefinition({
@@ -608,12 +532,12 @@ test.describe('Manage object entries through Page Templates', () => {
 			let matchString: string;
 
 			switch (objectField.businessType) {
-				case ObjectField.BusinessTypeEnum.AutoIncrement: {
+				case 'AutoIncrement': {
 					matchString = '1';
 
 					break;
 				}
-				case ObjectField.BusinessTypeEnum.Date: {
+				case 'Date': {
 					const date = new Date(
 						Date.parse(objectEntry[objectField.name])
 					);
@@ -624,14 +548,14 @@ test.describe('Manage object entries through Page Templates', () => {
 
 					continue overloop;
 				}
-				case ObjectField.BusinessTypeEnum.Picklist: {
+				case 'Picklist': {
 					matchString = (
 						objectEntry[objectField.name] as {key: string}
 					).key;
 
 					break;
 				}
-				case ObjectField.BusinessTypeEnum.MultiselectPicklist: {
+				case 'MultiselectPicklist': {
 					(objectEntry[objectField.name] as string[]).forEach(
 						(listTypeEntry, index) => {
 							index < 1
@@ -692,7 +616,7 @@ test.describe('Manage object entries through View Object Entries', () => {
 		});
 
 		const objectDefinitionAPIClient =
-			await apiHelpers.buildRestClient(ObjectDefinitionApi);
+			await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 		const {body: objectDefinition} =
 			await objectDefinitionAPIClient.postObjectDefinition({
@@ -727,15 +651,16 @@ test.describe('Manage object entries through View Object Entries', () => {
 
 		for (const objectField of objectFields) {
 			switch (objectField.businessType) {
-				case ObjectField.BusinessTypeEnum.Attachment: {
+				case 'Attachment': {
 					await viewObjectEntriesPage.selectFileButton.click();
+
 					await viewObjectEntriesPage.selectFileFromDocumentsAndMedia(
 						ATTACHMENT_FILE_NAME
 					);
 
 					break;
 				}
-				case ObjectField.BusinessTypeEnum.Boolean: {
+				case 'Boolean': {
 					objectEntry[objectField.name]
 						? await page
 								.getByLabel(objectField.label['en_US'])
@@ -746,7 +671,7 @@ test.describe('Manage object entries through View Object Entries', () => {
 
 					break;
 				}
-				case ObjectField.BusinessTypeEnum.Picklist: {
+				case 'Picklist': {
 					await viewObjectEntriesPage.selectDropdownItem(
 						objectField.label['en_US'],
 						objectEntry[objectField.name].key.toString()
@@ -775,29 +700,29 @@ test.describe('Manage object entries through View Object Entries', () => {
 			let matchString: string;
 
 			switch (businessType) {
-				case ObjectField.BusinessTypeEnum.Attachment: {
+				case 'Attachment': {
 					matchString = ATTACHMENT_FILE_NAME;
 
 					break;
 				}
-				case ObjectField.BusinessTypeEnum.Boolean: {
+				case 'Boolean': {
 					matchString = objectEntry[name] ? 'Yes' : 'No';
 
 					break;
 				}
-				case ObjectField.BusinessTypeEnum.Date: {
+				case 'Date': {
 					const date = new Date(objectEntry[name]);
 
 					matchString = getFDSDateFormat(date);
 
 					break;
 				}
-				case ObjectField.BusinessTypeEnum.Picklist: {
+				case 'Picklist': {
 					matchString = (objectEntry[name] as {key: string}).key;
 
 					break;
 				}
-				case ObjectField.BusinessTypeEnum.MultiselectPicklist: {
+				case 'MultiselectPicklist': {
 					(objectEntry[name] as string[]).forEach(
 						(listTypeEntry, index) => {
 							index < 1
@@ -808,7 +733,7 @@ test.describe('Manage object entries through View Object Entries', () => {
 
 					break;
 				}
-				case ObjectField.BusinessTypeEnum.RichText: {
+				case 'RichText': {
 					matchString = objectEntry[name].substring(0, 35);
 
 					break;
@@ -822,6 +747,72 @@ test.describe('Manage object entries through View Object Entries', () => {
 				page.locator('td').getByText(matchString, {exact: true})
 			).toBeVisible();
 		}
+	});
+
+	test('can add and update an entry with multi-select object field', async ({
+		apiHelpers,
+		formFieldsPage,
+		page,
+		viewObjectEntriesPage,
+	}) => {
+		const objectDefinitionLabel = 'ObjectDefinitionLabel' + getRandomInt();
+
+		const {listTypeDefinitionItems, objectFields, titleObjectFieldName} =
+			await mockObjectFields({
+				apiHelpers,
+				objectFieldBusinessTypes: ['multiselectPicklist'],
+			});
+
+		const objectDefinitionAPIClient =
+			await apiHelpers.buildRestClient(ObjectDefinitionAPI);
+
+		const {body: objectDefinition} =
+			await objectDefinitionAPIClient.postObjectDefinition({
+				active: true,
+				enableLocalization: true,
+				label: {
+					en_US: objectDefinitionLabel,
+				},
+				name: 'ObjectDefinitionName' + getRandomInt(),
+				objectFields,
+				pluralLabel: {
+					en_US: objectDefinitionLabel,
+				},
+				portlet: true,
+				scope: 'company',
+				status: {
+					code: 0,
+				},
+				titleObjectFieldName,
+			});
+
+		apiHelpers.data.push({
+			id: objectDefinition.id,
+			type: 'objectDefinition',
+		});
+
+		await viewObjectEntriesPage.goto(objectDefinition.className);
+
+		await viewObjectEntriesPage.addObjectEntryButton.click();
+
+		await formFieldsPage.addSelectItem(listTypeDefinitionItems[0]);
+
+		await viewObjectEntriesPage.saveObjectEntryButton.click();
+
+		await expect(viewObjectEntriesPage.successMessage).toBeVisible();
+
+		await expect(viewObjectEntriesPage.successMessage).toBeHidden();
+
+		await viewObjectEntriesPage.saveObjectEntryButton.click();
+
+		await expect(viewObjectEntriesPage.successMessage).toBeVisible();
+
+		await expect(
+			page.getByRole('gridcell', {
+				exact: true,
+				name: listTypeDefinitionItems[0],
+			})
+		).toBeVisible();
 	});
 
 	test('can deselect the last selected option in multiple select picklist and the field is not removed from the DOM when doing so', async ({
@@ -854,7 +845,7 @@ test.describe('Manage object entries through View Object Entries', () => {
 		});
 
 		const objectDefinitionAPIClient =
-			await apiHelpers.buildRestClient(ObjectDefinitionApi);
+			await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 		const {body: objectDefinition} =
 			await objectDefinitionAPIClient.postObjectDefinition({
@@ -896,9 +887,7 @@ test.describe('Manage object entries through View Object Entries', () => {
 		await page.getByPlaceholder(placeHolderText).click();
 
 		const multiselectPicklistField = objectFields.find(
-			({businessType}) =>
-				businessType ===
-				ObjectField.BusinessTypeEnum.MultiselectPicklist
+			({businessType}) => businessType === 'MultiselectPicklist'
 		);
 
 		const firstOptionName = objectEntry[multiselectPicklistField.name][0];
@@ -938,7 +927,7 @@ test.describe('Manage object entries through View Object Entries', () => {
 		});
 
 		const objectDefinitionAPIClient =
-			await apiHelpers.buildRestClient(ObjectDefinitionApi);
+			await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 		const {body: objectDefinition} =
 			await objectDefinitionAPIClient.postObjectDefinition({
@@ -1037,11 +1026,11 @@ test.describe('Manage object entries through View Object Entries', () => {
 		const objectRelationshipName =
 			'objectRelationshipName' + Math.floor(Math.random() * 99);
 
-		const objectRelationshipApiClient = await apiHelpers.buildRestClient(
-			ObjectRelationshipApi
+		const objectRelationshipAPIClient = await apiHelpers.buildRestClient(
+			ObjectRelationshipAPI
 		);
 
-		await objectRelationshipApiClient.postObjectDefinitionByExternalReferenceCodeObjectRelationship(
+		await objectRelationshipAPIClient.postObjectDefinitionByExternalReferenceCodeObjectRelationship(
 			objectDefinition1.externalReferenceCode,
 			{
 				label: {
@@ -1055,7 +1044,7 @@ test.describe('Manage object entries through View Object Entries', () => {
 				objectDefinitionId1: objectDefinition1.id,
 				objectDefinitionId2: objectDefinition2.id,
 				objectDefinitionName2: objectDefinition2.name,
-				type: ObjectRelationship.TypeEnum.OneToMany,
+				type: 'oneToMany',
 			}
 		);
 
@@ -1127,8 +1116,8 @@ test.describe('Manage object entries through View Object Entries', () => {
 		const objectRelationshipName =
 			'objectRelationshipName' + getRandomInt();
 
-		const objectRelationshipApiClient = await apiHelpers.buildRestClient(
-			ObjectRelationshipApi
+		const objectRelationshipAPIClient = await apiHelpers.buildRestClient(
+			ObjectRelationshipAPI
 		);
 
 		const objectRelationshipData: Partial<ObjectRelationship> = {
@@ -1143,10 +1132,10 @@ test.describe('Manage object entries through View Object Entries', () => {
 			objectDefinitionId1: objectDefinition1.id,
 			objectDefinitionId2: objectDefinition2.id,
 			objectDefinitionName2: objectDefinition2.name,
-			type: ObjectRelationship.TypeEnum.ManyToMany,
+			type: 'manyToMany',
 		};
 
-		await objectRelationshipApiClient.postObjectDefinitionByExternalReferenceCodeObjectRelationship(
+		await objectRelationshipAPIClient.postObjectDefinitionByExternalReferenceCodeObjectRelationship(
 			objectDefinition1.externalReferenceCode,
 			objectRelationshipData
 		);
@@ -1203,7 +1192,7 @@ test.describe('Manage object entries through View Object Entries', () => {
 		);
 
 		await viewObjectEntriesPage.fillObjectEntry({
-			objectFieldBusinessType: ObjectField.BusinessTypeEnum.Text,
+			objectFieldBusinessType: 'Text',
 			objectFieldLabel: objectField,
 			objectFieldValue: 'tests',
 		});
@@ -1305,14 +1294,14 @@ test.describe('Manage object entries through View Object Entries', () => {
 			type: 'objectDefinition',
 		});
 
-		const objectRelationshipApiClient = await apiHelpers.buildRestClient(
-			ObjectRelationshipApi
+		const objectRelationshipAPIClient = await apiHelpers.buildRestClient(
+			ObjectRelationshipAPI
 		);
 
-		await objectRelationshipApiClient.postObjectDefinitionByExternalReferenceCodeObjectRelationship(
+		await objectRelationshipAPIClient.postObjectDefinitionByExternalReferenceCodeObjectRelationship(
 			objectDefinition.externalReferenceCode,
 			{
-				deletionType: ObjectRelationship.DeletionTypeEnum.Disassociate,
+				deletionType: 'disassociate',
 				label: {
 					en_US: 'Relationship',
 				},
@@ -1323,7 +1312,7 @@ test.describe('Manage object entries through View Object Entries', () => {
 					objectDefinition.externalReferenceCode,
 				objectDefinitionId1: objectDefinition.id,
 				objectDefinitionId2: objectDefinition.id,
-				type: ObjectRelationship.TypeEnum.OneToMany,
+				type: 'oneToMany',
 			}
 		);
 
@@ -1354,11 +1343,11 @@ test.describe('Manage object entries through View Object Entries', () => {
 
 		await objectLayoutsPage.markAsDefaultButton.check();
 
-		await objectLayoutsPage.createObjectLayoutContent(
-			'Block 1',
+		await objectLayoutsPage.createObjectLayoutContent({
+			objectLayoutBlockName: 'Block 1',
 			objectLayoutName,
-			'Field Tab'
-		);
+			objectLayoutTabName: 'Field Tab',
+		});
 
 		await objectLayoutsPage.iframeLocator
 			.getByRole('option', {name: 'Custom Field Optional'})
@@ -1455,6 +1444,126 @@ test.describe('Manage object entries through View Object Entries', () => {
 			'Entry A'
 		);
 	});
+
+	test('Verify that temporary files are deleted from the database if the object creation is not completed', async ({
+		apiHelpers,
+		page,
+		viewObjectEntriesPage,
+	}) => {
+
+		// Create object definition with attachment object field
+
+		const objectDefinition =
+			await apiHelpers.objectAdmin.postRandomObjectDefinition({
+				objectFields: [mockedObjectFields.attachmentFieldUserComputer],
+				objectFolderExternalReferenceCode: 'default',
+				status: {code: 0},
+			});
+
+		apiHelpers.data.push({
+			id: objectDefinition.id,
+			type: 'objectDefinition',
+		});
+
+		await viewObjectEntriesPage.goto(objectDefinition.className);
+
+		await viewObjectEntriesPage.clickAddObjectEntry(objectDefinition.name);
+
+		// Upload first file from user computer
+
+		await viewObjectEntriesPage.selectFileFromUserComputer(
+			__dirname,
+			'sampleFile.txt'
+		);
+
+		const fileEntryId1 = await page.getAttribute(
+			'input[data-field-name^="testAttachment"]',
+			'value'
+		);
+
+		expect(
+			await apiHelpers.headlessDelivery.getDocument(fileEntryId1)
+		).toEqual(
+			expect.objectContaining({
+				id: Number(fileEntryId1),
+			})
+		);
+
+		// Verify that the first file is removed after the second file is uploaded
+
+		await viewObjectEntriesPage.selectFileFromUserComputer(
+			__dirname,
+			'astronaut.png'
+		);
+
+		expect(
+			await apiHelpers.headlessDelivery.getDocument(fileEntryId1)
+		).toEqual({status: 'NOT_FOUND'});
+
+		const fileEntryId2 = await page.getAttribute(
+			'input[data-field-name^="testAttachment"]',
+			'value'
+		);
+
+		expect(
+			await apiHelpers.headlessDelivery.getDocument(fileEntryId2)
+		).toEqual(
+			expect.objectContaining({
+				id: Number(fileEntryId2),
+			})
+		);
+
+		// Verify that the delete button removes the second file
+
+		await viewObjectEntriesPage.deleteFileButton.click();
+
+		expect(
+			await apiHelpers.headlessDelivery.getDocument(fileEntryId2)
+		).toEqual({status: 'NOT_FOUND'});
+
+		// Verify that the file is removed after page reload
+
+		await viewObjectEntriesPage.selectFileFromUserComputer(
+			__dirname,
+			'sampleFile.txt'
+		);
+
+		const fileEntryId3 = await page.getAttribute(
+			'input[data-field-name^="testAttachment"]',
+			'value'
+		);
+
+		await page.reload();
+
+		expect(
+			await apiHelpers.headlessDelivery.getDocument(fileEntryId3)
+		).toEqual({status: 'NOT_FOUND'});
+
+		// Verify that the file is saved successfully when clicking submit
+
+		await viewObjectEntriesPage.selectFileFromUserComputer(
+			__dirname,
+			'astronaut.png'
+		);
+
+		await viewObjectEntriesPage.saveObjectEntryButton.click();
+
+		await expect(viewObjectEntriesPage.successMessage).toBeVisible();
+		await expect(
+			viewObjectEntriesPage.page.getByText('astronaut.png')
+		).toBeVisible();
+
+		await viewObjectEntriesPage.selectFileFromUserComputer(
+			__dirname,
+			'sampleFile.txt'
+		);
+
+		await page.reload();
+
+		await expect(
+			viewObjectEntriesPage.page.getByText('astronaut.png')
+		).toBeVisible();
+	});
 });
 
 test.describe('Manage object entries through Workflow', () => {
@@ -1511,7 +1620,7 @@ test.describe('Manage object entries through Workflow', () => {
 		const objectFieldValue = getRandomString();
 
 		await viewObjectEntriesPage.fillObjectEntry({
-			objectFieldBusinessType: ObjectField.BusinessTypeEnum.Text,
+			objectFieldBusinessType: 'Text',
 			objectFieldLabel: objectDefinition.titleObjectFieldName,
 			objectFieldValue,
 		});

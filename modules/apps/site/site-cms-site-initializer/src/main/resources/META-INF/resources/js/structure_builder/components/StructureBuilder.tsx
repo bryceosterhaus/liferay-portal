@@ -5,25 +5,64 @@
 
 import '../../../css/structure_builder/StructureBuilder.scss';
 
-import React from 'react';
+import React, {useEffect} from 'react';
 
-import StateContextProvider from '../contexts/StateContext';
-import ManagementBar from './ManagementBar';
+import {Config, initializeConfig} from '../config';
+import CacheContextProvider from '../contexts/CacheContext';
+import StateContextProvider, {useSelector} from '../contexts/StateContext';
+import selectStructureId from '../selectors/selectStructureId';
+import {ObjectDefinition} from '../types/ObjectDefinition';
+import buildState from '../utils/buildState';
+import StructureBuilderManagementBar from './StructureBuilderManagementBar';
+import StructureFields from './StructureFields';
 import StructureSettings from './StructureSettings';
-import StructureFields from './structure_fields/StructureFields';
 
-export default function StructureBuilder() {
+export default function StructureBuilder({
+	config,
+	state,
+}: {
+	config: Config;
+	state: {objectDefinition: ObjectDefinition};
+}) {
+	initializeConfig(config);
+
 	return (
-		<StateContextProvider>
-			<div className="d-flex flex-column structure-builder__wrapper">
-				<ManagementBar />
+		<StateContextProvider initialState={buildState(state.objectDefinition)}>
+			<CacheContextProvider>
+				<div className="d-flex flex-column structure-builder__wrapper">
+					<HistoryManager />
 
-				<div className="d-flex flex-grow-1 p-4">
-					<StructureFields />
+					<StructureBuilderManagementBar />
 
-					<StructureSettings />
+					<div className="d-flex flex-grow-1 p-4">
+						<StructureFields />
+
+						<StructureSettings />
+					</div>
 				</div>
-			</div>
+			</CacheContextProvider>
 		</StateContextProvider>
 	);
+}
+
+function HistoryManager() {
+	const structureId = useSelector(selectStructureId);
+
+	useEffect(() => {
+		if (!structureId) {
+			return;
+		}
+
+		const url = new URL(window.location.href);
+
+		if (url.searchParams.has('objectFolderExternalReferenceCode')) {
+			url.searchParams.delete('objectFolderExternalReferenceCode');
+		}
+
+		url.searchParams.set('objectDefinitionId', structureId.toString());
+
+		history.replaceState(null, document.head.title, url.href);
+	}, [structureId]);
+
+	return null;
 }

@@ -15,11 +15,11 @@ import {ReviewAndSubmitAppPage} from './AppCreationFlow/ReviewAndSubmitAppPage/R
 
 import './App.scss';
 import {useMarketplaceContext} from '../../../../context/MarketplaceContext';
-import {PRODUCT_WORKFLOW_STATUS_CODE} from '../../../../enums/Product';
+import {ProductWorkflowStatusCode} from '../../../../enums/Product';
 import i18n from '../../../../i18n';
 import {Liferay} from '../../../../liferay/liferay';
 import koroneikiOAuth2 from '../../../../services/oauth/Koroneiki';
-import HeadlessCommerceAdminCatalogImpl from '../../../../services/rest/HeadlessCommerceAdminCatalog';
+import HeadlessCommerceAdminCatalog from '../../../../services/rest/HeadlessCommerceAdminCatalog';
 import {
 	getProductVersionFromSpecifications,
 	getThumbnailByProductAttachment,
@@ -44,14 +44,13 @@ const AdministratorButtons: React.FC<AdministratorButtons> = ({
 	const [loading, setLoading] = useState(false);
 
 	const isDraft =
-		selectedApp.workflowStatusInfo.code ===
-		PRODUCT_WORKFLOW_STATUS_CODE.DRAFT;
+		selectedApp.workflowStatusInfo.code === ProductWorkflowStatusCode.DRAFT;
 
 	const onUpdateRequestStatus = async (
-		workflowStatus: PRODUCT_WORKFLOW_STATUS_CODE
+		workflowStatus: ProductWorkflowStatusCode
 	) => {
 		try {
-			await HeadlessCommerceAdminCatalogImpl.updateProductByExternalReferenceCode(
+			await HeadlessCommerceAdminCatalog.updateProductByExternalReferenceCode(
 				selectedApp.externalReferenceCode,
 				{workflowStatusInfo: workflowStatus}
 			);
@@ -108,7 +107,7 @@ const AdministratorButtons: React.FC<AdministratorButtons> = ({
 					displayType="primary"
 					onClick={() =>
 						onUpdateRequestStatus(
-							PRODUCT_WORKFLOW_STATUS_CODE.APPROVED
+							ProductWorkflowStatusCode.APPROVED
 						)
 					}
 				>
@@ -131,7 +130,7 @@ const App: React.FC<AppProps> = ({isAdministratorDashboard}) => {
 		isLoading,
 		mutate,
 	} = useSWR(`/published-app/${productId}`, () =>
-		HeadlessCommerceAdminCatalogImpl.getProduct(
+		HeadlessCommerceAdminCatalog.getProduct(
 			productId,
 			new URLSearchParams({
 				nestedFields: 'attachments,images,productSpecifications',

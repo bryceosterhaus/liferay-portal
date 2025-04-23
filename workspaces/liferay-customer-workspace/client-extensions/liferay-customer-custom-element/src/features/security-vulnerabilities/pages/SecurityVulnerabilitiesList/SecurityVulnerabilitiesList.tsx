@@ -16,7 +16,6 @@ import {ClayPaginationBarWithBasicItems} from '@clayui/pagination-bar/lib/Pagina
 import {useMemo} from 'react';
 import {Link} from 'react-router-dom';
 import {SVWaves} from '~/assets/SVWaves';
-import {getFormattedDate} from '~/features/project/utils/getFormattedDate';
 import {FILTER_OPTIONS} from '~/features/security-vulnerabilities/utils/constants/filterOptions';
 import {JiraEnum} from '~/features/security-vulnerabilities/utils/constants/jiraEnum';
 import {
@@ -24,6 +23,7 @@ import {
 	paginationLabels,
 } from '~/features/security-vulnerabilities/utils/constants/paginationOptions';
 import {SORT_OPTIONS} from '~/features/security-vulnerabilities/utils/constants/sortOptions';
+import {getFormattedDate} from '~/utils/getFormattedDate';
 
 import {IRow} from '../../components/SVTable/SVTable';
 import SVAffectedVersions from '../../components/SVTable/components/SVAffectedVersions';
@@ -60,6 +60,7 @@ const SecurityVulnerabilitiesList = () => {
 
 	const columns = [
 		{
+			className: 'sv-priority-summary-column',
 			columnKey: 'prioritySummary',
 			label: i18n.translate('priority-summary'),
 		},
@@ -110,7 +111,7 @@ const SecurityVulnerabilitiesList = () => {
 								{issue[JiraEnum.FIELDS]?.[JiraEnum.SEVERITY]}
 							</div>
 
-							<div className="font-weight-bold sv-name">
+							<div className="font-weight-bold sv-name sv-wrap-text">
 								<Link
 									className="sv-name-link"
 									to={`/${issue?.[JiraEnum.KEY]}`}
@@ -119,7 +120,8 @@ const SecurityVulnerabilitiesList = () => {
 								</Link>
 							</div>
 						</div>
-						<div className="sv-summary text-neutral-8">
+
+						<div className="sv-summary sv-wrap-text text-neutral-8">
 							{issue[JiraEnum.FIELDS]?.[JiraEnum.SUMMARY]}
 						</div>
 					</div>

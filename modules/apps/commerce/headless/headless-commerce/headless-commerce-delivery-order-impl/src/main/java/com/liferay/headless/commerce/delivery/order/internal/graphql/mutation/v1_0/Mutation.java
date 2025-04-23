@@ -15,9 +15,9 @@ import com.liferay.headless.commerce.delivery.order.resource.v1_0.PlacedOrderCom
 import com.liferay.headless.commerce.delivery.order.resource.v1_0.PlacedOrderItemResource;
 import com.liferay.headless.commerce.delivery.order.resource.v1_0.PlacedOrderItemShipmentResource;
 import com.liferay.headless.commerce.delivery.order.resource.v1_0.PlacedOrderResource;
+import com.liferay.headless.commerce.delivery.order.resource.v1_0.ShipmentResource;
 import com.liferay.petra.function.UnsafeConsumer;
 import com.liferay.petra.function.UnsafeFunction;
-import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
@@ -94,22 +94,28 @@ public class Mutation {
 			placedOrderItemShipmentResourceComponentServiceObjects;
 	}
 
+	public static void setShipmentResourceComponentServiceObjects(
+		ComponentServiceObjects<ShipmentResource>
+			shipmentResourceComponentServiceObjects) {
+
+		_shipmentResourceComponentServiceObjects =
+			shipmentResourceComponentServiceObjects;
+	}
+
 	@GraphQLField
-	public Attachment
-			createPlacedOrderByExternalReferenceCodeAttachmentByBase64(
-				@GraphQLName("externalReferenceCode") String
-					externalReferenceCode,
-				@GraphQLName("attachmentBase64") AttachmentBase64
-					attachmentBase64)
+	public boolean deletePlacedOrderAttachment(
+			@GraphQLName("attachmentId") Long attachmentId,
+			@GraphQLName("placedOrderId") Long placedOrderId)
 		throws Exception {
 
-		return _applyComponentServiceObjects(
+		_applyVoidComponentServiceObjects(
 			_attachmentResourceComponentServiceObjects,
 			this::_populateResourceContext,
 			attachmentResource ->
-				attachmentResource.
-					postPlacedOrderByExternalReferenceCodeAttachmentByBase64(
-						externalReferenceCode, attachmentBase64));
+				attachmentResource.deletePlacedOrderAttachment(
+					attachmentId, placedOrderId));
+
+		return true;
 	}
 
 	@GraphQLField
@@ -134,6 +140,20 @@ public class Mutation {
 	}
 
 	@GraphQLField
+	public Attachment createPlacedOrderAttachmentByBase64(
+			@GraphQLName("placedOrderId") Long placedOrderId,
+			@GraphQLName("attachmentBase64") AttachmentBase64 attachmentBase64)
+		throws Exception {
+
+		return _applyComponentServiceObjects(
+			_attachmentResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			attachmentResource ->
+				attachmentResource.postPlacedOrderAttachmentByBase64(
+					placedOrderId, attachmentBase64));
+	}
+
+	@GraphQLField
 	public Response createPlacedOrderAttachmentsPageExportBatch(
 			@GraphQLName("placedOrderId") Long placedOrderId,
 			@GraphQLName("callbackURL") String callbackURL,
@@ -150,50 +170,21 @@ public class Mutation {
 	}
 
 	@GraphQLField
-	public Attachment createPlacedOrderAttachmentByBase64(
-			@GraphQLName("placedOrderId") Long placedOrderId,
-			@GraphQLName("attachmentBase64") AttachmentBase64 attachmentBase64)
+	public Attachment
+			createPlacedOrderByExternalReferenceCodeAttachmentByBase64(
+				@GraphQLName("externalReferenceCode") String
+					externalReferenceCode,
+				@GraphQLName("attachmentBase64") AttachmentBase64
+					attachmentBase64)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
 			_attachmentResourceComponentServiceObjects,
 			this::_populateResourceContext,
 			attachmentResource ->
-				attachmentResource.postPlacedOrderAttachmentByBase64(
-					placedOrderId, attachmentBase64));
-	}
-
-	@GraphQLField
-	public boolean deletePlacedOrderAttachment(
-			@GraphQLName("attachmentId") Long attachmentId,
-			@GraphQLName("placedOrderId") Long placedOrderId)
-		throws Exception {
-
-		_applyVoidComponentServiceObjects(
-			_attachmentResourceComponentServiceObjects,
-			this::_populateResourceContext,
-			attachmentResource ->
-				attachmentResource.deletePlacedOrderAttachment(
-					attachmentId, placedOrderId));
-
-		return true;
-	}
-
-	@GraphQLField
-	public Response createPlacedOrderOrderTransitionsPageExportBatch(
-			@GraphQLName("placedOrderId") Long placedOrderId,
-			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("contentType") String contentType,
-			@GraphQLName("fieldNames") String fieldNames)
-		throws Exception {
-
-		return _applyComponentServiceObjects(
-			_orderTransitionResourceComponentServiceObjects,
-			this::_populateResourceContext,
-			orderTransitionResource ->
-				orderTransitionResource.
-					postPlacedOrderOrderTransitionsPageExportBatch(
-						placedOrderId, callbackURL, contentType, fieldNames));
+				attachmentResource.
+					postPlacedOrderByExternalReferenceCodeAttachmentByBase64(
+						externalReferenceCode, attachmentBase64));
 	}
 
 	@GraphQLField
@@ -226,17 +217,20 @@ public class Mutation {
 	}
 
 	@GraphQLField
-	public PlacedOrder patchPlacedOrderByExternalReferenceCode(
-			@GraphQLName("externalReferenceCode") String externalReferenceCode,
-			@GraphQLName("placedOrder") PlacedOrder placedOrder)
+	public Response createPlacedOrderOrderTransitionsPageExportBatch(
+			@GraphQLName("placedOrderId") Long placedOrderId,
+			@GraphQLName("callbackURL") String callbackURL,
+			@GraphQLName("contentType") String contentType,
+			@GraphQLName("fieldNames") String fieldNames)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
-			_placedOrderResourceComponentServiceObjects,
+			_orderTransitionResourceComponentServiceObjects,
 			this::_populateResourceContext,
-			placedOrderResource ->
-				placedOrderResource.patchPlacedOrderByExternalReferenceCode(
-					externalReferenceCode, placedOrder));
+			orderTransitionResource ->
+				orderTransitionResource.
+					postPlacedOrderOrderTransitionsPageExportBatch(
+						placedOrderId, callbackURL, contentType, fieldNames));
 	}
 
 	@GraphQLField
@@ -250,6 +244,20 @@ public class Mutation {
 			this::_populateResourceContext,
 			placedOrderResource -> placedOrderResource.patchPlacedOrder(
 				placedOrderId, placedOrder));
+	}
+
+	@GraphQLField
+	public PlacedOrder patchPlacedOrderByExternalReferenceCode(
+			@GraphQLName("externalReferenceCode") String externalReferenceCode,
+			@GraphQLName("placedOrder") PlacedOrder placedOrder)
+		throws Exception {
+
+		return _applyComponentServiceObjects(
+			_placedOrderResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			placedOrderResource ->
+				placedOrderResource.patchPlacedOrderByExternalReferenceCode(
+					externalReferenceCode, placedOrder));
 	}
 
 	@GraphQLField
@@ -309,6 +317,28 @@ public class Mutation {
 					postPlacedOrderItemPlacedOrderItemShipmentsPageExportBatch(
 						placedOrderItemId, callbackURL, contentType,
 						fieldNames));
+	}
+
+	@GraphQLField
+	public Response createPlacedOrderShipmentsPageExportBatch(
+			@GraphQLName("placedOrderId") Long placedOrderId,
+			@GraphQLName("search") String search,
+			@GraphQLName("filter") String filterString,
+			@GraphQLName("sort") String sortsString,
+			@GraphQLName("callbackURL") String callbackURL,
+			@GraphQLName("contentType") String contentType,
+			@GraphQLName("fieldNames") String fieldNames)
+		throws Exception {
+
+		return _applyComponentServiceObjects(
+			_shipmentResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			shipmentResource ->
+				shipmentResource.postPlacedOrderShipmentsPageExportBatch(
+					placedOrderId, search,
+					_filterBiFunction.apply(shipmentResource, filterString),
+					_sortsBiFunction.apply(shipmentResource, sortsString),
+					callbackURL, contentType, fieldNames));
 	}
 
 	private <T, R, E1 extends Throwable, E2 extends Throwable> R
@@ -478,6 +508,25 @@ public class Mutation {
 			_vulcanBatchEngineImportTaskResource);
 	}
 
+	private void _populateResourceContext(ShipmentResource shipmentResource)
+		throws Exception {
+
+		shipmentResource.setContextAcceptLanguage(_acceptLanguage);
+		shipmentResource.setContextCompany(_company);
+		shipmentResource.setContextHttpServletRequest(_httpServletRequest);
+		shipmentResource.setContextHttpServletResponse(_httpServletResponse);
+		shipmentResource.setContextUriInfo(_uriInfo);
+		shipmentResource.setContextUser(_user);
+		shipmentResource.setGroupLocalService(_groupLocalService);
+		shipmentResource.setRoleLocalService(_roleLocalService);
+
+		shipmentResource.setVulcanBatchEngineExportTaskResource(
+			_vulcanBatchEngineExportTaskResource);
+
+		shipmentResource.setVulcanBatchEngineImportTaskResource(
+			_vulcanBatchEngineImportTaskResource);
+	}
+
 	private static ComponentServiceObjects<AttachmentResource>
 		_attachmentResourceComponentServiceObjects;
 	private static ComponentServiceObjects<OrderTransitionResource>
@@ -490,14 +539,20 @@ public class Mutation {
 		_placedOrderItemResourceComponentServiceObjects;
 	private static ComponentServiceObjects<PlacedOrderItemShipmentResource>
 		_placedOrderItemShipmentResourceComponentServiceObjects;
+	private static ComponentServiceObjects<ShipmentResource>
+		_shipmentResourceComponentServiceObjects;
 
 	private AcceptLanguage _acceptLanguage;
 	private com.liferay.portal.kernel.model.Company _company;
+	private BiFunction
+		<Object, String, com.liferay.portal.kernel.search.filter.Filter>
+			_filterBiFunction;
 	private GroupLocalService _groupLocalService;
 	private HttpServletRequest _httpServletRequest;
 	private HttpServletResponse _httpServletResponse;
 	private RoleLocalService _roleLocalService;
-	private BiFunction<Object, String, Sort[]> _sortsBiFunction;
+	private BiFunction<Object, String, com.liferay.portal.kernel.search.Sort[]>
+		_sortsBiFunction;
 	private UriInfo _uriInfo;
 	private com.liferay.portal.kernel.model.User _user;
 	private VulcanBatchEngineExportTaskResource

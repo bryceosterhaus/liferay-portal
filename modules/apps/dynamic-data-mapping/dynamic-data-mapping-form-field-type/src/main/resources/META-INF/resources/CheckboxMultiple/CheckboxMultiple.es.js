@@ -70,10 +70,12 @@ const CheckboxMultiple = ({
 	predefinedValue,
 	value: initialValue,
 }) => {
-	const [value, setValue] = useState(initialValue);
+	const [value, setValue] = useState(initialValue ?? predefinedValue);
 
 	useEffect(() => {
-		setValue(initialValue);
+		if (initialValue?.length > 0) {
+			setValue(initialValue);
+		}
 	}, [initialValue]);
 
 	const displayValues =
@@ -146,6 +148,12 @@ const Main = ({
 	<FieldBase name={name} readOnly={readOnly} {...otherProps}>
 		<CheckboxMultiple
 			accessibleProps={{
+				...(otherProps.tip && {
+					'aria-describedby': `${otherProps.id ?? name}_fieldHelp`,
+				}),
+				...(otherProps.errorMessage && {
+					'aria-errormessage': `${otherProps.id ?? name}_fieldError`,
+				}),
 				'aria-required': otherProps.required,
 			}}
 			disabled={readOnly}

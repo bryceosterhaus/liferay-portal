@@ -4,13 +4,12 @@
  */
 
 import {
-	ObjectDefinitionApi,
+	ObjectDefinitionAPI,
 	ObjectField,
-	ObjectFieldApi,
-	ObjectValidationRule,
-	ObjectValidationRuleApi,
+	ObjectFieldAPI,
+	ObjectValidationRuleAPI,
 } from '@liferay/object-admin-rest-client-js';
-import {Page, expect, mergeTests} from '@playwright/test';
+import {Locator, Page, expect, mergeTests} from '@playwright/test';
 import path from 'path';
 
 import {apiHelpersTest} from '../../fixtures/apiHelpersTest';
@@ -45,7 +44,7 @@ const test = mergeTests(
 	displayPageTemplatesPagesTest,
 	documentLibraryPagesTest,
 	featureFlagsTest({
-		'LPD-31772': {enabled: true},
+		'LPD-21926': {enabled: true},
 		'LPD-32050': {enabled: true},
 		'LPD-37927': {enabled: true},
 		'LPD-46393': {enabled: true},
@@ -267,11 +266,11 @@ test.describe('Form Configuration', () => {
 
 			// Create a default display page for lemon object
 
-			const objectDefinitionApiClient =
-				await apiHelpers.buildRestClient(ObjectDefinitionApi);
+			const objectDefinitionAPIClient =
+				await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 			const {className: objectDefinitionClassName} = (
-				await objectDefinitionApiClient.getObjectDefinitionByExternalReferenceCode(
+				await objectDefinitionAPIClient.getObjectDefinitionByExternalReferenceCode(
 					getObjectERC('Lemon')
 				)
 			).body;
@@ -489,7 +488,11 @@ test.describe('Form Configuration', () => {
 				`/web${pageManagementSite.friendlyUrlPath}${layout.friendlyUrlPath}`
 			);
 
-			await page.getByLabel('Lemon Weight', {exact: true}).fill('100');
+			const lemonWeightInput = page.getByRole('spinbutton', {
+				name: 'Lemon Weight',
+			});
+
+			await lemonWeightInput.fill('100');
 
 			await page.getByText('Submit', {exact: true}).click();
 
@@ -509,7 +512,7 @@ test.describe('Form Configuration', () => {
 				`/web${pageManagementSite.friendlyUrlPath}${layout.friendlyUrlPath}`
 			);
 
-			await page.getByLabel('Lemon Weight', {exact: true}).fill('100');
+			await lemonWeightInput.fill('100');
 
 			await page.getByText('Submit', {exact: true}).click();
 
@@ -532,11 +535,11 @@ test.describe('Captcha Fragment', () => {
 
 			// Create a page with a form fragment with a captcha fragment
 
-			const objectDefinitionApiClient =
-				await apiHelpers.buildRestClient(ObjectDefinitionApi);
+			const objectDefinitionAPIClient =
+				await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 			const {className: objectDefinitionClassName} = (
-				await objectDefinitionApiClient.getObjectDefinitionByExternalReferenceCode(
+				await objectDefinitionAPIClient.getObjectDefinitionByExternalReferenceCode(
 					getObjectERC('Lemon')
 				)
 			).body;
@@ -599,11 +602,11 @@ test.describe('Checkbox Fragment', () => {
 
 			// Create a page with a form fragment with a checkbox fragment
 
-			const objectDefinitionApiClient =
-				await apiHelpers.buildRestClient(ObjectDefinitionApi);
+			const objectDefinitionAPIClient =
+				await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 			const {className: objectDefinitionClassName} = (
-				await objectDefinitionApiClient.getObjectDefinitionByExternalReferenceCode(
+				await objectDefinitionAPIClient.getObjectDefinitionByExternalReferenceCode(
 					getObjectERC('All Fields')
 				)
 			).body;
@@ -693,11 +696,11 @@ test.describe('Checkbox Fragment', () => {
 
 			// Adds checkbox validation
 
-			const objectValidationRuleApiClient =
-				await apiHelpers.buildRestClient(ObjectValidationRuleApi);
+			const objectValidationRuleAPIClient =
+				await apiHelpers.buildRestClient(ObjectValidationRuleAPI);
 
 			const {body: objectValidationRule} =
-				await objectValidationRuleApiClient.postObjectDefinitionByExternalReferenceCodeObjectValidationRule(
+				await objectValidationRuleAPIClient.postObjectDefinitionByExternalReferenceCodeObjectValidationRule(
 					getObjectERC('All Fields'),
 					{
 						active: true,
@@ -715,9 +718,7 @@ test.describe('Checkbox Fragment', () => {
 								value: 'boolean-erc',
 							} as any,
 						],
-						outputType:
-							ObjectValidationRule.OutputTypeEnum
-								.PartialValidation,
+						outputType: 'partialValidation',
 						script: 'boolean == true',
 						system: false,
 					}
@@ -725,11 +726,11 @@ test.describe('Checkbox Fragment', () => {
 
 			// Create a page with a form fragment with a checkbox fragment
 
-			const objectDefinitionApiClient =
-				await apiHelpers.buildRestClient(ObjectDefinitionApi);
+			const objectDefinitionAPIClient =
+				await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 			const {className: objectDefinitionClassName} = (
-				await objectDefinitionApiClient.getObjectDefinitionByExternalReferenceCode(
+				await objectDefinitionAPIClient.getObjectDefinitionByExternalReferenceCode(
 					getObjectERC('All Fields')
 				)
 			).body;
@@ -777,7 +778,7 @@ test.describe('Checkbox Fragment', () => {
 
 			// Delete validation
 
-			await objectValidationRuleApiClient.deleteObjectValidationRule(
+			await objectValidationRuleAPIClient.deleteObjectValidationRule(
 				objectValidationRule.id
 			);
 		}
@@ -794,11 +795,11 @@ test.describe('Date Fragment', () => {
 
 			// Create a page with a form fragment with a date fragment
 
-			const objectDefinitionApiClient =
-				await apiHelpers.buildRestClient(ObjectDefinitionApi);
+			const objectDefinitionAPIClient =
+				await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 			const {className: objectDefinitionClassName} = (
-				await objectDefinitionApiClient.getObjectDefinitionByExternalReferenceCode(
+				await objectDefinitionAPIClient.getObjectDefinitionByExternalReferenceCode(
 					getObjectERC('All Fields')
 				)
 			).body;
@@ -845,7 +846,7 @@ test.describe('Date Fragment', () => {
 
 			await expect(
 				dateInput.getByText('Expiration Date')
-			).not.toHaveClass('sr-only');
+			).not.toHaveClass(/sr-only/);
 
 			// Hide label
 
@@ -857,7 +858,7 @@ test.describe('Date Fragment', () => {
 			});
 
 			await expect(dateInput.getByText('Expiration Date')).toHaveClass(
-				'sr-only'
+				/sr-only/
 			);
 
 			// Show help text
@@ -886,11 +887,11 @@ test.describe('Date Fragment', () => {
 
 			// Adds date validation
 
-			const objectValidationRuleApiClient =
-				await apiHelpers.buildRestClient(ObjectValidationRuleApi);
+			const objectValidationRuleAPIClient =
+				await apiHelpers.buildRestClient(ObjectValidationRuleAPI);
 
 			const {body: objectValidationRule} =
-				await objectValidationRuleApiClient.postObjectDefinitionByExternalReferenceCodeObjectValidationRule(
+				await objectValidationRuleAPIClient.postObjectDefinitionByExternalReferenceCodeObjectValidationRule(
 					getObjectERC('All Fields'),
 					{
 						active: true,
@@ -908,9 +909,7 @@ test.describe('Date Fragment', () => {
 								value: 'date-erc',
 							} as any,
 						],
-						outputType:
-							ObjectValidationRule.OutputTypeEnum
-								.PartialValidation,
+						outputType: 'partialValidation',
 						script: "futureDates(date, '2022-06-01')",
 						system: false,
 					}
@@ -918,11 +917,11 @@ test.describe('Date Fragment', () => {
 
 			// Create a page with a form fragment with a date fragment
 
-			const objectDefinitionApiClient =
-				await apiHelpers.buildRestClient(ObjectDefinitionApi);
+			const objectDefinitionAPIClient =
+				await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 			const {className: objectDefinitionClassName} = (
-				await objectDefinitionApiClient.getObjectDefinitionByExternalReferenceCode(
+				await objectDefinitionAPIClient.getObjectDefinitionByExternalReferenceCode(
 					getObjectERC('All Fields')
 				)
 			).body;
@@ -978,10 +977,10 @@ test.describe('Date Fragment', () => {
 
 			// Delete validation
 
-			const objectvalidationRuleApiClient =
-				await apiHelpers.buildRestClient(ObjectValidationRuleApi);
+			const objectvalidationRuleAPIClient =
+				await apiHelpers.buildRestClient(ObjectValidationRuleAPI);
 
-			await objectvalidationRuleApiClient.deleteObjectValidationRule(
+			await objectvalidationRuleAPIClient.deleteObjectValidationRule(
 				objectValidationRule.id
 			);
 		}
@@ -998,11 +997,11 @@ test.describe('Date and Time Fragment', () => {
 
 			// Create a page with a form fragment with a date and time fragment
 
-			const objectDefinitionApiClient =
-				await apiHelpers.buildRestClient(ObjectDefinitionApi);
+			const objectDefinitionAPIClient =
+				await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 			const {className: objectDefinitionClassName} = (
-				await objectDefinitionApiClient.getObjectDefinitionByExternalReferenceCode(
+				await objectDefinitionAPIClient.getObjectDefinitionByExternalReferenceCode(
 					getObjectERC('All Fields')
 				)
 			).body;
@@ -1122,7 +1121,7 @@ test.describe('Date and Time Fragment', () => {
 
 			const row = page.locator('.fds tbody tr').first();
 
-			await expect(row).toContainText('Oct 10, 2022, 10:10 AM');
+			await expect(row).toContainText('Oct 10, 2022, 10:10:00 AM');
 		}
 	);
 });
@@ -1200,11 +1199,11 @@ test.describe('File Upload Fragment', () => {
 
 			// Create a page with a form fragment with a file upload fragment
 
-			const objectDefinitionApiClient =
-				await apiHelpers.buildRestClient(ObjectDefinitionApi);
+			const objectDefinitionAPIClient =
+				await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 			const {className: objectDefinitionClassName} = (
-				await objectDefinitionApiClient.getObjectDefinitionByExternalReferenceCode(
+				await objectDefinitionAPIClient.getObjectDefinitionByExternalReferenceCode(
 					getObjectERC('All Fields')
 				)
 			).body;
@@ -1336,11 +1335,11 @@ test.describe('File Upload Fragment', () => {
 
 			// Create a page with a form fragment with a file upload fragment
 
-			const objectDefinitionApiClient =
-				await apiHelpers.buildRestClient(ObjectDefinitionApi);
+			const objectDefinitionAPIClient =
+				await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 			const {className: objectDefinitionClassName} = (
-				await objectDefinitionApiClient.getObjectDefinitionByExternalReferenceCode(
+				await objectDefinitionAPIClient.getObjectDefinitionByExternalReferenceCode(
 					getObjectERC('All Fields')
 				)
 			).body;
@@ -1444,11 +1443,11 @@ test.describe('File Upload Fragment', () => {
 
 			// Create a page with a form fragment with a file upload fragment
 
-			const objectDefinitionApiClient =
-				await apiHelpers.buildRestClient(ObjectDefinitionApi);
+			const objectDefinitionAPIClient =
+				await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 			const {className: objectDefinitionClassName} = (
-				await objectDefinitionApiClient.getObjectDefinitionByExternalReferenceCode(
+				await objectDefinitionAPIClient.getObjectDefinitionByExternalReferenceCode(
 					getObjectERC('All Fields')
 				)
 			).body;
@@ -1531,11 +1530,11 @@ test.describe('File Upload Fragment', () => {
 
 			// Create a page with a form fragment with a file upload fragment
 
-			const objectDefinitionApiClient =
-				await apiHelpers.buildRestClient(ObjectDefinitionApi);
+			const objectDefinitionAPIClient =
+				await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 			const {className: objectDefinitionClassName} = (
-				await objectDefinitionApiClient.getObjectDefinitionByExternalReferenceCode(
+				await objectDefinitionAPIClient.getObjectDefinitionByExternalReferenceCode(
 					getObjectERC('All Fields')
 				)
 			).body;
@@ -1606,11 +1605,11 @@ test.describe('File Upload Fragment', () => {
 
 			// Create a page with a form fragment with a file upload fragment
 
-			const objectDefinitionApiClient =
-				await apiHelpers.buildRestClient(ObjectDefinitionApi);
+			const objectDefinitionAPIClient =
+				await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 			const {className: objectDefinitionClassName} = (
-				await objectDefinitionApiClient.getObjectDefinitionByExternalReferenceCode(
+				await objectDefinitionAPIClient.getObjectDefinitionByExternalReferenceCode(
 					getObjectERC('All Fields')
 				)
 			).body;
@@ -1683,6 +1682,108 @@ test.describe('File Upload Fragment', () => {
 	);
 });
 
+test.describe('Friendly URL Fragment', () => {
+	test(
+		'Check the mapping field',
+		{
+			tag: '@LPD-52418',
+		},
+		async ({apiHelpers, page, pageEditorPage, pageManagementSite}) => {
+
+			// Create an object with the friendly url field enabled
+
+			const objectDefinitionAPIClient =
+				await apiHelpers.buildRestClient(ObjectDefinitionAPI);
+
+			const {body: objectDefinition} =
+				await objectDefinitionAPIClient.postObjectDefinition({
+					active: true,
+					enableFriendlyURLCustomization: true,
+					enableLocalization: true,
+					externalReferenceCode: 'erc',
+					label: {
+						en_US: 'Test',
+					},
+					name: 'Test',
+					objectFields: [
+						{
+							DBType: 'String',
+							businessType: 'Text',
+							externalReferenceCode: 'text-erc',
+							indexed: true,
+							indexedAsKeyword: true,
+							label: {
+								en_US: 'Text',
+							},
+							localized: true,
+							name: 'text',
+							required: false,
+						},
+					],
+					pluralLabel: {
+						en_US: 'Tests',
+					},
+					scope: 'company',
+					status: {
+						code: 0,
+					},
+				});
+
+			apiHelpers.data.push({
+				id: objectDefinition.id,
+				type: 'objectDefinition',
+			});
+
+			// Create a page with a Form fragment
+
+			const formId = getRandomString();
+
+			const formDefinition = getFormContainerDefinition({
+				id: formId,
+			});
+
+			const layout = await apiHelpers.headlessDelivery.createSitePage({
+				pageDefinition: getPageDefinition([formDefinition]),
+				siteId: pageManagementSite.id,
+				title: getRandomString(),
+			});
+
+			await pageEditorPage.goto(
+				layout,
+				pageManagementSite.friendlyUrlPath
+			);
+
+			// Map the form to the All Field object and add only the Friendly URL field
+
+			await pageEditorPage.mapFormFragment(formId, 'Test', [
+				'Friendly URL',
+			]);
+
+			await pageEditorPage.selectFragment(
+				await pageEditorPage.getFragmentId('Friendly URL')
+			);
+
+			// Check if the mapping field
+
+			await expect(
+				page.getByRole('combobox', {name: 'Field'})
+			).toHaveValue('ObjectEntry_objectEntryFriendlyURL');
+
+			// Change its label
+
+			await pageEditorPage.changeConfiguration({
+				fieldLabel: 'Label',
+				tab: 'General',
+				value: 'My new friendly url label',
+			});
+
+			await expect(
+				page.getByLabel('My new friendly url label')
+			).toBeAttached();
+		}
+	);
+});
+
 test.describe('Form Localization', () => {
 	test(
 		'Can translate text form fields',
@@ -1748,9 +1849,7 @@ test.describe('Form Localization', () => {
 
 			await translationSelector.click();
 
-			const option = page.getByRole('option', {
-				name: 'Spanish (Spain) Language',
-			});
+			const option = page.getByRole('option').filter({hasText: 'es-ES'});
 
 			await expect(option).toContainText(/Not Translated/);
 
@@ -1849,7 +1948,7 @@ test.describe('Form Localization', () => {
 			// Create object definition
 
 			const objectDefinitionAPIClient =
-				await apiHelpers.buildRestClient(ObjectDefinitionApi);
+				await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 			const {body: objectDefinition} =
 				await objectDefinitionAPIClient.postObjectDefinition({
@@ -1862,9 +1961,8 @@ test.describe('Form Localization', () => {
 					name: 'Numeric',
 					objectFields: [
 						{
-							DBType: ObjectField.DBTypeEnum.Long,
-							businessType:
-								ObjectField.BusinessTypeEnum.LongInteger,
+							DBType: 'Long',
+							businessType: 'LongInteger',
 							externalReferenceCode: 'longIntegerERC',
 							indexed: true,
 							indexedAsKeyword: false,
@@ -1876,8 +1974,8 @@ test.describe('Form Localization', () => {
 							required: false,
 						},
 						{
-							DBType: ObjectField.DBTypeEnum.Integer,
-							businessType: ObjectField.BusinessTypeEnum.Integer,
+							DBType: 'Integer',
+							businessType: 'Integer',
 							externalReferenceCode: 'integerERC',
 							indexed: true,
 							indexedAsKeyword: false,
@@ -1889,9 +1987,8 @@ test.describe('Form Localization', () => {
 							required: false,
 						},
 						{
-							DBType: ObjectField.DBTypeEnum.BigDecimal,
-							businessType:
-								ObjectField.BusinessTypeEnum.PrecisionDecimal,
+							DBType: 'BigDecimal',
+							businessType: 'PrecisionDecimal',
 							externalReferenceCode: 'precisionDecimalERC',
 							indexed: true,
 							indexedAsKeyword: false,
@@ -1903,8 +2000,8 @@ test.describe('Form Localization', () => {
 							required: false,
 						},
 						{
-							DBType: ObjectField.DBTypeEnum.Double,
-							businessType: ObjectField.BusinessTypeEnum.Decimal,
+							DBType: 'Double',
+							businessType: 'Decimal',
 							externalReferenceCode: 'decimalERC',
 							indexed: true,
 							indexedAsKeyword: false,
@@ -1959,33 +2056,40 @@ test.describe('Form Localization', () => {
 				`/web${site.friendlyUrlPath}${layout.friendlyUrlPath}`
 			);
 
-			await page
-				.getByLabel('Long Integer', {exact: true})
-				.fill('11111111111');
-			await page.getByLabel('Integer', {exact: true}).fill('1111');
-			await page
-				.getByLabel('Precision Decimal', {exact: true})
-				.fill('111.11');
-			await page.getByLabel('Decimal', {exact: true}).fill('1111.22222');
+			const decimalInput = page.getByRole('spinbutton', {
+				exact: true,
+				name: 'Decimal',
+			});
+			const integerInput = page.getByRole('spinbutton', {
+				exact: true,
+				name: 'Integer',
+			});
+			const longIntegerInput = page.getByRole('spinbutton', {
+				exact: true,
+				name: 'Long Integer',
+			});
+			const precisionDecimalInput = page.getByRole('spinbutton', {
+				exact: true,
+				name: 'Precision Decimal',
+			});
+
+			await decimalInput.fill('1111.22222');
+			await integerInput.fill('1111');
+			await longIntegerInput.fill('11111111111');
+			await precisionDecimalInput.fill('111.11');
 
 			await clickAndExpectToBeVisible({
 				autoClick: true,
-				target: page.getByRole('option', {
-					name: 'Spanish (Spain) Language',
-				}),
+				target: page.getByRole('option').filter({hasText: 'es-ES'}),
 				trigger: page.getByLabel(
 					'Select a language, current language:'
 				),
 			});
 
-			await page
-				.getByLabel('Long Integer', {exact: true})
-				.fill('22222222222');
-			await page.getByLabel('Integer', {exact: true}).fill('2222');
-			await page
-				.getByLabel('Precision Decimal', {exact: true})
-				.fill('222.22');
-			await page.getByLabel('Decimal', {exact: true}).fill('2222.33333');
+			await decimalInput.fill('2222.33333');
+			await integerInput.fill('2222');
+			await longIntegerInput.fill('22222222222');
+			await precisionDecimalInput.fill('222.22');
 
 			await page.getByRole('button', {name: 'Submit'}).click();
 
@@ -2032,7 +2136,7 @@ test.describe('Form Localization', () => {
 			// Create object definition with a localized boolean
 
 			const objectDefinitionAPIClient =
-				await apiHelpers.buildRestClient(ObjectDefinitionApi);
+				await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 			const {body: objectDefinition} =
 				await objectDefinitionAPIClient.postObjectDefinition({
@@ -2045,8 +2149,8 @@ test.describe('Form Localization', () => {
 					name: 'Boolean',
 					objectFields: [
 						{
-							DBType: ObjectField.DBTypeEnum.Boolean,
-							businessType: ObjectField.BusinessTypeEnum.Boolean,
+							DBType: 'Boolean',
+							businessType: 'Boolean',
 							externalReferenceCode: 'legalThingsERC',
 							indexed: true,
 							indexedAsKeyword: false,
@@ -2103,11 +2207,13 @@ test.describe('Form Localization', () => {
 
 			await page.getByLabel('Legal Things').check();
 
+			const spanishOption = page
+				.getByRole('option')
+				.filter({hasText: 'es-ES'});
+
 			await clickAndExpectToBeVisible({
 				autoClick: true,
-				target: page.getByRole('option', {
-					name: 'Spanish (Spain) Language',
-				}),
+				target: spanishOption,
 				trigger: page.getByLabel(
 					'Select a language, current language:'
 				),
@@ -2121,11 +2227,7 @@ test.describe('Form Localization', () => {
 				.getByLabel('Select a language, current language:')
 				.click();
 
-			expect(
-				page.getByRole('option', {
-					name: 'Spanish (Spain) Language',
-				})
-			).toContainText(/Translated/);
+			await expect(spanishOption).toContainText('Language: Translated');
 
 			await page.keyboard.press('Escape');
 
@@ -2162,8 +2264,8 @@ test.describe('Form Localization', () => {
 
 			// Create object definition with a localized select
 
-			const objectDefinitionApiClient =
-				await apiHelpers.buildRestClient(ObjectDefinitionApi);
+			const objectDefinitionAPIClient =
+				await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 			const listTypeDefinition =
 				await apiHelpers.listTypeAdmin.postRandomListTypeDefinition();
@@ -2178,7 +2280,7 @@ test.describe('Form Localization', () => {
 			}
 
 			const {body: objectDefinition} =
-				await objectDefinitionApiClient.postObjectDefinition({
+				await objectDefinitionAPIClient.postObjectDefinition({
 					active: true,
 					enableLocalization: true,
 					externalReferenceCode: 'SelectERC',
@@ -2188,8 +2290,8 @@ test.describe('Form Localization', () => {
 					name: 'Select',
 					objectFields: [
 						{
-							DBType: ObjectField.DBTypeEnum.String,
-							businessType: ObjectField.BusinessTypeEnum.Picklist,
+							DBType: 'String',
+							businessType: 'Picklist',
 							externalReferenceCode: 'selectCountryERC',
 							indexed: true,
 							indexedAsKeyword: false,
@@ -2256,11 +2358,13 @@ test.describe('Form Localization', () => {
 				trigger: page.getByPlaceholder('Choose an Option'),
 			});
 
+			const spanishOption = page
+				.getByRole('option')
+				.filter({hasText: 'es-ES'});
+
 			await clickAndExpectToBeVisible({
 				autoClick: true,
-				target: page.getByRole('option', {
-					name: 'Spanish (Spain) Language',
-				}),
+				target: spanishOption,
 				trigger: page.getByLabel(
 					'Select a language, current language:'
 				),
@@ -2280,11 +2384,7 @@ test.describe('Form Localization', () => {
 				.getByLabel('Select a language, current language:')
 				.click();
 
-			expect(
-				page.getByRole('option', {
-					name: 'Spanish (Spain) Language',
-				})
-			).toContainText(/Translated/);
+			await expect(spanishOption).toContainText('Language: Translated');
 
 			await page.keyboard.press('Escape');
 
@@ -2332,7 +2432,7 @@ test.describe('Form Localization', () => {
 			}
 
 			const objectDefinitionAPIClient =
-				await apiHelpers.buildRestClient(ObjectDefinitionApi);
+				await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 			const {body: objectDefinition} =
 				await objectDefinitionAPIClient.postObjectDefinition({
@@ -2345,10 +2445,8 @@ test.describe('Form Localization', () => {
 					name: 'Plant',
 					objectFields: [
 						{
-							DBType: ObjectField.DBTypeEnum.String,
-							businessType:
-								ObjectField.BusinessTypeEnum
-									.MultiselectPicklist,
+							DBType: 'String',
+							businessType: 'MultiselectPicklist',
 							indexed: true,
 							indexedAsKeyword: false,
 							label: {
@@ -2414,11 +2512,13 @@ test.describe('Form Localization', () => {
 			await page.getByRole('checkbox', {name: 'Spain'}).check();
 			await page.getByRole('checkbox', {name: 'Italy'}).check();
 
+			const spanishOption = page
+				.getByRole('option')
+				.filter({hasText: 'es-ES'});
+
 			await clickAndExpectToBeVisible({
 				autoClick: true,
-				target: page.getByRole('option', {
-					name: 'Spanish (Spain) Language',
-				}),
+				target: spanishOption,
 				trigger: translationTrigger,
 			});
 
@@ -2428,11 +2528,7 @@ test.describe('Form Localization', () => {
 
 			await translationTrigger.click();
 
-			expect(
-				page.getByRole('option', {
-					name: 'Spanish (Spain) Language',
-				})
-			).toContainText(/Translated/);
+			await expect(spanishOption).toContainText('Language: Translated');
 
 			await page.keyboard.press('Escape');
 
@@ -2475,7 +2571,7 @@ test.describe('Form Localization', () => {
 			// Create object definition
 
 			const objectDefinitionAPIClient =
-				await apiHelpers.buildRestClient(ObjectDefinitionApi);
+				await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 			const {body: objectDefinition} =
 				await objectDefinitionAPIClient.postObjectDefinition({
@@ -2488,8 +2584,8 @@ test.describe('Form Localization', () => {
 					name: 'Calendar',
 					objectFields: [
 						{
-							DBType: ObjectField.DBTypeEnum.Date,
-							businessType: ObjectField.BusinessTypeEnum.Date,
+							DBType: 'Date',
+							businessType: 'Date',
 							externalReferenceCode: 'dateERC',
 							indexed: true,
 							indexedAsKeyword: false,
@@ -2501,8 +2597,8 @@ test.describe('Form Localization', () => {
 							required: false,
 						},
 						{
-							DBType: ObjectField.DBTypeEnum.DateTime,
-							businessType: ObjectField.BusinessTypeEnum.DateTime,
+							DBType: 'DateTime',
+							businessType: 'DateTime',
 							externalReferenceCode: 'dateTimeERC',
 							indexed: true,
 							indexedAsKeyword: false,
@@ -2567,38 +2663,30 @@ test.describe('Form Localization', () => {
 
 			// Fill the form in spanish
 
-			await fillAndClickOutside(
-				page,
-				page.getByLabel('Date', {exact: true}),
-				'1970-01-01'
-			);
+			const dateInput = page.getByRole('textbox', {
+				exact: true,
+				name: 'Date',
+			});
+			const dateTimeInput = page.getByRole('textbox', {
+				exact: true,
+				name: 'Date Time',
+			});
 
-			await fillAndClickOutside(
-				page,
-				page.getByLabel('Date Time', {exact: true}),
-				'1971-01-01T00:00'
-			);
+			await fillAndClickOutside(page, dateInput, '1970-01-01');
+
+			await fillAndClickOutside(page, dateTimeInput, '1971-01-01T00:00');
 
 			await clickAndExpectToBeVisible({
 				autoClick: true,
-				target: page.getByRole('option', {
-					name: 'Spanish (Spain) Language',
-				}),
+				target: page.getByRole('option').filter({hasText: 'es-ES'}),
 				trigger: page.getByLabel(
 					'Select a language, current language:'
 				),
 			});
 
-			await fillAndClickOutside(
-				page,
-				page.getByLabel('Date', {exact: true}),
-				'1970-01-02'
-			);
-			await fillAndClickOutside(
-				page,
-				page.getByLabel('Date Time', {exact: true}),
-				'1971-01-02T01:01'
-			);
+			await fillAndClickOutside(page, dateInput, '1970-01-02');
+
+			await fillAndClickOutside(page, dateTimeInput, '1971-01-02T01:01');
 
 			// Submit the form
 
@@ -2628,6 +2716,696 @@ test.describe('Form Localization', () => {
 				en_US: '1971-01-01T00:00:00.000Z',
 				es_ES: '1971-01-02T01:01:00.000Z',
 			});
+		}
+	);
+
+	test(
+		'Can translate attachment form fields',
+		{tag: '@LPD-46482'},
+		async ({apiHelpers, page, pageEditorPage, pageManagementSite}) => {
+
+			// Create object definition
+
+			const objectDefinitionAPIClient =
+				await apiHelpers.buildRestClient(ObjectDefinitionAPI);
+
+			const {body: objectDefinition} =
+				await objectDefinitionAPIClient.postObjectDefinition({
+					active: true,
+					enableLocalization: true,
+					externalReferenceCode: 'attachmentERC',
+					label: {
+						en_US: 'Attachment',
+					},
+					name: 'Attachment',
+					objectFields: [
+						{
+							DBType: 'Long',
+							businessType: 'Attachment',
+							defaultValue: 'null',
+							externalReferenceCode: 'filesFromComputerERC',
+							label: {
+								en_US: 'Files from Computer',
+							},
+							localized: true,
+							name: 'filesFromComputer',
+							objectFieldSettings: [
+								{
+									name: 'acceptedFileExtensions',
+									value: 'jpeg, jpg, pdf, png',
+								} as any,
+								{
+									name: 'maximumFileSize',
+									value: 100,
+								} as any,
+								{
+									name: 'fileSource',
+									value: 'userComputer',
+								} as any,
+								{
+									name: 'showFilesInDocumentsAndMedia',
+									value: false,
+								} as any,
+							],
+							required: false,
+						},
+						{
+							DBType: 'Long',
+							businessType: 'Attachment',
+							defaultValue: 'null',
+							externalReferenceCode: 'filesFromLibraryERC',
+							label: {
+								en_US: 'Files from Document Library',
+							},
+							localized: true,
+							name: 'filesFromLibrary',
+							objectFieldSettings: [
+								{
+									name: 'acceptedFileExtensions',
+									value: 'jpeg, jpg, pdf, png',
+								} as any,
+								{
+									name: 'maximumFileSize',
+									value: 100,
+								} as any,
+								{
+									name: 'fileSource',
+									value: 'documentsAndMedia',
+								} as any,
+							],
+							required: false,
+						},
+					],
+					pluralLabel: {
+						en_US: 'Attachments',
+					},
+					portlet: true,
+					scope: 'company',
+					status: {
+						code: 0,
+					},
+				});
+
+			apiHelpers.data.push({
+				id: objectDefinition.id,
+				type: 'objectDefinition',
+			});
+
+			// Create a page with a Form fragment
+
+			const formId = getRandomString();
+
+			const formDefinition = getFormContainerDefinition({
+				id: formId,
+			});
+
+			const layout = await apiHelpers.headlessDelivery.createSitePage({
+				pageDefinition: getPageDefinition([formDefinition]),
+				siteId: pageManagementSite.id,
+				title: getRandomString(),
+			});
+
+			await pageEditorPage.goto(
+				layout,
+				pageManagementSite.friendlyUrlPath
+			);
+
+			// Map the form to the Attachment object and publish the page
+
+			await pageEditorPage.mapFormFragment(formId, 'Attachment', 'all', {
+				addLocalizationSelect: true,
+			});
+
+			await pageEditorPage.publishPage();
+
+			await page.goto(
+				`/web${pageManagementSite.friendlyUrlPath}${layout.friendlyUrlPath}`
+			);
+
+			// Select file from computer in the default language
+
+			const fileChooserPromise = page.waitForEvent('filechooser');
+
+			const firstFileUploadFragment = page
+				.locator('.file-upload')
+				.first();
+
+			await firstFileUploadFragment
+				.getByText('Select File', {exact: true})
+				.click();
+
+			const fileChooser = await fileChooserPromise;
+
+			await fileChooser.setFiles(
+				path.join(__dirname, '/dependencies/file_upload_image_1.jpg')
+			);
+
+			await expect(
+				firstFileUploadFragment.getByText('file_upload_image_1.jpg')
+			).toBeVisible();
+
+			// Select file from document library in the default language
+
+			const secondFileUploadFragment = page
+				.locator('.file-upload')
+				.nth(1);
+
+			await chooseFileFromDocumentLibrary({
+				fileName: 'balinese.jpg',
+				page,
+				trigger: secondFileUploadFragment.getByText('Select File', {
+					exact: true,
+				}),
+			});
+
+			// Change the translation to spanish and update the files
+
+			const spanishOption = page
+				.getByRole('option')
+				.filter({hasText: 'es-ES'});
+
+			await clickAndExpectToBeVisible({
+				autoClick: true,
+				target: spanishOption,
+				trigger: page.getByLabel(
+					'Select a language, current language:'
+				),
+			});
+
+			await fileChooser.setFiles(
+				path.join(__dirname, '/dependencies/file_upload_image_2.jpg')
+			);
+
+			// Check that the files have been selected and the fields have been translated
+
+			await expect(
+				firstFileUploadFragment.getByText('file_upload_image_2.jpg')
+			).toBeVisible();
+
+			await chooseFileFromDocumentLibrary({
+				fileName: 'cats.jpg',
+				page,
+				trigger: secondFileUploadFragment.getByText('Select File', {
+					exact: true,
+				}),
+			});
+
+			await page
+				.getByLabel('Select a language, current language:')
+				.click();
+
+			await expect(spanishOption).toContainText('Language: Translated');
+
+			// Choose other language to check the default values
+
+			const catalanOption = page
+				.getByRole('option')
+				.filter({hasText: 'ca-ES'});
+
+			await expect(catalanOption).toContainText(
+				'Language: Not Translated'
+			);
+
+			await catalanOption.click();
+
+			await expect(
+				firstFileUploadFragment.getByText('file_upload_image_1.jpg')
+			).toBeVisible();
+
+			await expect(
+				secondFileUploadFragment.getByText('balinese.jpg')
+			).toBeVisible();
+
+			// Submit the form
+
+			await page.getByRole('button', {name: 'Submit'}).click();
+
+			await expect(
+				page.getByText(
+					'Thank you. Your information was successfully received.'
+				)
+			).toBeVisible();
+
+			// Check the object entry
+
+			const {items} =
+				await apiHelpers.objectEntry.getObjectDefinitionObjectEntries(
+					'c/attachments'
+				);
+
+			const item = items[0];
+
+			const filesFromComputer = Object.entries(
+				item.filesFromComputer_i18n
+			).map(([locale, value]: [string, any]) => [locale, value.name]);
+
+			expect(filesFromComputer).toStrictEqual([
+				['en_US', 'file_upload_image_1.jpg'],
+				['es_ES', 'file_upload_image_2.jpg'],
+			]);
+
+			const filesFromLibrary = Object.entries(
+				item.filesFromLibrary_i18n
+			).map(([locale, value]: [string, any]) => [locale, value.name]);
+
+			expect(filesFromLibrary).toStrictEqual([
+				['en_US', 'balinese.jpg'],
+				['es_ES', 'cats.jpg'],
+			]);
+		}
+	);
+
+	test(
+		'Can remove a translation and keep its value in the attachment form field',
+		{tag: '@LPD-46482'},
+		async ({apiHelpers, page, pageEditorPage, pageManagementSite}) => {
+
+			// Create object definition
+
+			const objectDefinitionAPIClient =
+				await apiHelpers.buildRestClient(ObjectDefinitionAPI);
+
+			const {body: objectDefinition} =
+				await objectDefinitionAPIClient.postObjectDefinition({
+					active: true,
+					enableLocalization: true,
+					externalReferenceCode: 'attachmentERC',
+					label: {
+						en_US: 'Attachment',
+					},
+					name: 'Attachment',
+					objectFields: [
+						{
+							DBType: 'Long',
+							businessType: 'Attachment',
+							defaultValue: 'null',
+							externalReferenceCode: 'filesFromComputerERC',
+							label: {
+								en_US: 'Files from Computer',
+							},
+							localized: true,
+							name: 'filesFromComputer',
+							objectFieldSettings: [
+								{
+									name: 'acceptedFileExtensions',
+									value: 'jpeg, jpg, pdf, png',
+								} as any,
+								{
+									name: 'maximumFileSize',
+									value: 100,
+								} as any,
+								{
+									name: 'fileSource',
+									value: 'userComputer',
+								} as any,
+								{
+									name: 'showFilesInDocumentsAndMedia',
+									value: false,
+								} as any,
+							],
+							required: false,
+						},
+						{
+							DBType: 'Long',
+							businessType: 'Attachment',
+							defaultValue: 'null',
+							externalReferenceCode: 'filesFromLibraryERC',
+							label: {
+								en_US: 'Files from Document Library',
+							},
+							localized: true,
+							name: 'filesFromLibrary',
+							objectFieldSettings: [
+								{
+									name: 'acceptedFileExtensions',
+									value: 'jpeg, jpg, pdf, png',
+								} as any,
+								{
+									name: 'maximumFileSize',
+									value: 100,
+								} as any,
+								{
+									name: 'fileSource',
+									value: 'documentsAndMedia',
+								} as any,
+							],
+							required: false,
+						},
+					],
+					pluralLabel: {
+						en_US: 'Attachments',
+					},
+					portlet: true,
+					scope: 'company',
+					status: {
+						code: 0,
+					},
+				});
+
+			apiHelpers.data.push({
+				id: objectDefinition.id,
+				type: 'objectDefinition',
+			});
+
+			// Create a page with a Form fragment
+
+			const formId = getRandomString();
+
+			const formDefinition = getFormContainerDefinition({
+				id: formId,
+			});
+
+			const layout = await apiHelpers.headlessDelivery.createSitePage({
+				pageDefinition: getPageDefinition([formDefinition]),
+				siteId: pageManagementSite.id,
+				title: getRandomString(),
+			});
+
+			await pageEditorPage.goto(
+				layout,
+				pageManagementSite.friendlyUrlPath
+			);
+
+			// Map the form to the Attachment object and publish the page
+
+			await pageEditorPage.mapFormFragment(formId, 'Attachment', 'all', {
+				addLocalizationSelect: true,
+			});
+
+			await pageEditorPage.publishPage();
+
+			await page.goto(
+				`/web${pageManagementSite.friendlyUrlPath}${layout.friendlyUrlPath}`
+			);
+
+			// Select file from computer in the default language
+
+			const fileChooserPromise = page.waitForEvent('filechooser');
+
+			const firstFileUploadFragment = page
+				.locator('.file-upload')
+				.first();
+
+			await firstFileUploadFragment
+				.getByText('Select File', {exact: true})
+				.click();
+
+			const fileChooser = await fileChooserPromise;
+
+			await fileChooser.setFiles(
+				path.join(__dirname, '/dependencies/file_upload_image_1.jpg')
+			);
+
+			await expect(
+				firstFileUploadFragment.getByText('file_upload_image_1.jpg')
+			).toBeVisible();
+
+			// Select file from document library in the default language
+
+			const secondFileUploadFragment = page
+				.locator('.file-upload')
+				.nth(1);
+
+			await chooseFileFromDocumentLibrary({
+				fileName: 'balinese.jpg',
+				page,
+				trigger: secondFileUploadFragment.getByText('Select File', {
+					exact: true,
+				}),
+			});
+
+			// Change the translation to spanish and remove the files
+
+			const trigger = page.getByLabel(
+				'Select a language, current language:'
+			);
+
+			await trigger.waitFor();
+
+			await clickAndExpectToBeVisible({
+				autoClick: true,
+				target: page.getByRole('option').filter({hasText: 'es-ES'}),
+				trigger,
+			});
+
+			await firstFileUploadFragment.getByTitle('Remove Item').click();
+
+			await expect(
+				firstFileUploadFragment.getByText('file_upload_image_1.jpg')
+			).not.toBeVisible();
+
+			await secondFileUploadFragment.getByTitle('Remove Item').click();
+
+			await expect(
+				secondFileUploadFragment.getByText('balinese.jpg')
+			).not.toBeVisible();
+
+			// Check that the translations are kept properly
+
+			await clickAndExpectToBeVisible({
+				autoClick: true,
+				target: page.getByRole('option', {
+					name: 'English (United States) Language',
+				}),
+				trigger,
+			});
+
+			await expect(
+				firstFileUploadFragment.getByText('file_upload_image_1.jpg')
+			).toBeVisible();
+
+			await expect(
+				secondFileUploadFragment.getByText('balinese.jpg')
+			).toBeVisible();
+
+			await clickAndExpectToBeVisible({
+				autoClick: true,
+				target: page.getByRole('option').filter({hasText: 'es-ES'}),
+				trigger,
+			});
+
+			await expect(
+				firstFileUploadFragment.getByText('file_upload_image_1.jpg')
+			).not.toBeVisible();
+
+			await expect(
+				secondFileUploadFragment.getByText('balinese.jpg')
+			).not.toBeVisible();
+
+			await clickAndExpectToBeVisible({
+				autoClick: true,
+				target: page.getByRole('option').filter({hasText: 'ca-ES'}),
+				trigger,
+			});
+
+			await expect(
+				firstFileUploadFragment.getByText('file_upload_image_1.jpg')
+			).toBeVisible();
+
+			await expect(
+				secondFileUploadFragment.getByText('balinese.jpg')
+			).toBeVisible();
+		}
+	);
+
+	test(
+		'Translate an upload field to a language and check that the default language is empty',
+		{tag: '@LPD-46482'},
+		async ({apiHelpers, page, pageEditorPage, pageManagementSite}) => {
+
+			// Create object definition
+
+			const objectDefinitionAPIClient =
+				await apiHelpers.buildRestClient(ObjectDefinitionAPI);
+
+			const {body: objectDefinition} =
+				await objectDefinitionAPIClient.postObjectDefinition({
+					active: true,
+					enableLocalization: true,
+					externalReferenceCode: 'attachmentERC',
+					label: {
+						en_US: 'Attachment',
+					},
+					name: 'Attachment',
+					objectFields: [
+						{
+							DBType: 'Long',
+							businessType: 'Attachment',
+							defaultValue: 'null',
+							externalReferenceCode: 'filesFromComputerERC',
+							label: {
+								en_US: 'Files from Computer',
+							},
+							localized: true,
+							name: 'filesFromComputer',
+							objectFieldSettings: [
+								{
+									name: 'acceptedFileExtensions',
+									value: 'jpeg, jpg, pdf, png',
+								} as any,
+								{
+									name: 'maximumFileSize',
+									value: 100,
+								} as any,
+								{
+									name: 'fileSource',
+									value: 'userComputer',
+								} as any,
+								{
+									name: 'showFilesInDocumentsAndMedia',
+									value: false,
+								} as any,
+							],
+							required: false,
+						},
+						{
+							DBType: 'Long',
+							businessType: 'Attachment',
+							defaultValue: 'null',
+							externalReferenceCode: 'filesFromLibraryERC',
+							label: {
+								en_US: 'Files from Document Library',
+							},
+							localized: true,
+							name: 'filesFromLibrary',
+							objectFieldSettings: [
+								{
+									name: 'acceptedFileExtensions',
+									value: 'jpeg, jpg, pdf, png',
+								} as any,
+								{
+									name: 'maximumFileSize',
+									value: 100,
+								} as any,
+								{
+									name: 'fileSource',
+									value: 'documentsAndMedia',
+								} as any,
+							],
+							required: false,
+						},
+					],
+					pluralLabel: {
+						en_US: 'Attachments',
+					},
+					portlet: true,
+					scope: 'company',
+					status: {
+						code: 0,
+					},
+				});
+
+			apiHelpers.data.push({
+				id: objectDefinition.id,
+				type: 'objectDefinition',
+			});
+
+			// Create a page with a Form fragment
+
+			const formId = getRandomString();
+
+			const formDefinition = getFormContainerDefinition({
+				id: formId,
+			});
+
+			const layout = await apiHelpers.headlessDelivery.createSitePage({
+				pageDefinition: getPageDefinition([formDefinition]),
+				siteId: pageManagementSite.id,
+				title: getRandomString(),
+			});
+
+			await pageEditorPage.goto(
+				layout,
+				pageManagementSite.friendlyUrlPath
+			);
+
+			// Map the form to the Attachment object and publish the page
+
+			await pageEditorPage.mapFormFragment(formId, 'Attachment', 'all', {
+				addLocalizationSelect: true,
+			});
+
+			await pageEditorPage.publishPage();
+
+			await page.goto(
+				`/web${pageManagementSite.friendlyUrlPath}${layout.friendlyUrlPath}`
+			);
+
+			// Change the translation to spanish
+
+			const trigger = page.getByLabel(
+				'Select a language, current language:'
+			);
+
+			await trigger.waitFor();
+
+			await clickAndExpectToBeVisible({
+				autoClick: true,
+				target: page.getByRole('option').filter({hasText: 'es-ES'}),
+				trigger,
+			});
+
+			// Select file from computer in spanish
+
+			const fileChooserPromise = page.waitForEvent('filechooser');
+
+			const firstFileUploadFragment = page
+				.locator('.file-upload')
+				.first();
+
+			await firstFileUploadFragment
+				.getByText('Select File', {exact: true})
+				.click();
+
+			const fileChooser = await fileChooserPromise;
+
+			await fileChooser.setFiles(
+				path.join(__dirname, '/dependencies/file_upload_image_1.jpg')
+			);
+
+			await expect(
+				firstFileUploadFragment.getByText('file_upload_image_1.jpg')
+			).toBeVisible();
+
+			// Select file from document library in spanish
+
+			const secondFileUploadFragment = page
+				.locator('.file-upload')
+				.nth(1);
+
+			await chooseFileFromDocumentLibrary({
+				fileName: 'balinese.jpg',
+				page,
+				trigger: secondFileUploadFragment.getByText('Select File', {
+					exact: true,
+				}),
+			});
+
+			await expect(
+				firstFileUploadFragment.getByText('file_upload_image_1.jpg')
+			).toBeVisible();
+
+			await expect(
+				secondFileUploadFragment.getByText('balinese.jpg')
+			).toBeVisible();
+
+			// Check that the translations in the default language are empty
+
+			await clickAndExpectToBeVisible({
+				autoClick: true,
+				target: page.getByRole('option', {
+					name: 'English (United States) Language',
+				}),
+				trigger,
+			});
+
+			await expect(
+				firstFileUploadFragment.getByText('file_upload_image_1.jpg')
+			).not.toBeVisible();
+
+			await expect(
+				secondFileUploadFragment.getByText('balinese.jpg')
+			).not.toBeVisible();
 		}
 	);
 
@@ -2697,7 +3475,7 @@ test.describe('Form Localization', () => {
 			}
 
 			const objectDefinitionAPIClient =
-				await apiHelpers.buildRestClient(ObjectDefinitionApi);
+				await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 			const {body: objectDefinition} =
 				await objectDefinitionAPIClient.postObjectDefinition({
@@ -2710,8 +3488,8 @@ test.describe('Form Localization', () => {
 					name: 'Plant',
 					objectFields: [
 						{
-							DBType: ObjectField.DBTypeEnum.String,
-							businessType: ObjectField.BusinessTypeEnum.Text,
+							DBType: 'String',
+							businessType: 'Text',
 							externalReferenceCode: 'countryERC',
 							indexed: true,
 							indexedAsKeyword: false,
@@ -2723,8 +3501,8 @@ test.describe('Form Localization', () => {
 							required: false,
 						},
 						{
-							DBType: ObjectField.DBTypeEnum.Clob,
-							businessType: ObjectField.BusinessTypeEnum.RichText,
+							DBType: 'Clob',
+							businessType: 'RichText',
 							externalReferenceCode: 'descriptionERC',
 							indexed: true,
 							indexedAsKeyword: false,
@@ -2736,8 +3514,8 @@ test.describe('Form Localization', () => {
 							required: false,
 						},
 						{
-							DBType: ObjectField.DBTypeEnum.String,
-							businessType: ObjectField.BusinessTypeEnum.Text,
+							DBType: 'String',
+							businessType: 'Text',
 							externalReferenceCode: 'nameERC',
 							indexed: true,
 							indexedAsKeyword: false,
@@ -2749,8 +3527,8 @@ test.describe('Form Localization', () => {
 							required: false,
 						},
 						{
-							DBType: ObjectField.DBTypeEnum.Clob,
-							businessType: ObjectField.BusinessTypeEnum.LongText,
+							DBType: 'Clob',
+							businessType: 'LongText',
 							externalReferenceCode: 'scientificName',
 							indexed: true,
 							indexedAsKeyword: false,
@@ -2762,8 +3540,8 @@ test.describe('Form Localization', () => {
 							required: false,
 						},
 						{
-							DBType: ObjectField.DBTypeEnum.Boolean,
-							businessType: ObjectField.BusinessTypeEnum.Boolean,
+							DBType: 'Boolean',
+							businessType: 'Boolean',
 							externalReferenceCode: 'evergreen',
 							indexed: true,
 							indexedAsKeyword: false,
@@ -2775,8 +3553,8 @@ test.describe('Form Localization', () => {
 							required: false,
 						},
 						{
-							DBType: ObjectField.DBTypeEnum.String,
-							businessType: ObjectField.BusinessTypeEnum.Picklist,
+							DBType: 'String',
+							businessType: 'Picklist',
 							externalReferenceCode: 'selectOriginERC',
 							indexed: true,
 							indexedAsKeyword: false,
@@ -2791,10 +3569,8 @@ test.describe('Form Localization', () => {
 							required: false,
 						},
 						{
-							DBType: ObjectField.DBTypeEnum.String,
-							businessType:
-								ObjectField.BusinessTypeEnum
-									.MultiselectPicklist,
+							DBType: 'String',
+							businessType: 'MultiselectPicklist',
 							indexed: true,
 							indexedAsKeyword: false,
 							label: {
@@ -2806,6 +3582,74 @@ test.describe('Form Localization', () => {
 							localized: false,
 							name: 'growthAreas',
 							required: false,
+						},
+						{
+							DBType: 'Long',
+							businessType: 'Attachment',
+							defaultValue: 'null',
+							externalReferenceCode: 'filesFromLibraryERC',
+							label: {
+								en_US: 'Files from Document Library',
+							},
+							localized: false,
+							name: 'filesFromLibrary',
+							objectFieldSettings: [
+								{
+									name: 'acceptedFileExtensions',
+									value: 'jpeg, jpg, pdf, png',
+								} as any,
+								{
+									name: 'maximumFileSize',
+									value: 100,
+								} as any,
+								{
+									name: 'fileSource',
+									value: 'documentsAndMedia',
+								} as any,
+							],
+							required: false,
+						},
+						{
+							DBType: 'Integer',
+							businessType: 'Integer',
+							externalReferenceCode: 'idealTemperatureERC',
+							indexed: true,
+							indexedAsKeyword: false,
+							indexedLanguageId: '',
+							label: {
+								en_US: 'Ideal Temperature (ºC)',
+							},
+							localized: false,
+							name: 'idealTemperature',
+							required: false,
+						},
+						{
+							DBType: 'DateTime',
+							externalReferenceCode: 'lastWateringERC',
+							indexed: true,
+							indexedAsKeyword: false,
+							label: {
+								en_US: 'Last Watering',
+							},
+							localized: false,
+							name: 'lastWatering',
+							objectFieldSettings: [
+								{
+									name: 'timeStorage',
+									value: {},
+								},
+							],
+						},
+						{
+							DBType: 'Date',
+							externalReferenceCode: 'plantingDateERC',
+							indexed: true,
+							indexedAsKeyword: false,
+							label: {
+								en_US: 'Planting Date',
+							},
+							localized: false,
+							name: 'plantingDate',
 						},
 					],
 					pluralLabel: {
@@ -2857,9 +3701,7 @@ test.describe('Form Localization', () => {
 
 			await clickAndExpectToBeVisible({
 				autoClick: true,
-				target: page.getByRole('option', {
-					name: 'Spanish (Spain) Language',
-				}),
+				target: page.getByRole('option').filter({hasText: 'es-ES'}),
 				trigger: page.getByLabel(
 					'Select a language, current language:'
 				),
@@ -2889,6 +3731,26 @@ test.describe('Form Localization', () => {
 
 			await expect(
 				page.getByLabel('Growth Areas field cannot be localized')
+			).toBeVisible();
+
+			await expect(
+				page.getByLabel(
+					'Files from Document Library field cannot be localized'
+				)
+			).toBeVisible();
+
+			await expect(
+				page.getByLabel(
+					'Ideal Temperature (ºC) field cannot be localized'
+				)
+			).toBeVisible();
+
+			await expect(
+				page.getByLabel('Last Watering field cannot be localized')
+			).toBeVisible();
+
+			await expect(
+				page.getByLabel('Planting Date field cannot be localized')
 			).toBeVisible();
 
 			// Check that unlocalized fields are disabled
@@ -2934,6 +3796,20 @@ test.describe('Form Localization', () => {
 			await expect(firstMultiSelectOption).toBeDisabled();
 			await expect(secondMultiSelectOption).toBeDisabled();
 
+			await expect(page.getByText('Select File')).toBeDisabled();
+
+			await expect(
+				page.getByRole('spinbutton', {name: 'Ideal Temperature (ºC)'})
+			).toBeDisabled();
+
+			await expect(
+				page.getByRole('textbox', {name: 'Last Watering'})
+			).toBeDisabled();
+
+			await expect(
+				page.getByRole('textbox', {name: 'Planting Date'})
+			).toBeDisabled();
+
 			// Check that the read only labels are not visibles
 
 			const checkboxReadOnlyLabel = page
@@ -2956,11 +3832,31 @@ test.describe('Form Localization', () => {
 				.getByText('Growth Areas')
 				.getByText('(Read Only)');
 
+			const uploadFileReadOnlyLabel = page
+				.getByText('Files from Document Library')
+				.getByText('(Read Only)');
+
+			const numericReadOnlyLabel = page
+				.getByText('Ideal Temperature (ºC)')
+				.getByText('(Read Only)');
+
+			const dateReadOnlyLabel = page
+				.getByText('Planting Date')
+				.getByText('(Read Only)');
+
+			const dateTimeReadOnlyLabel = page
+				.getByText('Last Watering')
+				.getByText('(Read Only)');
+
 			await expect(checkboxReadOnlyLabel).not.toBeVisible();
 			await expect(inputTextReadOnlyLabel).not.toBeVisible();
 			await expect(textareaReadOnlyLabel).not.toBeVisible();
 			await expect(selectReadOnlyLabel).not.toBeVisible();
 			await expect(multiSelectReadOnlyLabel).not.toBeVisible();
+			await expect(uploadFileReadOnlyLabel).not.toBeVisible();
+			await expect(numericReadOnlyLabel).not.toBeVisible();
+			await expect(dateReadOnlyLabel).not.toBeVisible();
+			await expect(dateTimeReadOnlyLabel).not.toBeVisible();
 
 			// Go to edit mode and change unlocalized field configuration to read only
 
@@ -2992,9 +3888,7 @@ test.describe('Form Localization', () => {
 
 			await clickAndExpectToBeVisible({
 				autoClick: true,
-				target: page.getByRole('option', {
-					name: 'Spanish (Spain) Language',
-				}),
+				target: page.getByRole('option').filter({hasText: 'es-ES'}),
 				trigger: page.getByLabel(
 					'Select a language, current language:'
 				),
@@ -3004,13 +3898,17 @@ test.describe('Form Localization', () => {
 
 			await expect(
 				page.getByLabel('field is not localizable message')
-			).toHaveCount(6);
+			).toHaveCount(10);
 
 			await expect(checkboxReadOnlyLabel).toBeVisible();
 			await expect(inputTextReadOnlyLabel).toBeVisible();
 			await expect(textareaReadOnlyLabel).toBeVisible();
 			await expect(selectReadOnlyLabel).toBeVisible();
 			await expect(multiSelectReadOnlyLabel).toBeVisible();
+			await expect(uploadFileReadOnlyLabel).toBeVisible();
+			await expect(numericReadOnlyLabel).toBeVisible();
+			await expect(dateReadOnlyLabel).toBeVisible();
+			await expect(dateTimeReadOnlyLabel).toBeVisible();
 
 			await expect(page.getByLabel('Country')).toHaveAttribute(
 				'readonly'
@@ -3038,6 +3936,22 @@ test.describe('Form Localization', () => {
 
 			await expect(firstMultiSelectOption).not.toBeChecked();
 			await expect(secondMultiSelectOption).not.toBeChecked();
+
+			await expect(page.getByText('No file selected')).toHaveAttribute(
+				'readonly'
+			);
+
+			await expect(
+				page.getByLabel('Ideal Temperature (ºC)')
+			).toHaveAttribute('readonly');
+
+			await expect(page.getByLabel('Last Watering')).toHaveAttribute(
+				'readonly'
+			);
+
+			await expect(page.getByLabel('Planting Date')).toHaveAttribute(
+				'readonly'
+			);
 		}
 	);
 
@@ -3054,11 +3968,11 @@ test.describe('Form Localization', () => {
 
 			// Create an object with translations
 
-			const objectDefinitionApiClient =
-				await apiHelpers.buildRestClient(ObjectDefinitionApi);
+			const objectDefinitionAPIClient =
+				await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 			const {body: objectDefinition} =
-				await objectDefinitionApiClient.postObjectDefinition({
+				await objectDefinitionAPIClient.postObjectDefinition({
 					active: true,
 					enableLocalization: true,
 					externalReferenceCode: 'translationFieldsGroupERC',
@@ -3068,8 +3982,8 @@ test.describe('Form Localization', () => {
 					name: 'TranslationFieldsGroup',
 					objectFields: [
 						{
-							DBType: ObjectField.DBTypeEnum.Clob,
-							businessType: ObjectField.BusinessTypeEnum.RichText,
+							DBType: 'Clob',
+							businessType: 'RichText',
 							externalReferenceCode: 'richTextERC',
 							indexed: true,
 							indexedAsKeyword: false,
@@ -3081,8 +3995,8 @@ test.describe('Form Localization', () => {
 							required: false,
 						},
 						{
-							DBType: ObjectField.DBTypeEnum.Clob,
-							businessType: ObjectField.BusinessTypeEnum.LongText,
+							DBType: 'Clob',
+							businessType: 'LongText',
 							externalReferenceCode: 'longTextERC',
 							indexed: true,
 							indexedAsKeyword: false,
@@ -3094,8 +4008,8 @@ test.describe('Form Localization', () => {
 							required: false,
 						},
 						{
-							DBType: ObjectField.DBTypeEnum.String,
-							businessType: ObjectField.BusinessTypeEnum.Text,
+							DBType: 'String',
+							businessType: 'Text',
 							externalReferenceCode: 'text',
 							indexed: true,
 							indexedAsKeyword: false,
@@ -3107,8 +4021,8 @@ test.describe('Form Localization', () => {
 							required: false,
 						},
 						{
-							DBType: ObjectField.DBTypeEnum.Boolean,
-							businessType: ObjectField.BusinessTypeEnum.Boolean,
+							DBType: 'Boolean',
+							businessType: 'Boolean',
 							externalReferenceCode: 'booleanERC',
 							indexed: true,
 							indexedAsKeyword: false,
@@ -3250,9 +4164,7 @@ test.describe('Form Localization', () => {
 
 			await clickAndExpectToBeVisible({
 				autoClick: true,
-				target: page.getByRole('option', {
-					name: 'Spanish (Spain) Language',
-				}),
+				target: page.getByRole('option').filter({hasText: 'es-ES'}),
 				trigger: page.getByLabel(
 					'Select a language, current language:'
 				),
@@ -3345,6 +4257,297 @@ test.describe('Form Localization', () => {
 			await expect(page.locator('input.ddm-field-text')).toHaveValue(
 				'text spanish 1'
 			);
+		}
+	);
+
+	test(
+		'Visualize text fields in RTL languages',
+		{tag: '@LPD-48787'},
+		async ({apiHelpers, page, pageEditorPage, site}) => {
+			const objectDefinitionAPIClient =
+				await apiHelpers.buildRestClient(ObjectDefinitionAPI);
+
+			const listTypeDefinition =
+				await apiHelpers.listTypeAdmin.postRandomListTypeDefinition();
+
+			for (const option of ['Spain', 'Italy']) {
+				await apiHelpers.listTypeAdmin.postListTypeEntry(
+					listTypeDefinition.externalReferenceCode,
+					option
+				);
+			}
+
+			const objectFields: ObjectField[] = [
+				{
+					DBType: 'Clob',
+					businessType: 'RichText',
+					externalReferenceCode: 'richTextERC',
+					indexed: true,
+					indexedAsKeyword: false,
+					label: {
+						en_US: 'Rich Text',
+					},
+					localized: true,
+					name: 'richText',
+					required: false,
+				},
+				{
+					DBType: 'Clob',
+					businessType: 'LongText',
+					externalReferenceCode: 'longTextERC',
+					indexed: true,
+					indexedAsKeyword: false,
+					label: {
+						en_US: 'Long Text',
+					},
+					localized: true,
+					name: 'longText',
+					required: false,
+				},
+				{
+					DBType: 'String',
+					businessType: 'Text',
+					externalReferenceCode: 'text',
+					indexed: true,
+					indexedAsKeyword: false,
+					label: {
+						en_US: 'Text',
+					},
+					localized: true,
+					name: 'text',
+					required: false,
+				},
+				{
+					DBType: 'Integer',
+					externalReferenceCode: 'numeric-erc',
+					indexed: true,
+					indexedAsKeyword: false,
+					indexedLanguageId: '',
+					label: {
+						en_US: 'Numeric',
+					},
+					localized: true,
+					name: 'numeric',
+				},
+				{
+					DBType: 'DateTime',
+					externalReferenceCode: 'date-time-erc',
+					indexed: true,
+					indexedAsKeyword: false,
+					label: {
+						en_US: 'Date And Time',
+					},
+					localized: true,
+					name: 'dateAndTime',
+					objectFieldSettings: [
+						{
+							name: 'timeStorage',
+							value: {},
+						},
+					],
+				},
+				{
+					DBType: 'Date',
+					externalReferenceCode: 'date-erc',
+					indexed: true,
+					indexedAsKeyword: false,
+					label: {
+						en_US: 'Date',
+					},
+					localized: true,
+					name: 'date',
+				},
+				{
+					DBType: 'String',
+					businessType: 'Picklist',
+					externalReferenceCode: 'selectERC',
+					indexed: true,
+					indexedAsKeyword: false,
+					label: {
+						en_US: 'Select',
+					},
+					listTypeDefinitionExternalReferenceCode:
+						listTypeDefinition.externalReferenceCode,
+					listTypeDefinitionId: listTypeDefinition.id,
+					localized: true,
+					name: 'select',
+					required: false,
+				},
+			];
+
+			// Create an object with localizable fields
+
+			const {body: localizableObjectDefinition} =
+				await objectDefinitionAPIClient.postObjectDefinition({
+					active: true,
+					enableLocalization: true,
+					externalReferenceCode: 'localizableFieldsGroupERC',
+					label: {
+						en_US: 'Localizable Fields Group',
+					},
+					name: 'LocalizableFieldsGroup',
+					objectFields,
+					panelCategoryKey: 'control_panel.object',
+					pluralLabel: {
+						en_US: 'Localizable Fields Groups',
+					},
+					portlet: true,
+					scope: 'company',
+					status: {
+						code: 0,
+					},
+				});
+
+			apiHelpers.data.push({
+				id: localizableObjectDefinition.id,
+				type: 'objectDefinition',
+			});
+
+			// Create an object with unlocalizable fields
+
+			const {body: nonLocalizableObjectDefinition} =
+				await objectDefinitionAPIClient.postObjectDefinition({
+					active: true,
+					enableLocalization: true,
+					externalReferenceCode: 'UnlocalizableFieldsGroupERC',
+					label: {
+						en_US: 'Unlocalizable Fields Group',
+					},
+					name: 'UnlocalizableFieldsGroup',
+					objectFields: objectFields.map((field) => ({
+						...field,
+						localized: true,
+					})),
+					panelCategoryKey: 'control_panel.object',
+					pluralLabel: {
+						en_US: 'Unlocalizable Fields Groups',
+					},
+					portlet: true,
+					scope: 'company',
+					status: {
+						code: 0,
+					},
+				});
+
+			apiHelpers.data.push({
+				id: nonLocalizableObjectDefinition.id,
+				type: 'objectDefinition',
+			});
+
+			// Create a page with two Forms for both objects
+
+			const localizableFormId = getRandomString();
+
+			const localizableFormDefinition = getFormContainerDefinition({
+				id: localizableFormId,
+			});
+
+			const unlocalizableFormId = getRandomString();
+
+			const unlocalizableFormDefinition = getFormContainerDefinition({
+				id: unlocalizableFormId,
+			});
+
+			const layout = await apiHelpers.headlessDelivery.createSitePage({
+				pageDefinition: getPageDefinition([
+					localizableFormDefinition,
+					unlocalizableFormDefinition,
+				]),
+				siteId: site.id,
+				title: getRandomString(),
+			});
+
+			await pageEditorPage.goto(layout, site.friendlyUrlPath);
+
+			// Map the forms to both objects and publish the page
+
+			await pageEditorPage.mapFormFragment(
+				localizableFormId,
+				'Localizable Fields Group',
+				'all',
+				{
+					addLocalizationSelect: true,
+				}
+			);
+
+			await pageEditorPage.mapFormFragment(
+				unlocalizableFormId,
+				'Unlocalizable Fields Group',
+				'all'
+			);
+
+			await pageEditorPage.publishPage();
+
+			// Go to view mode and check the "dir" attribute of the fields
+
+			await page.goto(
+				`/web${site.friendlyUrlPath}${layout.friendlyUrlPath}`
+			);
+
+			const localizableForm = page
+				.locator('.lfr-layout-structure-item-form')
+				.first();
+
+			const unlocalizableForm = page
+				.locator('.lfr-layout-structure-item-form')
+				.nth(1);
+
+			const getFields = (form: Locator) => [
+				form.getByRole('textbox', {
+					exact: true,
+					name: 'Text',
+				}),
+				form.getByRole('textbox', {
+					exact: true,
+					name: 'Long Text',
+				}),
+				form.getByLabel('Numeric'),
+				form.getByRole('textbox', {
+					exact: true,
+					name: 'Date',
+				}),
+				form.getByRole('textbox', {
+					exact: true,
+					name: 'Date And Time',
+				}),
+				form.frameLocator('iframe[title="editor"]').locator('html'),
+				form.getByPlaceholder('Choose an Option'),
+			];
+
+			// Check the "dir" attribute before changing the translation language
+
+			const localizableFields = getFields(localizableForm);
+			const unlocalizableFields = getFields(unlocalizableForm);
+
+			for (const field of localizableFields) {
+				await expect(field).toHaveAttribute('dir', 'ltr');
+			}
+
+			for (const field of unlocalizableFields) {
+				await expect(field).toHaveAttribute('dir', 'ltr');
+			}
+
+			// Change the translation language
+
+			await clickAndExpectToBeVisible({
+				autoClick: true,
+				target: page.getByRole('option', {
+					name: 'Arabic (Saudi Arabia) Language',
+				}),
+				trigger: page.getByLabel(
+					'Select a language, current language:'
+				),
+			});
+
+			// Check the "dir" attribute after changing the translation language
+
+			for (const field of localizableFields) {
+				await expect(field).toHaveAttribute('dir', 'rtl');
+			}
+
+			for (const field of unlocalizableFields) {
+				await expect(field).toHaveAttribute('dir', 'rtl');
+			}
 		}
 	);
 });
@@ -3493,7 +4696,9 @@ test.describe('Numeric input field', () => {
 			`/web${pageManagementSite.friendlyUrlPath}${layout.friendlyUrlPath}`
 		);
 
-		const lemonWeightInput = page.getByLabel('Lemon Weight', {exact: true});
+		const lemonWeightInput = page.getByRole('spinbutton', {
+			name: 'Lemon Weight',
+		});
 
 		await expect(lemonWeightInput).toHaveAttribute('type', 'number');
 		await expect(lemonWeightInput).toHaveAttribute('max');
@@ -3844,7 +5049,9 @@ test.describe('Submit button', () => {
 				`/web${pageManagementSite.friendlyUrlPath}${layout.friendlyUrlPath}`
 			);
 
-			await page.getByLabel('Lemon Weight', {exact: true}).fill('200');
+			await page
+				.getByRole('spinbutton', {name: 'Lemon Weight'})
+				.fill('200');
 
 			await page.getByText('Submit', {exact: true}).click();
 
@@ -3880,7 +5087,7 @@ test.describe('Submit button', () => {
 			// Create object definition
 
 			const objectDefinitionAPIClient =
-				await apiHelpers.buildRestClient(ObjectDefinitionApi);
+				await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 			const {body: objectDefinition} =
 				await objectDefinitionAPIClient.postObjectDefinition({
@@ -3894,8 +5101,8 @@ test.describe('Submit button', () => {
 					name: 'Draft',
 					objectFields: [
 						{
-							DBType: ObjectField.DBTypeEnum.String,
-							businessType: ObjectField.BusinessTypeEnum.Text,
+							DBType: 'String',
+							businessType: 'Text',
 							externalReferenceCode: 'textERC',
 							indexed: true,
 							indexedAsKeyword: false,
@@ -4070,11 +5277,8 @@ test.describe('Submit button', () => {
 
 			// Go to display page
 
-			const objectDefinitionApiClient =
-				await apiHelpers.buildRestClient(ObjectDefinitionApi);
-
 			const {className: objectDefinitionClassName} = (
-				await objectDefinitionApiClient.getObjectDefinitionByExternalReferenceCode(
+				await objectDefinitionAPIClient.getObjectDefinitionByExternalReferenceCode(
 					getObjectERC('Lemon')
 				)
 			).body;
@@ -4414,7 +5618,7 @@ test.describe('Picklist input field', () => {
 			// Create object definition
 
 			const objectDefinitionAPIClient =
-				await apiHelpers.buildRestClient(ObjectDefinitionApi);
+				await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 			const {body: objectDefinition} =
 				await objectDefinitionAPIClient.postObjectDefinition({
@@ -4427,8 +5631,8 @@ test.describe('Picklist input field', () => {
 					name: 'Plant',
 					objectFields: [
 						{
-							DBType: ObjectField.DBTypeEnum.String,
-							businessType: ObjectField.BusinessTypeEnum.Picklist,
+							DBType: 'String',
+							businessType: 'Picklist',
 							externalReferenceCode: 'countryERC',
 							indexed: true,
 							indexedAsKeyword: false,
@@ -4615,11 +5819,11 @@ test.describe('Picklist input field', () => {
 
 			// Create a page with a Form fragment
 
-			const objectDefinitionApiClient =
-				await apiHelpers.buildRestClient(ObjectDefinitionApi);
+			const objectDefinitionAPIClient =
+				await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 			const {className: objectDefinitionClassName} = (
-				await objectDefinitionApiClient.getObjectDefinitionByExternalReferenceCode(
+				await objectDefinitionAPIClient.getObjectDefinitionByExternalReferenceCode(
 					getObjectERC('Lemon Basket')
 				)
 			).body;
@@ -4731,11 +5935,11 @@ test.describe('Rich Text Fragment', () => {
 
 			// Create a page with a form fragment with a rich text fragment
 
-			const objectDefinitionApiClient =
-				await apiHelpers.buildRestClient(ObjectDefinitionApi);
+			const objectDefinitionAPIClient =
+				await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 			const {className: objectDefinitionClassName} = (
-				await objectDefinitionApiClient.getObjectDefinitionByExternalReferenceCode(
+				await objectDefinitionAPIClient.getObjectDefinitionByExternalReferenceCode(
 					getObjectERC('All Fields')
 				)
 			).body;
@@ -4825,11 +6029,11 @@ test.describe('Rich Text Fragment', () => {
 
 			// Adds rich text validation
 
-			const objectValidationRuleApiClient =
-				await apiHelpers.buildRestClient(ObjectValidationRuleApi);
+			const objectValidationRuleAPIClient =
+				await apiHelpers.buildRestClient(ObjectValidationRuleAPI);
 
 			const {body: objectValidationRule} =
-				await objectValidationRuleApiClient.postObjectDefinitionByExternalReferenceCodeObjectValidationRule(
+				await objectValidationRuleAPIClient.postObjectDefinitionByExternalReferenceCodeObjectValidationRule(
 					getObjectERC('All Fields'),
 					{
 						active: true,
@@ -4847,9 +6051,7 @@ test.describe('Rich Text Fragment', () => {
 								value: 'rich-text-erc',
 							} as any,
 						],
-						outputType:
-							ObjectValidationRule.OutputTypeEnum
-								.PartialValidation,
+						outputType: 'partialValidation',
 						script: 'NOT(isEmpty(richText))',
 						system: false,
 					}
@@ -4857,11 +6059,11 @@ test.describe('Rich Text Fragment', () => {
 
 			// Create a page with a form fragment with a rich text fragment
 
-			const objectDefinitionApiClient =
-				await apiHelpers.buildRestClient(ObjectDefinitionApi);
+			const objectDefinitionAPIClient =
+				await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 			const {className: objectDefinitionClassName} = (
-				await objectDefinitionApiClient.getObjectDefinitionByExternalReferenceCode(
+				await objectDefinitionAPIClient.getObjectDefinitionByExternalReferenceCode(
 					getObjectERC('All Fields')
 				)
 			).body;
@@ -4909,7 +6111,7 @@ test.describe('Rich Text Fragment', () => {
 
 			// Delete validation
 
-			await objectValidationRuleApiClient.deleteObjectValidationRule(
+			await objectValidationRuleAPIClient.deleteObjectValidationRule(
 				objectValidationRule.id
 			);
 		}
@@ -5184,11 +6386,11 @@ test.describe('Multistep', () => {
 
 			// Get the id of Lemon object from the site initializer
 
-			const objectDefinitionApiClient =
-				await apiHelpers.buildRestClient(ObjectDefinitionApi);
+			const objectDefinitionAPIClient =
+				await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 			const {className: objectDefinitionClassName} = (
-				await objectDefinitionApiClient.getObjectDefinitionByExternalReferenceCode(
+				await objectDefinitionAPIClient.getObjectDefinitionByExternalReferenceCode(
 					getObjectERC('Lemon')
 				)
 			).body;
@@ -5264,11 +6466,11 @@ test.describe('Multistep', () => {
 
 			// Get the id of Lemon object from the site initializer
 
-			const objectDefinitionApiClient =
-				await apiHelpers.buildRestClient(ObjectDefinitionApi);
+			const objectDefinitionAPIClient =
+				await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 			const {className: objectDefinitionClassName} = (
-				await objectDefinitionApiClient.getObjectDefinitionByExternalReferenceCode(
+				await objectDefinitionAPIClient.getObjectDefinitionByExternalReferenceCode(
 					getObjectERC('Lemon')
 				)
 			).body;
@@ -5361,11 +6563,11 @@ test.describe('Multistep', () => {
 
 			// Get the id of Lemon object from the site initializer
 
-			const objectDefinitionApiClient =
-				await apiHelpers.buildRestClient(ObjectDefinitionApi);
+			const objectDefinitionAPIClient =
+				await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 			const {className: objectDefinitionClassName} = (
-				await objectDefinitionApiClient.getObjectDefinitionByExternalReferenceCode(
+				await objectDefinitionAPIClient.getObjectDefinitionByExternalReferenceCode(
 					getObjectERC('Lemon')
 				)
 			).body;
@@ -5462,11 +6664,11 @@ test.describe('Multistep', () => {
 
 			// Get the id of Lemon object from the site initializer
 
-			const objectDefinitionApiClient =
-				await apiHelpers.buildRestClient(ObjectDefinitionApi);
+			const objectDefinitionAPIClient =
+				await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 			const {className: objectDefinitionClassName} = (
-				await objectDefinitionApiClient.getObjectDefinitionByExternalReferenceCode(
+				await objectDefinitionAPIClient.getObjectDefinitionByExternalReferenceCode(
 					getObjectERC('Lemon')
 				)
 			).body;
@@ -5593,11 +6795,11 @@ test.describe('Multistep', () => {
 
 			// Get the id of Lemon object from the site initializer
 
-			const objectDefinitionApiClient =
-				await apiHelpers.buildRestClient(ObjectDefinitionApi);
+			const objectDefinitionAPIClient =
+				await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 			const {className: objectDefinitionClassName} = (
-				await objectDefinitionApiClient.getObjectDefinitionByExternalReferenceCode(
+				await objectDefinitionAPIClient.getObjectDefinitionByExternalReferenceCode(
 					getObjectERC('Lemon')
 				)
 			).body;
@@ -5689,11 +6891,11 @@ test.describe('Multistep', () => {
 
 			// Get the id of Lemon object from the site initializer
 
-			const objectDefinitionApiClient =
-				await apiHelpers.buildRestClient(ObjectDefinitionApi);
+			const objectDefinitionAPIClient =
+				await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 			const {className: objectDefinitionClassName} = (
-				await objectDefinitionApiClient.getObjectDefinitionByExternalReferenceCode(
+				await objectDefinitionAPIClient.getObjectDefinitionByExternalReferenceCode(
 					getObjectERC('Lemon')
 				)
 			).body;
@@ -5757,11 +6959,11 @@ test.describe('Multistep', () => {
 
 			// Get the id of Lemon object from the site initializer
 
-			const objectDefinitionApiClient =
-				await apiHelpers.buildRestClient(ObjectDefinitionApi);
+			const objectDefinitionAPIClient =
+				await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 			const {className: objectDefinitionClassName} = (
-				await objectDefinitionApiClient.getObjectDefinitionByExternalReferenceCode(
+				await objectDefinitionAPIClient.getObjectDefinitionByExternalReferenceCode(
 					getObjectERC('Lemon')
 				)
 			).body;
@@ -5836,11 +7038,11 @@ test.describe('Multistep', () => {
 
 			// Get the id of Lemon object from the site initializer
 
-			const objectDefinitionApiClient =
-				await apiHelpers.buildRestClient(ObjectDefinitionApi);
+			const objectDefinitionAPIClient =
+				await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 			const {className: objectDefinitionClassName} = (
-				await objectDefinitionApiClient.getObjectDefinitionByExternalReferenceCode(
+				await objectDefinitionAPIClient.getObjectDefinitionByExternalReferenceCode(
 					getObjectERC('Lemon')
 				)
 			).body;
@@ -5967,11 +7169,11 @@ test.describe('Multistep', () => {
 
 			// Get the id of Potato object from the site initializer
 
-			const objectDefinitionApiClient =
-				await apiHelpers.buildRestClient(ObjectDefinitionApi);
+			const objectDefinitionAPIClient =
+				await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 			const {className: objectDefinitionClassName} = (
-				await objectDefinitionApiClient.getObjectDefinitionByExternalReferenceCode(
+				await objectDefinitionAPIClient.getObjectDefinitionByExternalReferenceCode(
 					getObjectERC('Potato')
 				)
 			).body;
@@ -6117,11 +7319,11 @@ test.describe('Multistep', () => {
 
 			// Get the id of Lemon object from the site initializer
 
-			const objectDefinitionApiClient =
-				await apiHelpers.buildRestClient(ObjectDefinitionApi);
+			const objectDefinitionAPIClient =
+				await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 			const {className: objectDefinitionClassName} = (
-				await objectDefinitionApiClient.getObjectDefinitionByExternalReferenceCode(
+				await objectDefinitionAPIClient.getObjectDefinitionByExternalReferenceCode(
 					getObjectERC('Lemon')
 				)
 			).body;
@@ -6189,11 +7391,11 @@ test.describe('Multistep', () => {
 
 			// Get the id of Lemon object from the site initializer
 
-			const objectDefinitionApiClient =
-				await apiHelpers.buildRestClient(ObjectDefinitionApi);
+			const objectDefinitionAPIClient =
+				await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 			const {className: objectDefinitionClassName} = (
-				await objectDefinitionApiClient.getObjectDefinitionByExternalReferenceCode(
+				await objectDefinitionAPIClient.getObjectDefinitionByExternalReferenceCode(
 					getObjectERC('Lemon')
 				)
 			).body;
@@ -6314,11 +7516,11 @@ test.describe('Multistep', () => {
 
 			// Get the id of Lemon object from the site initializer
 
-			const objectDefinitionApiClient =
-				await apiHelpers.buildRestClient(ObjectDefinitionApi);
+			const objectDefinitionAPIClient =
+				await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 			const {className: objectDefinitionClassName} = (
-				await objectDefinitionApiClient.getObjectDefinitionByExternalReferenceCode(
+				await objectDefinitionAPIClient.getObjectDefinitionByExternalReferenceCode(
 					getObjectERC('Lemon')
 				)
 			).body;
@@ -6736,6 +7938,18 @@ test.describe('Edit mode form errors', () => {
 				'Error:Fragments cannot be placed inside an unmapped form container.',
 				{type: 'danger'}
 			);
+
+			// Publish the page and check the localization selector is visible
+
+			await pageEditorPage.publishPage();
+
+			await page.goto(
+				`/web${pageManagementSite.friendlyUrlPath}${layout.friendlyUrlPath}`
+			);
+
+			await expect(
+				page.getByLabel('Select a language, current language:')
+			).toBeVisible();
 		}
 	);
 
@@ -6747,7 +7961,7 @@ test.describe('Edit mode form errors', () => {
 			// Create a new object definition with a required field
 
 			const objectDefinitionAPIClient =
-				await apiHelpers.buildRestClient(ObjectDefinitionApi);
+				await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 			const {body: objectDefinition} =
 				await objectDefinitionAPIClient.postObjectDefinition({
@@ -6759,8 +7973,8 @@ test.describe('Edit mode form errors', () => {
 					name: 'Student',
 					objectFields: [
 						{
-							DBType: ObjectField.DBTypeEnum.String,
-							businessType: ObjectField.BusinessTypeEnum.Text,
+							DBType: 'String',
+							businessType: 'Text',
 							externalReferenceCode: 'nameERC',
 							indexed: true,
 							indexedAsKeyword: true,
@@ -6772,8 +7986,8 @@ test.describe('Edit mode form errors', () => {
 							required: true,
 						},
 						{
-							DBType: ObjectField.DBTypeEnum.Integer,
-							businessType: ObjectField.BusinessTypeEnum.Integer,
+							DBType: 'Integer',
+							businessType: 'Integer',
 							externalReferenceCode: 'ageERC',
 							indexed: true,
 							indexedAsKeyword: false,
@@ -6972,11 +8186,11 @@ test.describe('Edit mode form errors', () => {
 
 			// Get the id of Lemon object from the site initializer
 
-			const objectDefinitionApiClient =
-				await apiHelpers.buildRestClient(ObjectDefinitionApi);
+			const objectDefinitionAPIClient =
+				await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 			const {className: objectDefinitionClassName} = (
-				await objectDefinitionApiClient.getObjectDefinitionByExternalReferenceCode(
+				await objectDefinitionAPIClient.getObjectDefinitionByExternalReferenceCode(
 					getObjectERC('Lemon')
 				)
 			).body;
@@ -7021,11 +8235,11 @@ test.describe('Edit mode form errors', () => {
 
 			// Get the id of Lemon object from the site initializer
 
-			const objectDefinitionApiClient =
-				await apiHelpers.buildRestClient(ObjectDefinitionApi);
+			const objectDefinitionAPIClient =
+				await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 			const {className: objectDefinitionClassName} = (
-				await objectDefinitionApiClient.getObjectDefinitionByExternalReferenceCode(
+				await objectDefinitionAPIClient.getObjectDefinitionByExternalReferenceCode(
 					getObjectERC('Lemon')
 				)
 			).body;
@@ -7183,11 +8397,11 @@ test.describe('View mode form errors', () => {
 
 			// Create a default display page for lemon object
 
-			const objectDefinitionApiClient =
-				await apiHelpers.buildRestClient(ObjectDefinitionApi);
+			const objectDefinitionAPIClient =
+				await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 			const {className: objectDefinitionClassName} = (
-				await objectDefinitionApiClient.getObjectDefinitionByExternalReferenceCode(
+				await objectDefinitionAPIClient.getObjectDefinitionByExternalReferenceCode(
 					getObjectERC('Lemon')
 				)
 			).body;
@@ -7324,7 +8538,7 @@ test(
 		// Create a new object definition with all fields
 
 		const objectDefinitionAPIClient =
-			await apiHelpers.buildRestClient(ObjectDefinitionApi);
+			await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 		const {body: objectDefinition} =
 			await objectDefinitionAPIClient.postObjectDefinition({
@@ -7335,7 +8549,7 @@ test(
 				name: 'ReadOnlyObject',
 				objectFields: [
 					{
-						DBType: ObjectField.DBTypeEnum.Boolean,
+						DBType: 'Boolean',
 						externalReferenceCode: 'boolean-erc',
 						indexed: true,
 						indexedAsKeyword: true,
@@ -7345,7 +8559,7 @@ test(
 						name: 'boolean',
 					},
 					{
-						DBType: ObjectField.DBTypeEnum.DateTime,
+						DBType: 'DateTime',
 						externalReferenceCode: 'date-time-erc',
 						indexed: true,
 						indexedAsKeyword: false,
@@ -7361,7 +8575,7 @@ test(
 						],
 					},
 					{
-						DBType: ObjectField.DBTypeEnum.Date,
+						DBType: 'Date',
 						externalReferenceCode: 'date-erc',
 						indexed: true,
 						indexedAsKeyword: false,
@@ -7371,7 +8585,7 @@ test(
 						name: 'date',
 					},
 					{
-						DBType: ObjectField.DBTypeEnum.Clob,
+						DBType: 'Clob',
 						externalReferenceCode: 'long-text-erc',
 						indexed: true,
 						indexedAsKeyword: false,
@@ -7381,8 +8595,8 @@ test(
 						name: 'longText',
 					},
 					{
-						DBType: ObjectField.DBTypeEnum.Long,
-						businessType: ObjectField.BusinessTypeEnum.Attachment,
+						DBType: 'Long',
+						businessType: 'Attachment',
 						externalReferenceCode: 'dl-file-upload-erc',
 						indexed: true,
 						indexedAsKeyword: false,
@@ -7405,10 +8619,10 @@ test(
 								value: 'documentsAndMedia',
 							},
 						] as any,
-						type: ObjectField.TypeEnum.Long,
+						type: 'Long',
 					},
 					{
-						DBType: ObjectField.DBTypeEnum.String,
+						DBType: 'String',
 						externalReferenceCode: 'text-erc',
 						indexed: true,
 						indexedAsKeyword: true,
@@ -7418,8 +8632,8 @@ test(
 						name: 'text',
 					},
 					{
-						DBType: ObjectField.DBTypeEnum.Clob,
-						businessType: ObjectField.BusinessTypeEnum.RichText,
+						DBType: 'Clob',
+						businessType: 'RichText',
 						externalReferenceCode: 'rich-text-erc',
 						indexed: true,
 						indexedAsKeyword: false,
@@ -7429,8 +8643,8 @@ test(
 						name: 'richText',
 					},
 					{
-						DBType: ObjectField.DBTypeEnum.String,
-						businessType: ObjectField.BusinessTypeEnum.Picklist,
+						DBType: 'String',
+						businessType: 'Picklist',
 						externalReferenceCode: 'picklist-erc',
 						indexed: true,
 						indexedAsKeyword: false,
@@ -7442,9 +8656,8 @@ test(
 						name: 'picklist',
 					},
 					{
-						DBType: ObjectField.DBTypeEnum.String,
-						businessType:
-							ObjectField.BusinessTypeEnum.MultiselectPicklist,
+						DBType: 'String',
+						businessType: 'MultiselectPicklist',
 						externalReferenceCode: 'multiselect-picklist-erc',
 						indexed: true,
 						indexedAsKeyword: false,
@@ -7456,7 +8669,7 @@ test(
 						name: 'multiSelectPicklist',
 					},
 					{
-						DBType: ObjectField.DBTypeEnum.Integer,
+						DBType: 'Integer',
 						externalReferenceCode: 'numeric-erc',
 						indexed: true,
 						indexedAsKeyword: false,
@@ -7478,13 +8691,13 @@ test(
 
 		// Set readOnly to true for all fields
 
-		const objectFieldApiClient =
-			await apiHelpers.buildRestClient(ObjectFieldApi);
+		const objectFieldAPIClient =
+			await apiHelpers.buildRestClient(ObjectFieldAPI);
 
 		for (const objectField of objectDefinition.objectFields) {
-			await objectFieldApiClient.putObjectField(objectField.id, {
+			await objectFieldAPIClient.putObjectField(objectField.id, {
 				...objectField,
-				readOnly: ObjectField.ReadOnlyEnum.True,
+				readOnly: 'true',
 			});
 		}
 
@@ -7559,11 +8772,11 @@ test(
 	'Submitted entry status configuration is only visible if the form button is submit',
 	{tag: '@LPD-37217'},
 	async ({apiHelpers, page, pageEditorPage, pageManagementSite}) => {
-		const objectDefinitionApiClient =
-			await apiHelpers.buildRestClient(ObjectDefinitionApi);
+		const objectDefinitionAPIClient =
+			await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 		const {className: objectDefinitionClassName} = (
-			await objectDefinitionApiClient.getObjectDefinitionByExternalReferenceCode(
+			await objectDefinitionAPIClient.getObjectDefinitionByExternalReferenceCode(
 				getObjectERC('Lemon')
 			)
 		).body;
@@ -7613,3 +8826,27 @@ test(
 		).not.toBeVisible();
 	}
 );
+
+async function chooseFileFromDocumentLibrary({
+	fileName,
+	page,
+	trigger,
+}: {
+	fileName: string;
+	page: Page;
+	trigger: Locator;
+}) {
+	const iframe = page.frameLocator('iframe');
+
+	await clickAndExpectToBeVisible({
+		target: iframe.getByText('Drag & Drop Your Files or Browse to Upload'),
+		timeout: 2000,
+		trigger,
+	});
+
+	await clickAndExpectToBeHidden({
+		target: iframe.getByText(fileName),
+		timeout: 2000,
+		trigger: iframe.locator('.card', {hasText: fileName}).locator('img'),
+	});
+}

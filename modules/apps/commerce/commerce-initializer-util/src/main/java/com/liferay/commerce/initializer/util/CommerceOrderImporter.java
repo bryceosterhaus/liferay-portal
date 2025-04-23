@@ -173,7 +173,8 @@ public class CommerceOrderImporter {
 			User user = _userLocalService.getUser(userId);
 
 			accountEntry = _accountEntryLocalService.addAccountEntry(
-				userId, AccountConstants.PARENT_ACCOUNT_ENTRY_ID_DEFAULT,
+				StringPool.BLANK, userId,
+				AccountConstants.PARENT_ACCOUNT_ENTRY_ID_DEFAULT,
 				user.getFullName(), null, null, user.getEmailAddress(), null,
 				StringPool.BLANK, AccountConstants.ACCOUNT_ENTRY_TYPE_PERSON,
 				WorkflowConstants.STATUS_APPROVED, serviceContext);
@@ -202,9 +203,8 @@ public class CommerceOrderImporter {
 		// Create CommerceContext
 
 		CommerceContext commerceContext = _commerceContextFactory.create(
-			serviceContext.getCompanyId(), commerceOrder.getGroupId(),
-			serviceContext.getUserId(), commerceOrder.getCommerceOrderId(),
-			accountEntry.getAccountEntryId());
+			accountEntry.getAccountEntryId(), commerceOrder.getGroupId(), null,
+			commerceOrder.getCommerceOrderId(), serviceContext.getCompanyId());
 
 		// Create CommerceOrderItem
 

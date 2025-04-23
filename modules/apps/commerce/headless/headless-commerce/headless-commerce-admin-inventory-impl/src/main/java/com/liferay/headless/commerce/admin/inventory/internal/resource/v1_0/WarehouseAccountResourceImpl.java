@@ -5,7 +5,6 @@
 
 package com.liferay.headless.commerce.admin.inventory.internal.resource.v1_0;
 
-import com.liferay.account.exception.NoSuchEntryException;
 import com.liferay.account.model.AccountEntry;
 import com.liferay.account.service.AccountEntryService;
 import com.liferay.commerce.exception.NoSuchWarehouseException;
@@ -204,15 +203,9 @@ public class WarehouseAccountResourceImpl
 		}
 		else {
 			accountEntry =
-				_accountEntryService.fetchAccountEntryByExternalReferenceCode(
-					commerceInventoryWarehouse.getCompanyId(),
-					warehouseAccount.getAccountExternalReferenceCode());
-
-			if (accountEntry == null) {
-				throw new NoSuchEntryException(
-					"Unable to find account with external reference code " +
-						warehouseAccount.getAccountExternalReferenceCode());
-			}
+				_accountEntryService.getAccountEntryByExternalReferenceCode(
+					warehouseAccount.getAccountExternalReferenceCode(),
+					commerceInventoryWarehouse.getCompanyId());
 		}
 
 		return _commerceInventoryWarehouseRelService.

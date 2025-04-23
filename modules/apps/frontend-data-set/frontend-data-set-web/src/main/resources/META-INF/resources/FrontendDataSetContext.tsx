@@ -9,6 +9,7 @@ import {IInlineEditingSettings, IItemsActions, ISchema} from '.';
 
 export interface IFrontendDataSetContext {
 	actionParameterName?: string | null;
+	allItemsSelectedActive: boolean;
 	apiURL?: string;
 	appURL?: string;
 	applyItemInlineUpdates: Function;
@@ -38,6 +39,13 @@ export interface IFrontendDataSetContext {
 	nestedItemsReferenceKey?: string;
 	onActionDropdownItemClick: Function;
 	onBulkActionItemClick: Function;
+	onItemsChange: ({
+		itemKey,
+		items,
+	}: {
+		itemKey?: string;
+		items: Array<any>;
+	}) => void;
 	onSearch: ({query}: {query: string}) => void;
 	onSelect: Function;
 	openModal: Function;
@@ -84,6 +92,7 @@ export interface IInternalRenderer {
 export type TRenderer = IClientExtensionRenderer | IInternalRenderer;
 
 const FrontendDataSetContext = React.createContext({
+	allItemsSelectedActive: false,
 	applyItemInlineUpdates: () => {},
 	createInlineItem: () => {},
 	executeAsyncItemAction: () => {},
@@ -91,6 +100,7 @@ const FrontendDataSetContext = React.createContext({
 	loadData: () => {},
 	onActionDropdownItemClick: () => {},
 	onBulkActionItemClick: () => {},
+	onItemsChange: () => {},
 	onSearch: () => {},
 	onSelect: () => {},
 	openModal: () => {},

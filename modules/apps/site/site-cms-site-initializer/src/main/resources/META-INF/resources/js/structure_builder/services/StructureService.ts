@@ -3,27 +3,37 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-import {API, objectDefinitionUtils} from '@liferay/object-js-components-web';
-
-import {Field, State} from '../contexts/StateContext';
+import {State} from '../contexts/StateContext';
 import buildObjectDefinition from '../utils/buildObjectDefinition';
+import {Field} from '../utils/field';
+import getRandomId from '../utils/getRandomId';
+import ApiHelper from './ApiHelper';
 
 async function createStructure({
+	erc = getRandomId(),
 	fields,
 	label,
-	name = objectDefinitionUtils.normalizeName(label),
+	name,
+	spaces,
 }: {
+	erc?: State['erc'];
 	fields: Field[];
 	label: State['label'];
 	name?: State['name'];
+	spaces: State['spaces'];
 }) {
 	const objectDefinition = buildObjectDefinition({
+		erc,
 		fields,
 		label,
 		name,
+		spaces,
 	});
 
-	return await API.postObjectDefinition(objectDefinition);
+	return await ApiHelper.post(
+		'/o/object-admin/v1.0/object-definitions',
+		objectDefinition
+	);
 }
 
 async function publishStructure({id}: {id: State['id']}) {
@@ -31,23 +41,39 @@ async function publishStructure({id}: {id: State['id']}) {
 		return;
 	}
 
-	return await API.postObjectDefinitionPublish(id);
+	return await ApiHelper.post(
+		`/o/object-admin/v1.0/object-definitions/${id}/publish`
+	);
 }
 
 async function updateStructure({
+	erc,
 	fields,
 	id,
 	label,
 	name,
+	spaces,
 }: {
+	erc: State['erc'];
 	fields: Field[];
 	id: State['id'];
 	label: State['label'];
 	name: State['name'];
+	spaces: State['spaces'];
 }) {
-	const objectDefinition = buildObjectDefinition({fields, id, label, name});
+	const objectDefinition = buildObjectDefinition({
+		erc,
+		fields,
+		id,
+		label,
+		name,
+		spaces,
+	});
 
-	return await API.putObjectDefinition(objectDefinition);
+	return await ApiHelper.put(
+		`/o/object-admin/v1.0/object-definitions/${id}`,
+		objectDefinition
+	);
 }
 
 export default {

@@ -18,7 +18,10 @@ import com.liferay.frontend.data.set.filter.FDSFilterContextContributor;
 import com.liferay.frontend.data.set.filter.FDSFilterContextContributorRegistry;
 import com.liferay.frontend.data.set.filter.FDSFilterRegistry;
 import com.liferay.frontend.data.set.model.FDSActionDropdownItem;
+import com.liferay.frontend.data.set.model.FDSSortItem;
 import com.liferay.frontend.data.set.serializer.FDSSerializer;
+import com.liferay.frontend.data.set.sort.FDSSorts;
+import com.liferay.frontend.data.set.sort.FDSSortsRegistry;
 import com.liferay.frontend.data.set.view.FDSView;
 import com.liferay.frontend.data.set.view.FDSViewContextContributor;
 import com.liferay.frontend.data.set.view.FDSViewContextContributorRegistry;
@@ -28,6 +31,8 @@ import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 
@@ -51,6 +56,19 @@ import org.osgi.service.component.annotations.Reference;
 )
 public class SystemFDSSerializer
 	extends BaseFDSSerializer implements FDSSerializer {
+
+	@Override
+	public boolean isAvailable(
+		String fdsName, HttpServletRequest httpServletRequest) {
+
+		if ((fdsViewRegistry.getFDSViews(fdsName) != null) ||
+			(systemFDSEntryRegistry.getSystemFDSEntry(fdsName) != null)) {
+
+			return true;
+		}
+
+		return false;
+	}
 
 	@Override
 	public String serializeAPIURL(
@@ -138,6 +156,77 @@ public class SystemFDSSerializer
 	}
 
 	@Override
+	public JSONObject serializePagination(
+		String fdsName, HttpServletRequest httpServletRequest) {
+
+		SystemFDSEntry systemFDSEntry =
+			systemFDSEntryRegistry.getSystemFDSEntry(fdsName);
+
+		if (systemFDSEntry == null) {
+			return null;
+		}
+
+		return JSONUtil.put(
+			"deltas",
+			() -> {
+				int[] listOfItemsPerPage =
+					systemFDSEntry.getListOfItemsPerPage();
+
+				if (ArrayUtil.isEmpty(listOfItemsPerPage)) {
+					listOfItemsPerPage =
+						_systemFDSEntry.getListOfItemsPerPage();
+				}
+
+				return JSONUtil.toJSONArray(
+					ListUtil.fromArray(listOfItemsPerPage),
+					itemsPerPage -> {
+						if (itemsPerPage > 0) {
+							return JSONUtil.put("label", itemsPerPage);
+						}
+
+						return null;
+					});
+			}
+		).put(
+			"initialDelta",
+			() -> {
+				if (systemFDSEntry.getDefaultItemsPerPage() > 0) {
+					return systemFDSEntry.getDefaultItemsPerPage();
+				}
+
+				return _systemFDSEntry.getDefaultItemsPerPage();
+			}
+		);
+	}
+
+	@Override
+	public String serializePropsTransformer(
+		String fdsName, HttpServletRequest httpServletRequest) {
+
+		SystemFDSEntry systemFDSEntry =
+			systemFDSEntryRegistry.getSystemFDSEntry(fdsName);
+
+		if (systemFDSEntry == null) {
+			return null;
+		}
+
+		return systemFDSEntry.getPropsTransformer();
+	}
+
+	@Override
+	public List<FDSSortItem> serializeSorts(
+		String fdsName, HttpServletRequest httpServletRequest) {
+
+		FDSSorts fdsSorts = fdsSortsRegistry.getFDSSorts(fdsName);
+
+		if (fdsSorts == null) {
+			return Collections.emptyList();
+		}
+
+		return fdsSorts.getFDSSortItems(httpServletRequest);
+	}
+
+	@Override
 	public JSONArray serializeViews(
 		String fdsName, HttpServletRequest httpServletRequest) {
 
@@ -209,6 +298,9 @@ public class SystemFDSSerializer
 	protected FDSItemsActionsRegistry fdsItemsActionsRegistry;
 
 	@Reference
+	protected FDSSortsRegistry fdsSortsRegistry;
+
+	@Reference
 	protected FDSViewContextContributorRegistry
 		fdsViewContextContributorRegistry;
 
@@ -266,5 +358,52 @@ public class SystemFDSSerializer
 			jsonArray.put(jsonObject);
 		}
 	}
+
+	private static final SystemFDSEntry _systemFDSEntry = new SystemFDSEntry() {
+
+		@Override
+		public String getAdditionalAPIURLParameters() {
+			return "";
+		}
+
+		public int getDefaultItemsPerPage() {
+			return SystemFDSEntry.super.getDefaultItemsPerPage();
+		}
+
+		@Override
+		public String getDescription() {
+			return "";
+		}
+
+		public int[] getListOfItemsPerPage() {
+			return SystemFDSEntry.super.getListOfItemsPerPage();
+		}
+
+		@Override
+		public String getName() {
+			return "";
+		}
+
+		@Override
+		public String getRESTApplication() {
+			return "";
+		}
+
+		@Override
+		public String getRESTEndpoint() {
+			return "";
+		}
+
+		@Override
+		public String getRESTSchema() {
+			return "";
+		}
+
+		@Override
+		public String getTitle() {
+			return "";
+		}
+
+	};
 
 }

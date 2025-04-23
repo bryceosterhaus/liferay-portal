@@ -9,6 +9,7 @@ import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.instances.internal.configuration.InsertPortalInstanceConfiguration;
 import com.liferay.portal.kernel.dao.jdbc.DataAccess;
+import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.service.CompanyLocalService;
@@ -44,6 +45,8 @@ public class InsertPortalInstanceOperation extends BasePortalInstanceOperation {
 	protected void activate(Map<String, Object> properties) {
 		onPortalInstance(
 			() -> {
+				FeatureFlagManagerUtil.checkEnabled("LPD-11342");
+
 				InsertPortalInstanceConfiguration
 					insertPortalInstanceConfiguration =
 						ConfigurableUtil.createConfigurable(

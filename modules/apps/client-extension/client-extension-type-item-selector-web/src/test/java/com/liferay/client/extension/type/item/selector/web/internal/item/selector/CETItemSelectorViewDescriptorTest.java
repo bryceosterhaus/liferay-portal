@@ -10,7 +10,7 @@ import com.liferay.client.extension.type.CET;
 import com.liferay.client.extension.type.GlobalCSSCET;
 import com.liferay.client.extension.type.GlobalJSCET;
 import com.liferay.client.extension.type.ThemeCSSCET;
-import com.liferay.client.extension.type.item.selector.criterion.CETItemSelectorCriterion;
+import com.liferay.client.extension.type.item.selector.CETItemSelectorCriterion;
 import com.liferay.client.extension.type.manager.CETManager;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -149,11 +149,11 @@ public class CETItemSelectorViewDescriptorTest {
 		SearchContainer<CET> searchContainer =
 			_cetItemSelectorViewDescriptor.getSearchContainer();
 
-		List<CET> results = searchContainer.getResults();
+		List<CET> cets = searchContainer.getResults();
 
-		Assert.assertEquals(results.toString(), 1, results.size());
+		Assert.assertEquals(cets.toString(), 1, cets.size());
 
-		CET cet3 = results.get(0);
+		CET cet3 = cets.get(0);
 
 		Assert.assertEquals(
 			"", ReflectionTestUtil.invoke(cet3, "getScope", null));

@@ -11,6 +11,7 @@ import {
 	SingleSelect,
 	stringUtils,
 } from '@liferay/object-js-components-web';
+import {ILearnResourceContext} from 'frontend-js-components-web';
 import {createResourceURL} from 'frontend-js-web';
 import React, {useEffect, useState} from 'react';
 
@@ -25,6 +26,7 @@ interface ObjectRelationshipFormBaseProps {
 	errors: FormError<ObjectRelationship>;
 	handleChange: React.ChangeEventHandler<HTMLInputElement>;
 	hasDefinedObjectDefinitionTarget?: boolean;
+	learnResources: ILearnResourceContext;
 	objectDefinitionExternalReferenceCode1: string;
 	objectDefinitionExternalReferenceCode2?: string;
 	onChangeInheritanceCheckbox: (
@@ -90,6 +92,7 @@ export function ObjectRelationshipFormBase({
 	errors,
 	handleChange,
 	hasDefinedObjectDefinitionTarget,
+	learnResources,
 	objectDefinitionExternalReferenceCode1,
 	objectDefinitionExternalReferenceCode2,
 	onChangeInheritanceCheckbox,
@@ -337,11 +340,12 @@ export function ObjectRelationshipFormBase({
 								name="currentObjectInput"
 								readOnly={true}
 								required
-								value={stringUtils.getLocalizableLabel(
-									objectDefinition2?.defaultLanguageId as Liferay.Language.Locale,
-									objectDefinition2?.label,
-									objectDefinition2?.name
-								)}
+								value={stringUtils.getLocalizableLabel({
+									fallbackLabel: objectDefinition2?.name,
+									fallbackLanguageId:
+										objectDefinition2?.defaultLanguageId as Liferay.Language.Locale,
+									labels: objectDefinition2?.label,
+								})}
 							/>
 						) : (
 							<SelectObjectDefinition
@@ -380,11 +384,12 @@ export function ObjectRelationshipFormBase({
 								name="currentObjectInput"
 								readOnly={true}
 								required
-								value={stringUtils.getLocalizableLabel(
-									objectDefinition1?.defaultLanguageId as Liferay.Language.Locale,
-									objectDefinition1?.label,
-									objectDefinition1?.name
-								)}
+								value={stringUtils.getLocalizableLabel({
+									fallbackLabel: objectDefinition1?.name,
+									fallbackLanguageId:
+										objectDefinition1?.defaultLanguageId as Liferay.Language.Locale,
+									labels: objectDefinition1?.label,
+								})}
 							/>
 						) : (
 							<SelectObjectDefinition
@@ -433,6 +438,7 @@ export function ObjectRelationshipFormBase({
 				values.type === 'oneToMany' &&
 				Liferay.FeatureFlags['LPD-34594'] && (
 					<ObjectRelationshipInheritanceCheckbox
+						learnResources={learnResources}
 						onChange={onChangeInheritanceCheckbox}
 						values={values}
 					/>

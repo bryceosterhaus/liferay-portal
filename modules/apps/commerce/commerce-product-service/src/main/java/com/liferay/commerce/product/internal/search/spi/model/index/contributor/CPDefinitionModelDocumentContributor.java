@@ -35,6 +35,7 @@ import com.liferay.commerce.product.service.CPConfigurationEntrySettingLocalServ
 import com.liferay.commerce.product.service.CPConfigurationListLocalService;
 import com.liferay.commerce.product.service.CPDefinitionLinkLocalService;
 import com.liferay.commerce.product.service.CPDefinitionLocalService;
+import com.liferay.commerce.product.service.CPDefinitionSpecificationOptionValueLocalService;
 import com.liferay.commerce.product.service.CPInstanceLocalService;
 import com.liferay.commerce.product.service.CommerceChannelRelLocalService;
 import com.liferay.friendly.url.model.FriendlyURLEntry;
@@ -187,7 +188,7 @@ public class CPDefinitionModelDocumentContributor
 
 			document.addKeyword(
 				CPField.EXTERNAL_REFERENCE_CODE,
-				cProduct.getExternalReferenceCode());
+				cProduct.getExternalReferenceCode(), true);
 
 			document.addKeyword(
 				CPField.GTINS,
@@ -225,7 +226,8 @@ public class CPDefinitionModelDocumentContributor
 			document.addKeyword(
 				CPField.PRODUCT_ID, cpDefinition.getCProductId());
 			document.addKeyword(
-				CPField.PRODUCT_TYPE_NAME, cpDefinition.getProductTypeName());
+				CPField.PRODUCT_TYPE_NAME, cpDefinition.getProductTypeName(),
+				true);
 			document.addKeyword(CPField.PUBLISHED, cpDefinition.isPublished());
 			document.addText(
 				CPField.SHORT_DESCRIPTION,
@@ -235,8 +237,10 @@ public class CPDefinitionModelDocumentContributor
 			List<CPDefinitionSpecificationOptionValue>
 				cpDefinitionSpecificationOptionValues =
 					_getFilteredCPDefinitionSpecificationOptionValues(
-						cpDefinition.
-							getCPDefinitionSpecificationOptionValues());
+						_cpDefinitionSpecificationOptionValueLocalService.
+							getCPDefinitionSpecificationOptionValues(
+								cpDefinition.getCPDefinitionId(), null,
+								QueryUtil.ALL_POS, QueryUtil.ALL_POS, null));
 
 			document.addNumber(
 				CPField.SPECIFICATION_IDS,
@@ -661,7 +665,10 @@ public class CPDefinitionModelDocumentContributor
 					cpDefinitionSpecificationOptionValue.
 						getCPSpecificationOption();
 
-				if (!cpSpecificationOption.isFacetable()) {
+				if (!cpDefinitionSpecificationOptionValue.isVisible() ||
+					!cpSpecificationOption.isFacetable() ||
+					!cpSpecificationOption.isVisible()) {
+
 					return null;
 				}
 
@@ -738,6 +745,10 @@ public class CPDefinitionModelDocumentContributor
 
 	@Reference
 	private CPDefinitionLocalService _cpDefinitionLocalService;
+
+	@Reference
+	private CPDefinitionSpecificationOptionValueLocalService
+		_cpDefinitionSpecificationOptionValueLocalService;
 
 	@Reference
 	private CPInstanceLocalService _cpInstanceLocalService;

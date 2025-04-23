@@ -246,13 +246,13 @@ public class RowChecker {
 
 		StringBundler sb = new StringBundler(9);
 
-		sb.append("onClick=\"Liferay.Util.rowCheckerCheckAllBox(AUI().");
-		sb.append("one(this).ancestor('.table'), AUI().one(this).");
-		sb.append("ancestor('tr:not(.d-none)'), ");
+		sb.append("onClick=\"Liferay.Util.checkAll(AUI");
+		sb.append("AUI().one(this).ancestor('.table'),");
 		sb.append(checkBoxRowIds);
-		sb.append(", ");
+		sb.append(",");
 		sb.append(checkBoxAllRowIds);
-		sb.append(", 'info');");
+		sb.append("); AUI().one(this).ancestor('tr:not(.d-none)')?.");
+		sb.append("toggleClass('info');");
 
 		if (Validator.isNotNull(checkBoxPostOnClick)) {
 			sb.append(checkBoxPostOnClick);

@@ -8,21 +8,24 @@ import {Locator, Page, expect} from '@playwright/test';
 import {ApplicationsMenuPage} from '../../../../../pages/product-navigation-applications-menu/ApplicationsMenuPage';
 
 export class SystemDataSetsPage {
+	readonly activeToggle: Locator;
 	private readonly applicationsMenuPage: ApplicationsMenuPage;
 	readonly createButton: Locator;
 	readonly creationModal: {
+		readonly body: Locator;
 		readonly cancelButton: Locator;
-		readonly container: Locator;
 		readonly createButton: Locator;
 		readonly header: Locator;
 		readonly listItems: Locator;
 		readonly searchInput: Locator;
 	};
+	readonly inactiveToggle: Locator;
 	readonly page: Page;
 	readonly pageContainer: Locator;
 	private readonly systemDataSetsTab: Locator;
 
 	constructor(page: Page) {
+		this.activeToggle = page.getByLabel('Active', {exact: true});
 		this.applicationsMenuPage = new ApplicationsMenuPage(page);
 
 		const systemDataSetsPageContainer = page.locator('.system-data-sets');
@@ -33,22 +36,31 @@ export class SystemDataSetsPage {
 				name: 'Create System Data Set Customization',
 			});
 
-		const creationModalContainer = page.locator(
-			'.select-system-data-set-modal-content'
+		const creationModalBody = page.locator(
+			'.select-system-data-set-modal-body'
+		);
+
+		const creationModalFooter = page.locator(
+			'.select-system-data-set-modal-footer'
+		);
+
+		const creationModalHeader = page.locator(
+			'.select-system-data-set-modal-header'
 		);
 
 		this.creationModal = {
-			cancelButton: creationModalContainer.getByRole('button', {
+			body: creationModalBody,
+			cancelButton: creationModalFooter.getByRole('button', {
 				name: 'Cancel',
 			}),
-			container: creationModalContainer,
-			createButton: creationModalContainer.getByRole('button', {
+			createButton: creationModalFooter.getByRole('button', {
 				name: 'Create',
 			}),
-			header: creationModalContainer.locator('.modal-header'),
-			listItems: creationModalContainer.getByRole('listitem'),
-			searchInput: creationModalContainer.getByPlaceholder('Search'),
+			header: creationModalHeader,
+			listItems: creationModalBody.getByRole('listitem'),
+			searchInput: creationModalBody.getByPlaceholder('Search'),
 		};
+		this.inactiveToggle = page.getByLabel('Inactive', {exact: true});
 		this.page = page;
 		this.pageContainer = systemDataSetsPageContainer;
 		this.systemDataSetsTab = page

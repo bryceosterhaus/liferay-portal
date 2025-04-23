@@ -185,6 +185,12 @@ public class ObjectEntryOpenAPIContributor extends BaseOpenAPIContributor {
 			schemas.remove("TaxonomyCategoryBrief");
 		}
 
+		if (!_objectDefinition.isEnableObjectEntryVersioning()) {
+			objectDefinitionSchemaProperties.remove("systemProperties");
+
+			schemas.remove("SystemProperties");
+		}
+
 		if ((openAPIContext != null) &&
 			FeatureFlagManagerUtil.isEnabled("LPS-180090")) {
 

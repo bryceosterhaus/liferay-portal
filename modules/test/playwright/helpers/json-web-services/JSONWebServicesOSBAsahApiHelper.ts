@@ -42,13 +42,17 @@ type Event = {
 	applicationId: string;
 	assetId?: string;
 	assetTitle?: string;
+	browserName?: string;
 	canonicalUrl: string;
 	channelId: string;
 	dataSourceId?: number;
+	deviceType?: string;
 	eventDate: string;
 	eventId: string;
 	eventProperties?: string;
+	platformName?: string;
 	properties?: Property[];
+	referrer?: string;
 	title: string;
 	userId: string;
 };
@@ -257,7 +261,7 @@ export class JSONWebServicesOSBAsahApiHelper {
 	async closeSessions(): Promise<any> {
 		return this.apiHelpers.delete(
 			`${asahConfig.environment.backendUrl}${this.basePath}/sessions/close`,
-			this.getHeaders()
+			{headers: this.getHeaders()}
 		);
 	}
 }

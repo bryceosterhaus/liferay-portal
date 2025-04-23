@@ -312,6 +312,7 @@ type DefaultProperties = {
 	productId: string;
 	trialAccountCheck: 'false' | 'true';
 	trialEulaURL: string;
+	useSiteTaxonomyVocabularyQuery: boolean;
 };
 
 type DeliveryProduct = {
@@ -332,6 +333,7 @@ type DeliveryProduct = {
 	shortDescription: string;
 	skus: DeliverySKU[];
 	urlImage: string;
+	urls: {en_US: string};
 };
 
 type DeliveryProductAttachment = {
@@ -494,6 +496,7 @@ type PlacedOrder = {
 		label_i18n: string;
 	};
 	orderTypeExternalReferenceCode: string;
+	paymentStatus: number;
 	placedOrderBillingAddress: any;
 	placedOrderBillingAddressId: number;
 	placedOrderItems: PlacedOrderItems[];
@@ -562,6 +565,7 @@ type Product = {
 	catalogId: number;
 	catalogName?: string;
 	categories: ProductCategories[];
+	createDate: string;
 	customFields?: CustomField[];
 	description: {[key: string]: string};
 	externalReferenceCode: string;
@@ -572,11 +576,14 @@ type Product = {
 	name: {[key: string]: string};
 	price?: number;
 	productId: number;
+	productOptions: ProductOption[];
 	productSpecifications: ProductSpecification[];
 	productStatus: number;
 	productType: string;
 	skus: SKU[];
 	thumbnail: string;
+	urlImage: string;
+	urls: {en_US: string};
 	version: number;
 	workflowStatusInfo: {
 		code: number;
@@ -605,6 +612,27 @@ type ProductCategories = {
 };
 
 type ProductImages = ProductAttachment;
+
+type ProductOption = {
+	customFields: any[];
+	description: {[key: string]: string};
+	facetable: boolean;
+	fieldType: string;
+	id: number;
+	key: string;
+	name: {[key: string]: string};
+	optionExternalReferenceCode: string;
+	optionId: number;
+	priceType: string;
+	productOptionValues: {
+		id: number;
+		key: string;
+		name: {en_US: string};
+	}[];
+	required: boolean;
+	skuContributor: boolean;
+	typeSettings: string;
+};
 
 type ProductOptionItem = {
 	id: number;
@@ -668,6 +696,20 @@ type Specification = {
 	key?: string;
 	optionCategory?: OptionCategory;
 	title?: {[key: string]: string};
+};
+
+type TaxonomyCategory = {
+	externalReferenceCode: string;
+	id: number;
+	name: string;
+};
+
+type TaxonomyVocabulary = {
+	externalReferenceCode: string;
+	id: number;
+	label: string;
+	name: string;
+	taxonomyCategories: APIResponse<TaxonomyCategory>;
 };
 
 type TierPrice = {

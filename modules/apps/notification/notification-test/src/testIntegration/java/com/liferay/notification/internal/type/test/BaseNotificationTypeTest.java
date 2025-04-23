@@ -243,11 +243,13 @@ public class BaseNotificationTypeTest {
 		childObjectDefinition =
 			objectDefinitionLocalService.addCustomObjectDefinition(
 				user1.getUserId(), 0, null, false, false, true, false, false,
+				false,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				ObjectDefinitionTestUtil.getRandomName(), null, null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				true, ObjectDefinitionConstants.SCOPE_SITE,
 				ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
+				Collections.emptyList(),
 				Arrays.asList(
 					new AttachmentObjectFieldBuilder(
 					).labelMap(
@@ -362,11 +364,13 @@ public class BaseNotificationTypeTest {
 		parentObjectDefinition =
 			objectDefinitionLocalService.addCustomObjectDefinition(
 				user1.getUserId(), 0, null, false, false, true, false, false,
+				false,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				"ParentObjectDefinition", null, null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				false, ObjectDefinitionConstants.SCOPE_COMPANY,
 				ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
+				Collections.emptyList(),
 				Arrays.asList(
 					new DateObjectFieldBuilder(
 					).labelMap(

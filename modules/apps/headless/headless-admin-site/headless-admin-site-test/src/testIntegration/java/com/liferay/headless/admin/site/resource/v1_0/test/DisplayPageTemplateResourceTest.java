@@ -30,6 +30,7 @@ import com.liferay.layout.page.template.service.LayoutPageTemplateCollectionLoca
 import com.liferay.layout.page.template.service.LayoutPageTemplateEntryLocalService;
 import com.liferay.layout.test.util.ContentLayoutTestUtil;
 import com.liferay.petra.function.UnsafeRunnable;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONObject;
@@ -46,6 +47,7 @@ import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.test.rule.FeatureFlags;
 import com.liferay.portal.test.rule.Inject;
@@ -111,7 +113,7 @@ public class DisplayPageTemplateResourceTest
 					testGroup.getGroupId()));
 
 		_assertProblemException(
-			"NOT_FOUND",
+			"NOT_FOUND", null,
 			() ->
 				displayPageTemplateResource.
 					deleteSiteSiteByExternalReferenceCodeDisplayPageTemplate(
@@ -125,7 +127,7 @@ public class DisplayPageTemplateResourceTest
 		_enableLocalStaging();
 
 		_assertProblemException(
-			"BAD_REQUEST",
+			"BAD_REQUEST", null,
 			() ->
 				displayPageTemplateResource.
 					deleteSiteSiteByExternalReferenceCodeDisplayPageTemplate(
@@ -168,7 +170,7 @@ public class DisplayPageTemplateResourceTest
 			displayPageTemplate);
 
 		_assertProblemException(
-			"NOT_FOUND",
+			"NOT_FOUND", null,
 			() ->
 				displayPageTemplateResource.
 					getSiteSiteByExternalReferenceCodeDisplayPageTemplate(
@@ -274,7 +276,17 @@ public class DisplayPageTemplateResourceTest
 
 		Assert.assertNull(postDisplayPageTemplate.getParentFolder());
 
+		ClassSubtypeReference contentTypeReference =
+			postDisplayPageTemplate.getContentTypeReference();
+
+		String className = contentTypeReference.getClassName();
+
+		if (className.equals(AssetCategory.class.getName())) {
+			className = "com.liferay.journal.model.JournalArticle";
+		}
+
 		_testPatchSiteSiteByExternalReferenceCodeDisplayPageTemplate(
+			_getClassSubtypeReference(className),
 			postDisplayPageTemplate.getExternalReferenceCode(),
 			new DisplayPageTemplateFolder() {
 				{
@@ -285,18 +297,18 @@ public class DisplayPageTemplateResourceTest
 			},
 			Boolean.FALSE);
 		_testPatchSiteSiteByExternalReferenceCodeDisplayPageTemplate(
-			postDisplayPageTemplate.getExternalReferenceCode(), null,
+			null, postDisplayPageTemplate.getExternalReferenceCode(), null,
 			Boolean.FALSE);
 
 		_updateLayoutPageTemplateEntryStatus(
 			postDisplayPageTemplate.getExternalReferenceCode());
 
 		_testPatchSiteSiteByExternalReferenceCodeDisplayPageTemplate(
-			postDisplayPageTemplate.getExternalReferenceCode(), null,
+			null, postDisplayPageTemplate.getExternalReferenceCode(), null,
 			Boolean.TRUE);
 
 		_assertProblemException(
-			"NOT_FOUND",
+			"NOT_FOUND", null,
 			() ->
 				displayPageTemplateResource.
 					patchSiteSiteByExternalReferenceCodeDisplayPageTemplate(
@@ -307,7 +319,7 @@ public class DisplayPageTemplateResourceTest
 		_enableLocalStaging();
 
 		_assertProblemException(
-			"BAD_REQUEST",
+			"BAD_REQUEST", null,
 			() ->
 				displayPageTemplateResource.
 					patchSiteSiteByExternalReferenceCodeDisplayPageTemplate(
@@ -323,6 +335,7 @@ public class DisplayPageTemplateResourceTest
 
 		super.testPostSiteSiteByExternalReferenceCodeDisplayPageTemplate();
 
+		_testPostSiteSiteByExternalReferenceCodeDisplayPageTemplateWithKey();
 		_testPostSiteSiteByExternalReferenceCodeDisplayPageTemplateWithParentFolder();
 	}
 
@@ -386,6 +399,9 @@ public class DisplayPageTemplateResourceTest
 	public void testPutSiteSiteByExternalReferenceCodeDisplayPageTemplate()
 		throws Exception {
 
+		_testPutSiteSiteByExternalReferenceCodeDisplayPageTemplateContentTypeReference();
+		_testPutSiteSiteByExternalReferenceCodeDisplayPageTemplateMarkAsDefault();
+
 		_testPutSiteSiteByExternalReferenceCodeDisplayPageTemplate(
 			randomDisplayPageTemplate());
 
@@ -399,7 +415,7 @@ public class DisplayPageTemplateResourceTest
 		_enableLocalStaging();
 
 		_assertProblemException(
-			"BAD_REQUEST",
+			"BAD_REQUEST", null,
 			() ->
 				displayPageTemplateResource.
 					putSiteSiteByExternalReferenceCodeDisplayPageTemplate(
@@ -579,7 +595,7 @@ public class DisplayPageTemplateResourceTest
 		throws Exception {
 
 		_assertProblemException(
-			"BAD_REQUEST",
+			"BAD_REQUEST", null,
 			() ->
 				displayPageTemplateResource.
 					postSiteSiteByExternalReferenceCodeDisplayPageTemplatePageSpecification(
@@ -593,7 +609,8 @@ public class DisplayPageTemplateResourceTest
 	}
 
 	private void _assertProblemException(
-			String status, UnsafeRunnable<Exception> unsafeRunnable)
+			String status, String title,
+			UnsafeRunnable<Exception> unsafeRunnable)
 		throws Exception {
 
 		try {
@@ -605,7 +622,7 @@ public class DisplayPageTemplateResourceTest
 			Problem problem = problemException.getProblem();
 
 			Assert.assertEquals(status, problem.getStatus());
-			Assert.assertNull(problem.getTitle());
+			Assert.assertEquals(title, problem.getTitle());
 		}
 	}
 
@@ -614,6 +631,55 @@ public class DisplayPageTemplateResourceTest
 			TestPropsValues.getUserId(), testGroup, true, false,
 			ServiceContextTestUtil.getServiceContext(
 				testGroup, TestPropsValues.getUserId()));
+	}
+
+	private ClassSubtypeReference _getClassSubtypeReference(
+		String classSubtypeReferenceClassName) {
+
+		if (classSubtypeReferenceClassName.equals(
+				AssetCategory.class.getName())) {
+
+			return new ClassSubtypeReference() {
+				{
+					setClassName(classSubtypeReferenceClassName);
+				}
+			};
+		}
+
+		Assert.assertEquals(
+			"com.liferay.journal.model.JournalArticle",
+			classSubtypeReferenceClassName);
+
+		InfoItemFormVariationsProvider<?> infoItemFormVariationsProvider =
+			_infoItemServiceRegistry.getFirstInfoItemService(
+				InfoItemFormVariationsProvider.class,
+				classSubtypeReferenceClassName);
+
+		List<InfoItemFormVariation> infoItemFormVariations = new ArrayList<>(
+			infoItemFormVariationsProvider.getInfoItemFormVariations(
+				testGroup.getGroupId()));
+
+		Assert.assertFalse(infoItemFormVariations.isEmpty());
+
+		infoItemFormVariations.sort(
+			Comparator.comparing(InfoItemFormVariation::getKey));
+
+		InfoItemFormVariation infoItemFormVariation =
+			infoItemFormVariations.get(0);
+
+		return new ClassSubtypeReference() {
+			{
+				setClassName(classSubtypeReferenceClassName);
+				setSubTypeExternalReference(
+					() -> new ItemExternalReference() {
+						{
+							setExternalReferenceCode(
+								infoItemFormVariation::
+									getExternalReferenceCode);
+						}
+					});
+			}
+		};
 	}
 
 	private DisplayPageTemplate _getDisplayPageTemplate(
@@ -670,55 +736,18 @@ public class DisplayPageTemplateResourceTest
 
 	private ClassSubtypeReference _getRandomClassSubtypeReference() {
 		if (RandomTestUtil.randomBoolean()) {
-			return new ClassSubtypeReference() {
-				{
-					setClassName(AssetCategory.class.getName());
-				}
-			};
+			return _getClassSubtypeReference(AssetCategory.class.getName());
 		}
 
-		InfoItemFormVariationsProvider<?> infoItemFormVariationsProvider =
-			_infoItemServiceRegistry.getFirstInfoItemService(
-				InfoItemFormVariationsProvider.class,
-				"com.liferay.journal.model.JournalArticle");
-
-		List<InfoItemFormVariation> infoItemFormVariations = new ArrayList<>(
-			infoItemFormVariationsProvider.getInfoItemFormVariations(
-				testGroup.getGroupId()));
-
-		Assert.assertFalse(infoItemFormVariations.isEmpty());
-
-		infoItemFormVariations.sort(
-			Comparator.comparing(InfoItemFormVariation::getKey));
-
-		InfoItemFormVariation infoItemFormVariation =
-			infoItemFormVariations.get(0);
-
-		return new ClassSubtypeReference() {
-			{
-				setClassName("com.liferay.journal.model.JournalArticle");
-				setSubTypeExternalReference(
-					() -> new ItemExternalReference() {
-						{
-							setExternalReferenceCode(
-								infoItemFormVariation::
-									getExternalReferenceCode);
-						}
-					});
-			}
-		};
+		return _getClassSubtypeReference(
+			"com.liferay.journal.model.JournalArticle");
 	}
 
 	private boolean _isPublished(Layout layout) {
 		Layout draftLayout = layout.fetchDraftLayout();
 
-		if (GetterUtil.getBoolean(
-				draftLayout.getTypeSettingsProperty("published"))) {
-
-			return true;
-		}
-
-		return false;
+		return GetterUtil.getBoolean(
+			draftLayout.getTypeSettingsProperty("published"));
 	}
 
 	private void _testGetSiteSiteByExternalReferenceCodeDisplayPageTemplate(
@@ -812,6 +841,7 @@ public class DisplayPageTemplateResourceTest
 	}
 
 	private void _testPatchSiteSiteByExternalReferenceCodeDisplayPageTemplate(
+			ClassSubtypeReference classSubtypeReference,
 			String displayPageTemplateExternalReferenceCode,
 			DisplayPageTemplateFolder displayPageTemplateFolder,
 			Boolean markedAsDefault)
@@ -826,6 +856,8 @@ public class DisplayPageTemplateResourceTest
 		DisplayPageTemplate randomDisplayPageTemplate =
 			randomDisplayPageTemplate();
 
+		randomDisplayPageTemplate.setContentTypeReference(
+			classSubtypeReference);
 		randomDisplayPageTemplate.setExternalReferenceCode(
 			displayPageTemplateExternalReferenceCode);
 		randomDisplayPageTemplate.setMarkedAsDefault(markedAsDefault);
@@ -840,6 +872,17 @@ public class DisplayPageTemplateResourceTest
 
 		assertEquals(randomDisplayPageTemplate, patchDisplayPageTemplate);
 		assertValid(patchDisplayPageTemplate);
+
+		if (classSubtypeReference == null) {
+			Assert.assertEquals(
+				getDisplayPageTemplate.getContentTypeReference(),
+				patchDisplayPageTemplate.getContentTypeReference());
+		}
+		else {
+			Assert.assertEquals(
+				classSubtypeReference,
+				patchDisplayPageTemplate.getContentTypeReference());
+		}
 
 		if (displayPageTemplateFolder == null) {
 			displayPageTemplateFolder =
@@ -859,6 +902,32 @@ public class DisplayPageTemplateResourceTest
 
 		Assert.assertEquals(
 			markedAsDefault, patchDisplayPageTemplate.getMarkedAsDefault());
+	}
+
+	private void _testPostSiteSiteByExternalReferenceCodeDisplayPageTemplateWithKey()
+		throws Exception {
+
+		DisplayPageTemplate displayPageTemplate = randomDisplayPageTemplate();
+
+		displayPageTemplate.setKey(StringPool.BLANK);
+
+		DisplayPageTemplate postDisplayPageTemplate =
+			displayPageTemplateResource.
+				postSiteSiteByExternalReferenceCodeDisplayPageTemplate(
+					testGroup.getExternalReferenceCode(), displayPageTemplate);
+
+		Assert.assertTrue(
+			Validator.isNotNull(postDisplayPageTemplate.getKey()));
+
+		displayPageTemplate = randomDisplayPageTemplate();
+
+		postDisplayPageTemplate =
+			displayPageTemplateResource.
+				postSiteSiteByExternalReferenceCodeDisplayPageTemplate(
+					testGroup.getExternalReferenceCode(), displayPageTemplate);
+
+		Assert.assertEquals(
+			displayPageTemplate.getKey(), postDisplayPageTemplate.getKey());
 	}
 
 	private void _testPostSiteSiteByExternalReferenceCodeDisplayPageTemplateWithParentFolder()
@@ -958,6 +1027,63 @@ public class DisplayPageTemplateResourceTest
 		Assert.assertEquals(
 			layoutPageTemplateCollection.getExternalReferenceCode(),
 			displayPageTemplateFolder.getExternalReferenceCode());
+	}
+
+	private void _testPutSiteSiteByExternalReferenceCodeDisplayPageTemplateContentTypeReference()
+		throws Exception {
+
+		DisplayPageTemplate displayPageTemplate = randomDisplayPageTemplate();
+
+		displayPageTemplate.setContentTypeReference(
+			_getClassSubtypeReference(AssetCategory.class.getName()));
+
+		DisplayPageTemplate putDisplayPageTemplate =
+			displayPageTemplateResource.
+				putSiteSiteByExternalReferenceCodeDisplayPageTemplate(
+					testGroup.getExternalReferenceCode(),
+					displayPageTemplate.getExternalReferenceCode(),
+					displayPageTemplate);
+
+		Assert.assertEquals(
+			displayPageTemplate.getContentTypeReference(),
+			putDisplayPageTemplate.getContentTypeReference());
+
+		displayPageTemplate.setContentTypeReference(
+			_getClassSubtypeReference(
+				"com.liferay.journal.model.JournalArticle"));
+
+		putDisplayPageTemplate =
+			displayPageTemplateResource.
+				putSiteSiteByExternalReferenceCodeDisplayPageTemplate(
+					testGroup.getExternalReferenceCode(),
+					displayPageTemplate.getExternalReferenceCode(),
+					displayPageTemplate);
+
+		Assert.assertEquals(
+			displayPageTemplate.getContentTypeReference(),
+			putDisplayPageTemplate.getContentTypeReference());
+	}
+
+	private void _testPutSiteSiteByExternalReferenceCodeDisplayPageTemplateMarkAsDefault()
+		throws Exception {
+
+		DisplayPageTemplate displayPageTemplate =
+			displayPageTemplateResource.
+				postSiteSiteByExternalReferenceCodeDisplayPageTemplate(
+					testGroup.getExternalReferenceCode(),
+					randomDisplayPageTemplate());
+
+		displayPageTemplate.setMarkedAsDefault(true);
+
+		_assertProblemException(
+			"CONFLICT",
+			"The default display page template must be published first.",
+			() ->
+				displayPageTemplateResource.
+					putSiteSiteByExternalReferenceCodeDisplayPageTemplate(
+						testGroup.getExternalReferenceCode(),
+						displayPageTemplate.getExternalReferenceCode(),
+						displayPageTemplate));
 	}
 
 	private void _updateLayoutPageTemplateEntryStatus(

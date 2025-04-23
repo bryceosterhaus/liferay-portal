@@ -3,10 +3,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-import {
-	ObjectDefinitionApi,
-	ObjectField,
-} from '@liferay/object-admin-rest-client-js';
+import {ObjectDefinitionAPI} from '@liferay/object-admin-rest-client-js';
 import {expect, mergeTests} from '@playwright/test';
 
 import {apiHelpersTest} from '../../../../fixtures/apiHelpersTest';
@@ -22,6 +19,9 @@ import {dataSetFragmentPageTest} from './fixtures/dataSetFragmentPageTest';
 const picklistBooleanOptionLabel = 'Boolean';
 const picklistDefaultOptionLabel = 'Default';
 
+const picklistBooleanOptionKey = picklistBooleanOptionLabel.toLocaleLowerCase();
+const picklistDefaultOptionKey = picklistDefaultOptionLabel.toLocaleLowerCase();
+
 const apiHeadlessName = 'FieldType';
 const apiHeadlessURL = `c/${apiHeadlessName.toLocaleLowerCase()}s`;
 const dataSetERCs: string[] = [];
@@ -30,13 +30,13 @@ let dataSetLabel: string;
 let objectDefinition: any;
 let picklistBooleanOption: any;
 let picklistDefaultOption: any;
+let picklistERC: any;
 let picklistName: string;
 
 export const test = mergeTests(
 	apiHelpersTest,
 	dataSetManagerApiHelpersTest,
 	featureFlagsTest({
-		'LPD-37531': {enabled: true},
 		'LPS-178052': {enabled: true},
 	}),
 	isolatedLayoutTest({publish: false}),
@@ -59,25 +59,27 @@ test.beforeEach(
 		});
 
 		await test.step('Create and populate a picklist', async () => {
-			await picklistApiHelpers.createPicklist({
+			const picklist = await picklistApiHelpers.createPicklist({
 				name: picklistName,
 			});
 
+			picklistERC = picklist.externalReferenceCode;
+
 			picklistDefaultOption = await picklistApiHelpers.editPicklist({
-				key: picklistDefaultOptionLabel.toLocaleLowerCase(),
+				key: picklistDefaultOptionKey,
 				name: picklistName,
 				value: picklistDefaultOptionLabel,
 			});
 
 			picklistBooleanOption = await picklistApiHelpers.editPicklist({
-				key: picklistBooleanOptionLabel.toLocaleLowerCase(),
+				key: picklistBooleanOptionKey,
 				name: picklistName,
 				value: picklistBooleanOptionLabel,
 			});
 		});
 
 		const objectDefinitionAPIClient =
-			await apiHelpers.buildRestClient(ObjectDefinitionApi);
+			await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 		await test.step('Create a Headless application and populate with filter values', async () => {
 			objectDefinition = (
@@ -90,8 +92,8 @@ test.beforeEach(
 					name: apiHeadlessName,
 					objectFields: [
 						{
-							DBType: ObjectField.DBTypeEnum.String,
-							businessType: ObjectField.BusinessTypeEnum.Text,
+							DBType: 'String',
+							businessType: 'Text',
 							indexed: true,
 							indexedAsKeyword: true,
 							label: {
@@ -99,6 +101,21 @@ test.beforeEach(
 							},
 							localized: true,
 							name: 'type',
+							required: false,
+							state: false,
+						},
+						{
+							DBType: 'String',
+							businessType: 'MultiselectPicklist',
+							indexed: true,
+							indexedAsKeyword: true,
+							label: {
+								en_US: 'picklist',
+							},
+							listTypeDefinitionExternalReferenceCode:
+								picklistERC,
+							localized: false,
+							name: 'picklist',
 							required: false,
 							state: false,
 						},
@@ -125,11 +142,27 @@ test.beforeEach(
 				apiHeadlessURL
 			);
 			await apiHelpers.objectEntry.postObjectEntry(
-				{type: 'object'},
+				{
+					picklist: [
+						{
+							key: picklistBooleanOptionKey,
+							name: picklistBooleanOptionLabel,
+						},
+					],
+					type: 'object',
+				},
 				apiHeadlessURL
 			);
 			await apiHelpers.objectEntry.postObjectEntry(
-				{type: 'string'},
+				{
+					picklist: [
+						{
+							key: picklistDefaultOptionKey,
+							name: picklistDefaultOptionLabel,
+						},
+					],
+					type: 'string',
+				},
 				apiHeadlessURL
 			);
 		});
@@ -149,7 +182,7 @@ test.afterEach(
 		await picklistApiHelpers.deletePicklist(picklistName);
 
 		const objectDefinitionAPIClient =
-			await apiHelpers.buildRestClient(ObjectDefinitionApi);
+			await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 		await objectDefinitionAPIClient.deleteObjectDefinition(
 			objectDefinition.id
@@ -236,10 +269,10 @@ test('Selection filter of type "Object Picklist" is displayed in fragment @LPD-1
 			.check();
 
 		await dataSetFragmentPage.addFilterButton.click();
+	});
 
-		// Close filter
-
-		await dataSetFragmentPage.page.keyboard.press('Escape');
+	await test.step('Assert that the filter is hidden', async () => {
+		await expect(dataSetFragmentPage.filterConfirmButton).not.toBeVisible();
 	});
 
 	await test.step('Check that the filter works', async () => {
@@ -446,6 +479,99 @@ test('Selection filter of type "Object Picklist" can be configured to include or
 	});
 });
 
+test('Selection filter of type "Object Picklist" using a "Multiselect Picklist" type field', async ({
+	dataSetFragmentPage,
+	dataSetManagerApiHelpers,
+	layout,
+	picklistApiHelpers,
+}) => {
+	const filterLabel = 'picklist';
+	const picklistDataSetERC = getRandomString();
+	const picklistDataSetLabel = getRandomString();
+
+	await test.step('Create a new data set for FieldType', async () => {
+		dataSetERCs.push(picklistDataSetERC);
+
+		await dataSetManagerApiHelpers.createDataSet({
+			erc: picklistDataSetERC,
+			label: picklistDataSetLabel,
+			restApplication: `/${apiHeadlessURL}`,
+			restSchema: apiHeadlessName,
+		});
+	});
+
+	await test.step('Add fields, so FDS has something to show', async () => {
+		await dataSetManagerApiHelpers.createDataSetTableSection({
+			dataSetERC: picklistDataSetERC,
+			fieldName: 'picklist',
+			label_i18n: {en_US: 'Picklist'},
+		});
+	});
+
+	await test.step('Create a selection filter with the picklist', async () => {
+		const picklist = await picklistApiHelpers.getPicklist(picklistName);
+
+		await dataSetManagerApiHelpers.createDataSetSelectionFilter({
+			dataSetERC: picklistDataSetERC,
+			fieldName: 'picklist[]name',
+			label_i18n: {en_US: filterLabel},
+			multiple: true,
+			source: picklist.externalReferenceCode,
+			sourceType: 'OBJECT_PICKLIST',
+		});
+	});
+
+	await test.step('Configure Data Set fragment', async () => {
+		await dataSetFragmentPage.configureDataSetFragment({
+			dataSetLabel: picklistDataSetLabel,
+			layout,
+		});
+	});
+
+	await test.step(`Select ${filterLabel} filter`, async () => {
+		await dataSetFragmentPage.selectFilter(filterLabel);
+	});
+
+	await test.step('Configure and apply filter', async () => {
+		await expect(
+			dataSetFragmentPage.filterItem.getByRole('checkbox', {
+				name: picklistDefaultOptionLabel,
+			})
+		).toBeVisible();
+		await expect(
+			dataSetFragmentPage.filterItem.getByRole('checkbox', {
+				name: picklistDefaultOptionLabel,
+			})
+		).toBeVisible();
+
+		await dataSetFragmentPage.filterItem
+			.getByRole('checkbox', {name: picklistDefaultOptionLabel})
+			.check();
+
+		await dataSetFragmentPage.addFilterButton.click();
+	});
+
+	await test.step('Check that the filter works', async () => {
+		await dataSetFragmentPage.filterResumeButton.waitFor({
+			state: 'visible',
+		});
+
+		await expect(
+			dataSetFragmentPage.page.getByRole('button', {
+				name: `${filterLabel}: ${picklistDefaultOptionLabel}`,
+			})
+		).toBeVisible();
+
+		const rows = await dataSetFragmentPage.table.bodyRows.all();
+
+		for (const row of rows) {
+			await expect(row.locator('td:first-child')).toHaveText(
+				'[{"key":"default","name":"Default"}]'
+			);
+		}
+	});
+});
+
 test('Selection filter of type "API REST Application" is displayed in fragment @LPD-10754', async ({
 	dataSetFragmentPage,
 	dataSetManagerApiHelpers,
@@ -543,10 +669,10 @@ test('Selection filter of type "API REST Application" is displayed in fragment @
 		await dataSetFragmentPage.filterItem
 			.getByRole('button', {name: 'Add filter'})
 			.click();
+	});
 
-		// Close filter
-
-		await dataSetFragmentPage.page.keyboard.press('Escape');
+	await test.step('Assert that the filter is hidden', async () => {
+		await expect(dataSetFragmentPage.filterConfirmButton).not.toBeVisible();
 	});
 
 	await test.step('Check that the filter works', async () => {
@@ -591,10 +717,10 @@ test('Selection filter of type "API REST Application" is displayed in fragment @
 			.getByRole('checkbox', {name: 'boolean'})
 			.check();
 		await dataSetFragmentPage.addFilterButton.click();
+	});
 
-		// Close filter
-
-		await dataSetFragmentPage.page.keyboard.press('Escape');
+	await test.step('Assert that the filter is hidden', async () => {
+		await expect(dataSetFragmentPage.filterConfirmButton).not.toBeVisible();
 	});
 
 	await test.step('Check that the filter works', async () => {
@@ -712,10 +838,12 @@ test(
 			await dataSetFragmentPage.filterItem
 				.getByRole('button', {name: 'Add filter'})
 				.click();
+		});
 
-			// Close filter
-
-			await dataSetFragmentPage.page.keyboard.press('Escape');
+		await test.step('Assert that the filter is hidden', async () => {
+			await expect(
+				dataSetFragmentPage.filterConfirmButton
+			).not.toBeVisible();
 		});
 
 		await test.step('Check that the filter works', async () => {

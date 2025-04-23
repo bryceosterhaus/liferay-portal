@@ -80,6 +80,7 @@ const FrontendDataSet = ({
 	showManagementBar,
 	showPagination,
 	showSearch,
+	showSelectAll,
 	sidePanelId,
 	sorts: sortsProp,
 	style,
@@ -103,6 +104,9 @@ const FrontendDataSet = ({
 			(pagination?.initialPageNumber || DEFAULT_PAGINATION_PAGE_NUMBER)
 	);
 	const [searchParam, setSearchParam] = useState('');
+
+	const [allItemsSelectedActive, setAllItemsSelectedActive] = useState(false);
+
 	const [selectedItemsValue, setSelectedItemsValue] = useState(
 		initialSelectedItemsValues || []
 	);
@@ -248,7 +252,24 @@ const FrontendDataSet = ({
 	const isMounted = useIsMounted();
 
 	function updateDataSetItems(dataSetData) {
-		setItems(dataSetData.items);
+		const remappedItems = dataSetData.items.map((item) => {
+			if (item.embedded && item.embedded.actions) {
+				const actions = item.embedded.actions;
+
+				delete item.embedded.actions;
+
+				return {
+					...item,
+					actions,
+				};
+			}
+
+			return {
+				...item,
+			};
+		});
+
+		setItems(remappedItems);
 		setTotal(dataSetData.totalCount);
 
 		if (!dataSetData.items.length && dataSetData.totalCount > 0) {
@@ -339,24 +360,40 @@ const FrontendDataSet = ({
 		}
 	}, [itemsProp]);
 
-	function selectItems(value) {
+	function deselectItems(value) {
 		if (Array.isArray(value)) {
-			return setSelectedItemsValue(value);
+			return setSelectedItemsValue(
+				selectedItemsValue.filter((item) => !value.includes(item))
+			);
 		}
 
+		setSelectedItemsValue(
+			selectedItemsValue.filter((item) => item !== value)
+		);
+	}
+
+	function selectItems(value) {
 		if (selectionType === 'single') {
-			return setSelectedItemsValue([value]);
+			return setSelectedItemsValue(
+				Array.isArray(value) ? value : [value]
+			);
 		}
 
-		const itemAdded = selectedItemsValue.find((item) => item === value);
+		if (Array.isArray(value)) {
+			const newItems = value.filter(
+				(item) => !selectedItemsValue.includes(item)
+			);
 
-		if (itemAdded) {
+			return setSelectedItemsValue([...selectedItemsValue, ...newItems]);
+		}
+
+		if (selectedItemsValue.includes(value)) {
 			setSelectedItemsValue(
-				selectedItemsValue.filter((element) => element !== value)
+				selectedItemsValue.filter((item) => item !== value)
 			);
 		}
 		else {
-			setSelectedItemsValue(selectedItemsValue.concat(value));
+			setSelectedItemsValue([...selectedItemsValue, value]);
 		}
 	}
 
@@ -559,14 +596,28 @@ const FrontendDataSet = ({
 			<ManagementBar
 				bulkActions={bulkActions}
 				creationMenu={creationMenu}
+				deselectItems={(items) => {
+					deselectItems(items);
+
+					if (allItemsSelectedActive) {
+						setAllItemsSelectedActive(false);
+					}
+				}}
 				fluid={style === 'fluid'}
 				items={items}
+				onBulkActionsClear={() => {
+					deselectItems(selectedItemsValue);
+
+					setAllItemsSelectedActive(false);
+				}}
+				onSelectAll={(value) => setAllItemsSelectedActive(value)}
 				selectItems={(items) => selectItems(items)}
 				selectedItems={selectedItems}
 				selectedItemsKey={selectedItemsKey}
 				selectedItemsValue={selectedItemsValue}
 				selectionType={selectionType}
 				showSearch={showSearch}
+				showSelectAll={showSelectAll}
 				sidePanelId={dataSetSupportSidePanelId}
 				total={total}
 			/>
@@ -593,6 +644,23 @@ const FrontendDataSet = ({
 						header={header}
 						items={items}
 						itemsActions={itemsActions}
+						onItemSelectionChange={(selectedItem) => {
+							if (allItemsSelectedActive) {
+								setSelectedItemsValue(
+									items
+										.filter(
+											(item) =>
+												item.id !== selectedItem.id
+										)
+										.map((item) => item.id)
+								);
+
+								setAllItemsSelectedActive(false);
+							}
+							else {
+								selectItems(selectedItem.id);
+							}
+						}}
 						style={style}
 						{...currentViewProps}
 					/>
@@ -729,6 +797,14 @@ const FrontendDataSet = ({
 			onSubmit: refreshData,
 			...config,
 		});
+	}
+
+	function onItemsChange({itemKey = 'id', items: itemsChanged}) {
+		const updatedItems = new Map(
+			[...items, ...itemsChanged].map((item) => [item[itemKey], item])
+		);
+
+		setItems(Array.from(updatedItems.values()));
 	}
 
 	function updateItem(itemKey, property, valuePath, value = null) {
@@ -879,6 +955,7 @@ const FrontendDataSet = ({
 		<FrontendDataSetContext.Provider
 			value={{
 				actionParameterName,
+				allItemsSelectedActive,
 				apiURL,
 				appURL,
 				applyItemInlineUpdates,
@@ -902,6 +979,7 @@ const FrontendDataSet = ({
 				nestedItemsReferenceKey,
 				onActionDropdownItemClick,
 				onBulkActionItemClick,
+				onItemsChange,
 				onSearch,
 				onSelect,
 				openModal,
@@ -967,7 +1045,7 @@ const FrontendDataSet = ({
 							<div className="data-set data-set-fluid">
 								{managementBar}
 
-								<div className="container-fluid container-xl mt-3">
+								<div className="container-fluid mt-3">
 									{view}
 
 									{paginationComponent}
@@ -996,6 +1074,7 @@ FrontendDataSet.defaultProps = {
 	showManagementBar: true,
 	showPagination: true,
 	showSearch: true,
+	showSelectAll: false,
 	sorts: [],
 	style: 'default',
 };

@@ -3,21 +3,30 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-import {IAccountSubscriptionGroup, IProject, IUserAccount} from '~/utils/types';
+import {
+	IAccountSubscription,
+	IAccountSubscriptionGroup,
+	IBusinessEvent,
+	IProject,
+	IUserAccount,
+} from '~/utils/types';
 
 export const actionTypes = {
+	UPDATE_BUSINESS_EVENTS: 'UPDATE_BUSINESS_EVENTS',
 	UPDATE_PAGE: 'UPDATE_PAGE',
 	UPDATE_PROJECT: 'UPDATE_PROJECT',
 	UPDATE_QUICK_LINKS: 'UPDATE_QUICK_LINKS',
 	UPDATE_QUICK_LINKS_EXPANDED_PANEL: 'UPDATE_QUICK_LINKS_EXPANDED_PANEL',
 	UPDATE_STRUCTURED_CONTENTS: 'UPDATE_STRUCTURED_CONTENTS',
 	UPDATE_SUBSCRIPTION_GROUPS: 'UPDATE_SUBSCRIPTION_GROUPS',
+	UPDATE_SUBSCRIPTIONS: 'UPDATE_SUBSCRIPTIONS',
 	UPDATE_USER_ACCOUNT: 'UPDATE_USER_ACCOUNT',
 	UPDATE_USER_PROJECT_ACCESS: 'UPDATE_USER_PROJECT_ACCESS',
 };
 
 export type ActionPayload =
 	| string
+	| IAccountSubscription[]
 	| IAccountSubscriptionGroup[]
 	| IUserAccount
 	| IProject
@@ -30,12 +39,14 @@ export interface IAction {
 }
 
 export interface IState {
+	businessEvents: IBusinessEvent | undefined;
 	isQuickLinksExpanded: boolean;
 	page: string | undefined;
 	project: IProject | undefined;
 	quickLinks: string | undefined;
 	structuredContents: string | undefined;
 	subscriptionGroups: IAccountSubscriptionGroup[] | undefined;
+	subscriptions: IAccountSubscription[] | undefined;
 	userAccount: IUserAccount | undefined;
 	userProjectAccess: boolean | undefined;
 }
@@ -46,6 +57,11 @@ const reducer = (state: IState, action: IAction): IState => {
 			return {
 				...state,
 				userAccount: action.payload as IUserAccount,
+			};
+		case actionTypes.UPDATE_BUSINESS_EVENTS:
+			return {
+				...state,
+				businessEvents: action.payload as IBusinessEvent,
 			};
 		case actionTypes.UPDATE_PROJECT:
 			return {
@@ -72,6 +88,12 @@ const reducer = (state: IState, action: IAction): IState => {
 				...state,
 				subscriptionGroups:
 					action.payload as unknown as IAccountSubscriptionGroup[],
+			};
+		case actionTypes.UPDATE_SUBSCRIPTIONS:
+			return {
+				...state,
+				subscriptions:
+					action.payload as unknown as IAccountSubscription[],
 			};
 		case actionTypes.UPDATE_PAGE:
 			return {

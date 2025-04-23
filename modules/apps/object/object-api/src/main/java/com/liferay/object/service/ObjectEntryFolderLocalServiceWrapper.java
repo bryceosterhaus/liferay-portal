@@ -127,12 +127,14 @@ public class ObjectEntryFolderLocalServiceWrapper
 	}
 
 	@Override
-	public com.liferay.object.model.ObjectEntryFolder deleteObjectEntryFolder(
-			String externalReferenceCode, long groupId, long companyId)
+	public com.liferay.object.model.ObjectEntryFolder
+			deleteObjectEntryFolderByExternalReferenceCode(
+				String externalReferenceCode, long groupId, long companyId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
-		return _objectEntryFolderLocalService.deleteObjectEntryFolder(
-			externalReferenceCode, groupId, companyId);
+		return _objectEntryFolderLocalService.
+			deleteObjectEntryFolderByExternalReferenceCode(
+				externalReferenceCode, groupId, companyId);
 	}
 
 	/**
@@ -258,6 +260,16 @@ public class ObjectEntryFolderLocalServiceWrapper
 			objectEntryFolderId);
 	}
 
+	@Override
+	public com.liferay.object.model.ObjectEntryFolder
+		fetchObjectEntryFolderByExternalReferenceCode(
+			String externalReferenceCode, long groupId, long companyId) {
+
+		return _objectEntryFolderLocalService.
+			fetchObjectEntryFolderByExternalReferenceCode(
+				externalReferenceCode, groupId, companyId);
+	}
+
 	/**
 	 * Returns the object entry folder matching the UUID and group.
 	 *
@@ -312,6 +324,17 @@ public class ObjectEntryFolderLocalServiceWrapper
 
 		return _objectEntryFolderLocalService.getObjectEntryFolder(
 			objectEntryFolderId);
+	}
+
+	@Override
+	public com.liferay.object.model.ObjectEntryFolder
+			getObjectEntryFolderByExternalReferenceCode(
+				String externalReferenceCode, long groupId, long companyId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _objectEntryFolderLocalService.
+			getObjectEntryFolderByExternalReferenceCode(
+				externalReferenceCode, groupId, companyId);
 	}
 
 	/**
@@ -440,12 +463,13 @@ public class ObjectEntryFolderLocalServiceWrapper
 	public com.liferay.object.model.ObjectEntryFolder updateObjectEntryFolder(
 			long userId, long objectEntryFolderId,
 			long parentObjectEntryFolderId,
-			java.util.Map<java.util.Locale, String> labelMap, String name)
+			java.util.Map<java.util.Locale, String> labelMap, String name,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _objectEntryFolderLocalService.updateObjectEntryFolder(
 			userId, objectEntryFolderId, parentObjectEntryFolderId, labelMap,
-			name);
+			name, serviceContext);
 	}
 
 	/**

@@ -30,7 +30,7 @@ import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
-import com.liferay.portal.kernel.util.DateFormatFactoryUtil;
+import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.odata.entity.EntityField;
@@ -42,7 +42,7 @@ import com.liferay.portal.vulcan.resource.EntityModelResource;
 
 import java.lang.reflect.Method;
 
-import java.text.DateFormat;
+import java.text.Format;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -81,7 +81,7 @@ public abstract class BaseAccountResourceTestCase {
 
 	@BeforeClass
 	public static void setUpClass() throws Exception {
-		_dateFormat = DateFormatFactoryUtil.getSimpleDateFormat(
+		_format = FastDateFormatFactoryUtil.getSimpleDateFormat(
 			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 	}
 
@@ -95,12 +95,12 @@ public abstract class BaseAccountResourceTestCase {
 
 		_accountResource.setContextCompany(testCompany);
 
-		com.liferay.portal.kernel.model.User testCompanyAdminUser =
-			UserTestUtil.getAdminUser(testCompany.getCompanyId());
+		_testCompanyAdminUser = UserTestUtil.getAdminUser(
+			testCompany.getCompanyId());
 
 		accountResource = AccountResource.builder(
 		).authentication(
-			testCompanyAdminUser.getEmailAddress(),
+			_testCompanyAdminUser.getEmailAddress(),
 			PropsValues.DEFAULT_ADMIN_PASSWORD
 		).endpoint(
 			testCompany.getVirtualHostname(), 8080, "http"
@@ -180,140 +180,6 @@ public abstract class BaseAccountResourceTestCase {
 		Assert.assertEquals(regex, account.getExternalReferenceCode());
 		Assert.assertEquals(regex, account.getName());
 		Assert.assertEquals(regex, account.getTaxId());
-	}
-
-	@Test
-	public void testGetOrderRuleAccountAccount() throws Exception {
-		Account postAccount = testGetOrderRuleAccountAccount_addAccount();
-
-		Account getAccount = accountResource.getOrderRuleAccountAccount(
-			testGetOrderRuleAccountAccount_getOrderRuleAccountId());
-
-		assertEquals(postAccount, getAccount);
-		assertValid(getAccount);
-	}
-
-	protected Long testGetOrderRuleAccountAccount_getOrderRuleAccountId()
-		throws Exception {
-
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
-	}
-
-	protected Account testGetOrderRuleAccountAccount_addAccount()
-		throws Exception {
-
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
-	}
-
-	@Test
-	public void testGraphQLGetOrderRuleAccountAccount() throws Exception {
-		Account account = testGraphQLGetOrderRuleAccountAccount_addAccount();
-
-		// No namespace
-
-		Assert.assertTrue(
-			equals(
-				account,
-				AccountSerDes.toDTO(
-					JSONUtil.getValueAsString(
-						invokeGraphQLQuery(
-							new GraphQLField(
-								"orderRuleAccountAccount",
-								new HashMap<String, Object>() {
-									{
-										put(
-											"orderRuleAccountId",
-											testGraphQLGetOrderRuleAccountAccount_getOrderRuleAccountId());
-									}
-								},
-								getGraphQLFields())),
-						"JSONObject/data", "Object/orderRuleAccountAccount"))));
-
-		// Using the namespace headlessCommerceAdminOrder_v1_0
-
-		Assert.assertTrue(
-			equals(
-				account,
-				AccountSerDes.toDTO(
-					JSONUtil.getValueAsString(
-						invokeGraphQLQuery(
-							new GraphQLField(
-								"headlessCommerceAdminOrder_v1_0",
-								new GraphQLField(
-									"orderRuleAccountAccount",
-									new HashMap<String, Object>() {
-										{
-											put(
-												"orderRuleAccountId",
-												testGraphQLGetOrderRuleAccountAccount_getOrderRuleAccountId());
-										}
-									},
-									getGraphQLFields()))),
-						"JSONObject/data",
-						"JSONObject/headlessCommerceAdminOrder_v1_0",
-						"Object/orderRuleAccountAccount"))));
-	}
-
-	protected Long testGraphQLGetOrderRuleAccountAccount_getOrderRuleAccountId()
-		throws Exception {
-
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
-	}
-
-	@Test
-	public void testGraphQLGetOrderRuleAccountAccountNotFound()
-		throws Exception {
-
-		Long irrelevantOrderRuleAccountId = RandomTestUtil.randomLong();
-
-		// No namespace
-
-		Assert.assertEquals(
-			"Not Found",
-			JSONUtil.getValueAsString(
-				invokeGraphQLQuery(
-					new GraphQLField(
-						"orderRuleAccountAccount",
-						new HashMap<String, Object>() {
-							{
-								put(
-									"orderRuleAccountId",
-									irrelevantOrderRuleAccountId);
-							}
-						},
-						getGraphQLFields())),
-				"JSONArray/errors", "Object/0", "JSONObject/extensions",
-				"Object/code"));
-
-		// Using the namespace headlessCommerceAdminOrder_v1_0
-
-		Assert.assertEquals(
-			"Not Found",
-			JSONUtil.getValueAsString(
-				invokeGraphQLQuery(
-					new GraphQLField(
-						"headlessCommerceAdminOrder_v1_0",
-						new GraphQLField(
-							"orderRuleAccountAccount",
-							new HashMap<String, Object>() {
-								{
-									put(
-										"orderRuleAccountId",
-										irrelevantOrderRuleAccountId);
-								}
-							},
-							getGraphQLFields()))),
-				"JSONArray/errors", "Object/0", "JSONObject/extensions",
-				"Object/code"));
-	}
-
-	protected Account testGraphQLGetOrderRuleAccountAccount_addAccount()
-		throws Exception {
-
-		return testGraphQLAccount_addAccount();
 	}
 
 	@Test
@@ -586,6 +452,140 @@ public abstract class BaseAccountResourceTestCase {
 	}
 
 	protected Account testGraphQLGetOrderIdAccount_addAccount()
+		throws Exception {
+
+		return testGraphQLAccount_addAccount();
+	}
+
+	@Test
+	public void testGetOrderRuleAccountAccount() throws Exception {
+		Account postAccount = testGetOrderRuleAccountAccount_addAccount();
+
+		Account getAccount = accountResource.getOrderRuleAccountAccount(
+			testGetOrderRuleAccountAccount_getOrderRuleAccountId());
+
+		assertEquals(postAccount, getAccount);
+		assertValid(getAccount);
+	}
+
+	protected Long testGetOrderRuleAccountAccount_getOrderRuleAccountId()
+		throws Exception {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	protected Account testGetOrderRuleAccountAccount_addAccount()
+		throws Exception {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	@Test
+	public void testGraphQLGetOrderRuleAccountAccount() throws Exception {
+		Account account = testGraphQLGetOrderRuleAccountAccount_addAccount();
+
+		// No namespace
+
+		Assert.assertTrue(
+			equals(
+				account,
+				AccountSerDes.toDTO(
+					JSONUtil.getValueAsString(
+						invokeGraphQLQuery(
+							new GraphQLField(
+								"orderRuleAccountAccount",
+								new HashMap<String, Object>() {
+									{
+										put(
+											"orderRuleAccountId",
+											testGraphQLGetOrderRuleAccountAccount_getOrderRuleAccountId());
+									}
+								},
+								getGraphQLFields())),
+						"JSONObject/data", "Object/orderRuleAccountAccount"))));
+
+		// Using the namespace headlessCommerceAdminOrder_v1_0
+
+		Assert.assertTrue(
+			equals(
+				account,
+				AccountSerDes.toDTO(
+					JSONUtil.getValueAsString(
+						invokeGraphQLQuery(
+							new GraphQLField(
+								"headlessCommerceAdminOrder_v1_0",
+								new GraphQLField(
+									"orderRuleAccountAccount",
+									new HashMap<String, Object>() {
+										{
+											put(
+												"orderRuleAccountId",
+												testGraphQLGetOrderRuleAccountAccount_getOrderRuleAccountId());
+										}
+									},
+									getGraphQLFields()))),
+						"JSONObject/data",
+						"JSONObject/headlessCommerceAdminOrder_v1_0",
+						"Object/orderRuleAccountAccount"))));
+	}
+
+	protected Long testGraphQLGetOrderRuleAccountAccount_getOrderRuleAccountId()
+		throws Exception {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	@Test
+	public void testGraphQLGetOrderRuleAccountAccountNotFound()
+		throws Exception {
+
+		Long irrelevantOrderRuleAccountId = RandomTestUtil.randomLong();
+
+		// No namespace
+
+		Assert.assertEquals(
+			"Not Found",
+			JSONUtil.getValueAsString(
+				invokeGraphQLQuery(
+					new GraphQLField(
+						"orderRuleAccountAccount",
+						new HashMap<String, Object>() {
+							{
+								put(
+									"orderRuleAccountId",
+									irrelevantOrderRuleAccountId);
+							}
+						},
+						getGraphQLFields())),
+				"JSONArray/errors", "Object/0", "JSONObject/extensions",
+				"Object/code"));
+
+		// Using the namespace headlessCommerceAdminOrder_v1_0
+
+		Assert.assertEquals(
+			"Not Found",
+			JSONUtil.getValueAsString(
+				invokeGraphQLQuery(
+					new GraphQLField(
+						"headlessCommerceAdminOrder_v1_0",
+						new GraphQLField(
+							"orderRuleAccountAccount",
+							new HashMap<String, Object>() {
+								{
+									put(
+										"orderRuleAccountId",
+										irrelevantOrderRuleAccountId);
+								}
+							},
+							getGraphQLFields()))),
+				"JSONArray/errors", "Object/0", "JSONObject/extensions",
+				"Object/code"));
+	}
+
+	protected Account testGraphQLGetOrderRuleAccountAccount_addAccount()
 		throws Exception {
 
 		return testGraphQLAccount_addAccount();
@@ -1531,7 +1531,9 @@ public abstract class BaseAccountResourceTestCase {
 	private static final com.liferay.portal.kernel.log.Log _log =
 		LogFactoryUtil.getLog(BaseAccountResourceTestCase.class);
 
-	private static DateFormat _dateFormat;
+	private static Format _format;
+
+	private com.liferay.portal.kernel.model.User _testCompanyAdminUser;
 
 	@Inject
 	private

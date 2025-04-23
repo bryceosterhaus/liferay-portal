@@ -12,7 +12,9 @@ import com.liferay.portal.configuration.metatype.annotations.ExtendedObjectClass
 /**
  * @author Mariano Álvaro Sáiz
  */
-@ExtendedObjectClassDefinition(generateUI = false)
+@ExtendedObjectClassDefinition(
+	category = "upgrades", featureFlagKey = "LPD-11342"
+)
 @Meta.OCD(
 	id = "com.liferay.portal.instances.internal.configuration.InsertPortalInstanceConfiguration",
 	localization = "content/Language",
@@ -20,16 +22,16 @@ import com.liferay.portal.configuration.metatype.annotations.ExtendedObjectClass
 )
 public interface InsertPortalInstanceConfiguration {
 
-	@Meta.AD(type = Meta.Type.Long)
+	@Meta.AD(name = "insert-company-id", type = Meta.Type.Long)
 	public long insertCompanyId();
 
-	@Meta.AD(required = false)
+	@Meta.AD(name = "new-name", required = false)
 	public String newName();
 
-	@Meta.AD(required = false)
+	@Meta.AD(name = "new-virtual-hostname", required = false)
 	public String newVirtualHostname();
 
-	@Meta.AD(required = false)
+	@Meta.AD(name = "new-web-id", required = false)
 	public String newWebId();
 
 }

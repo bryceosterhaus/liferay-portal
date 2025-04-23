@@ -59,6 +59,7 @@ import com.liferay.expando.kernel.service.ExpandoValueLocalService;
 import com.liferay.expando.kernel.util.ExpandoBridgeFactoryUtil;
 import com.liferay.fragment.importer.FragmentsImportStrategy;
 import com.liferay.fragment.importer.FragmentsImporter;
+import com.liferay.fragment.service.FragmentEntryLinkLocalService;
 import com.liferay.headless.admin.list.type.dto.v1_0.ListTypeDefinition;
 import com.liferay.headless.admin.list.type.dto.v1_0.ListTypeEntry;
 import com.liferay.headless.admin.list.type.resource.v1_0.ListTypeDefinitionResource;
@@ -166,7 +167,6 @@ import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.service.LayoutSetLocalService;
 import com.liferay.portal.kernel.service.OrganizationLocalService;
-import com.liferay.portal.kernel.service.PortletPreferencesLocalService;
 import com.liferay.portal.kernel.service.ResourceActionLocalService;
 import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
@@ -215,6 +215,7 @@ import com.liferay.segments.model.SegmentsEntry;
 import com.liferay.segments.model.SegmentsExperience;
 import com.liferay.segments.service.SegmentsEntryLocalService;
 import com.liferay.segments.service.SegmentsExperienceLocalService;
+import com.liferay.site.configuration.manager.MenuAccessConfigurationManager;
 import com.liferay.site.exception.InitializationException;
 import com.liferay.site.initializer.SiteInitializer;
 import com.liferay.site.initializer.extender.CommerceSiteInitializer;
@@ -274,11 +275,12 @@ public class BundleSiteInitializer implements SiteInitializer {
 		AccountResource.Factory accountResourceFactory,
 		AccountRoleLocalService accountRoleLocalService,
 		AccountRoleResource.Factory accountRoleResourceFactory,
+		ArchivedSettingsFactory archivedSettingsFactory,
 		AssetCategoryLocalService assetCategoryLocalService,
 		AssetEntryLocalService assetEntryLocalService,
 		AssetLinkLocalService assetLinkLocalService,
 		AssetListEntryLocalService assetListEntryLocalService,
-		BlogPostingResource.Factory blogPostingResourceFactory, Bundle bundle,
+		BlogPostingResource.Factory blogPostingResourceFactory,
 		CETManager cetManager,
 		ClientExtensionEntryLocalService clientExtensionEntryLocalService,
 		CompanyLocalService companyLocalService,
@@ -294,6 +296,7 @@ public class BundleSiteInitializer implements SiteInitializer {
 		DocumentFolderResource.Factory documentFolderResourceFactory,
 		DocumentResource.Factory documentResourceFactory,
 		ExpandoValueLocalService expandoValueLocalService,
+		FragmentEntryLinkLocalService fragmentEntryLinkLocalService,
 		FragmentsImporter fragmentsImporter,
 		GroupLocalService groupLocalService,
 		JournalArticleLocalService journalArticleLocalService,
@@ -315,6 +318,7 @@ public class BundleSiteInitializer implements SiteInitializer {
 		ListTypeEntryLocalService listTypeEntryLocalService,
 		ListTypeEntryResource listTypeEntryResource,
 		ListTypeEntryResource.Factory listTypeEntryResourceFactory,
+		MenuAccessConfigurationManager menuAccessConfigurationManager,
 		NotificationTemplateResource.Factory
 			notificationTemplateResourceFactory,
 		ObjectActionLocalService objectActionLocalService,
@@ -330,14 +334,13 @@ public class BundleSiteInitializer implements SiteInitializer {
 		OrganizationLocalService organizationLocalService,
 		OrganizationResource.Factory organizationResourceFactory,
 		PLOEntryLocalService ploEntryLocalService, Portal portal,
-		PortletPreferencesLocalService portletPreferencesLocalService,
 		ResourceActionLocalService resourceActionLocalService,
 		ResourcePermissionLocalService resourcePermissionLocalService,
 		RoleLocalService roleLocalService,
 		SAPEntryLocalService sapEntryLocalService,
 		SegmentsEntryLocalService segmentsEntryLocalService,
 		SegmentsExperienceLocalService segmentsExperienceLocalService,
-		ArchivedSettingsFactory archivedSettingsFactory,
+		Bundle siteBundle, Bundle siteInitializerExtenderBundle,
 		SiteNavigationMenuItemLocalService siteNavigationMenuItemLocalService,
 		SiteNavigationMenuItemTypeRegistry siteNavigationMenuItemTypeRegistry,
 		SiteNavigationMenuLocalService siteNavigationMenuLocalService,
@@ -363,12 +366,12 @@ public class BundleSiteInitializer implements SiteInitializer {
 		_accountResourceFactory = accountResourceFactory;
 		_accountRoleLocalService = accountRoleLocalService;
 		_accountRoleResourceFactory = accountRoleResourceFactory;
+		_archivedSettingsFactory = archivedSettingsFactory;
 		_assetCategoryLocalService = assetCategoryLocalService;
 		_assetEntryLocalService = assetEntryLocalService;
 		_assetLinkLocalService = assetLinkLocalService;
 		_assetListEntryLocalService = assetListEntryLocalService;
 		_blogPostingResourceFactory = blogPostingResourceFactory;
-		_bundle = bundle;
 		_cetManager = cetManager;
 		_clientExtensionEntryLocalService = clientExtensionEntryLocalService;
 		_companyLocalService = companyLocalService;
@@ -384,6 +387,7 @@ public class BundleSiteInitializer implements SiteInitializer {
 		_documentFolderResourceFactory = documentFolderResourceFactory;
 		_documentResourceFactory = documentResourceFactory;
 		_expandoValueLocalService = expandoValueLocalService;
+		_fragmentEntryLinkLocalService = fragmentEntryLinkLocalService;
 		_fragmentsImporter = fragmentsImporter;
 		_groupLocalService = groupLocalService;
 		_journalArticleLocalService = journalArticleLocalService;
@@ -409,6 +413,7 @@ public class BundleSiteInitializer implements SiteInitializer {
 		_listTypeEntryLocalService = listTypeEntryLocalService;
 		_listTypeEntryResource = listTypeEntryResource;
 		_listTypeEntryResourceFactory = listTypeEntryResourceFactory;
+		_menuAccessConfigurationManager = menuAccessConfigurationManager;
 		_notificationTemplateResourceFactory =
 			notificationTemplateResourceFactory;
 		_objectActionLocalService = objectActionLocalService;
@@ -425,14 +430,14 @@ public class BundleSiteInitializer implements SiteInitializer {
 		_organizationResourceFactory = organizationResourceFactory;
 		_ploEntryLocalService = ploEntryLocalService;
 		_portal = portal;
-		_portletPreferencesLocalService = portletPreferencesLocalService;
 		_resourceActionLocalService = resourceActionLocalService;
 		_resourcePermissionLocalService = resourcePermissionLocalService;
 		_roleLocalService = roleLocalService;
 		_sapEntryLocalService = sapEntryLocalService;
 		_segmentsEntryLocalService = segmentsEntryLocalService;
 		_segmentsExperienceLocalService = segmentsExperienceLocalService;
-		_archivedSettingsFactory = archivedSettingsFactory;
+		_siteBundle = siteBundle;
+		_siteInitializerExtenderBundle = siteInitializerExtenderBundle;
 		_siteNavigationMenuItemLocalService =
 			siteNavigationMenuItemLocalService;
 		_siteNavigationMenuItemTypeRegistry =
@@ -453,7 +458,7 @@ public class BundleSiteInitializer implements SiteInitializer {
 		_workflowDefinitionResourceFactory = workflowDefinitionResourceFactory;
 		_zipWriterFactory = zipWriterFactory;
 
-		BundleWiring bundleWiring = _bundle.adapt(BundleWiring.class);
+		BundleWiring bundleWiring = _siteBundle.adapt(BundleWiring.class);
 
 		_classLoader = bundleWiring.getClassLoader();
 
@@ -465,7 +470,7 @@ public class BundleSiteInitializer implements SiteInitializer {
 
 	@Override
 	public String getDescription(Locale locale) {
-		Dictionary<String, String> headers = _bundle.getHeaders(
+		Dictionary<String, String> headers = _siteBundle.getHeaders(
 			StringPool.BLANK);
 
 		return GetterUtil.getString(
@@ -474,12 +479,12 @@ public class BundleSiteInitializer implements SiteInitializer {
 
 	@Override
 	public String getKey() {
-		return _bundle.getSymbolicName();
+		return _siteBundle.getSymbolicName();
 	}
 
 	@Override
 	public String getName(Locale locale) {
-		Dictionary<String, String> headers = _bundle.getHeaders(
+		Dictionary<String, String> headers = _siteBundle.getHeaders(
 			StringPool.BLANK);
 
 		return GetterUtil.getString(
@@ -551,7 +556,7 @@ public class BundleSiteInitializer implements SiteInitializer {
 
 	@Override
 	public boolean isActive(long companyId) {
-		Dictionary<String, String> headers = _bundle.getHeaders(
+		Dictionary<String, String> headers = _siteBundle.getHeaders(
 			StringPool.BLANK);
 
 		String featureFlagKey = headers.get(
@@ -801,7 +806,8 @@ public class BundleSiteInitializer implements SiteInitializer {
 		}
 
 		commerceSiteInitializer.addCPDefinitions(
-			_bundle, serviceContext, _servletContext, stringUtilReplaceValues);
+			_siteBundle, serviceContext, _servletContext,
+			stringUtilReplaceValues);
 	}
 
 	private void _addExpandoValues(
@@ -862,12 +868,12 @@ public class BundleSiteInitializer implements SiteInitializer {
 	}
 
 	private void _addFragmentEntries(
-			long groupId, String parentResourcePath,
+			Bundle bundle, long groupId, String parentResourcePath,
 			ServiceContext serviceContext,
 			Map<String, String> stringUtilReplaceValues)
 		throws Exception {
 
-		Enumeration<URL> enumeration = _bundle.findEntries(
+		Enumeration<URL> enumeration = bundle.findEntries(
 			parentResourcePath, StringPool.STAR, true);
 
 		if (enumeration == null) {
@@ -907,7 +913,7 @@ public class BundleSiteInitializer implements SiteInitializer {
 
 		_fragmentsImporter.importFragmentEntries(
 			serviceContext.getUserId(), groupId, 0, zipWriter.getFile(),
-			FragmentsImportStrategy.OVERWRITE);
+			FragmentsImportStrategy.OVERWRITE, false);
 	}
 
 	private void _addFragmentEntries(
@@ -919,13 +925,22 @@ public class BundleSiteInitializer implements SiteInitializer {
 			serviceContext.getCompanyId());
 
 		_addFragmentEntries(
-			group.getGroupId(), "/site-initializer/fragments/company",
-			serviceContext, stringUtilReplaceValues);
+			_siteBundle, group.getGroupId(),
+			"/site-initializer/fragments/company", serviceContext,
+			stringUtilReplaceValues);
 
 		_addFragmentEntries(
-			serviceContext.getScopeGroupId(),
+			_siteBundle, serviceContext.getScopeGroupId(),
 			"/site-initializer/fragments/group", serviceContext,
 			stringUtilReplaceValues);
+
+		if (_dialectThemeDetected) {
+			_addFragmentEntries(
+				_siteInitializerExtenderBundle,
+				serviceContext.getScopeGroupId(),
+				"/site-initializer/fragments/group", serviceContext,
+				stringUtilReplaceValues);
+		}
 	}
 
 	private void _addKeywords(
@@ -1038,7 +1053,7 @@ public class BundleSiteInitializer implements SiteInitializer {
 			Map<String, String> stringUtilReplaceValues)
 		throws Exception {
 
-		Enumeration<URL> enumeration = _bundle.findEntries(
+		Enumeration<URL> enumeration = _siteBundle.findEntries(
 			"/site-initializer/layout-page-templates", StringPool.STAR, true);
 
 		if (enumeration == null) {
@@ -1110,7 +1125,7 @@ public class BundleSiteInitializer implements SiteInitializer {
 			Map<String, String> stringUtilReplaceValues)
 		throws Exception {
 
-		Enumeration<URL> enumeration = _bundle.findEntries(
+		Enumeration<URL> enumeration = _siteBundle.findEntries(
 			"/site-initializer/layout-utility-page-entries", StringPool.STAR,
 			true);
 
@@ -1798,7 +1813,7 @@ public class BundleSiteInitializer implements SiteInitializer {
 				String.valueOf(ddmTemplate.getTemplateId()));
 		}
 
-		Enumeration<URL> enumeration = _bundle.findEntries(
+		Enumeration<URL> enumeration = _siteBundle.findEntries(
 			"/site-initializer/ddm-templates", "ddm-template.json", true);
 
 		if (enumeration == null) {
@@ -1850,7 +1865,8 @@ public class BundleSiteInitializer implements SiteInitializer {
 					).build(),
 					null, DDMTemplateConstants.TEMPLATE_TYPE_DISPLAY, null,
 					TemplateConstants.LANG_TYPE_FTL,
-					SiteInitializerUtil.read(_bundle, "ddm-template.ftl", url),
+					SiteInitializerUtil.read(
+						_siteBundle, "ddm-template.ftl", url),
 					false, false, null, null, serviceContext);
 
 				if (Objects.equals(
@@ -1886,7 +1902,8 @@ public class BundleSiteInitializer implements SiteInitializer {
 					).build(),
 					null, DDMTemplateConstants.TEMPLATE_TYPE_DISPLAY, null,
 					TemplateConstants.LANG_TYPE_FTL,
-					SiteInitializerUtil.read(_bundle, "ddm-template.ftl", url),
+					SiteInitializerUtil.read(
+						_siteBundle, "ddm-template.ftl", url),
 					false, false, null, null, serviceContext);
 			}
 
@@ -2832,9 +2849,12 @@ public class BundleSiteInitializer implements SiteInitializer {
 							layoutPageTemplateStructure.
 								getLayoutPageTemplateStructureId(),
 							segmentsExperienceId, layoutStructure.toString());
-					_portletPreferencesLocalService.deletePortletPreferences(
-						0, PortletKeys.PREFS_OWNER_TYPE_LAYOUT,
-						draftLayout.getPlid());
+
+					_fragmentEntryLinkLocalService.
+						deleteLayoutPageTemplateEntryFragmentEntryLinks(
+							draftLayout.getGroupId(),
+							new long[] {segmentsExperienceId},
+							draftLayout.getPlid());
 				}
 
 				for (int i = 0; i < jsonArray.length(); i++) {
@@ -3034,7 +3054,7 @@ public class BundleSiteInitializer implements SiteInitializer {
 
 		JSONObject bodyJSONObject = _jsonFactory.createJSONObject();
 
-		Enumeration<URL> enumeration = _bundle.findEntries(
+		Enumeration<URL> enumeration = _siteBundle.findEntries(
 			resourcePath, "*.html", true);
 
 		if (enumeration == null) {
@@ -3563,9 +3583,9 @@ public class BundleSiteInitializer implements SiteInitializer {
 				if (_log.isWarnEnabled()) {
 					_log.warn(
 						StringBundler.concat(
-							"No resource action found with resourceName ",
+							"No resource action found with name ",
 							jsonObject.getString("resourceName"),
-							" with the actionIds: ",
+							" and action IDs ",
 							ArrayUtil.toString(actionIds, "")));
 				}
 
@@ -4489,9 +4509,8 @@ public class BundleSiteInitializer implements SiteInitializer {
 	private void _addSiteConfiguration(ServiceContext serviceContext)
 		throws Exception {
 
-		String resourcePath = "site-initializer/site-configuration.json";
-
-		String json = SiteInitializerUtil.read(resourcePath, _servletContext);
+		String json = SiteInitializerUtil.read(
+			"/site-initializer/site-configuration.json", _servletContext);
 
 		if (json == null) {
 			return;
@@ -4508,6 +4527,43 @@ public class BundleSiteInitializer implements SiteInitializer {
 			jsonObject.getInt("membershipRestriction"));
 
 		_groupLocalService.updateGroup(group);
+
+		JSONArray accessToControlMenuRoleNamesJSONArray =
+			jsonObject.getJSONArray("accessToControlMenuRoleNames");
+
+		if (accessToControlMenuRoleNamesJSONArray == null) {
+			_menuAccessConfigurationManager.updateMenuAccessConfiguration(
+				serviceContext.getScopeGroupId(), new String[0],
+				jsonObject.getBoolean("showControlMenuByRole"));
+
+			return;
+		}
+
+		List<Long> roleIds = new ArrayList<>();
+
+		for (int i = 0; i < accessToControlMenuRoleNamesJSONArray.length();
+			 i++) {
+
+			Role role = _roleLocalService.fetchRole(
+				serviceContext.getCompanyId(),
+				accessToControlMenuRoleNamesJSONArray.getString(i));
+
+			if (role == null) {
+				if (_log.isWarnEnabled()) {
+					_log.warn(
+						"No role found with name " +
+							accessToControlMenuRoleNamesJSONArray.getString(i));
+				}
+
+				continue;
+			}
+
+			roleIds.add(role.getRoleId());
+		}
+
+		_menuAccessConfigurationManager.updateMenuAccessConfiguration(
+			serviceContext.getScopeGroupId(), ArrayUtil.toStringArray(roleIds),
+			jsonObject.getBoolean("showControlMenuByRole"));
 	}
 
 	private void _addSiteSettings(ServiceContext serviceContext)
@@ -4547,7 +4603,7 @@ public class BundleSiteInitializer implements SiteInitializer {
 	private void _addStyleBookEntries(ServiceContext serviceContext)
 		throws Exception {
 
-		Enumeration<URL> enumeration = _bundle.findEntries(
+		Enumeration<URL> enumeration = _siteBundle.findEntries(
 			"/site-initializer/style-books", StringPool.STAR, true);
 
 		if (enumeration == null) {
@@ -5217,7 +5273,8 @@ public class BundleSiteInitializer implements SiteInitializer {
 				addOrUpdateKnowledgeBaseArticlesR, addOrUpdateLayoutsContentR,
 				addOrUpdateSegmentsEntriesR, addOrUpdateUserGroupsR)
 		).put(
-			addFragmentEntriesR, _dependsOn(addOrUpdateDocumentsR)
+			addFragmentEntriesR,
+			_dependsOn(addOrUpdateDocumentsR, updateLayoutSetsR)
 		).put(
 			addKeywordsR, _dependsOn(addOrUpdateDepotEntriesR)
 		).put(
@@ -5324,7 +5381,7 @@ public class BundleSiteInitializer implements SiteInitializer {
 			addSegmentsExperiencesR,
 			_dependsOn(addOrUpdateLayoutsContentR, addOrUpdateSegmentsEntriesR)
 		).put(
-			addSiteConfigurationR, _dependsOn()
+			addSiteConfigurationR, _dependsOn(addOrUpdateRolesR)
 		).put(
 			addSiteSettingsR, _dependsOn()
 		).put(
@@ -5565,6 +5622,10 @@ public class BundleSiteInitializer implements SiteInitializer {
 		if (ListUtil.isNotEmpty(themes)) {
 			Theme theme = themes.get(0);
 
+			if (Objects.equals(theme.getName(), "Dialect")) {
+				_dialectThemeDetected = true;
+			}
+
 			return theme.getThemeId();
 		}
 
@@ -5697,14 +5758,15 @@ public class BundleSiteInitializer implements SiteInitializer {
 		stringUtilReplaceValues.put(
 			"OBJECT_DEFINITION_ID:" + name, String.valueOf(objectDefinitionId));
 
-		if (!name.contains(StringPool.POUND)) {
+		if (!className.contains(StringPool.POUND)) {
 			return;
 		}
 
 		stringUtilReplaceValues.put(
 			"OBJECT_DEFINITION_PORTLET_ID:" + name,
-			ObjectPortletKeys.OBJECT_DEFINITIONS +
-				StringUtil.split(className, StringPool.POUND)[1]);
+			StringBundler.concat(
+				ObjectPortletKeys.OBJECT_DEFINITIONS, StringPool.UNDERLINE,
+				StringUtil.split(className, StringPool.POUND)[1]));
 	}
 
 	private void _setDefaultLayoutUtilityPageEntries(
@@ -5983,7 +6045,6 @@ public class BundleSiteInitializer implements SiteInitializer {
 	private final AssetLinkLocalService _assetLinkLocalService;
 	private final AssetListEntryLocalService _assetListEntryLocalService;
 	private final BlogPostingResource.Factory _blogPostingResourceFactory;
-	private final Bundle _bundle;
 	private final CETManager _cetManager;
 	private final ClassLoader _classLoader;
 	private final Map<String, String> _classNameIdStringUtilReplaceValues;
@@ -5998,11 +6059,13 @@ public class BundleSiteInitializer implements SiteInitializer {
 	private final DepotEntryGroupRelLocalService
 		_depotEntryGroupRelLocalService;
 	private final DepotEntryLocalService _depotEntryLocalService;
+	private boolean _dialectThemeDetected;
 	private final DLFileEntryTypeLocalService _dlFileEntryTypeLocalService;
 	private final DLURLHelper _dlURLHelper;
 	private final DocumentFolderResource.Factory _documentFolderResourceFactory;
 	private final DocumentResource.Factory _documentResourceFactory;
 	private final ExpandoValueLocalService _expandoValueLocalService;
+	private final FragmentEntryLinkLocalService _fragmentEntryLinkLocalService;
 	private final FragmentsImporter _fragmentsImporter;
 	private final GroupLocalService _groupLocalService;
 	private final JournalArticleLocalService _journalArticleLocalService;
@@ -6029,6 +6092,8 @@ public class BundleSiteInitializer implements SiteInitializer {
 	private final ListTypeEntryLocalService _listTypeEntryLocalService;
 	private final ListTypeEntryResource _listTypeEntryResource;
 	private final ListTypeEntryResource.Factory _listTypeEntryResourceFactory;
+	private final MenuAccessConfigurationManager
+		_menuAccessConfigurationManager;
 	private final NotificationTemplateResource.Factory
 		_notificationTemplateResourceFactory;
 	private final ObjectActionLocalService _objectActionLocalService;
@@ -6048,8 +6113,6 @@ public class BundleSiteInitializer implements SiteInitializer {
 	private final OrganizationResource.Factory _organizationResourceFactory;
 	private final PLOEntryLocalService _ploEntryLocalService;
 	private final Portal _portal;
-	private final PortletPreferencesLocalService
-		_portletPreferencesLocalService;
 	private final Map<String, String> _releaseInfoStringUtilReplaceValues;
 	private final ResourceActionLocalService _resourceActionLocalService;
 	private final ResourcePermissionLocalService
@@ -6060,6 +6123,8 @@ public class BundleSiteInitializer implements SiteInitializer {
 	private final SegmentsExperienceLocalService
 		_segmentsExperienceLocalService;
 	private ServletContext _servletContext;
+	private final Bundle _siteBundle;
+	private final Bundle _siteInitializerExtenderBundle;
 	private final SiteNavigationMenuItemLocalService
 		_siteNavigationMenuItemLocalService;
 	private final SiteNavigationMenuItemTypeRegistry

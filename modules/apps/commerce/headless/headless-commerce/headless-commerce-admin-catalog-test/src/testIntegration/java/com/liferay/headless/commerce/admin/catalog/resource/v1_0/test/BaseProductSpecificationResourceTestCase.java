@@ -13,12 +13,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
+import com.liferay.headless.batch.engine.client.dto.v1_0.ImportTask;
+import com.liferay.headless.batch.engine.client.resource.v1_0.ImportTaskResource;
 import com.liferay.headless.commerce.admin.catalog.client.dto.v1_0.ProductSpecification;
 import com.liferay.headless.commerce.admin.catalog.client.http.HttpInvoker;
 import com.liferay.headless.commerce.admin.catalog.client.pagination.Page;
 import com.liferay.headless.commerce.admin.catalog.client.pagination.Pagination;
 import com.liferay.headless.commerce.admin.catalog.client.resource.v1_0.ProductSpecificationResource;
 import com.liferay.headless.commerce.admin.catalog.client.serdes.v1_0.ProductSpecificationSerDes;
+import com.liferay.oauth2.provider.scope.ScopeChecker;
 import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.petra.string.StringBundler;
@@ -28,11 +31,17 @@ import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.service.CompanyLocalServiceUtil;
+import com.liferay.portal.kernel.service.GroupLocalService;
+import com.liferay.portal.kernel.service.ResourceActionLocalService;
+import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
+import com.liferay.portal.kernel.service.RoleLocalService;
+import com.liferay.portal.kernel.service.UserLocalService;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
-import com.liferay.portal.kernel.util.DateFormatFactoryUtil;
+import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -40,12 +49,18 @@ import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
 import com.liferay.portal.util.PropsValues;
+import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
+import com.liferay.portal.vulcan.crud.VulcanCRUDItemDelegate;
+import com.liferay.portal.vulcan.crud.VulcanCRUDItemDelegateBuilderRegistry;
 import com.liferay.portal.vulcan.resource.EntityModelResource;
 
 import java.lang.reflect.Method;
 
-import java.text.DateFormat;
+import java.net.URI;
+
+import java.text.Format;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -54,13 +69,20 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
 import javax.annotation.Generated;
 
+import javax.servlet.http.HttpServletRequest;
+
 import javax.ws.rs.core.MultivaluedHashMap;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.PathSegment;
+import javax.ws.rs.core.UriBuilder;
+import javax.ws.rs.core.UriInfo;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -69,6 +91,9 @@ import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockHttpServletResponse;
 
 /**
  * @author Zoltán Takács
@@ -79,12 +104,14 @@ public abstract class BaseProductSpecificationResourceTestCase {
 
 	@ClassRule
 	@Rule
-	public static final LiferayIntegrationTestRule liferayIntegrationTestRule =
-		new LiferayIntegrationTestRule();
+	public static final AggregateTestRule aggregateTestRule =
+		new AggregateTestRule(
+			new LiferayIntegrationTestRule(),
+			PermissionCheckerMethodTestRule.INSTANCE);
 
 	@BeforeClass
 	public static void setUpClass() throws Exception {
-		_dateFormat = DateFormatFactoryUtil.getSimpleDateFormat(
+		_format = FastDateFormatFactoryUtil.getSimpleDateFormat(
 			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 	}
 
@@ -98,12 +125,22 @@ public abstract class BaseProductSpecificationResourceTestCase {
 
 		_productSpecificationResource.setContextCompany(testCompany);
 
-		com.liferay.portal.kernel.model.User testCompanyAdminUser =
-			UserTestUtil.getAdminUser(testCompany.getCompanyId());
+		_testCompanyAdminUser = UserTestUtil.getAdminUser(
+			testCompany.getCompanyId());
 
 		productSpecificationResource = ProductSpecificationResource.builder(
 		).authentication(
-			testCompanyAdminUser.getEmailAddress(),
+			_testCompanyAdminUser.getEmailAddress(),
+			PropsValues.DEFAULT_ADMIN_PASSWORD
+		).endpoint(
+			testCompany.getVirtualHostname(), 8080, "http"
+		).locale(
+			LocaleUtil.getDefault()
+		).build();
+
+		importTaskResource = ImportTaskResource.builder(
+		).authentication(
+			_testCompanyAdminUser.getEmailAddress(),
 			PropsValues.DEFAULT_ADMIN_PASSWORD
 		).endpoint(
 			testCompany.getVirtualHostname(), 8080, "http"
@@ -197,220 +234,6 @@ public abstract class BaseProductSpecificationResourceTestCase {
 	}
 
 	@Test
-	public void testDeleteProductSpecificationByExternalReferenceCode()
-		throws Exception {
-
-		@SuppressWarnings("PMD.UnusedLocalVariable")
-		ProductSpecification productSpecification =
-			testDeleteProductSpecificationByExternalReferenceCode_addProductSpecification();
-
-		assertHttpResponseStatusCode(
-			204,
-			productSpecificationResource.
-				deleteProductSpecificationByExternalReferenceCodeHttpResponse(
-					productSpecification.getExternalReferenceCode()));
-
-		assertHttpResponseStatusCode(
-			404,
-			productSpecificationResource.
-				getProductSpecificationByExternalReferenceCodeHttpResponse(
-					productSpecification.getExternalReferenceCode()));
-
-		assertHttpResponseStatusCode(
-			404,
-			productSpecificationResource.
-				getProductSpecificationByExternalReferenceCodeHttpResponse(
-					productSpecification.getExternalReferenceCode()));
-	}
-
-	protected ProductSpecification
-			testDeleteProductSpecificationByExternalReferenceCode_addProductSpecification()
-		throws Exception {
-
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
-	}
-
-	@Test
-	public void testGetProductSpecificationByExternalReferenceCode()
-		throws Exception {
-
-		ProductSpecification postProductSpecification =
-			testGetProductSpecificationByExternalReferenceCode_addProductSpecification();
-
-		ProductSpecification getProductSpecification =
-			productSpecificationResource.
-				getProductSpecificationByExternalReferenceCode(
-					postProductSpecification.getExternalReferenceCode());
-
-		assertEquals(postProductSpecification, getProductSpecification);
-		assertValid(getProductSpecification);
-	}
-
-	protected ProductSpecification
-			testGetProductSpecificationByExternalReferenceCode_addProductSpecification()
-		throws Exception {
-
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
-	}
-
-	@Test
-	public void testGraphQLGetProductSpecificationByExternalReferenceCode()
-		throws Exception {
-
-		ProductSpecification productSpecification =
-			testGraphQLGetProductSpecificationByExternalReferenceCode_addProductSpecification();
-
-		// No namespace
-
-		Assert.assertTrue(
-			equals(
-				productSpecification,
-				ProductSpecificationSerDes.toDTO(
-					JSONUtil.getValueAsString(
-						invokeGraphQLQuery(
-							new GraphQLField(
-								"productSpecificationByExternalReferenceCode",
-								new HashMap<String, Object>() {
-									{
-										put(
-											"externalReferenceCode",
-											"\"" +
-												productSpecification.
-													getExternalReferenceCode() +
-														"\"");
-									}
-								},
-								getGraphQLFields())),
-						"JSONObject/data",
-						"Object/productSpecificationByExternalReferenceCode"))));
-
-		// Using the namespace headlessCommerceAdminCatalog_v1_0
-
-		Assert.assertTrue(
-			equals(
-				productSpecification,
-				ProductSpecificationSerDes.toDTO(
-					JSONUtil.getValueAsString(
-						invokeGraphQLQuery(
-							new GraphQLField(
-								"headlessCommerceAdminCatalog_v1_0",
-								new GraphQLField(
-									"productSpecificationByExternalReferenceCode",
-									new HashMap<String, Object>() {
-										{
-											put(
-												"externalReferenceCode",
-												"\"" +
-													productSpecification.
-														getExternalReferenceCode() +
-															"\"");
-										}
-									},
-									getGraphQLFields()))),
-						"JSONObject/data",
-						"JSONObject/headlessCommerceAdminCatalog_v1_0",
-						"Object/productSpecificationByExternalReferenceCode"))));
-	}
-
-	@Test
-	public void testGraphQLGetProductSpecificationByExternalReferenceCodeNotFound()
-		throws Exception {
-
-		String irrelevantExternalReferenceCode =
-			"\"" + RandomTestUtil.randomString() + "\"";
-
-		// No namespace
-
-		Assert.assertEquals(
-			"Not Found",
-			JSONUtil.getValueAsString(
-				invokeGraphQLQuery(
-					new GraphQLField(
-						"productSpecificationByExternalReferenceCode",
-						new HashMap<String, Object>() {
-							{
-								put(
-									"externalReferenceCode",
-									irrelevantExternalReferenceCode);
-							}
-						},
-						getGraphQLFields())),
-				"JSONArray/errors", "Object/0", "JSONObject/extensions",
-				"Object/code"));
-
-		// Using the namespace headlessCommerceAdminCatalog_v1_0
-
-		Assert.assertEquals(
-			"Not Found",
-			JSONUtil.getValueAsString(
-				invokeGraphQLQuery(
-					new GraphQLField(
-						"headlessCommerceAdminCatalog_v1_0",
-						new GraphQLField(
-							"productSpecificationByExternalReferenceCode",
-							new HashMap<String, Object>() {
-								{
-									put(
-										"externalReferenceCode",
-										irrelevantExternalReferenceCode);
-								}
-							},
-							getGraphQLFields()))),
-				"JSONArray/errors", "Object/0", "JSONObject/extensions",
-				"Object/code"));
-	}
-
-	protected ProductSpecification
-			testGraphQLGetProductSpecificationByExternalReferenceCode_addProductSpecification()
-		throws Exception {
-
-		return testGraphQLProductSpecification_addProductSpecification();
-	}
-
-	@Test
-	public void testPatchProductSpecificationByExternalReferenceCode()
-		throws Exception {
-
-		ProductSpecification postProductSpecification =
-			testPatchProductSpecificationByExternalReferenceCode_addProductSpecification();
-
-		ProductSpecification randomPatchProductSpecification =
-			randomPatchProductSpecification();
-
-		@SuppressWarnings("PMD.UnusedLocalVariable")
-		ProductSpecification patchProductSpecification =
-			productSpecificationResource.
-				patchProductSpecificationByExternalReferenceCode(
-					postProductSpecification.getExternalReferenceCode(),
-					randomPatchProductSpecification);
-
-		ProductSpecification expectedPatchProductSpecification =
-			postProductSpecification.clone();
-
-		BeanTestUtil.copyProperties(
-			randomPatchProductSpecification, expectedPatchProductSpecification);
-
-		ProductSpecification getProductSpecification =
-			productSpecificationResource.
-				getProductSpecificationByExternalReferenceCode(
-					patchProductSpecification.getExternalReferenceCode());
-
-		assertEquals(
-			expectedPatchProductSpecification, getProductSpecification);
-		assertValid(getProductSpecification);
-	}
-
-	protected ProductSpecification
-			testPatchProductSpecificationByExternalReferenceCode_addProductSpecification()
-		throws Exception {
-
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
-	}
-
-	@Test
 	public void testDeleteProductSpecification() throws Exception {
 		@SuppressWarnings("PMD.UnusedLocalVariable")
 		ProductSpecification productSpecification =
@@ -425,11 +248,10 @@ public abstract class BaseProductSpecificationResourceTestCase {
 			404,
 			productSpecificationResource.getProductSpecificationHttpResponse(
 				productSpecification.getId()));
-
 		assertHttpResponseStatusCode(
 			404,
 			productSpecificationResource.getProductSpecificationHttpResponse(
-				productSpecification.getId()));
+				0L));
 	}
 
 	protected ProductSpecification
@@ -520,153 +342,117 @@ public abstract class BaseProductSpecificationResourceTestCase {
 	}
 
 	@Test
-	public void testGetProductSpecification() throws Exception {
-		ProductSpecification postProductSpecification =
-			testGetProductSpecification_addProductSpecification();
+	public void testDeleteProductSpecificationBatch() throws Exception {
+		ProductSpecification productSpecification1 =
+			testDeleteProductSpecificationBatch_addProductSpecification();
 
-		ProductSpecification getProductSpecification =
-			productSpecificationResource.getProductSpecification(
-				postProductSpecification.getId());
+		testDeleteProductSpecificationBatch_deleteProductSpecification(
+			"COMPLETED", null, productSpecification1.getId());
 
-		assertEquals(postProductSpecification, getProductSpecification);
-		assertValid(getProductSpecification);
+		assertHttpResponseStatusCode(
+			404,
+			productSpecificationResource.getProductSpecificationHttpResponse(
+				productSpecification1.getId()));
+
+		ProductSpecification productSpecification2 =
+			testDeleteProductSpecificationBatch_addProductSpecification();
+
+		testDeleteProductSpecificationBatch_deleteProductSpecification(
+			"COMPLETED", productSpecification2.getExternalReferenceCode(),
+			null);
+
+		assertHttpResponseStatusCode(
+			404,
+			productSpecificationResource.getProductSpecificationHttpResponse(
+				productSpecification2.getId()));
+
+		productSpecification1 =
+			testDeleteProductSpecificationBatch_addProductSpecification();
+		productSpecification2 =
+			testDeleteProductSpecificationBatch_addProductSpecification();
+
+		testDeleteProductSpecificationBatch_deleteProductSpecification(
+			"COMPLETED", productSpecification2.getExternalReferenceCode(),
+			productSpecification1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			productSpecificationResource.getProductSpecificationHttpResponse(
+				productSpecification1.getId()));
+		assertHttpResponseStatusCode(
+			200,
+			productSpecificationResource.getProductSpecificationHttpResponse(
+				productSpecification2.getId()));
+
+		testDeleteProductSpecificationBatch_deleteProductSpecification(
+			"COMPLETED", productSpecification2.getExternalReferenceCode(),
+			productSpecification1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			productSpecificationResource.getProductSpecificationHttpResponse(
+				productSpecification2.getId()));
 	}
 
 	protected ProductSpecification
-			testGetProductSpecification_addProductSpecification()
+			testDeleteProductSpecificationBatch_addProductSpecification()
 		throws Exception {
 
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
+		return testDeleteProductSpecification_addProductSpecification();
 	}
 
-	@Test
-	public void testGraphQLGetProductSpecification() throws Exception {
-		ProductSpecification productSpecification =
-			testGraphQLGetProductSpecification_addProductSpecification();
-
-		// No namespace
-
-		Assert.assertTrue(
-			equals(
-				productSpecification,
-				ProductSpecificationSerDes.toDTO(
-					JSONUtil.getValueAsString(
-						invokeGraphQLQuery(
-							new GraphQLField(
-								"productSpecification",
-								new HashMap<String, Object>() {
-									{
-										put("id", productSpecification.getId());
-									}
-								},
-								getGraphQLFields())),
-						"JSONObject/data", "Object/productSpecification"))));
-
-		// Using the namespace headlessCommerceAdminCatalog_v1_0
-
-		Assert.assertTrue(
-			equals(
-				productSpecification,
-				ProductSpecificationSerDes.toDTO(
-					JSONUtil.getValueAsString(
-						invokeGraphQLQuery(
-							new GraphQLField(
-								"headlessCommerceAdminCatalog_v1_0",
-								new GraphQLField(
-									"productSpecification",
-									new HashMap<String, Object>() {
-										{
-											put(
-												"id",
-												productSpecification.getId());
-										}
-									},
-									getGraphQLFields()))),
-						"JSONObject/data",
-						"JSONObject/headlessCommerceAdminCatalog_v1_0",
-						"Object/productSpecification"))));
-	}
-
-	@Test
-	public void testGraphQLGetProductSpecificationNotFound() throws Exception {
-		Long irrelevantId = RandomTestUtil.randomLong();
-
-		// No namespace
-
-		Assert.assertEquals(
-			"Not Found",
-			JSONUtil.getValueAsString(
-				invokeGraphQLQuery(
-					new GraphQLField(
-						"productSpecification",
-						new HashMap<String, Object>() {
-							{
-								put("id", irrelevantId);
-							}
-						},
-						getGraphQLFields())),
-				"JSONArray/errors", "Object/0", "JSONObject/extensions",
-				"Object/code"));
-
-		// Using the namespace headlessCommerceAdminCatalog_v1_0
-
-		Assert.assertEquals(
-			"Not Found",
-			JSONUtil.getValueAsString(
-				invokeGraphQLQuery(
-					new GraphQLField(
-						"headlessCommerceAdminCatalog_v1_0",
-						new GraphQLField(
-							"productSpecification",
-							new HashMap<String, Object>() {
-								{
-									put("id", irrelevantId);
-								}
-							},
-							getGraphQLFields()))),
-				"JSONArray/errors", "Object/0", "JSONObject/extensions",
-				"Object/code"));
-	}
-
-	protected ProductSpecification
-			testGraphQLGetProductSpecification_addProductSpecification()
+	protected void
+			testDeleteProductSpecificationBatch_deleteProductSpecification(
+				String expectedExecuteStatus, String externalReferenceCode,
+				Long id)
 		throws Exception {
 
-		return testGraphQLProductSpecification_addProductSpecification();
+		HttpInvoker.HttpResponse httpResponse =
+			productSpecificationResource.
+				deleteProductSpecificationBatchHttpResponse(
+					null,
+					JSONUtil.putAll(
+						JSONUtil.put(
+							"externalReferenceCode", () -> externalReferenceCode
+						).put(
+							"id", () -> id
+						)));
+
+		Assert.assertEquals(202, httpResponse.getStatusCode());
+
+		waitForFinish(
+			expectedExecuteStatus,
+			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
 	}
 
 	@Test
-	public void testPatchProductSpecification() throws Exception {
-		ProductSpecification postProductSpecification =
-			testPatchProductSpecification_addProductSpecification();
-
-		ProductSpecification randomPatchProductSpecification =
-			randomPatchProductSpecification();
+	public void testDeleteProductSpecificationByExternalReferenceCode()
+		throws Exception {
 
 		@SuppressWarnings("PMD.UnusedLocalVariable")
-		ProductSpecification patchProductSpecification =
-			productSpecificationResource.patchProductSpecification(
-				postProductSpecification.getId(),
-				randomPatchProductSpecification);
+		ProductSpecification productSpecification =
+			testDeleteProductSpecificationByExternalReferenceCode_addProductSpecification();
 
-		ProductSpecification expectedPatchProductSpecification =
-			postProductSpecification.clone();
+		assertHttpResponseStatusCode(
+			204,
+			productSpecificationResource.
+				deleteProductSpecificationByExternalReferenceCodeHttpResponse(
+					productSpecification.getExternalReferenceCode()));
 
-		BeanTestUtil.copyProperties(
-			randomPatchProductSpecification, expectedPatchProductSpecification);
-
-		ProductSpecification getProductSpecification =
-			productSpecificationResource.getProductSpecification(
-				patchProductSpecification.getId());
-
-		assertEquals(
-			expectedPatchProductSpecification, getProductSpecification);
-		assertValid(getProductSpecification);
+		assertHttpResponseStatusCode(
+			404,
+			productSpecificationResource.
+				getProductSpecificationByExternalReferenceCodeHttpResponse(
+					productSpecification.getExternalReferenceCode()));
+		assertHttpResponseStatusCode(
+			404,
+			productSpecificationResource.
+				getProductSpecificationByExternalReferenceCodeHttpResponse(
+					"-"));
 	}
 
 	protected ProductSpecification
-			testPatchProductSpecification_addProductSpecification()
+			testDeleteProductSpecificationByExternalReferenceCode_addProductSpecification()
 		throws Exception {
 
 		throw new UnsupportedOperationException(
@@ -896,30 +682,6 @@ public abstract class BaseProductSpecificationResourceTestCase {
 	}
 
 	@Test
-	public void testPostProductByExternalReferenceCodeProductSpecification()
-		throws Exception {
-
-		ProductSpecification randomProductSpecification =
-			randomProductSpecification();
-
-		ProductSpecification postProductSpecification =
-			testPostProductByExternalReferenceCodeProductSpecification_addProductSpecification(
-				randomProductSpecification);
-
-		assertEquals(randomProductSpecification, postProductSpecification);
-		assertValid(postProductSpecification);
-	}
-
-	protected ProductSpecification
-			testPostProductByExternalReferenceCodeProductSpecification_addProductSpecification(
-				ProductSpecification productSpecification)
-		throws Exception {
-
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
-	}
-
-	@Test
 	public void testGetProductIdProductSpecificationsPage() throws Exception {
 		Long id = testGetProductIdProductSpecificationsPage_getId();
 		Long irrelevantId =
@@ -1123,6 +885,556 @@ public abstract class BaseProductSpecificationResourceTestCase {
 		throws Exception {
 
 		return null;
+	}
+
+	@Test
+	public void testGetProductSpecification() throws Exception {
+		ProductSpecification postProductSpecification =
+			testGetProductSpecification_addProductSpecification();
+
+		ProductSpecification getProductSpecification =
+			productSpecificationResource.getProductSpecification(
+				postProductSpecification.getId());
+
+		assertEquals(postProductSpecification, getProductSpecification);
+		assertValid(getProductSpecification);
+	}
+
+	@Test
+	public void testVulcanCRUDItemDelegateGetItem() throws Exception {
+		ProductSpecification postProductSpecification =
+			testGetProductSpecification_addProductSpecification();
+
+		ProductSpecification getProductSpecification =
+			productSpecificationResource.getProductSpecification(
+				postProductSpecification.getId());
+
+		VulcanCRUDItemDelegate vulcanCRUDItemDelegate =
+			_vulcanCRUDItemDelegateBuilderRegistry.builder(
+				testCompany,
+				"com.liferay.headless.commerce.admin.catalog.dto.v1_0.ProductSpecification"
+			).acceptLanguage(
+				new AcceptLanguage() {
+
+					@Override
+					public List<Locale> getLocales() {
+						return Arrays.asList(LocaleUtil.getDefault());
+					}
+
+					@Override
+					public String getPreferredLanguageId() {
+						return LocaleUtil.toLanguageId(LocaleUtil.getDefault());
+					}
+
+					@Override
+					public Locale getPreferredLocale() {
+						return LocaleUtil.getDefault();
+					}
+
+				}
+			).groupLocalService(
+				_groupLocalService
+			).httpServletRequest(
+				testVulcanCRUDItemDelegate_getHttpServletRequest()
+			).httpServletResponse(
+				new MockHttpServletResponse()
+			).resourceActionLocalService(
+				_resourceActionLocalService
+			).resourcePermissionLocalService(
+				_resourcePermissionLocalService
+			).roleLocalService(
+				_roleLocalService
+			).scopeChecker(
+				_scopeChecker
+			).uriInfo(
+				testVulcanCRUDItemDelegate_getUriInfo()
+			).user(
+				testVulcanCRUDItemDelegate_getUser()
+			).build();
+
+		Object item = vulcanCRUDItemDelegate.getItem(
+			postProductSpecification.getId());
+
+		assertEquals(
+			getProductSpecification,
+			ProductSpecificationSerDes.toDTO(item.toString()));
+	}
+
+	protected HttpServletRequest
+		testVulcanCRUDItemDelegate_getHttpServletRequest() {
+
+		return new MockHttpServletRequest() {
+
+			@Override
+			public StringBuffer getRequestURL() {
+				return new StringBuffer(
+					StringBundler.concat(
+						"http://localhost:8080/o/v1.0/",
+						RandomTestUtil.randomString(), "/",
+						RandomTestUtil.randomString()));
+			}
+
+		};
+	}
+
+	protected UriInfo testVulcanCRUDItemDelegate_getUriInfo() {
+		String applicationPath = RandomTestUtil.randomString() + "/";
+		String resourcePath = RandomTestUtil.randomString();
+
+		return new UriInfo() {
+
+			@Override
+			public String getPath() {
+				return resourcePath;
+			}
+
+			@Override
+			public String getPath(boolean decode) {
+				return getPath();
+			}
+
+			@Override
+			public List<PathSegment> getPathSegments() {
+				return Collections.emptyList();
+			}
+
+			@Override
+			public List<PathSegment> getPathSegments(boolean decode) {
+				return getPathSegments();
+			}
+
+			@Override
+			public URI getRequestUri() {
+				return URI.create(
+					"http://localhost:8080/o/" + applicationPath +
+						resourcePath);
+			}
+
+			@Override
+			public UriBuilder getRequestUriBuilder() {
+				return UriBuilder.fromUri(getRequestUri());
+			}
+
+			@Override
+			public URI getAbsolutePath() {
+				return getRequestUri();
+			}
+
+			@Override
+			public UriBuilder getAbsolutePathBuilder() {
+				return getRequestUriBuilder();
+			}
+
+			@Override
+			public URI getBaseUri() {
+				return URI.create("http://localhost:8080/o/" + applicationPath);
+			}
+
+			@Override
+			public UriBuilder getBaseUriBuilder() {
+				return UriBuilder.fromUri(getBaseUri());
+			}
+
+			@Override
+			public MultivaluedMap<String, String> getPathParameters() {
+				return new MultivaluedHashMap<>();
+			}
+
+			@Override
+			public MultivaluedMap<String, String> getPathParameters(
+				boolean decode) {
+
+				return getPathParameters();
+			}
+
+			@Override
+			public MultivaluedMap<String, String> getQueryParameters() {
+				return new MultivaluedHashMap<>();
+			}
+
+			@Override
+			public MultivaluedMap<String, String> getQueryParameters(
+				boolean decode) {
+
+				return getQueryParameters();
+			}
+
+			@Override
+			public List<String> getMatchedURIs() {
+				return Collections.emptyList();
+			}
+
+			@Override
+			public List<String> getMatchedURIs(boolean decode) {
+				return getMatchedURIs();
+			}
+
+			@Override
+			public List<Object> getMatchedResources() {
+				return Collections.emptyList();
+			}
+
+			@Override
+			public URI resolve(URI requestUri) {
+				return getBaseUri().resolve(requestUri);
+			}
+
+			@Override
+			public URI relativize(URI uri) {
+				return getBaseUri().relativize(uri);
+			}
+
+		};
+	}
+
+	protected com.liferay.portal.kernel.model.User
+		testVulcanCRUDItemDelegate_getUser() {
+
+		return _testCompanyAdminUser;
+	}
+
+	protected ProductSpecification
+			testGetProductSpecification_addProductSpecification()
+		throws Exception {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	@Test
+	public void testGraphQLGetProductSpecification() throws Exception {
+		ProductSpecification productSpecification =
+			testGraphQLGetProductSpecification_addProductSpecification();
+
+		// No namespace
+
+		Assert.assertTrue(
+			equals(
+				productSpecification,
+				ProductSpecificationSerDes.toDTO(
+					JSONUtil.getValueAsString(
+						invokeGraphQLQuery(
+							new GraphQLField(
+								"productSpecification",
+								new HashMap<String, Object>() {
+									{
+										put("id", productSpecification.getId());
+									}
+								},
+								getGraphQLFields())),
+						"JSONObject/data", "Object/productSpecification"))));
+
+		// Using the namespace headlessCommerceAdminCatalog_v1_0
+
+		Assert.assertTrue(
+			equals(
+				productSpecification,
+				ProductSpecificationSerDes.toDTO(
+					JSONUtil.getValueAsString(
+						invokeGraphQLQuery(
+							new GraphQLField(
+								"headlessCommerceAdminCatalog_v1_0",
+								new GraphQLField(
+									"productSpecification",
+									new HashMap<String, Object>() {
+										{
+											put(
+												"id",
+												productSpecification.getId());
+										}
+									},
+									getGraphQLFields()))),
+						"JSONObject/data",
+						"JSONObject/headlessCommerceAdminCatalog_v1_0",
+						"Object/productSpecification"))));
+	}
+
+	@Test
+	public void testGraphQLGetProductSpecificationNotFound() throws Exception {
+		Long irrelevantId = RandomTestUtil.randomLong();
+
+		// No namespace
+
+		Assert.assertEquals(
+			"Not Found",
+			JSONUtil.getValueAsString(
+				invokeGraphQLQuery(
+					new GraphQLField(
+						"productSpecification",
+						new HashMap<String, Object>() {
+							{
+								put("id", irrelevantId);
+							}
+						},
+						getGraphQLFields())),
+				"JSONArray/errors", "Object/0", "JSONObject/extensions",
+				"Object/code"));
+
+		// Using the namespace headlessCommerceAdminCatalog_v1_0
+
+		Assert.assertEquals(
+			"Not Found",
+			JSONUtil.getValueAsString(
+				invokeGraphQLQuery(
+					new GraphQLField(
+						"headlessCommerceAdminCatalog_v1_0",
+						new GraphQLField(
+							"productSpecification",
+							new HashMap<String, Object>() {
+								{
+									put("id", irrelevantId);
+								}
+							},
+							getGraphQLFields()))),
+				"JSONArray/errors", "Object/0", "JSONObject/extensions",
+				"Object/code"));
+	}
+
+	protected ProductSpecification
+			testGraphQLGetProductSpecification_addProductSpecification()
+		throws Exception {
+
+		return testGraphQLProductSpecification_addProductSpecification();
+	}
+
+	@Test
+	public void testGetProductSpecificationByExternalReferenceCode()
+		throws Exception {
+
+		ProductSpecification postProductSpecification =
+			testGetProductSpecificationByExternalReferenceCode_addProductSpecification();
+
+		ProductSpecification getProductSpecification =
+			productSpecificationResource.
+				getProductSpecificationByExternalReferenceCode(
+					postProductSpecification.getExternalReferenceCode());
+
+		assertEquals(postProductSpecification, getProductSpecification);
+		assertValid(getProductSpecification);
+	}
+
+	protected ProductSpecification
+			testGetProductSpecificationByExternalReferenceCode_addProductSpecification()
+		throws Exception {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	@Test
+	public void testGraphQLGetProductSpecificationByExternalReferenceCode()
+		throws Exception {
+
+		ProductSpecification productSpecification =
+			testGraphQLGetProductSpecificationByExternalReferenceCode_addProductSpecification();
+
+		// No namespace
+
+		Assert.assertTrue(
+			equals(
+				productSpecification,
+				ProductSpecificationSerDes.toDTO(
+					JSONUtil.getValueAsString(
+						invokeGraphQLQuery(
+							new GraphQLField(
+								"productSpecificationByExternalReferenceCode",
+								new HashMap<String, Object>() {
+									{
+										put(
+											"externalReferenceCode",
+											"\"" +
+												productSpecification.
+													getExternalReferenceCode() +
+														"\"");
+									}
+								},
+								getGraphQLFields())),
+						"JSONObject/data",
+						"Object/productSpecificationByExternalReferenceCode"))));
+
+		// Using the namespace headlessCommerceAdminCatalog_v1_0
+
+		Assert.assertTrue(
+			equals(
+				productSpecification,
+				ProductSpecificationSerDes.toDTO(
+					JSONUtil.getValueAsString(
+						invokeGraphQLQuery(
+							new GraphQLField(
+								"headlessCommerceAdminCatalog_v1_0",
+								new GraphQLField(
+									"productSpecificationByExternalReferenceCode",
+									new HashMap<String, Object>() {
+										{
+											put(
+												"externalReferenceCode",
+												"\"" +
+													productSpecification.
+														getExternalReferenceCode() +
+															"\"");
+										}
+									},
+									getGraphQLFields()))),
+						"JSONObject/data",
+						"JSONObject/headlessCommerceAdminCatalog_v1_0",
+						"Object/productSpecificationByExternalReferenceCode"))));
+	}
+
+	@Test
+	public void testGraphQLGetProductSpecificationByExternalReferenceCodeNotFound()
+		throws Exception {
+
+		String irrelevantExternalReferenceCode =
+			"\"" + RandomTestUtil.randomString() + "\"";
+
+		// No namespace
+
+		Assert.assertEquals(
+			"Not Found",
+			JSONUtil.getValueAsString(
+				invokeGraphQLQuery(
+					new GraphQLField(
+						"productSpecificationByExternalReferenceCode",
+						new HashMap<String, Object>() {
+							{
+								put(
+									"externalReferenceCode",
+									irrelevantExternalReferenceCode);
+							}
+						},
+						getGraphQLFields())),
+				"JSONArray/errors", "Object/0", "JSONObject/extensions",
+				"Object/code"));
+
+		// Using the namespace headlessCommerceAdminCatalog_v1_0
+
+		Assert.assertEquals(
+			"Not Found",
+			JSONUtil.getValueAsString(
+				invokeGraphQLQuery(
+					new GraphQLField(
+						"headlessCommerceAdminCatalog_v1_0",
+						new GraphQLField(
+							"productSpecificationByExternalReferenceCode",
+							new HashMap<String, Object>() {
+								{
+									put(
+										"externalReferenceCode",
+										irrelevantExternalReferenceCode);
+								}
+							},
+							getGraphQLFields()))),
+				"JSONArray/errors", "Object/0", "JSONObject/extensions",
+				"Object/code"));
+	}
+
+	protected ProductSpecification
+			testGraphQLGetProductSpecificationByExternalReferenceCode_addProductSpecification()
+		throws Exception {
+
+		return testGraphQLProductSpecification_addProductSpecification();
+	}
+
+	@Test
+	public void testPatchProductSpecification() throws Exception {
+		ProductSpecification postProductSpecification =
+			testPatchProductSpecification_addProductSpecification();
+
+		ProductSpecification randomPatchProductSpecification =
+			randomPatchProductSpecification();
+
+		@SuppressWarnings("PMD.UnusedLocalVariable")
+		ProductSpecification patchProductSpecification =
+			productSpecificationResource.patchProductSpecification(
+				postProductSpecification.getId(),
+				randomPatchProductSpecification);
+
+		ProductSpecification expectedPatchProductSpecification =
+			postProductSpecification.clone();
+
+		BeanTestUtil.copyProperties(
+			randomPatchProductSpecification, expectedPatchProductSpecification);
+
+		ProductSpecification getProductSpecification =
+			productSpecificationResource.getProductSpecification(
+				patchProductSpecification.getId());
+
+		assertEquals(
+			expectedPatchProductSpecification, getProductSpecification);
+		assertValid(getProductSpecification);
+	}
+
+	protected ProductSpecification
+			testPatchProductSpecification_addProductSpecification()
+		throws Exception {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	@Test
+	public void testPatchProductSpecificationByExternalReferenceCode()
+		throws Exception {
+
+		ProductSpecification postProductSpecification =
+			testPatchProductSpecificationByExternalReferenceCode_addProductSpecification();
+
+		ProductSpecification randomPatchProductSpecification =
+			randomPatchProductSpecification();
+
+		@SuppressWarnings("PMD.UnusedLocalVariable")
+		ProductSpecification patchProductSpecification =
+			productSpecificationResource.
+				patchProductSpecificationByExternalReferenceCode(
+					postProductSpecification.getExternalReferenceCode(),
+					randomPatchProductSpecification);
+
+		ProductSpecification expectedPatchProductSpecification =
+			postProductSpecification.clone();
+
+		BeanTestUtil.copyProperties(
+			randomPatchProductSpecification, expectedPatchProductSpecification);
+
+		ProductSpecification getProductSpecification =
+			productSpecificationResource.
+				getProductSpecificationByExternalReferenceCode(
+					patchProductSpecification.getExternalReferenceCode());
+
+		assertEquals(
+			expectedPatchProductSpecification, getProductSpecification);
+		assertValid(getProductSpecification);
+	}
+
+	protected ProductSpecification
+			testPatchProductSpecificationByExternalReferenceCode_addProductSpecification()
+		throws Exception {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	@Test
+	public void testPostProductByExternalReferenceCodeProductSpecification()
+		throws Exception {
+
+		ProductSpecification randomProductSpecification =
+			randomProductSpecification();
+
+		ProductSpecification postProductSpecification =
+			testPostProductByExternalReferenceCodeProductSpecification_addProductSpecification(
+				randomProductSpecification);
+
+		assertEquals(randomProductSpecification, postProductSpecification);
+		assertValid(postProductSpecification);
+	}
+
+	protected ProductSpecification
+			testPostProductByExternalReferenceCodeProductSpecification_addProductSpecification(
+				ProductSpecification productSpecification)
+		throws Exception {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
 	}
 
 	@Test
@@ -1353,6 +1665,14 @@ public abstract class BaseProductSpecificationResourceTestCase {
 
 			if (Objects.equals("value", additionalAssertFieldName)) {
 				if (productSpecification.getValue() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("visible", additionalAssertFieldName)) {
+				if (productSpecification.getVisible() == null) {
 					valid = false;
 				}
 
@@ -1630,6 +1950,17 @@ public abstract class BaseProductSpecificationResourceTestCase {
 				if (!equals(
 						(Map)productSpecification1.getValue(),
 						(Map)productSpecification2.getValue())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("visible", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						productSpecification1.getVisible(),
+						productSpecification2.getVisible())) {
 
 					return false;
 				}
@@ -2021,6 +2352,11 @@ public abstract class BaseProductSpecificationResourceTestCase {
 				"Invalid entity field " + entityFieldName);
 		}
 
+		if (entityFieldName.equals("visible")) {
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
+		}
+
 		throw new IllegalArgumentException(
 			"Invalid entity field " + entityFieldName);
 	}
@@ -2083,6 +2419,7 @@ public abstract class BaseProductSpecificationResourceTestCase {
 				specificationKey = StringUtil.toLowerCase(
 					RandomTestUtil.randomString());
 				specificationPriority = RandomTestUtil.randomDouble();
+				visible = RandomTestUtil.randomBoolean();
 			}
 		};
 	}
@@ -2102,7 +2439,30 @@ public abstract class BaseProductSpecificationResourceTestCase {
 		return randomProductSpecification();
 	}
 
+	protected final JSONObject waitForFinish(
+			String expectedExecuteStatus, JSONObject jsonObject)
+		throws Exception {
+
+		while (true) {
+			ImportTask importTask = importTaskResource.getImportTask(
+				jsonObject.getLong("id"));
+
+			ImportTask.ExecuteStatus executeStatus =
+				importTask.getExecuteStatus();
+
+			if (StringUtil.equals(executeStatus.getValue(), "COMPLETED") ||
+				StringUtil.equals(executeStatus.getValue(), "FAILED")) {
+
+				Assert.assertEquals(
+					expectedExecuteStatus, executeStatus.getValue());
+
+				return jsonObject;
+			}
+		}
+	}
+
 	protected ProductSpecificationResource productSpecificationResource;
+	protected ImportTaskResource importTaskResource;
 	protected com.liferay.portal.kernel.model.Group irrelevantGroup;
 	protected com.liferay.portal.kernel.model.Company testCompany;
 	protected com.liferay.portal.kernel.model.Group testGroup;
@@ -2303,10 +2663,34 @@ public abstract class BaseProductSpecificationResourceTestCase {
 	private static final com.liferay.portal.kernel.log.Log _log =
 		LogFactoryUtil.getLog(BaseProductSpecificationResourceTestCase.class);
 
-	private static DateFormat _dateFormat;
+	private static Format _format;
+
+	private com.liferay.portal.kernel.model.User _testCompanyAdminUser;
 
 	@Inject
 	private com.liferay.headless.commerce.admin.catalog.resource.v1_0.
 		ProductSpecificationResource _productSpecificationResource;
+
+	@Inject
+	private GroupLocalService _groupLocalService;
+
+	@Inject
+	private ResourceActionLocalService _resourceActionLocalService;
+
+	@Inject
+	private ResourcePermissionLocalService _resourcePermissionLocalService;
+
+	@Inject
+	private RoleLocalService _roleLocalService;
+
+	@Inject
+	private ScopeChecker _scopeChecker;
+
+	@Inject
+	private UserLocalService _userLocalService;
+
+	@Inject
+	private VulcanCRUDItemDelegateBuilderRegistry
+		_vulcanCRUDItemDelegateBuilderRegistry;
 
 }

@@ -4125,7 +4125,7 @@ return	Array.from(getWebElement("(//div[@data-name='${fragmentName}'])[${index}]
 	macro viewFragmentMessageInfo(fragmentName = null) {
 		if (${fragmentName} == "Collection Display") {
 			if (!(isSet(messageInfo))) {
-				var messageInfo = "No Collection Selected Yet";
+				var messageInfo = "Select a collection to display.";
 			}
 
 			AssertVisible(
@@ -4386,7 +4386,7 @@ return	Array.from(getWebElement("(//div[@data-name='${fragmentName}'])[${index}]
 
 	@summary = "Default summary"
 	macro viewNotPresentInPermissionsIframeBody(elementValue = null) {
-		Click.clickAtNotVisible(locator1 = "Portlet#OPTIONS_ICON");
+		Click.clickAtNotVisible(locator1 = "Icon#FRAGMENT_OPTIONS_ICON");
 
 		Click(
 			key_menuItem = "Permissions",

@@ -206,7 +206,9 @@ public class ObjectFieldUtil {
 		else if ((value.length() == 27) && (value.charAt(26) == 'M')) {
 			return "dd-MMM-yyyy hh:mm:ss.SSS a";
 		}
-		else if ((value.length() == 28) && (value.charAt(23) == '+')) {
+		else if ((value.length() == 28) &&
+				 ((value.charAt(23) == '+') || (value.charAt(23) == '-'))) {
+
 			return "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
 		}
 		else if (value.length() == 28) {
@@ -218,6 +220,41 @@ public class ObjectFieldUtil {
 
 	public static boolean isMetadata(String objectFieldName) {
 		return _metadataObjectFieldNames.contains(objectFieldName);
+	}
+
+	public static boolean isReadOnly(
+		DDMExpressionFactory ddmExpressionFactory, ObjectField objectField,
+		Map<String, Object> values) {
+
+		if (Objects.equals(
+				objectField.getReadOnly(),
+				ObjectFieldConstants.READ_ONLY_CONDITIONAL)) {
+
+			try {
+				DDMExpression<Boolean> ddmExpression =
+					ddmExpressionFactory.createExpression(
+						CreateExpressionRequest.Builder.newBuilder(
+							objectField.getReadOnlyConditionExpression()
+						).withDDMExpressionFieldAccessor(
+							new ObjectEntryDDMExpressionFieldAccessor(values)
+						).build());
+
+				ddmExpression.setVariables(values);
+
+				return ddmExpression.evaluate();
+			}
+			catch (DDMExpressionException ddmExpressionException) {
+				_log.error(ddmExpressionException);
+			}
+		}
+		else if (Objects.equals(
+					objectField.getReadOnly(),
+					ObjectFieldConstants.READ_ONLY_TRUE)) {
+
+			return true;
+		}
+
+		return false;
 	}
 
 	public static Map<String, ObjectField> toObjectFieldsMap(

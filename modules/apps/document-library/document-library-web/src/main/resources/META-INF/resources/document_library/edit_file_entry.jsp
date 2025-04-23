@@ -126,7 +126,9 @@ renderResponse.setTitle(headerTitle);
 	%>
 
 	<div class="management-bar management-bar-light navbar navbar-expand-md">
-		<clay:container-fluid>
+		<clay:container-fluid
+			fullWidth="<%= true %>"
+		>
 			<ul class="m-auto navbar-nav"></ul>
 
 			<ul class="middle navbar-nav">
@@ -142,6 +144,7 @@ renderResponse.setTitle(headerTitle);
 
 <clay:container-fluid
 	cssClass="container-form-lg"
+	size="lg"
 >
 	<c:if test="<%= checkedOut %>">
 
@@ -627,11 +630,6 @@ renderResponse.setTitle(headerTitle);
 			</div>
 		</div>
 	</aui:form>
-
-	<liferay-document-library:upload-progress
-		id="<%= uploadProgressId %>"
-		message="uploading"
-	/>
 </clay:container-fluid>
 
 <c:if test="<%= (fileEntry != null) && checkedOut && dlAdminDisplayContext.isVersioningStrategyOverridable() %>">
@@ -708,10 +706,6 @@ renderResponse.setTitle(headerTitle);
 
 	function <portlet:namespace />saveFileEntry(draft) {
 		var fileElement = Liferay.Util.getFormElement(form, 'file');
-
-		if (fileElement && fileElement.value) {
-			<%= HtmlUtil.escape(uploadProgressId) %>.startProgress();
-		}
 
 		var cmdElement = Liferay.Util.getFormElement(form, 'cmd');
 

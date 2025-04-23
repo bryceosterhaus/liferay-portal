@@ -5,6 +5,8 @@
 
 package com.liferay.style.book.web.internal.display.context;
 
+import com.liferay.client.extension.type.CET;
+import com.liferay.client.extension.type.ThemeCSSCET;
 import com.liferay.client.extension.type.manager.CETManager;
 import com.liferay.frontend.taglib.clay.servlet.taglib.display.context.SearchContainerManagementToolbarDisplayContext;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenu;
@@ -13,7 +15,9 @@ import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemListBuilder;
 import com.liferay.frontend.token.definition.FrontendTokenDefinition;
 import com.liferay.frontend.token.definition.FrontendTokenDefinitionRegistry;
+import com.liferay.frontend.token.definition.constants.FrontendTokenDefinitionConstants;
 import com.liferay.petra.string.StringPool;
+import com.liferay.petra.string.StringUtil;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
@@ -24,13 +28,14 @@ import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.style.book.constants.StyleBookActionKeys;
 import com.liferay.style.book.model.StyleBookEntry;
+import com.liferay.style.book.util.StyleBookUtil;
 import com.liferay.style.book.web.internal.security.permissions.resource.StyleBookPermission;
-import com.liferay.style.book.web.internal.util.StyleBookUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import javax.portlet.ResourceURL;
 
@@ -197,15 +202,10 @@ public class StyleBookManagementToolbarDisplayContext
 
 	@Override
 	public Boolean isShowCreationMenu() {
-		if (StyleBookPermission.contains(
-				_themeDisplay.getPermissionChecker(),
-				_themeDisplay.getScopeGroupId(),
-				StyleBookActionKeys.MANAGE_STYLE_BOOK_ENTRIES)) {
-
-			return true;
-		}
-
-		return false;
+		return StyleBookPermission.contains(
+			_themeDisplay.getPermissionChecker(),
+			_themeDisplay.getScopeGroupId(),
+			StyleBookActionKeys.MANAGE_STYLE_BOOK_ENTRIES);
 	}
 
 	@Override
@@ -221,12 +221,29 @@ public class StyleBookManagementToolbarDisplayContext
 				_frontendTokenDefinitionRegistry.getFrontendTokenDefinitions(
 					_themeDisplay.getCompanyId())) {
 
+			if (Objects.equals(
+					frontendTokenDefinition.getThemeType(),
+					FrontendTokenDefinitionConstants.
+						THEME_TYPE_THEME_CSS_CET)) {
+
+				CET cet = _cetManager.getCET(
+					_themeDisplay.getCompanyId(),
+					frontendTokenDefinition.getThemeId());
+
+				ThemeCSSCET themeCSSCET = (ThemeCSSCET)cet;
+
+				if (StringUtil.equalsIgnoreCase(
+						themeCSSCET.getScope(), "controlPanel")) {
+
+					continue;
+				}
+			}
+
 			frontendTokenDefinitionProviders.add(
 				HashMapBuilder.<String, Object>put(
 					"name",
 					StyleBookUtil.getThemeName(
-						_cetManager, _themeDisplay.getCompanyId(),
-						httpServletRequest,
+						_themeDisplay.getCompanyId(), _themeDisplay.getLocale(),
 						frontendTokenDefinition.getThemeId())
 				).put(
 					"themeId", frontendTokenDefinition.getThemeId()

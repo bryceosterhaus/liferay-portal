@@ -4,19 +4,21 @@
  */
 
 if (!themeDisplay.isSignedIn()) {
-	document.querySelector('.learn-banner').style.marginTop = '150px';
+	const publicSiteNavigationContainer = document.querySelector(
+		'.public-site-navigation-container'
+	);
+
+	publicSiteNavigationContainer.classList.add(
+		'public-site-navigation-margin-top'
+	);
 
 	document.addEventListener('DOMContentLoaded', () => {
 		document.querySelector('.icon-x').addEventListener('click', () => {
 			document.querySelector('.banner-sign-in').style.display = 'none';
-			document.querySelector('.learn-banner').style.marginTop = '0';
 
-			const navigationContainer = document.querySelector(
-				'.navigation-container'
+			publicSiteNavigationContainer.classList.remove(
+				'public-site-navigation-margin-top'
 			);
-
-			navigationContainer.style.marginTop = '0';
-			navigationContainer.style.position = 'inherit';
 		});
 	});
 }

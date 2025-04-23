@@ -3,7 +3,8 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-import {openToast, sub} from 'frontend-js-web';
+import {openToast} from 'frontend-js-components-web';
+import {sub} from 'frontend-js-web';
 
 import {ACCOUNT_ENTRY_ID_DEFAULT} from '../../../utilities/constants';
 import {
@@ -246,7 +247,6 @@ export function hasPriceOnApplication(cartItems) {
 
 export function regenerateOrderDetailURL(
 	baseOrderDetailURL,
-	hasCommerceOpenOrderContentPortlet,
 	orderId,
 	orderUUID
 ) {
@@ -256,7 +256,7 @@ export function regenerateOrderDetailURL(
 		);
 	}
 
-	if (hasCommerceOpenOrderContentPortlet) {
+	if (baseOrderDetailURL.includes(DEFAULT_ORDER_DETAILS_PORTLET_ID)) {
 		if (!orderUUID) {
 			throw new Error(
 				'Cannot generate a new Order Detail URL. Invalid "orderUUID"'

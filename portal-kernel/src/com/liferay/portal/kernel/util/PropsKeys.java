@@ -124,6 +124,12 @@ public interface PropsKeys {
 	public static final String ANALYTICS_CLOUD_CLIENT_JS_VERSION =
 		"analytics.cloud.client.js.version";
 
+	public static final String ANALYTICS_CLOUD_DOMAIN_ALLOWED =
+		"analytics.cloud.domain.allowed";
+
+	public static final String ANALYTICS_CLOUD_MOCK_ENABLED =
+		"analytics.cloud.mock.enabled";
+
 	public static final String ANNOUNCEMENTS_EMAIL_BODY =
 		"announcements.email.body";
 
@@ -1250,6 +1256,9 @@ public interface PropsKeys {
 	public static final String JDBC_DEFAULT_URL = "jdbc.default.url";
 
 	public static final String JDBC_DEFAULT_USERNAME = "jdbc.default.username";
+
+	public static final String JDBC_READ_DATA_SOURCE_UNAVAILABLE_TIMEOUT =
+		"jdbc.read.data.source.unavailable.timeout";
 
 	public static final String JNDI_ENVIRONMENT = "jndi.environment.";
 

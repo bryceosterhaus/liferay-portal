@@ -4,8 +4,10 @@
  */
 
 import {
-	ObjectDefinitionApi,
+	ObjectDefinitionAPI,
 	ObjectField,
+	ObjectFieldAPI,
+	ObjectRelationshipAPI,
 } from '@liferay/object-admin-rest-client-js';
 import {expect, mergeTests} from '@playwright/test';
 
@@ -23,8 +25,9 @@ import {pageEditorPagesTest} from '../../fixtures/pageEditorPagesTest';
 import {workflowPagesTest} from '../../fixtures/workflowPagesTest';
 import {getRandomDouble} from '../../utils/getRandomDouble';
 import {getRandomInt} from '../../utils/getRandomInt';
+import getRandomString from '../../utils/getRandomString';
 import {journalPagesTest} from '../journal-web/fixtures/journalPagesTest';
-import {mockObjectFields} from './utils/mockObjectFields';
+import {createObjectFields, mockObjectFields} from './utils/mockObjectFields';
 
 export const test = mergeTests(
 	accountSettingsPagesTest,
@@ -71,7 +74,7 @@ test.describe('Localized object entries are saved correctly', () => {
 		});
 
 		const objectDefinitionAPIClient =
-			await apiHelpers.buildRestClient(ObjectDefinitionApi);
+			await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 		const {body: objectDefinition} =
 			await objectDefinitionAPIClient.postObjectDefinition({
@@ -245,7 +248,7 @@ test.describe('Localized object entries are saved correctly', () => {
 		});
 
 		const objectDefinitionAPIClient =
-			await apiHelpers.buildRestClient(ObjectDefinitionApi);
+			await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 		const {body: objectDefinition} =
 			await objectDefinitionAPIClient.postObjectDefinition({
@@ -386,7 +389,7 @@ test.describe('Localized object entries are saved correctly', () => {
 		});
 
 		const objectDefinitionAPIClient =
-			await apiHelpers.buildRestClient(ObjectDefinitionApi);
+			await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 		const {body: objectDefinition} =
 			await objectDefinitionAPIClient.postObjectDefinition({
@@ -521,18 +524,23 @@ test.describe('Localized object entries are saved correctly', () => {
 		const objectDefinitionLabel = 'ObjectDefinitionLabel' + getRandomInt();
 		const objectDefinitionName = 'ObjectDefinitionName' + getRandomInt();
 
-		const {listTypeDefinitionItems, objectFields, titleObjectFieldName} =
-			await mockObjectFields({
-				apiHelpers,
-				localizeAllLocalizable: true,
-				objectFieldBusinessTypes: [
-					'multiselectPicklist',
-					'multiselectPicklist',
-				],
-			});
+		const {
+			listTypeDefinitionItems,
+			objectFields,
+			titleObjectFieldName,
+			translatedListTypeDefinitionItems,
+		} = await mockObjectFields({
+			apiHelpers,
+			localeToTranslateListTypeItems: 'ca_ES',
+			localizeAllLocalizable: true,
+			objectFieldBusinessTypes: [
+				'multiselectPicklist',
+				'multiselectPicklist',
+			],
+		});
 
 		const objectDefinitionAPIClient =
-			await apiHelpers.buildRestClient(ObjectDefinitionApi);
+			await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 		const {body: objectDefinition} =
 			await objectDefinitionAPIClient.postObjectDefinition({
@@ -564,8 +572,8 @@ test.describe('Localized object entries are saved correctly', () => {
 		await viewObjectEntriesPage.addObjectEntryButton.click();
 
 		for (const item of listTypeDefinitionItems) {
-			await formFieldsPage.addMultipleSelectItem(item, 0);
-			await formFieldsPage.addMultipleSelectItem(item, 1);
+			await formFieldsPage.addSelectItem(item, 0);
+			await formFieldsPage.addSelectItem(item, 1);
 		}
 
 		const responsePromise = page.waitForResponse(
@@ -650,11 +658,15 @@ test.describe('Localized object entries are saved correctly', () => {
 
 		await catalanOption.first().click();
 
-		expect(itemLocators[0]).toHaveCount(1);
+		const catalanItemLocators = translatedListTypeDefinitionItems.map(
+			(item) => page.getByRole('row', {name: `Remove ${item}`})
+		);
+
+		expect(catalanItemLocators[0]).toHaveCount(1);
 
 		for (let index = 1; index <= 2; index++) {
-			await expect(itemLocators[index].nth(0)).toBeVisible();
-			await expect(itemLocators[index].nth(1)).toBeVisible();
+			await expect(catalanItemLocators[index].nth(0)).toBeVisible();
+			await expect(catalanItemLocators[index].nth(1)).toBeVisible();
 		}
 
 		// remove some of the items from catalan entry
@@ -675,8 +687,8 @@ test.describe('Localized object entries are saved correctly', () => {
 		// expect only the remaining to be visible
 
 		async function expectFinalCatalanState() {
-			await expect(itemLocators[0]).toBeVisible();
-			await expect(itemLocators[1]).toBeVisible();
+			await expect(catalanItemLocators[0]).toBeVisible();
+			await expect(catalanItemLocators[1]).toBeVisible();
 		}
 
 		await expectFinalCatalanState();
@@ -700,6 +712,125 @@ test.describe('Localized object entries are saved correctly', () => {
 		await expectFinalCatalanState();
 	});
 
+	test('Non-localizable object fields are disabled and have correct tooltip information when managing translations', async ({
+		apiHelpers,
+		page,
+		viewObjectEntriesPage,
+	}) => {
+		const objectDefinitionLabel = 'ObjectDefinitionLabel' + getRandomInt();
+		const objectDefinitionName = 'ObjectDefinitionName' + getRandomInt();
+
+		const {objectFields} = await mockObjectFields({
+			apiHelpers,
+			objectFieldBusinessTypes: ['encrypted', 'text'],
+		});
+
+		const objectDefinitionAPIClient =
+			await apiHelpers.buildRestClient(ObjectDefinitionAPI);
+
+		const {body: objectDefinition} =
+			await objectDefinitionAPIClient.postObjectDefinition({
+				active: true,
+				enableLocalization: true,
+				label: {
+					en_US: objectDefinitionLabel,
+				},
+				name: objectDefinitionName,
+				objectFields,
+				pluralLabel: {
+					en_US: objectDefinitionLabel,
+				},
+				portlet: true,
+				scope: 'company',
+				status: {
+					code: 0,
+				},
+			});
+
+		apiHelpers.data.push({
+			id: objectDefinition.id,
+			type: 'objectDefinition',
+		});
+
+		const objectFieldApiClient =
+			await apiHelpers.buildRestClient(ObjectFieldAPI);
+
+		const integerLocalizedObjectField: ObjectField = {
+			DBType: 'Integer',
+			label: {
+				en_US: 'Integer Localized Field',
+			},
+			localized: true,
+			name: 'integerField',
+			objectFieldSettings: [],
+			readOnly: 'false',
+			required: false,
+			state: false,
+			system: false,
+		};
+
+		await objectFieldApiClient.postObjectDefinitionByExternalReferenceCodeObjectField(
+			objectDefinition.externalReferenceCode,
+			integerLocalizedObjectField
+		);
+
+		await viewObjectEntriesPage.goto(objectDefinition.className);
+
+		await viewObjectEntriesPage.addObjectEntryButton.click();
+
+		const translationsDropdownTriggerButton = page
+			.getByTestId('triggerButton')
+			.first();
+
+		await translationsDropdownTriggerButton.click();
+
+		const catalanOption = page.getByTestId('availableLocalesDropdownca_ES');
+
+		await catalanOption.first().click();
+
+		const encryptedContainer = page
+			.locator('.form-group')
+			.filter({has: page.getByLabel(objectFields[0].label['en_US'])});
+
+		await expect(encryptedContainer.getByRole('textbox')).toBeDisabled();
+
+		await expect(
+			encryptedContainer.getByTitle(
+				'This field does not support translations.'
+			)
+		).toBeVisible();
+
+		const textContainer = page
+			.locator('.form-group')
+			.filter({has: page.getByLabel(objectFields[1].label['en_US'])});
+
+		await expect(textContainer.getByRole('textbox')).toBeDisabled();
+
+		await expect(
+			textContainer.getByTitle('Translation is disabled for this field.')
+		).toBeVisible();
+
+		await translationsDropdownTriggerButton.click();
+
+		const englishOption = page.getByTestId('availableLocalesDropdownen_US');
+
+		await englishOption.first().click();
+
+		await expect(encryptedContainer.getByRole('textbox')).toBeEnabled();
+
+		await expect(
+			encryptedContainer.getByTitle(
+				'This field does not support translations.'
+			)
+		).toBeHidden();
+
+		await expect(textContainer.getByRole('textbox')).toBeEnabled();
+
+		await expect(
+			textContainer.getByTitle('Translation is disabled for this field.')
+		).toBeHidden();
+	});
+
 	test('Numeric fields', async ({
 		apiHelpers,
 		page,
@@ -720,7 +851,7 @@ test.describe('Localized object entries are saved correctly', () => {
 		});
 
 		const objectDefinitionAPIClient =
-			await apiHelpers.buildRestClient(ObjectDefinitionApi);
+			await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 		const {body: objectDefinition} =
 			await objectDefinitionAPIClient.postObjectDefinition({
@@ -755,8 +886,8 @@ test.describe('Localized object entries are saved correctly', () => {
 
 		for (const {businessType, label, name} of objectFields) {
 			if (
-				businessType === ObjectField.BusinessTypeEnum.Decimal ||
-				businessType === ObjectField.BusinessTypeEnum.PrecisionDecimal
+				businessType === 'Decimal' ||
+				businessType === 'PrecisionDecimal'
 			) {
 				englishValues = {
 					...englishValues,
@@ -820,8 +951,8 @@ test.describe('Localized object entries are saved correctly', () => {
 			).toBeTruthy();
 
 			if (
-				businessType === ObjectField.BusinessTypeEnum.Decimal ||
-				businessType === ObjectField.BusinessTypeEnum.PrecisionDecimal
+				businessType === 'Decimal' ||
+				businessType === 'PrecisionDecimal'
 			) {
 				catalanValues = {
 					...catalanValues,
@@ -867,5 +998,605 @@ test.describe('Localized object entries are saved correctly', () => {
 
 			expect(inputValue === catalanValues[name]).toBeTruthy();
 		}
+	});
+
+	test('Picklist fields', async ({
+		apiHelpers,
+		formFieldsPage,
+		page,
+		viewObjectEntriesPage,
+	}) => {
+		const objectDefinitionLabel = 'ObjectDefinitionLabel' + getRandomInt();
+		const objectDefinitionName = 'ObjectDefinitionName' + getRandomInt();
+
+		const {
+			listTypeDefinitionItems,
+			objectFields,
+			titleObjectFieldName,
+			translatedListTypeDefinitionItems,
+		} = await mockObjectFields({
+			apiHelpers,
+			localeToTranslateListTypeItems: 'ca_ES',
+			localizeAllLocalizable: true,
+			objectFieldBusinessTypes: ['picklist', 'picklist'],
+		});
+
+		const objectDefinitionAPIClient =
+			await apiHelpers.buildRestClient(ObjectDefinitionAPI);
+
+		const {body: objectDefinition} =
+			await objectDefinitionAPIClient.postObjectDefinition({
+				active: true,
+				enableLocalization: true,
+				label: {
+					en_US: objectDefinitionLabel,
+				},
+				name: objectDefinitionName,
+				objectFields,
+				pluralLabel: {
+					en_US: objectDefinitionLabel,
+				},
+				portlet: true,
+				scope: 'company',
+				status: {
+					code: 0,
+				},
+				titleObjectFieldName,
+			});
+
+		apiHelpers.data.push({
+			id: objectDefinition.id,
+			type: 'objectDefinition',
+		});
+
+		await viewObjectEntriesPage.goto(objectDefinition.className);
+
+		await viewObjectEntriesPage.addObjectEntryButton.click();
+
+		await formFieldsPage.addSelectItem(listTypeDefinitionItems[0], 0);
+		await formFieldsPage.addSelectItem(listTypeDefinitionItems[1], 1);
+
+		const responsePromise = page.waitForResponse(
+			`**${objectDefinition.restContextPath}`
+		);
+
+		await viewObjectEntriesPage.saveObjectEntryButton.click();
+
+		const response = await responsePromise;
+
+		// expect new entry to be saved successfully
+
+		await expect(
+			page.getByText('Success:Your request completed successfully.')
+		).toBeVisible();
+
+		await page.getByRole('link', {name: 'Back'}).click();
+
+		const responseBody = await response.json();
+
+		const entryLink = page.getByRole('link', {name: responseBody.id});
+
+		await entryLink.click();
+
+		// expect saved entry to have all added items
+
+		const englishItemLocators = listTypeDefinitionItems.map((item) =>
+			page.getByRole('combobox').filter({hasText: item})
+		);
+
+		async function expectFinalEnglishState() {
+			await expect(englishItemLocators[0]).toBeVisible();
+			await expect(englishItemLocators[1]).toBeVisible();
+		}
+
+		await expectFinalEnglishState();
+
+		// expect unaltered entry to be saved successfully
+
+		await viewObjectEntriesPage.saveObjectEntryButton.click();
+
+		await expect(
+			page.getByText('Success:Your request completed successfully.')
+		).toBeVisible();
+
+		await expectFinalEnglishState();
+
+		// after navigating to catalan for the first time
+		// expect catalan items to be a copy of the default language
+
+		const translationsDropdownTrigger = page
+			.getByTestId('triggerButton')
+			.first();
+
+		await translationsDropdownTrigger.click();
+
+		const catalanOption = page.getByTestId('availableLocalesDropdownca_ES');
+
+		await catalanOption.first().click();
+
+		const catalanItemLocators = translatedListTypeDefinitionItems.map(
+			(item) => page.getByRole('combobox').filter({hasText: item})
+		);
+
+		async function expectFinalCatalanState() {
+			await expect(catalanItemLocators[0]).toBeVisible();
+			await expect(catalanItemLocators[1]).toBeVisible();
+		}
+
+		await expectFinalCatalanState();
+
+		// save, navigate back to entry and expect final states to be persisted
+
+		await viewObjectEntriesPage.saveObjectEntryButton.click();
+
+		await page
+			.getByText('Success:Your request completed successfully.')
+			.first()
+			.waitFor({state: 'hidden'});
+
+		await page.getByRole('link', {name: 'Back'}).click();
+
+		await entryLink.click();
+
+		await expectFinalEnglishState();
+
+		await translationsDropdownTrigger.click();
+
+		await catalanOption.first().click();
+
+		await expectFinalCatalanState();
+	});
+});
+
+test.describe('Manage object entries through Page Templates', () => {
+	test('can view all entries related to an object in the relationship field', async ({
+		apiHelpers,
+		page,
+		viewObjectEntriesPage,
+	}) => {
+		const objectFields: ObjectField[] = [
+			{
+				DBType: 'Boolean',
+				businessType: 'Boolean',
+				externalReferenceCode: 'booleanField',
+				indexed: true,
+				indexedAsKeyword: false,
+				indexedLanguageId: '',
+				label: {en_US: 'booleanField'},
+				listTypeDefinitionId: 0,
+				localized: true,
+				name: 'booleanField',
+				required: false,
+				system: false,
+				type: 'Boolean',
+			},
+			{
+				DBType: 'String',
+				businessType: 'Text',
+				externalReferenceCode: 'textField',
+				indexed: true,
+				indexedAsKeyword: false,
+				indexedLanguageId: '',
+				label: {en_US: 'textField'},
+				listTypeDefinitionId: 0,
+				localized: true,
+				name: 'textField',
+				required: false,
+				system: false,
+				type: 'String',
+			},
+		];
+
+		const objectDefinitionExternalReferenceCode =
+			'ObjectDefinition' + getRandomInt();
+
+		const objectDefinitionAPIClient =
+			await apiHelpers.buildRestClient(ObjectDefinitionAPI);
+
+		const {body: objectDefinition1} =
+			await objectDefinitionAPIClient.postObjectDefinition({
+				active: true,
+				enableLocalization: true,
+				externalReferenceCode: objectDefinitionExternalReferenceCode,
+				label: {
+					en_US: objectDefinitionExternalReferenceCode,
+				},
+				name: objectDefinitionExternalReferenceCode,
+				objectFields,
+				objectFolderExternalReferenceCode: 'default',
+				pluralLabel: {
+					en_US: objectDefinitionExternalReferenceCode,
+				},
+				portlet: true,
+				scope: 'company',
+				status: {code: 0},
+				titleObjectFieldName: 'booleanField',
+			});
+
+		apiHelpers.data.push({
+			id: objectDefinition1.id,
+			type: 'objectDefinition',
+		});
+
+		const objectDefinition2 =
+			await apiHelpers.objectAdmin.postRandomObjectDefinition({
+				objectFolderExternalReferenceCode: 'default',
+				status: {code: 0},
+			});
+
+		apiHelpers.data.push({
+			id: objectDefinition2.id,
+			type: 'objectDefinition',
+		});
+
+		const objectRelationshipLabel =
+			'objectRelationshipLabel' + getRandomInt();
+		const objectRelationshipName =
+			'objectRelationshipName' + Math.floor(Math.random() * 99);
+
+		const objectRelationshipAPIClient = await apiHelpers.buildRestClient(
+			ObjectRelationshipAPI
+		);
+
+		await objectRelationshipAPIClient.postObjectDefinitionByExternalReferenceCodeObjectRelationship(
+			objectDefinition1.externalReferenceCode,
+			{
+				label: {
+					en_US: objectRelationshipLabel,
+				},
+				name: objectRelationshipName,
+				objectDefinitionExternalReferenceCode1:
+					objectDefinition1.externalReferenceCode,
+				objectDefinitionExternalReferenceCode2:
+					objectDefinition2.externalReferenceCode,
+				objectDefinitionId1: objectDefinition1.id,
+				objectDefinitionId2: objectDefinition2.id,
+				objectDefinitionName2: objectDefinition2.name,
+				type: 'oneToMany',
+			}
+		);
+
+		const applicationName =
+			'c/' + objectDefinition1.name.toLowerCase() + 's';
+
+		const itemValues = [];
+
+		for (let i = 0; i <= 15; i++) {
+			const objectEntry = await apiHelpers.objectEntry.postObjectEntry(
+				{
+					booleanField_i18n: {
+						en_US: false,
+						pt_BR: true,
+					},
+					textField_i18n: {
+						en_US: 'entry_en_US' + i,
+						pt_BR: 'entry_pt_BR' + i,
+					},
+				},
+				applicationName
+			);
+
+			itemValues.push({
+				booleanField: objectEntry.booleanField_i18n['pt_BR'],
+				textField: objectEntry.textField_i18n['pt_BR'],
+			});
+		}
+
+		await viewObjectEntriesPage.goto(objectDefinition2.className, 'pt');
+
+		siteLanguage = 'pt';
+
+		await viewObjectEntriesPage.clickAddObjectEntry();
+
+		await page.getByPlaceholder('Buscar', {exact: true}).click();
+
+		itemValues.forEach((itemValue, index) => {
+			expect(
+				page
+					.getByRole('menuitem', {
+						exact: true,
+						name: String(itemValue.booleanField),
+					})
+					.nth(index)
+			).toBeVisible();
+		});
+
+		await objectDefinitionAPIClient.patchObjectDefinition(
+			objectDefinition1.id,
+			{
+				titleObjectFieldName: 'textField',
+			}
+		);
+
+		await viewObjectEntriesPage.goto(objectDefinition2.className, 'pt');
+
+		await viewObjectEntriesPage.clickAddObjectEntry();
+
+		await page.getByPlaceholder('Buscar', {exact: true}).click();
+
+		itemValues.forEach((itemValue) => {
+			expect(
+				page.getByRole('menuitem', {
+					exact: true,
+					name: String(itemValue.textField),
+				})
+			).toBeVisible();
+		});
+	});
+});
+
+test.describe('Required localized object fields', () => {
+	test('assert that when required error is thrown the locale dropdown switches back to the default language', async ({
+		apiHelpers,
+		page,
+		viewObjectEntriesPage,
+	}) => {
+		const objectDefinitionLabel = 'ObjectDefinitionLabel' + getRandomInt();
+		const objectDefinitionName = 'ObjectDefinitionName' + getRandomInt();
+
+		const objectFields = createObjectFields(
+			'boolean',
+			[
+				{
+					label: 'booleanField',
+					name: 'booleanField',
+				},
+			],
+			{required: true},
+			true
+		);
+
+		const objectDefinitionAPIClient =
+			await apiHelpers.buildRestClient(ObjectDefinitionAPI);
+
+		const {body: objectDefinition} =
+			await objectDefinitionAPIClient.postObjectDefinition({
+				active: true,
+				enableLocalization: true,
+				label: {
+					en_US: objectDefinitionLabel,
+				},
+				name: objectDefinitionName,
+				objectFields,
+				pluralLabel: {
+					en_US: objectDefinitionLabel,
+				},
+				portlet: true,
+				scope: 'company',
+				status: {
+					code: 0,
+				},
+			});
+
+		apiHelpers.data.push({
+			id: objectDefinition.id,
+			type: 'objectDefinition',
+		});
+
+		await viewObjectEntriesPage.goto(objectDefinition.className);
+
+		await viewObjectEntriesPage.addObjectEntryButton.click();
+
+		await expect(page.getByRole('button', {name: 'en-us'})).toBeVisible();
+
+		const translationsDropdownTrigger = page
+			.getByTestId('triggerButton')
+			.first();
+
+		await translationsDropdownTrigger.click();
+
+		const englishOption = page.getByTestId('availableLocalesDropdownen_US');
+
+		await expect(englishOption.locator('.label-item-expand')).toHaveText(
+			'default',
+			{ignoreCase: true}
+		);
+
+		const catalanOption = page.getByTestId('availableLocalesDropdownca_ES');
+
+		await catalanOption.locator('.label-item-expand').click();
+
+		await expect(page.getByRole('button', {name: 'ca-es'})).toBeVisible();
+
+		await viewObjectEntriesPage.saveObjectEntryButton.click();
+
+		await expect(page.getByRole('button', {name: 'en-us'})).toBeVisible();
+
+		await expect(
+			page
+				.locator('.form-feedback-item')
+				.getByText('This field is required.')
+		).toBeVisible();
+
+		await page.getByRole('checkbox').check();
+
+		await viewObjectEntriesPage.saveObjectEntryButton.click();
+
+		await expect(
+			page.getByText('Success:Your request completed successfully.')
+		).toBeVisible();
+	});
+
+	test('verify that default language id is required', async ({
+		apiHelpers,
+		page,
+		viewObjectEntriesPage,
+	}) => {
+		const objectDefinitionLabel = 'ObjectDefinitionLabel' + getRandomInt();
+		const objectDefinitionName = 'ObjectDefinitionName' + getRandomInt();
+
+		const objectFields = createObjectFields(
+			'text',
+			[
+				{
+					label: 'textField',
+					name: 'textField',
+				},
+			],
+			{required: true},
+			true
+		);
+
+		const objectDefinitionAPIClient =
+			await apiHelpers.buildRestClient(ObjectDefinitionAPI);
+
+		const {body: objectDefinition} =
+			await objectDefinitionAPIClient.postObjectDefinition({
+				active: true,
+				enableLocalization: true,
+				label: {
+					en_US: objectDefinitionLabel,
+				},
+				name: objectDefinitionName,
+				objectFields,
+				pluralLabel: {
+					en_US: objectDefinitionLabel,
+				},
+				portlet: true,
+				scope: 'company',
+				status: {
+					code: 0,
+				},
+			});
+
+		apiHelpers.data.push({
+			id: objectDefinition.id,
+			type: 'objectDefinition',
+		});
+
+		const objectEntry = await apiHelpers.objectEntry.postObjectEntry(
+			{
+				defaultLanguageId: 'ca_ES',
+				textField: getRandomString(),
+			},
+			'c/' + objectDefinition.name.toLowerCase() + 's'
+		);
+
+		await viewObjectEntriesPage.goto(objectDefinition.className);
+
+		await page.getByRole('link', {name: String(objectEntry.id)}).click();
+
+		await expect(page.getByRole('button', {name: 'ca-es'})).toBeVisible();
+
+		const translationsDropdownTrigger = page
+			.getByTestId('triggerButton')
+			.first();
+
+		await translationsDropdownTrigger.click();
+
+		const catalanOption = page.getByTestId('availableLocalesDropdownca_ES');
+
+		await expect(catalanOption.locator('.label-item-expand')).toHaveText(
+			'default',
+			{ignoreCase: true}
+		);
+
+		await catalanOption.locator('.label-item-expand').click();
+
+		const fieldInput = page.getByTestId('visibleChangeInput');
+
+		await fieldInput.fill(getRandomString());
+
+		await viewObjectEntriesPage.saveObjectEntryButton.click();
+
+		await expect(
+			page.getByText('Success:Your request completed successfully.')
+		).toBeVisible();
+
+		await fieldInput.fill('');
+
+		await viewObjectEntriesPage.saveObjectEntryButton.click();
+
+		await expect(
+			page.getByText('Aquest camp és obligatori.', {exact: true})
+		).toBeVisible();
+
+		await translationsDropdownTrigger.click();
+
+		const englishOption = page.getByTestId('availableLocalesDropdownen_US');
+
+		await englishOption.locator('.label-item-expand').click();
+
+		await fieldInput.fill(getRandomString());
+
+		await viewObjectEntriesPage.saveObjectEntryButton.click();
+
+		await expect(
+			page.getByText('Aquest camp és obligatori.', {exact: true})
+		).toBeVisible();
+	});
+
+	test('verify that labels of single/multi select picklist options are present when the field is required', async ({
+		apiHelpers,
+		formFieldsPage,
+		page,
+		viewObjectEntriesPage,
+	}) => {
+		const objectDefinitionLabel = 'ObjectDefinitionLabel' + getRandomInt();
+		const objectDefinitionName = 'ObjectDefinitionName' + getRandomInt();
+
+		const {listTypeDefinitionItems, objectFields, titleObjectFieldName} =
+			await mockObjectFields({
+				apiHelpers,
+				localizeAllLocalizable: true,
+				objectFieldBusinessTypes: ['picklist', 'multiselectPicklist'],
+			});
+
+		const objectDefinitionAPIClient =
+			await apiHelpers.buildRestClient(ObjectDefinitionAPI);
+
+		const {body: objectDefinition} =
+			await objectDefinitionAPIClient.postObjectDefinition({
+				active: true,
+				enableLocalization: true,
+				label: {
+					en_US: objectDefinitionLabel,
+				},
+				name: objectDefinitionName,
+				objectFields,
+				pluralLabel: {
+					en_US: objectDefinitionLabel,
+				},
+				portlet: true,
+				scope: 'company',
+				status: {
+					code: 0,
+				},
+				titleObjectFieldName,
+			});
+
+		apiHelpers.data.push({
+			id: objectDefinition.id,
+			type: 'objectDefinition',
+		});
+
+		await viewObjectEntriesPage.goto(objectDefinition.className);
+
+		await viewObjectEntriesPage.addObjectEntryButton.click();
+
+		await expect(
+			page.getByRole('button', {name: 'en-us'}).first()
+		).toBeVisible();
+
+		await formFieldsPage.addSelectItem(listTypeDefinitionItems[0], 0);
+
+		await formFieldsPage.addSelectItem(listTypeDefinitionItems[0], 1);
+
+		await expect(
+			page.getByText('This field is required.', {exact: true})
+		).not.toBeVisible();
+
+		await expect(
+			page.getByRole('gridcell', {
+				exact: true,
+				name: listTypeDefinitionItems[0],
+			})
+		).toBeVisible();
+
+		await page.getByRole('combobox').nth(1).click();
+
+		listTypeDefinitionItems.forEach((item) => {
+			expect(page.getByRole('option', {name: item})).toBeVisible();
+		});
 	});
 });

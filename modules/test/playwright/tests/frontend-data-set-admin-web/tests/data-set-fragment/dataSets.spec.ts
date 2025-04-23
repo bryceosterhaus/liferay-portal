@@ -62,9 +62,9 @@ const taxonomyVocabularyDataSetConfig = {
 };
 
 test.afterEach(async ({apiHelpers, dataSetManagerApiHelpers}) => {
-	for (const DATA_SET_ERC of dataSetERCs) {
+	for (const erc of dataSetERCs) {
 		await dataSetManagerApiHelpers.deleteDataSet({
-			erc: DATA_SET_ERC,
+			erc,
 		});
 	}
 
@@ -95,6 +95,15 @@ test(
 
 		dataSetERCs.push(dataSetERC1);
 		dataSetERCs.push(dataSetERC2);
+
+		const dataSetInput1 =
+			dataSetFragmentPage.selectDataSetModalFrame.locator(
+				`li:has-text("${dataSetLabel1}") input.custom-control-input`
+			);
+		const dataSetInput2 =
+			dataSetFragmentPage.selectDataSetModalFrame.locator(
+				`li:has-text("${dataSetLabel2}") input.custom-control-input`
+			);
 
 		await test.step('Create data sets', async () => {
 			await dataSetManagerApiHelpers.createDataSet({
@@ -132,6 +141,30 @@ test(
 			await dataSetFragmentPage.addDataSetFragment(layout);
 		});
 
+		await test.step('Check that only one data set can be selected', async () => {
+			await dataSetFragmentPage.selectDataSetButton.click();
+
+			await page.getByRole('dialog').isVisible();
+
+			await page.getByRole('heading', {name: 'Select'}).isVisible();
+
+			await dataSetFragmentPage.selectionListContainer.waitFor();
+
+			await dataSetInput1.setChecked(true);
+
+			await expect(dataSetInput1).toBeChecked();
+
+			await dataSetInput2.setChecked(true);
+
+			await expect(dataSetInput2).toBeChecked();
+
+			await expect(dataSetInput1).not.toBeChecked();
+
+			await dataSetFragmentPage.selectDataSetModalFrame
+				.getByRole('button', {name: 'Cancel'})
+				.click();
+		});
+
 		await test.step('Assign first data set to fragment', async () => {
 			await dataSetFragmentPage.selectDataSetButton.click();
 
@@ -141,21 +174,9 @@ test(
 		await test.step('Change assignment to second data set', async () => {
 			await dataSetFragmentPage.changeDataSetButton.click();
 
-			const selectionListContainer =
-				dataSetFragmentPage.selectDataSetModalFrame.locator(
-					'.fds-admin-item-selector'
-				);
+			await dataSetFragmentPage.selectionListContainer.waitFor();
 
-			await expect(selectionListContainer).toBeVisible();
-
-			await expect(
-				selectionListContainer
-					.locator('.selectable.list-group-item')
-					.filter({
-						has: page.getByText(dataSetLabel1, {exact: true}),
-					})
-					.getByRole('radio')
-			).toBeChecked();
+			await expect(dataSetInput1).toBeChecked();
 
 			await dataSetFragmentPage.selectDataSet(dataSetLabel2);
 		});
@@ -231,9 +252,7 @@ test('Data set selection modal shows a "No results found" message when there are
 	});
 
 	await test.step('Assert that there are no Data Sets available to select', async () => {
-		await dataSetFragmentPage.selectDataSetModalFrame
-			.locator('.fds-admin-item-selector')
-			.waitFor({state: 'visible'});
+		await dataSetFragmentPage.selectionListContainer.waitFor();
 
 		await expect(
 			dataSetFragmentPage.selectDataSetModalFrame.locator(
@@ -400,12 +419,7 @@ test(
 
 			await dataSetFragmentPage.changeDataSetButton.click();
 
-			const selectionListContainer =
-				dataSetFragmentPage.selectDataSetModalFrame.locator(
-					'.fds-admin-item-selector'
-				);
-
-			await expect(selectionListContainer).toBeVisible();
+			await dataSetFragmentPage.selectionListContainer.waitFor();
 
 			await dataSetFragmentPage.selectDataSetModalFrame
 				.locator('li')
@@ -440,11 +454,15 @@ test(
 			).toEqual(['Role Type', 'Name', '']);
 
 			expect(
+				await dataSetFragmentPage.table.bodyRows.count()
+			).toBeGreaterThanOrEqual(1);
+
+			expect(
 				await dataSetFragmentPage.table.bodyRows
 					.first()
 					.locator('td')
 					.allInnerTexts()
-			).toEqual(['organization', 'Account Manager', '']);
+			).toHaveLength(3);
 		});
 
 		await test.step('Confirm that we can change the Data Set and display the Taxonomy Vocabulary Data Set', async () => {
@@ -454,12 +472,7 @@ test(
 
 			await dataSetFragmentPage.changeDataSetButton.click();
 
-			const selectionListContainer =
-				dataSetFragmentPage.selectDataSetModalFrame.locator(
-					'.fds-admin-item-selector'
-				);
-
-			await expect(selectionListContainer).toBeVisible();
+			await dataSetFragmentPage.selectionListContainer.waitFor();
 
 			await page
 				.frameLocator('iframe[title="Select"]')

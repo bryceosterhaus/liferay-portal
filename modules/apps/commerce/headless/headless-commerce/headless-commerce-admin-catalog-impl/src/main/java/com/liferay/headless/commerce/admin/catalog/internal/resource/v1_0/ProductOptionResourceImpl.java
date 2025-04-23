@@ -17,7 +17,6 @@ import com.liferay.commerce.product.service.CPOptionService;
 import com.liferay.headless.commerce.admin.catalog.dto.v1_0.Product;
 import com.liferay.headless.commerce.admin.catalog.dto.v1_0.ProductOption;
 import com.liferay.headless.commerce.admin.catalog.dto.v1_0.ProductOptionValue;
-import com.liferay.headless.commerce.admin.catalog.internal.dto.v1_0.util.CustomFieldsUtil;
 import com.liferay.headless.commerce.admin.catalog.internal.util.v1_0.ProductOptionUtil;
 import com.liferay.headless.commerce.admin.catalog.internal.util.v1_0.ProductOptionValueUtil;
 import com.liferay.headless.commerce.admin.catalog.resource.v1_0.ProductOptionResource;
@@ -29,6 +28,7 @@ import com.liferay.portal.kernel.search.BaseModelSearchResult;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.vulcan.custom.field.CustomFieldsUtil;
 import com.liferay.portal.vulcan.dto.converter.DTOConverter;
 import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
 import com.liferay.portal.vulcan.fields.NestedField;
@@ -36,6 +36,9 @@ import com.liferay.portal.vulcan.fields.NestedFieldId;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
 
+import java.io.Serializable;
+
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -171,10 +174,7 @@ public class ProductOptionResourceImpl extends BaseProductOptionResourceImpl {
 			cpDefinitionOptionRel.getGroupId());
 
 		serviceContext.setExpandoBridgeAttributes(
-			CustomFieldsUtil.toMap(
-				CPDefinitionOptionRel.class.getName(),
-				contextCompany.getCompanyId(), productOption.getCustomFields(),
-				contextAcceptLanguage.getPreferredLocale()));
+			_getExpandoBridgeAttributes(productOption));
 
 		_cpDefinitionOptionRelService.updateCPDefinitionOptionRel(
 			cpDefinitionOptionRel.getCPDefinitionOptionRelId(),
@@ -277,11 +277,7 @@ public class ProductOptionResourceImpl extends BaseProductOptionResourceImpl {
 					cpDefinition.getGroupId());
 
 			serviceContext.setExpandoBridgeAttributes(
-				CustomFieldsUtil.toMap(
-					CPDefinitionOptionRel.class.getName(),
-					contextCompany.getCompanyId(),
-					productOption.getCustomFields(),
-					contextAcceptLanguage.getPreferredLocale()));
+				_getExpandoBridgeAttributes(productOption));
 
 			CPDefinitionOptionRel cpDefinitionOptionRel =
 				ProductOptionUtil.addOrUpdateCPDefinitionOptionRel(
@@ -314,6 +310,22 @@ public class ProductOptionResourceImpl extends BaseProductOptionResourceImpl {
 				QueryUtil.ALL_POS),
 			cpDefinitionOptionRel -> _toProductOption(
 				cpDefinitionOptionRel.getCPDefinitionOptionRelId()));
+	}
+
+	private Map<String, Serializable> _getExpandoBridgeAttributes(
+		ProductOption productOption) {
+
+		Map<String, Serializable> expandoBridgeAttributes =
+			CustomFieldsUtil.toMap(
+				CPDefinitionOptionRel.class.getName(),
+				contextCompany.getCompanyId(), productOption.getCustomFields(),
+				contextAcceptLanguage.getPreferredLocale());
+
+		if (expandoBridgeAttributes == null) {
+			expandoBridgeAttributes = new HashMap<>();
+		}
+
+		return expandoBridgeAttributes;
 	}
 
 	private long _getOptionId(long defaultOptionId, ProductOption productOption)

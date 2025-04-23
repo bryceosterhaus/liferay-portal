@@ -11,11 +11,11 @@ import useSWR from 'swr';
 
 import {useMarketplaceContext} from '../../../../../../context/MarketplaceContext';
 import {
-	PRODUCT_CATEGORIES,
-	PRODUCT_SPECIFICATION_KEY,
+	ProductCategoies,
+	ProductSpecificationKey,
 } from '../../../../../../enums/Product';
 import useGetProductByOrderId from '../../../../../../hooks/useGetProductByOrderId';
-import HeadlessCommerceDeliveryCatalogImpl from '../../../../../../services/rest/HeadlessCommerceDeliveryCatalog';
+import HeadlessCommerceDeliveryCatalog from '../../../../../../services/rest/HeadlessCommerceDeliveryCatalog';
 import {getProductCategoriesByVocabularyName} from '../../../../../../utils/productUtils';
 import DownloadTable from './DownloadTable';
 
@@ -38,7 +38,7 @@ const Download = () => {
 		outletContext?.product.productSpecifications.find(
 			(specification) =>
 				specification.specificationKey ===
-				PRODUCT_SPECIFICATION_KEY.APP_VERSION
+				ProductSpecificationKey.APP_VERSION
 		);
 
 	const {data: skus = [], isLoading} = useSWR(
@@ -48,7 +48,7 @@ const Download = () => {
 		() =>
 			Promise.all(
 				virtualProducts.map((orderItem: PlacedOrderItems) =>
-					HeadlessCommerceDeliveryCatalogImpl.getSkuInfo(
+					HeadlessCommerceDeliveryCatalog.getSkuInfo(
 						channel.id,
 						orderItem.productId,
 						orderItem.skuId,
@@ -77,7 +77,7 @@ const Download = () => {
 					'Liferay Portal ' +
 						getProductCategoriesByVocabularyName(
 							outletContext?.product?.categories || [],
-							PRODUCT_CATEGORIES.MARKETPLACE_LIFERAY_VERSION
+							ProductCategoies.MARKETPLACE_LIFERAY_VERSION
 						)
 							.map((versionName) => versionName)
 							.join(', '),

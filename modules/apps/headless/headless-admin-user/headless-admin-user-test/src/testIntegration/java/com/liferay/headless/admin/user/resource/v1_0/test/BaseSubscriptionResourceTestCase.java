@@ -31,7 +31,7 @@ import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
-import com.liferay.portal.kernel.util.DateFormatFactoryUtil;
+import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -45,7 +45,7 @@ import com.liferay.portal.vulcan.resource.EntityModelResource;
 
 import java.lang.reflect.Method;
 
-import java.text.DateFormat;
+import java.text.Format;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -84,7 +84,7 @@ public abstract class BaseSubscriptionResourceTestCase {
 
 	@BeforeClass
 	public static void setUpClass() throws Exception {
-		_dateFormat = DateFormatFactoryUtil.getSimpleDateFormat(
+		_format = FastDateFormatFactoryUtil.getSimpleDateFormat(
 			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 	}
 
@@ -98,12 +98,12 @@ public abstract class BaseSubscriptionResourceTestCase {
 
 		_subscriptionResource.setContextCompany(testCompany);
 
-		com.liferay.portal.kernel.model.User testCompanyAdminUser =
-			UserTestUtil.getAdminUser(testCompany.getCompanyId());
+		_testCompanyAdminUser = UserTestUtil.getAdminUser(
+			testCompany.getCompanyId());
 
 		subscriptionResource = SubscriptionResource.builder(
 		).authentication(
-			testCompanyAdminUser.getEmailAddress(),
+			_testCompanyAdminUser.getEmailAddress(),
 			PropsValues.DEFAULT_ADMIN_PASSWORD
 		).endpoint(
 			testCompany.getVirtualHostname(), 8080, "http"
@@ -179,6 +179,155 @@ public abstract class BaseSubscriptionResourceTestCase {
 
 		Assert.assertEquals(regex, subscription.getContentType());
 		Assert.assertEquals(regex, subscription.getFrequency());
+	}
+
+	@Test
+	public void testDeleteMyUserAccountSubscription() throws Exception {
+		@SuppressWarnings("PMD.UnusedLocalVariable")
+		Subscription subscription =
+			testDeleteMyUserAccountSubscription_addSubscription();
+
+		assertHttpResponseStatusCode(
+			204,
+			subscriptionResource.deleteMyUserAccountSubscriptionHttpResponse(
+				subscription.getId()));
+
+		assertHttpResponseStatusCode(
+			404,
+			subscriptionResource.getMyUserAccountSubscriptionHttpResponse(
+				subscription.getId()));
+		assertHttpResponseStatusCode(
+			404,
+			subscriptionResource.getMyUserAccountSubscriptionHttpResponse(0L));
+	}
+
+	protected Subscription testDeleteMyUserAccountSubscription_addSubscription()
+		throws Exception {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	@Test
+	public void testGetMyUserAccountSubscription() throws Exception {
+		Subscription postSubscription =
+			testGetMyUserAccountSubscription_addSubscription();
+
+		Subscription getSubscription =
+			subscriptionResource.getMyUserAccountSubscription(
+				postSubscription.getId());
+
+		assertEquals(postSubscription, getSubscription);
+		assertValid(getSubscription);
+	}
+
+	protected Subscription testGetMyUserAccountSubscription_addSubscription()
+		throws Exception {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	@Test
+	public void testGraphQLGetMyUserAccountSubscription() throws Exception {
+		Subscription subscription =
+			testGraphQLGetMyUserAccountSubscription_addSubscription();
+
+		// No namespace
+
+		Assert.assertTrue(
+			equals(
+				subscription,
+				SubscriptionSerDes.toDTO(
+					JSONUtil.getValueAsString(
+						invokeGraphQLQuery(
+							new GraphQLField(
+								"myUserAccountSubscription",
+								new HashMap<String, Object>() {
+									{
+										put(
+											"subscriptionId",
+											subscription.getId());
+									}
+								},
+								getGraphQLFields())),
+						"JSONObject/data",
+						"Object/myUserAccountSubscription"))));
+
+		// Using the namespace headlessAdminUser_v1_0
+
+		Assert.assertTrue(
+			equals(
+				subscription,
+				SubscriptionSerDes.toDTO(
+					JSONUtil.getValueAsString(
+						invokeGraphQLQuery(
+							new GraphQLField(
+								"headlessAdminUser_v1_0",
+								new GraphQLField(
+									"myUserAccountSubscription",
+									new HashMap<String, Object>() {
+										{
+											put(
+												"subscriptionId",
+												subscription.getId());
+										}
+									},
+									getGraphQLFields()))),
+						"JSONObject/data", "JSONObject/headlessAdminUser_v1_0",
+						"Object/myUserAccountSubscription"))));
+	}
+
+	@Test
+	public void testGraphQLGetMyUserAccountSubscriptionNotFound()
+		throws Exception {
+
+		Long irrelevantSubscriptionId = RandomTestUtil.randomLong();
+
+		// No namespace
+
+		Assert.assertEquals(
+			"Not Found",
+			JSONUtil.getValueAsString(
+				invokeGraphQLQuery(
+					new GraphQLField(
+						"myUserAccountSubscription",
+						new HashMap<String, Object>() {
+							{
+								put("subscriptionId", irrelevantSubscriptionId);
+							}
+						},
+						getGraphQLFields())),
+				"JSONArray/errors", "Object/0", "JSONObject/extensions",
+				"Object/code"));
+
+		// Using the namespace headlessAdminUser_v1_0
+
+		Assert.assertEquals(
+			"Not Found",
+			JSONUtil.getValueAsString(
+				invokeGraphQLQuery(
+					new GraphQLField(
+						"headlessAdminUser_v1_0",
+						new GraphQLField(
+							"myUserAccountSubscription",
+							new HashMap<String, Object>() {
+								{
+									put(
+										"subscriptionId",
+										irrelevantSubscriptionId);
+								}
+							},
+							getGraphQLFields()))),
+				"JSONArray/errors", "Object/0", "JSONObject/extensions",
+				"Object/code"));
+	}
+
+	protected Subscription
+			testGraphQLGetMyUserAccountSubscription_addSubscription()
+		throws Exception {
+
+		return testGraphQLSubscription_addSubscription();
 	}
 
 	@Test
@@ -314,156 +463,6 @@ public abstract class BaseSubscriptionResourceTestCase {
 
 		throw new UnsupportedOperationException(
 			"This method needs to be implemented");
-	}
-
-	@Test
-	public void testDeleteMyUserAccountSubscription() throws Exception {
-		@SuppressWarnings("PMD.UnusedLocalVariable")
-		Subscription subscription =
-			testDeleteMyUserAccountSubscription_addSubscription();
-
-		assertHttpResponseStatusCode(
-			204,
-			subscriptionResource.deleteMyUserAccountSubscriptionHttpResponse(
-				subscription.getId()));
-
-		assertHttpResponseStatusCode(
-			404,
-			subscriptionResource.getMyUserAccountSubscriptionHttpResponse(
-				subscription.getId()));
-
-		assertHttpResponseStatusCode(
-			404,
-			subscriptionResource.getMyUserAccountSubscriptionHttpResponse(0L));
-	}
-
-	protected Subscription testDeleteMyUserAccountSubscription_addSubscription()
-		throws Exception {
-
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
-	}
-
-	@Test
-	public void testGetMyUserAccountSubscription() throws Exception {
-		Subscription postSubscription =
-			testGetMyUserAccountSubscription_addSubscription();
-
-		Subscription getSubscription =
-			subscriptionResource.getMyUserAccountSubscription(
-				postSubscription.getId());
-
-		assertEquals(postSubscription, getSubscription);
-		assertValid(getSubscription);
-	}
-
-	protected Subscription testGetMyUserAccountSubscription_addSubscription()
-		throws Exception {
-
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
-	}
-
-	@Test
-	public void testGraphQLGetMyUserAccountSubscription() throws Exception {
-		Subscription subscription =
-			testGraphQLGetMyUserAccountSubscription_addSubscription();
-
-		// No namespace
-
-		Assert.assertTrue(
-			equals(
-				subscription,
-				SubscriptionSerDes.toDTO(
-					JSONUtil.getValueAsString(
-						invokeGraphQLQuery(
-							new GraphQLField(
-								"myUserAccountSubscription",
-								new HashMap<String, Object>() {
-									{
-										put(
-											"subscriptionId",
-											subscription.getId());
-									}
-								},
-								getGraphQLFields())),
-						"JSONObject/data",
-						"Object/myUserAccountSubscription"))));
-
-		// Using the namespace headlessAdminUser_v1_0
-
-		Assert.assertTrue(
-			equals(
-				subscription,
-				SubscriptionSerDes.toDTO(
-					JSONUtil.getValueAsString(
-						invokeGraphQLQuery(
-							new GraphQLField(
-								"headlessAdminUser_v1_0",
-								new GraphQLField(
-									"myUserAccountSubscription",
-									new HashMap<String, Object>() {
-										{
-											put(
-												"subscriptionId",
-												subscription.getId());
-										}
-									},
-									getGraphQLFields()))),
-						"JSONObject/data", "JSONObject/headlessAdminUser_v1_0",
-						"Object/myUserAccountSubscription"))));
-	}
-
-	@Test
-	public void testGraphQLGetMyUserAccountSubscriptionNotFound()
-		throws Exception {
-
-		Long irrelevantSubscriptionId = RandomTestUtil.randomLong();
-
-		// No namespace
-
-		Assert.assertEquals(
-			"Not Found",
-			JSONUtil.getValueAsString(
-				invokeGraphQLQuery(
-					new GraphQLField(
-						"myUserAccountSubscription",
-						new HashMap<String, Object>() {
-							{
-								put("subscriptionId", irrelevantSubscriptionId);
-							}
-						},
-						getGraphQLFields())),
-				"JSONArray/errors", "Object/0", "JSONObject/extensions",
-				"Object/code"));
-
-		// Using the namespace headlessAdminUser_v1_0
-
-		Assert.assertEquals(
-			"Not Found",
-			JSONUtil.getValueAsString(
-				invokeGraphQLQuery(
-					new GraphQLField(
-						"headlessAdminUser_v1_0",
-						new GraphQLField(
-							"myUserAccountSubscription",
-							new HashMap<String, Object>() {
-								{
-									put(
-										"subscriptionId",
-										irrelevantSubscriptionId);
-								}
-							},
-							getGraphQLFields()))),
-				"JSONArray/errors", "Object/0", "JSONObject/extensions",
-				"Object/code"));
-	}
-
-	protected Subscription
-			testGraphQLGetMyUserAccountSubscription_addSubscription()
-		throws Exception {
-
-		return testGraphQLSubscription_addSubscription();
 	}
 
 	protected Subscription testGraphQLSubscription_addSubscription()
@@ -946,13 +945,11 @@ public abstract class BaseSubscriptionResourceTestCase {
 				sb.append("(");
 				sb.append(entityFieldName);
 				sb.append(" gt ");
-				sb.append(
-					_dateFormat.format(date.getTime() - (2 * Time.SECOND)));
+				sb.append(_format.format(date.getTime() - (2 * Time.SECOND)));
 				sb.append(" and ");
 				sb.append(entityFieldName);
 				sb.append(" lt ");
-				sb.append(
-					_dateFormat.format(date.getTime() + (2 * Time.SECOND)));
+				sb.append(_format.format(date.getTime() + (2 * Time.SECOND)));
 				sb.append(")");
 			}
 			else {
@@ -962,7 +959,7 @@ public abstract class BaseSubscriptionResourceTestCase {
 				sb.append(operator);
 				sb.append(" ");
 
-				sb.append(_dateFormat.format(subscription.getDateCreated()));
+				sb.append(_format.format(subscription.getDateCreated()));
 			}
 
 			return sb.toString();
@@ -977,13 +974,11 @@ public abstract class BaseSubscriptionResourceTestCase {
 				sb.append("(");
 				sb.append(entityFieldName);
 				sb.append(" gt ");
-				sb.append(
-					_dateFormat.format(date.getTime() - (2 * Time.SECOND)));
+				sb.append(_format.format(date.getTime() - (2 * Time.SECOND)));
 				sb.append(" and ");
 				sb.append(entityFieldName);
 				sb.append(" lt ");
-				sb.append(
-					_dateFormat.format(date.getTime() + (2 * Time.SECOND)));
+				sb.append(_format.format(date.getTime() + (2 * Time.SECOND)));
 				sb.append(")");
 			}
 			else {
@@ -993,7 +988,7 @@ public abstract class BaseSubscriptionResourceTestCase {
 				sb.append(operator);
 				sb.append(" ");
 
-				sb.append(_dateFormat.format(subscription.getDateModified()));
+				sb.append(_format.format(subscription.getDateModified()));
 			}
 
 			return sb.toString();
@@ -1325,7 +1320,9 @@ public abstract class BaseSubscriptionResourceTestCase {
 	private static final com.liferay.portal.kernel.log.Log _log =
 		LogFactoryUtil.getLog(BaseSubscriptionResourceTestCase.class);
 
-	private static DateFormat _dateFormat;
+	private static Format _format;
+
+	private com.liferay.portal.kernel.model.User _testCompanyAdminUser;
 
 	@Inject
 	private com.liferay.headless.admin.user.resource.v1_0.SubscriptionResource

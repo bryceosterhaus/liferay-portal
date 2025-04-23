@@ -28,9 +28,9 @@ import com.liferay.expando.kernel.model.ExpandoColumnConstants;
 import com.liferay.expando.kernel.model.ExpandoTable;
 import com.liferay.expando.kernel.service.ExpandoColumnLocalService;
 import com.liferay.expando.kernel.service.ExpandoTableLocalService;
+import com.liferay.headless.admin.user.client.custom.field.CustomField;
+import com.liferay.headless.admin.user.client.custom.field.CustomValue;
 import com.liferay.headless.admin.user.client.dto.v1_0.Creator;
-import com.liferay.headless.admin.user.client.dto.v1_0.CustomField;
-import com.liferay.headless.admin.user.client.dto.v1_0.CustomValue;
 import com.liferay.headless.admin.user.client.dto.v1_0.EmailAddress;
 import com.liferay.headless.admin.user.client.dto.v1_0.OrganizationBrief;
 import com.liferay.headless.admin.user.client.dto.v1_0.Phone;
@@ -160,7 +160,6 @@ import javax.ws.rs.core.Response;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -728,62 +727,6 @@ public class UserAccountResourceTest extends BaseUserAccountResourceTestCase {
 
 	@Override
 	@Test
-	public void testGetUserAccountsPageWithFilterDateTimeEquals()
-		throws Exception {
-	}
-
-	@Ignore
-	@Override
-	@Test
-	public void testGetUserAccountsPageWithPagination() throws Exception {
-		UserAccount userAccount1 = testGetUserAccountsPage_addUserAccount(
-			randomUserAccount());
-		UserAccount userAccount2 = testGetUserAccountsPage_addUserAccount(
-			randomUserAccount());
-		UserAccount userAccount3 = testGetUserAccountsPage_addUserAccount(
-			randomUserAccount());
-		UserAccount userAccount4 = userAccountResource.getUserAccount(
-			_testUser.getUserId());
-
-		Page<UserAccount> page1 = userAccountResource.getUserAccountsPage(
-			null, null, Pagination.of(1, 2), null);
-
-		List<UserAccount> userAccounts1 = (List<UserAccount>)page1.getItems();
-
-		Assert.assertEquals(userAccounts1.toString(), 2, userAccounts1.size());
-
-		Page<UserAccount> page2 = userAccountResource.getUserAccountsPage(
-			null, null, Pagination.of(1, 4), null);
-
-		Assert.assertEquals(4, page2.getTotalCount());
-
-		assertEqualsIgnoringOrder(
-			Arrays.asList(
-				userAccount1, userAccount2, userAccount3, userAccount4),
-			(List<UserAccount>)page2.getItems());
-	}
-
-	@Ignore
-	@Override
-	@Test
-	public void testGetUserAccountsPageWithSortString() throws Exception {
-	}
-
-	@Ignore
-	@Override
-	@Test
-	public void testGraphQLGetAccountByExternalReferenceCodeUserAccountByExternalReferenceCode()
-		throws Exception {
-	}
-
-	@Ignore
-	@Override
-	@Test
-	public void testGraphQLGetAccountUserAccount() throws Exception {
-	}
-
-	@Override
-	@Test
 	public void testGraphQLGetMyUserAccount() throws Exception {
 		Assert.assertTrue(
 			equals(
@@ -794,37 +737,6 @@ public class UserAccountResourceTest extends BaseUserAccountResourceTestCase {
 							new GraphQLField(
 								"myUserAccount", getGraphQLFields())),
 						"JSONObject/data", "JSONObject/myUserAccount"))));
-	}
-
-	@Ignore
-	@Override
-	@Test
-	public void testGraphQLGetUserAccountsPage() throws Exception {
-		UserAccount userAccount1 = testGraphQLUserAccount_addUserAccount();
-		UserAccount userAccount2 = testGraphQLUserAccount_addUserAccount();
-		UserAccount userAccount3 = userAccountResource.getUserAccount(
-			_testUser.getUserId());
-
-		JSONObject userAccountsJSONObject = JSONUtil.getValueAsJSONObject(
-			invokeGraphQLQuery(
-				new GraphQLField(
-					"userAccounts",
-					HashMapBuilder.<String, Object>put(
-						"page", 1
-					).put(
-						"pageSize", 3
-					).build(),
-					new GraphQLField("items", getGraphQLFields()),
-					new GraphQLField("page"), new GraphQLField("totalCount"))),
-			"JSONObject/data", "JSONObject/userAccounts");
-
-		Assert.assertEquals(3, userAccountsJSONObject.get("totalCount"));
-
-		assertEqualsIgnoringOrder(
-			Arrays.asList(userAccount1, userAccount2, userAccount3),
-			Arrays.asList(
-				UserAccountSerDes.toDTOs(
-					userAccountsJSONObject.getString("items"))));
 	}
 
 	@Override
@@ -1701,6 +1613,38 @@ public class UserAccountResourceTest extends BaseUserAccountResourceTestCase {
 	}
 
 	@Override
+	protected UserAccount
+			testGraphQLGetAccountByExternalReferenceCodeUserAccountByExternalReferenceCode_addUserAccount()
+		throws Exception {
+
+		return _addUserAccount(
+			testGroup.getGroupId(), _accountEntry, randomUserAccount());
+	}
+
+	@Override
+	protected String
+			testGraphQLGetAccountByExternalReferenceCodeUserAccountByExternalReferenceCode_getAccountExternalReferenceCode()
+		throws Exception {
+
+		return _accountEntry.getExternalReferenceCode();
+	}
+
+	@Override
+	protected UserAccount testGraphQLGetAccountUserAccount_addUserAccount()
+		throws Exception {
+
+		return _addUserAccount(
+			testGroup.getGroupId(), _accountEntry, randomUserAccount());
+	}
+
+	@Override
+	protected Long testGraphQLGetAccountUserAccount_getAccountId()
+		throws Exception {
+
+		return _accountEntry.getAccountEntryId();
+	}
+
+	@Override
 	protected UserAccount testGraphQLUserAccount_addUserAccount()
 		throws Exception {
 
@@ -1776,7 +1720,7 @@ public class UserAccountResourceTest extends BaseUserAccountResourceTestCase {
 
 	private AccountEntry _addAccountEntry() throws Exception {
 		AccountEntry accountEntry = _accountEntryLocalService.addAccountEntry(
-			TestPropsValues.getUserId(),
+			StringPool.BLANK, TestPropsValues.getUserId(),
 			AccountConstants.ACCOUNT_ENTRY_ID_DEFAULT,
 			RandomTestUtil.randomString(20), RandomTestUtil.randomString(20),
 			null, null, null, null,

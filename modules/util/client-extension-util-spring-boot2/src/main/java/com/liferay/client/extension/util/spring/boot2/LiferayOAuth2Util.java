@@ -5,8 +5,6 @@
 
 package com.liferay.client.extension.util.spring.boot2;
 
-import com.liferay.petra.string.StringBundler;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -24,19 +22,33 @@ import org.springframework.web.reactive.function.client.WebClient;
 public class LiferayOAuth2Util {
 
 	public static String getClientId(
-		String externalReferenceCode, String lxcMainDomain,
-		String lxcServerProtocol) {
+		String externalReferenceCode, String lxcDXPMainDomain,
+		String lxcDXPServerProtocol) {
 
 		try {
-			String baseURL = StringBundler.concat(
-				lxcServerProtocol, "://", lxcMainDomain,
-				"/o/oauth2/application");
+			String baseURL = new StringBuilder(
+			).append(
+				lxcDXPServerProtocol
+			).append(
+				"://"
+			).append(
+				lxcDXPMainDomain
+			).append(
+				"/o/oauth2/application"
+			).toString();
 
 			if (_log.isDebugEnabled()) {
 				_log.debug(
-					StringBundler.concat(
-						"Get client ID from ", baseURL, " using ",
-						externalReferenceCode));
+					new StringBuilder(
+					).append(
+						"Get client ID from "
+					).append(
+						baseURL
+					).append(
+						" using "
+					).append(
+						externalReferenceCode
+					));
 			}
 
 			return WebClient.create(

@@ -26,8 +26,8 @@ import com.liferay.headless.admin.user.dto.v1_0.Phone;
 import com.liferay.headless.admin.user.dto.v1_0.PostalAddress;
 import com.liferay.headless.admin.user.dto.v1_0.TaxonomyCategoryBrief;
 import com.liferay.headless.admin.user.dto.v1_0.WebUrl;
+import com.liferay.headless.admin.user.internal.dto.v1_0.converter.constants.DTOConverterConstants;
 import com.liferay.headless.admin.user.internal.dto.v1_0.util.CreatorUtil;
-import com.liferay.headless.admin.user.internal.dto.v1_0.util.CustomFieldsUtil;
 import com.liferay.headless.admin.user.internal.dto.v1_0.util.EmailAddressUtil;
 import com.liferay.headless.admin.user.internal.dto.v1_0.util.PermissionUtil;
 import com.liferay.headless.admin.user.internal.dto.v1_0.util.PhoneUtil;
@@ -40,6 +40,7 @@ import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.model.Address;
 import com.liferay.portal.kernel.model.Contact;
 import com.liferay.portal.kernel.model.Organization;
+import com.liferay.portal.kernel.model.ResourceConstants;
 import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
@@ -49,6 +50,7 @@ import com.liferay.portal.kernel.service.ListTypeLocalService;
 import com.liferay.portal.kernel.service.OrganizationLocalService;
 import com.liferay.portal.kernel.service.PermissionService;
 import com.liferay.portal.kernel.service.ResourceActionLocalService;
+import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.service.RoleService;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -56,8 +58,11 @@ import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.webserver.WebServerServletToken;
+import com.liferay.portal.vulcan.custom.field.CustomFieldsUtil;
 import com.liferay.portal.vulcan.dto.converter.DTOConverter;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterContext;
+import com.liferay.portal.vulcan.dto.converter.DTOConverterRegistry;
+import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
 import com.liferay.portal.vulcan.fields.NestedFieldsSupplier;
 
 import org.osgi.service.component.annotations.Component;
@@ -273,14 +278,20 @@ public class AccountResourceDTOConverter
 			AccountEntry accountEntry, DTOConverterContext dtoConverterContext)
 		throws Exception {
 
-		if (!_accountEntryModelResourcePermission.contains(
+		int count = _resourcePermissionLocalService.getResourcePermissionsCount(
+			accountEntry.getCompanyId(), AccountEntry.class.getName(),
+			ResourceConstants.SCOPE_INDIVIDUAL,
+			String.valueOf(accountEntry.getAccountEntryId()));
+
+		if ((count == 0) ||
+			(!_accountEntryModelResourcePermission.contains(
 				PermissionThreadLocal.getPermissionChecker(),
 				accountEntry.getAccountEntryId(),
 				AccountActionKeys.MANAGE_ADDRESSES) &&
-			!_accountEntryModelResourcePermission.contains(
-				PermissionThreadLocal.getPermissionChecker(),
-				accountEntry.getAccountEntryId(),
-				AccountActionKeys.VIEW_ADDRESSES)) {
+			 !_accountEntryModelResourcePermission.contains(
+				 PermissionThreadLocal.getPermissionChecker(),
+				 accountEntry.getAccountEntryId(),
+				 AccountActionKeys.VIEW_ADDRESSES))) {
 
 			return null;
 		}
@@ -316,10 +327,14 @@ public class AccountResourceDTOConverter
 								getAccountEntryContactAddressListTypeIds(
 									accountEntry.getCompanyId(),
 									_listTypeLocalService)),
-						address -> PostalAddressUtil.toPostalAddress(
-							dtoConverterContext.isAcceptAllLanguages(), address,
-							accountEntry.getCompanyId(),
-							dtoConverterContext.getLocale()),
+						address -> _postalAddressDTOConverter.toDTO(
+							new DefaultDTOConverterContext(
+								dtoConverterContext.isAcceptAllLanguages(),
+								null, _dtoConverterRegistry,
+								address.getAddressId(),
+								dtoConverterContext.getLocale(),
+								dtoConverterContext.getUriInfo(),
+								dtoConverterContext.getUser())),
 						PostalAddress.class));
 				setSkype(
 					() -> {
@@ -421,6 +436,9 @@ public class AccountResourceDTOConverter
 	private AssetTagLocalService _assetTagLocalService;
 
 	@Reference
+	private DTOConverterRegistry _dtoConverterRegistry;
+
+	@Reference
 	private ListTypeLocalService _listTypeLocalService;
 
 	@Reference
@@ -432,8 +450,14 @@ public class AccountResourceDTOConverter
 	@Reference
 	private Portal _portal;
 
+	@Reference(target = DTOConverterConstants.POSTAL_ADDRESS_DTO_CONVERTER)
+	private DTOConverter<Address, PostalAddress> _postalAddressDTOConverter;
+
 	@Reference
 	private ResourceActionLocalService _resourceActionLocalService;
+
+	@Reference
+	private ResourcePermissionLocalService _resourcePermissionLocalService;
 
 	@Reference
 	private RoleService _roleService;

@@ -8,12 +8,14 @@ import {TOGGLE_PERMISSION} from './types';
 export type PermissionKey =
 	| 'EDIT_SEGMENTS_ENTRY'
 	| 'LOCKED_SEGMENTS_EXPERIMENT'
+	| 'MANAGE_FRAGMENT_ENTRIES'
 	| 'SWITCH_EDIT_MODE'
 	| 'UPDATE'
 	| 'UPDATE_LAYOUT_ADVANCED_OPTIONS'
 	| 'UPDATE_LAYOUT_BASIC'
 	| 'UPDATE_LAYOUT_CONTENT'
-	| 'UPDATE_LAYOUT_LIMITED';
+	| 'UPDATE_LAYOUT_LIMITED'
+	| 'VIEW_MARKETPLACE';
 
 export default function togglePermission(
 	key: PermissionKey,

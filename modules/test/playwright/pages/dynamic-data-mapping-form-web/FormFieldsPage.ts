@@ -3,16 +3,22 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-import {Locator, Page} from '@playwright/test';
+import {Locator, Page, expect} from '@playwright/test';
 
 export class FormFieldsPage {
 	readonly page: Page;
+	readonly repeatFieldButton: Locator;
+	readonly richTextAddImageButton: Locator;
 
 	constructor(page: Page) {
 		this.page = page;
+		this.repeatFieldButton = page.getByTitle('Duplicate');
+		this.richTextAddImageButton = page
+			.getByLabel('Rich Text')
+			.getByTitle('Image');
 	}
 
-	async addMultipleSelectItem(optionName: string, nth?: number) {
+	async addSelectItem(optionName: string, nth?: number) {
 		const inputFieldLocator = this.page.getByRole('combobox');
 
 		if (nth !== null && nth !== undefined) {
@@ -50,5 +56,29 @@ export class FormFieldsPage {
 		else {
 			await itemBaseLocator.click();
 		}
+	}
+
+	async richTextselectImage(imageName: string) {
+		const fileSelectorIFrame = this.page.frameLocator(
+			'iframe[title="Select Item"]'
+		);
+
+		await fileSelectorIFrame
+			.getByRole('link', {name: 'Sites and Libraries'})
+			.click();
+
+		await fileSelectorIFrame
+			.getByRole('link', {name: 'Liferay DXP'})
+			.click();
+
+		await fileSelectorIFrame
+			.getByRole('link', {name: 'Provided by Liferay'})
+			.click();
+
+		await expect(
+			fileSelectorIFrame.getByText('Drag & Drop Your Images or')
+		).toBeVisible();
+
+		await fileSelectorIFrame.getByText(imageName).click();
 	}
 }

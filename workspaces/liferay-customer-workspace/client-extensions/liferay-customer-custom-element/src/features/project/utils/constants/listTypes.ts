@@ -4,9 +4,14 @@
  */
 
 export const LIST_TYPES = {
-	developerKeyportalVersion: 'Developer Key Portal Version',
+	businessEventTypes: 'Business Event Types',
+	developerKeyPortalVersion: 'Developer Key Portal Version',
 	dxpMajorVersion: 'DXP Major Version',
 	dxpMinorVersion: 'DXP Minor Version',
+	dxpMinorVersionAndPortalMajorVersion:
+		'DXP Minor Version and Portal Major Version',
 	lxcPrimaryRegion: 'LXC Primary Region',
 	portalMajorVersion: 'Portal Major Version',
+	utcTimeZones: 'UTC Time Zones',
+	versionOfLiferaySoftware: 'Version of Liferay Software',
 };

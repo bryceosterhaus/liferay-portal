@@ -3,47 +3,55 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-import {
-	ObjectDefinitionApi,
-	ObjectField,
-} from '@liferay/object-admin-rest-client-js';
+import {ObjectDefinitionAPI} from '@liferay/object-admin-rest-client-js';
 import {Page, expect, mergeTests} from '@playwright/test';
 import fs from 'fs/promises';
 import * as path from 'path';
 import {getComparator} from 'playwright-core/lib/utils';
 
+import {accountSettingsPagesTest} from '../../fixtures/accountSettingsPagesTest';
+import {accountsPagesTest} from '../../fixtures/accountsPagesTest';
+import {applicationsMenuPageTest} from '../../fixtures/applicationsMenuPageTest';
 import {dataApiHelpersTest} from '../../fixtures/dataApiHelpersTest';
 import {depotAdminPageTest} from '../../fixtures/depotAdminPageTest';
 import {documentLibraryPagesTest} from '../../fixtures/documentLibraryPages.fixtures';
 import {featureFlagsTest} from '../../fixtures/featureFlagsTest';
 import {isolatedSiteTest} from '../../fixtures/isolatedSiteTest';
 import {loginTest} from '../../fixtures/loginTest';
-import {pageEditorPagesTest} from '../../fixtures/pageEditorPagesTest';
+import {objectPagesTest} from '../../fixtures/objectPagesTest';
 import {pageTemplatesPagesTest} from '../../fixtures/pageTemplatesPagesTest';
+import {pageViewModePagesTest} from '../../fixtures/pageViewModePagesTest';
 import {productMenuPageTest} from '../../fixtures/productMenuPageTest';
+import {usersAndOrganizationsPagesTest} from '../../fixtures/usersAndOrganizationsPagesTest';
 import {wikiPagesTest} from '../../fixtures/wikiPagesTest';
 import getRandomString from '../../utils/getRandomString';
 import {getTempDir} from '../../utils/temp';
 import {companyExportImportPageTest} from './fixtures/companyExportImportPagesTest';
 import {exportImportPagesTest} from './fixtures/exportImportPagesTest';
 import {stagingPageTest} from './fixtures/stagingPageTest';
+import {openImportFieldset} from './utils/openImportFieldset';
 
 export const test = mergeTests(
+	accountSettingsPagesTest,
+	accountsPagesTest,
+	applicationsMenuPageTest,
 	companyExportImportPageTest,
 	dataApiHelpersTest,
 	depotAdminPageTest,
 	documentLibraryPagesTest,
+	exportImportPagesTest,
 	featureFlagsTest({
 		'LPD-35013': {enabled: true},
 		'LPD-35914': {enabled: false, system: true},
 	}),
-	exportImportPagesTest,
 	isolatedSiteTest,
 	loginTest(),
-	pageEditorPagesTest,
+	objectPagesTest,
+	pageViewModePagesTest,
 	pageTemplatesPagesTest,
 	productMenuPageTest,
 	stagingPageTest,
+	usersAndOrganizationsPagesTest,
 	wikiPagesTest
 );
 
@@ -80,9 +88,9 @@ test(
 	async ({
 		exportImportPage,
 		page,
-		pageEditorPage,
 		pageTemplatesPage,
 		site,
+		widgetPagePage,
 		wikiPage,
 	}) => {
 		await wikiPage.goto(site.friendlyUrlPath);
@@ -114,9 +122,9 @@ test(
 
 		await pageTemplatesPage.page.getByLabel('Add', {exact: true}).click();
 
-		await pageEditorPage.addWidgetToWidgetPageTemplate(
-			'Content Management',
-			'Web Content Display'
+		await widgetPagePage.addPortlet(
+			'Web Content Display',
+			'Content Management'
 		);
 
 		await wikiPage.goto(site.friendlyUrlPath);
@@ -292,11 +300,11 @@ test('can see corresponding elements at site level', async ({
 	apiHelpers,
 	exportImportPage,
 }) => {
-	const objectActionApiClient =
-		await apiHelpers.buildRestClient(ObjectDefinitionApi);
+	const objectActionAPIClient =
+		await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 	const {body: objectDefinition} =
-		await objectActionApiClient.postObjectDefinition({
+		await objectActionAPIClient.postObjectDefinition({
 			active: true,
 			externalReferenceCode: 'test',
 			label: {
@@ -305,8 +313,8 @@ test('can see corresponding elements at site level', async ({
 			name: 'Test',
 			objectFields: [
 				{
-					DBType: ObjectField.DBTypeEnum.String,
-					businessType: ObjectField.BusinessTypeEnum.Text,
+					DBType: 'String',
+					businessType: 'Text',
 					indexed: true,
 					indexedAsKeyword: true,
 					label: {
@@ -355,4 +363,25 @@ test('can see corresponding elements at site level', async ({
 	await expect(
 		exportImportPage.page.getByRole('group', {name: 'Pages'})
 	).toBeVisible();
+
+	await expect(
+		exportImportPage.page.getByLabel('Delete Application Data')
+	).toBeVisible();
+
+	await openImportFieldset({
+		name: 'Update Data',
+		page: exportImportPage.page,
+	});
+
+	await expect(
+		exportImportPage.page.getByText(
+			'Mirror: All data and content inside the imported LAR is created as new the first time while maintaining a reference to the source. Subsequent imports from the same source update the entries instead of creating new entries.'
+		)
+	).toBeVisible();
+
+	await expect(
+		exportImportPage.page.getByText('Mirror with overwriting:')
+	).toBeVisible();
+
+	await expect(exportImportPage.page.getByText('Copy as New:')).toBeVisible();
 });

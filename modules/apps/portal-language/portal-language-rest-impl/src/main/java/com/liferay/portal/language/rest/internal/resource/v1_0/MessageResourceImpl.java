@@ -114,6 +114,19 @@ public class MessageResourceImpl extends BaseMessageResourceImpl {
 	}
 
 	@Override
+	public Page<Message> postMessagesExportPage(
+		String languageId, String[] keys) {
+
+		List<Message> messages = new ArrayList<>();
+
+		for (String key : keys) {
+			messages.add(getMessage(key, languageId));
+		}
+
+		return Page.of(messages);
+	}
+
+	@Override
 	public Message putMessage(Message message) throws PortalException {
 		return _addOrUpdatePLOEntry(message);
 	}

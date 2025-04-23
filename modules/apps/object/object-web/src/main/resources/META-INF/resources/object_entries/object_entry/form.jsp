@@ -117,13 +117,17 @@ portletDisplay.setURLBack(backURL);
 				}
 
 				let value = field.value;
-				if (field.type === 'select' && !field.multiple) {
+				if (
+					field.type === 'select' &&
+					!field.multiple &&
+					!field.localizedObjectField
+				) {
 					value = {key: value.length ? field.value[0] : ''};
 				}
 
 				let fieldName = field.fieldName;
 
-				if (field.localizable) {
+				if (value && field.localizable) {
 					fieldName += '_i18n';
 
 					if (typeof value == 'string') {
@@ -252,6 +256,8 @@ portletDisplay.setURLBack(backURL);
 							method: externalReferenceCode ? 'PATCH' : 'POST',
 						})
 							.then((response) => {
+								Liferay.fire('submitButtonClicked');
+
 								if (response.status === 401) {
 									window.location.reload();
 								}
@@ -287,6 +293,15 @@ portletDisplay.setURLBack(backURL);
 										response.detail
 									);
 
+									const alertClassName = '<portlet:namespace />alert';
+
+									const alertElements =
+										document.getElementsByClassName(alertClassName);
+
+									for (let i = 0; i < alertElements.length; i++) {
+										alertElements[i].remove();
+									}
+
 									for (const error of errorMessageArray) {
 										const portletBody =
 											document.querySelector('.portlet-body');
@@ -301,7 +316,8 @@ portletDisplay.setURLBack(backURL);
 										const alertElement =
 											document.createElement('div');
 
-										alertElement.className = 'alert alert-danger';
+										alertElement.className =
+											'alert alert-danger ' + alertClassName;
 										alertElement.setAttribute('role', 'alert');
 										alertElement.style.bottom = '20px';
 										alertElement.style.margin = '2rem auto 0';
@@ -350,6 +366,8 @@ portletDisplay.setURLBack(backURL);
 					}
 				}
 				else {
+					current.updateLocalesDropdownToDefaultLanguage();
+
 					loadingElement.remove();
 				}
 			});

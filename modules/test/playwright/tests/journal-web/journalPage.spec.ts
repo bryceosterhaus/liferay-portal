@@ -20,6 +20,41 @@ export const test = mergeTests(
 );
 
 test(
+	'List view displays folders and articles correctly',
+	{
+		tag: '@LPD-53481',
+	},
+	async ({apiHelpers, journalPage, page, site}) => {
+		const basicWebContentStructureId =
+			await getBasicWebContentStructureId(apiHelpers);
+
+		await apiHelpers.jsonWebServicesJournal.addWebContent({
+			ddmStructureId: basicWebContentStructureId,
+			groupId: site.id,
+			titleMap: {en_US: 'First Web content'},
+		});
+
+		await apiHelpers.jsonWebServicesJournal.addFolder({
+			groupId: site.id,
+		});
+
+		await journalPage.goto(site.friendlyUrlPath);
+
+		await journalPage.changeView('list');
+
+		await expect(
+			page
+				.locator(
+					'[id="_com_liferay_journal_web_portlet_JournalPortlet_articlesSearchContainer"]'
+				)
+				.getByText('Web Content', {exact: true})
+		).toBeVisible();
+
+		await expect(page.getByText('Folders')).toBeVisible();
+	}
+);
+
+test(
 	'Table view displays folders and articles correctly',
 	{
 		tag: '@LPD-42429',
@@ -49,6 +84,14 @@ test(
 		).toBeVisible();
 
 		await expect(page.getByRole('cell', {name: 'Author'})).toBeVisible();
+
+		await expect(
+			page.getByRole('cell', {exact: true, name: 'Web Content'})
+		).toBeVisible();
+
+		await expect(
+			page.getByRole('cell', {exact: true, name: 'Folders'})
+		).toBeVisible();
 
 		await expect(page.getByRole('cell', {name: 'Status'})).toBeVisible();
 
@@ -163,5 +206,38 @@ test(
 		expect(
 			page.getByRole('row', {name: /\d+ .* ago by .*/i})
 		).toBeVisible();
+	}
+);
+
+test(
+	'Latest version of Web Content should not have delete option',
+	{
+		tag: '@LPD-52126',
+	},
+	async ({apiHelpers, journalPage, page, site}) => {
+		const basicWebContentStructureId =
+			await getBasicWebContentStructureId(apiHelpers);
+
+		await apiHelpers.jsonWebServicesJournal.addWebContent({
+			ddmStructureId: basicWebContentStructureId,
+			groupId: site.id,
+			titleMap: {en_US: 'Basic Web content'},
+		});
+
+		await journalPage.goto(site.friendlyUrlPath);
+
+		await page.getByRole('button', {name: 'Actions'}).click();
+
+		await page.getByRole('menuitem', {name: 'View History'}).click();
+
+		await page.getByRole('button', {name: 'Actions'}).first().click();
+
+		await expect(
+			page.getByRole('menuitem', {name: 'Delete'})
+		).not.toBeVisible();
+
+		await page.locator('.management-bar input[type="checkbox"]').click();
+
+		await expect(page.getByRole('button', {name: 'Delete'})).toBeDisabled();
 	}
 );

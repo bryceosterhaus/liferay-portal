@@ -13,17 +13,30 @@ public class CMSSiteInitializerFDSNames {
 	public static final String ALL_SECTION =
 		CMSSiteInitializerConstants.BUNDLE_SYMBOLIC_NAME + "-allSection";
 
+	public static final String ALL_SPACES_SECTION =
+		CMSSiteInitializerConstants.BUNDLE_SYMBOLIC_NAME + "-allSpacesSection";
+
 	public static final String CATEGORIZATION_SECTION =
 		CMSSiteInitializerConstants.BUNDLE_SYMBOLIC_NAME +
 			"-categorizationSection";
 
-	public static final String CONTENT_SECTION =
-		CMSSiteInitializerConstants.BUNDLE_SYMBOLIC_NAME + "-contentSection";
+	public static final String CATEGORIZATION_TAGS =
+		CMSSiteInitializerConstants.BUNDLE_SYMBOLIC_NAME +
+			"-categorizationTags";
+
+	public static final String CONTENTS_SECTION =
+		CMSSiteInitializerConstants.BUNDLE_SYMBOLIC_NAME + "-contentsSection";
 
 	public static final String FILES_SECTION =
 		CMSSiteInitializerConstants.BUNDLE_SYMBOLIC_NAME + "-filesSection";
 
+	public static final String STRUCTURE_USAGES =
+		CMSSiteInitializerConstants.BUNDLE_SYMBOLIC_NAME + "-structureUsages";
+
 	public static final String STRUCTURES_SECTION =
 		CMSSiteInitializerConstants.BUNDLE_SYMBOLIC_NAME + "-structuresSection";
+
+	public static final String VOCABULARIES =
+		CMSSiteInitializerConstants.BUNDLE_SYMBOLIC_NAME + "-vocabularies";
 
 }

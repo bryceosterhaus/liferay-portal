@@ -574,6 +574,19 @@ public class CPTestUtil {
 		return cpInstance;
 	}
 
+	public static CPInstance addCPInstanceFromCatalogWithoutCommercePriceEntry(
+			long groupId, BigDecimal price, BigDecimal promoPrice, String sku)
+		throws PortalException {
+
+		CPInstance cpInstance = addCPInstanceFromCatalog(groupId);
+
+		cpInstance.setSku(sku);
+		cpInstance.setPrice(price);
+		cpInstance.setPromoPrice(promoPrice);
+
+		return CPInstanceLocalServiceUtil.updateCPInstance(cpInstance);
+	}
+
 	public static CPInstanceUnitOfMeasure addCPInstanceUnitOfMeasure(
 			long groupId, long cpInstanceId, String key,
 			BigDecimal incrementalOrderQuantity, String sku)
@@ -752,7 +765,7 @@ public class CPTestUtil {
 			RandomTestUtil.randomString(), serviceContext.getUserId(), 0, null,
 			RandomTestUtil.randomLocaleStringMap(),
 			RandomTestUtil.randomLocaleStringMap(), facetable,
-			RandomTestUtil.randomString(), RandomTestUtil.randomDouble(),
+			RandomTestUtil.randomString(), RandomTestUtil.randomDouble(), true,
 			serviceContext);
 	}
 
@@ -1041,7 +1054,7 @@ public class CPTestUtil {
 
 		CPDefinition cpDefinition =
 			CPDefinitionLocalServiceUtil.addCPDefinition(
-				null, groupId, user.getUserId(), titleMap, shortDescriptionMap,
+				null, user.getUserId(), groupId, titleMap, shortDescriptionMap,
 				descriptionMap, urlTitleMap, metaTitleMap, metaKeywordsMap,
 				metaDescriptionMap, productTypeName, ignoreSKUCombinations,
 				shippable, freeShipping, shipSeparately, shippingExtraPrice,
@@ -1138,7 +1151,7 @@ public class CPTestUtil {
 
 		CPDefinition cpDefinition =
 			CPDefinitionLocalServiceUtil.addCPDefinition(
-				null, groupId, user.getUserId(), titleMap, shortDescriptionMap,
+				null, user.getUserId(), groupId, titleMap, shortDescriptionMap,
 				descriptionMap, urlTitleMap, metaTitleMap, metaKeywordsMap,
 				metaDescriptionMap, productTypeName, true, shippable,
 				freeShipping, shipSeparately, shippingExtraPrice, width, height,
@@ -1250,7 +1263,7 @@ public class CPTestUtil {
 		}
 
 		return CPDefinitionLocalServiceUtil.addCPDefinition(
-			null, commerceCatalog.getGroupId(), user.getUserId(), titleMap,
+			null, user.getUserId(), commerceCatalog.getGroupId(), titleMap,
 			shortDescriptionMap, descriptionMap, urlTitleMap, metaTitleMap,
 			metaKeywordsMap, metaDescriptionMap, productTypeName,
 			ignoreSKUCombinations, shippable, freeShipping, shipSeparately,

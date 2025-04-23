@@ -18,6 +18,7 @@ import com.liferay.commerce.test.util.CommerceInventoryTestUtil;
 import com.liferay.headless.commerce.admin.inventory.client.dto.v1_0.WarehouseAccountGroup;
 import com.liferay.headless.commerce.admin.inventory.client.pagination.Page;
 import com.liferay.headless.commerce.admin.inventory.client.pagination.Pagination;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
@@ -55,8 +56,8 @@ public class WarehouseAccountGroupResourceTest
 			_user.getUserId());
 
 		_accountEntry = _accountEntryLocalService.addAccountEntry(
-			_user.getUserId(), 0, RandomTestUtil.randomString(),
-			RandomTestUtil.randomString(), null,
+			StringPool.BLANK, _user.getUserId(), 0,
+			RandomTestUtil.randomString(), RandomTestUtil.randomString(), null,
 			RandomTestUtil.randomString() + "@liferay.com", null, null,
 			"business", 1, _serviceContext);
 
@@ -114,8 +115,9 @@ public class WarehouseAccountGroupResourceTest
 
 		AccountGroup randomAccountGroup =
 			_accountGroupLocalService.addAccountGroup(
-				_user.getUserId(), RandomTestUtil.randomString(),
-				RandomTestUtil.randomString(), _serviceContext);
+				StringPool.BLANK, _user.getUserId(),
+				RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+				_serviceContext);
 
 		_accountGroupIds.add(randomAccountGroup.getAccountGroupId());
 
@@ -136,6 +138,17 @@ public class WarehouseAccountGroupResourceTest
 						getCommerceInventoryWarehouseId();
 			}
 		};
+	}
+
+	@Override
+	protected WarehouseAccountGroup
+			testDeleteWarehouseAccountGroupBatch_addWarehouseAccountGroup()
+		throws Exception {
+
+		return warehouseAccountGroupResource.
+			postWarehouseIdWarehouseAccountGroup(
+				_commerceInventoryWarehouse.getCommerceInventoryWarehouseId(),
+				randomWarehouseAccountGroup());
 	}
 
 	@Override

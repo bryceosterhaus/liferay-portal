@@ -8,6 +8,7 @@ package com.liferay.commerce.service.impl;
 import com.liferay.account.model.AccountEntry;
 import com.liferay.commerce.configuration.CommerceOrderConfiguration;
 import com.liferay.commerce.configuration.CommerceOrderFieldsConfiguration;
+import com.liferay.commerce.constants.CommerceAddressConstants;
 import com.liferay.commerce.constants.CommerceConstants;
 import com.liferay.commerce.constants.CommerceOrderConstants;
 import com.liferay.commerce.constants.CommerceOrderPaymentConstants;
@@ -264,7 +265,7 @@ public class CommerceOrderLocalServiceImpl
 
 		// Commerce order
 
-		_validateAccountOrdersLimit(groupId, commerceAccountId);
+		_validateAccountLimit(groupId, commerceAccountId);
 		_validateCommerceChannelAccount(groupId, commerceAccountId);
 		_validateGuestOrders();
 
@@ -1243,17 +1244,17 @@ public class CommerceOrderLocalServiceImpl
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
 	public CommerceOrder updateBillingAddress(
-			long commerceOrderId, String name, String description,
-			String street1, String street2, String street3, String city,
-			String zip, long regionId, long countryId, String phoneNumber,
+			long commerceOrderId, long countryId, long regionId, String city,
+			String description, String name, String phoneNumber, String street1,
+			String street2, String street3, String subtype, String zip,
 			ServiceContext serviceContext)
 		throws PortalException {
 
 		return _updateAddress(
-			commerceOrderId, name, description, street1, street2, street3, city,
-			zip, regionId, countryId, phoneNumber,
-			CommerceOrder::getBillingAddressId,
-			CommerceOrder::setBillingAddressId, serviceContext);
+			city, CommerceOrder::getBillingAddressId,
+			CommerceOrder::setBillingAddressId, commerceOrderId, countryId,
+			description, name, phoneNumber, regionId, street1, street2, street3,
+			serviceContext, subtype, zip);
 	}
 
 	@Indexable(type = IndexableType.REINDEX)
@@ -2106,17 +2107,17 @@ public class CommerceOrderLocalServiceImpl
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
 	public CommerceOrder updateShippingAddress(
-			long commerceOrderId, String name, String description,
-			String street1, String street2, String street3, String city,
-			String zip, long regionId, long countryId, String phoneNumber,
+			long commerceOrderId, long countryId, long regionId, String city,
+			String description, String name, String phoneNumber, String street1,
+			String street2, String street3, String subtype, String zip,
 			ServiceContext serviceContext)
 		throws PortalException {
 
 		return _updateAddress(
-			commerceOrderId, name, description, street1, street2, street3, city,
-			zip, regionId, countryId, phoneNumber,
-			CommerceOrder::getShippingAddressId,
-			CommerceOrder::setShippingAddressId, serviceContext);
+			city, CommerceOrder::getShippingAddressId,
+			CommerceOrder::setShippingAddressId, commerceOrderId, countryId,
+			description, name, phoneNumber, regionId, street1, street2, street3,
+			serviceContext, subtype, zip);
 	}
 
 	@Indexable(type = IndexableType.REINDEX)
@@ -2246,7 +2247,7 @@ public class CommerceOrderLocalServiceImpl
 		dtoConverterContext.setAttribute("secure", Boolean.FALSE);
 
 		JSONObject commerceOrderJSONObject = _jsonFactory.createJSONObject(
-			String.valueOf(
+			_jsonFactory.looseSerializeDeep(
 				commerceOrderDTOConverter.toDTO(dtoConverterContext)));
 
 		JSONArray commerceOrderItemsJSONArray = _jsonFactory.createJSONArray();
@@ -2709,12 +2710,12 @@ public class CommerceOrderLocalServiceImpl
 	}
 
 	private CommerceOrder _updateAddress(
-			long commerceOrderId, String name, String description,
-			String street1, String street2, String street3, String city,
-			String zip, long regionId, long countryId, String phoneNumber,
-			Function<CommerceOrder, Long> commerceAddressIdGetter,
+			String city, Function<CommerceOrder, Long> commerceAddressIdGetter,
 			BiConsumer<CommerceOrder, Long> commerceAddressIdSetter,
-			ServiceContext serviceContext)
+			long commerceOrderId, long countryId, String description,
+			String name, String phoneNumber, long regionId, String street1,
+			String street2, String street3, ServiceContext serviceContext,
+			String subtype, String zip)
 		throws PortalException {
 
 		CommerceOrder commerceOrder = commerceOrderPersistence.findByPrimaryKey(
@@ -2725,18 +2726,24 @@ public class CommerceOrderLocalServiceImpl
 		long commerceAddressId = commerceAddressIdGetter.apply(commerceOrder);
 
 		if (commerceAddressId > 0) {
+			commerceAddress = _commerceAddressLocalService.getCommerceAddress(
+				commerceAddressId);
+
 			commerceAddress =
 				_commerceAddressLocalService.updateCommerceAddress(
-					commerceAddressId, name, description, street1, street2,
-					street3, city, zip, regionId, countryId, phoneNumber, false,
-					false, serviceContext);
+					commerceAddress.getExternalReferenceCode(),
+					commerceAddressId, countryId, regionId, city, description,
+					name, phoneNumber, street1, street2, street3, subtype,
+					commerceAddress.getType(), zip, serviceContext);
 		}
 		else {
 			commerceAddress = _commerceAddressLocalService.addCommerceAddress(
-				commerceOrder.getModelClassName(),
-				commerceOrder.getCommerceOrderId(), name, description, street1,
-				street2, street3, city, zip, regionId, countryId, phoneNumber,
-				false, false, serviceContext);
+				StringPool.BLANK, commerceOrder.getModelClassName(),
+				commerceOrder.getCommerceOrderId(), countryId, regionId, city,
+				description, name, phoneNumber, street1, street2, street3,
+				subtype,
+				CommerceAddressConstants.ADDRESS_TYPE_BILLING_AND_SHIPPING, zip,
+				serviceContext);
 		}
 
 		commerceAddressIdSetter.accept(
@@ -2781,9 +2788,13 @@ public class CommerceOrderLocalServiceImpl
 		}
 	}
 
-	private void _validateAccountOrdersLimit(
+	private void _validateAccountLimit(
 			long commerceChannelGroupId, long commerceAccountId)
 		throws PortalException {
+
+		if (CommerceOrderThreadLocal.isSkipValidateAccountLimit()) {
+			return;
+		}
 
 		Group group = _groupLocalService.getGroup(commerceChannelGroupId);
 

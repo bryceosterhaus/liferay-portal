@@ -45,7 +45,7 @@ public class ObjectEntryFolderAssetRendererFactory
 			_objectEntryFolderService.getObjectEntryFolder(classPK);
 
 		if (!FeatureFlagManagerUtil.isEnabled(
-				objectEntryFolder.getCompanyId(), "LPD-17809")) {
+				objectEntryFolder.getCompanyId(), "LPD-17564")) {
 
 			return null;
 		}
@@ -70,13 +70,8 @@ public class ObjectEntryFolderAssetRendererFactory
 
 	@Override
 	public boolean isSearchable() {
-		if (FeatureFlagManagerUtil.isEnabled(
-				CompanyThreadLocal.getCompanyId(), "LPD-17809")) {
-
-			return true;
-		}
-
-		return false;
+		return FeatureFlagManagerUtil.isEnabled(
+			CompanyThreadLocal.getCompanyId(), "LPD-17564");
 	}
 
 	@Reference

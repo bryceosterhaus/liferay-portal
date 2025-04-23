@@ -6,18 +6,20 @@
 import React, {ReactNode} from 'react';
 
 import {useMarketplaceContext} from '../../MarketplaceContext';
+import BaseModal from './BaseModal';
 import {ConnectionWithMarketplaceNeededModal} from './ConnectionWithMarketplaceNeededModal';
-import MarketplaceModalView from './MarketplaceModal';
 
 export type MarketplaceModalProps = {
 	children: ReactNode;
 	noConnectionMessage?: string;
 	trigger: React.ReactElement;
-};
+} & Pick<React.ComponentProps<typeof BaseModal>, 'size' | 'title'>;
 
 export function MarketplaceModal({
 	children,
 	noConnectionMessage,
+	size,
+	title,
 	trigger,
 }: MarketplaceModalProps) {
 	const {
@@ -26,7 +28,7 @@ export function MarketplaceModal({
 	} = useMarketplaceContext();
 
 	const Modal = marketplaceConfiguration.authorized
-		? MarketplaceModalView
+		? BaseModal
 		: ConnectionWithMarketplaceNeededModal;
 
 	if (marketplaceConfiguration.loading) {
@@ -49,6 +51,8 @@ export function MarketplaceModal({
 				message={noConnectionMessage}
 				observer={observer}
 				open={open}
+				size={size}
+				title={title}
 			>
 				{children}
 			</Modal>

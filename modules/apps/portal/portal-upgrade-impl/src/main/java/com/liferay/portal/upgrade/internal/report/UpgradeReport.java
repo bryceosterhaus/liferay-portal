@@ -5,6 +5,7 @@
 
 package com.liferay.portal.upgrade.internal.report;
 
+import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.events.StartupHelperUtil;
@@ -492,8 +493,6 @@ public class UpgradeReport {
 					return null;
 				}
 
-				List<TablePrinter> tablePrinters = new ArrayList<>();
-
 				List<String> tableNames = new ArrayList<>();
 
 				tableNames.addAll(_initialTableCounts.keySet());
@@ -514,28 +513,29 @@ public class UpgradeReport {
 						return tableName1.compareTo(tableName2);
 					});
 
-				for (String tableName : tableNames) {
-					int finalTableCount = finalTableCounts.getOrDefault(
-						tableName, -1);
-					int initialTableCount = _initialTableCounts.getOrDefault(
-						tableName, -1);
+				return TransformUtil.transform(
+					tableNames,
+					tableName -> {
+						int finalTableCount = finalTableCounts.getOrDefault(
+							tableName, -1);
+						int initialTableCount =
+							_initialTableCounts.getOrDefault(tableName, -1);
 
-					if ((finalTableCount <= 0) && (initialTableCount <= 0)) {
-						continue;
-					}
+						if ((finalTableCount <= 0) &&
+							(initialTableCount <= 0)) {
 
-					tablePrinters.add(
-						new TablePrinter(
+							return null;
+						}
+
+						return new TablePrinter(
 							(finalTableCount >= 0) ?
 								String.valueOf(finalTableCount) :
 									StringPool.DASH,
 							(initialTableCount >= 0) ?
 								String.valueOf(initialTableCount) :
 									StringPool.DASH,
-							tableName));
-				}
-
-				return tablePrinters;
+							tableName);
+					});
 			}
 		).build();
 	}
@@ -567,33 +567,25 @@ public class UpgradeReport {
 				Map<String, Long> upgradeProcessDurations = new HashMap<>();
 
 				for (String message : messages) {
-					int startIndex = message.indexOf("com.");
+					String[] parts = StringUtil.split(
+						message, StringPool.SPACE);
 
-					int endIndex = message.indexOf(
-						StringPool.SPACE, startIndex);
+					String upgradeProcessClassName = parts[3];
 
-					String className = message.substring(startIndex, endIndex);
-
-					if (className.equals(
+					if (upgradeProcessClassName.equals(
 							PortalUpgradeProcess.class.getName())) {
 
 						continue;
 					}
 
-					startIndex = message.indexOf(
-						StringPool.SPACE, endIndex + 1);
-
-					endIndex = message.indexOf(
-						StringPool.SPACE, startIndex + 1);
-
-					long duration = GetterUtil.getLong(
-						message.substring(startIndex, endIndex));
+					long duration = GetterUtil.getLong(parts[parts.length - 2]);
 
 					if (duration >=
 							PropsValues.
 								UPGRADE_REPORT_UPGRADE_PROCESS_THRESHOLD) {
 
-						upgradeProcessDurations.put(className, duration);
+						upgradeProcessDurations.put(
+							upgradeProcessClassName, duration);
 					}
 				}
 

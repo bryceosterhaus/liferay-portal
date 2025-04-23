@@ -4,9 +4,8 @@
  */
 
 import {
-	ObjectActionApi,
-	ObjectDefinitionApi,
-	ObjectField,
+	ObjectActionAPI,
+	ObjectDefinitionAPI,
 } from '@liferay/object-admin-rest-client-js';
 import {expect, mergeTests} from '@playwright/test';
 
@@ -104,7 +103,7 @@ test.describe('General', () => {
 
 		await page.locator('.lfr-layout-structure-item-collection').click();
 
-		await pageEditorPage.chooseCollectionDisplayOption(
+		await pageEditorPage.chooseCollectionDisplayCollection(
 			'Repeatable Fields Collection Providers',
 			'Species'
 		);
@@ -767,7 +766,7 @@ test.describe('Object Display page', () => {
 				'Collection Display'
 			);
 
-			await pageEditorPage.chooseCollectionDisplayOption(
+			await pageEditorPage.chooseCollectionDisplayCollection(
 				'Related Items Collection Providers',
 				'Lemon Basket to Lemon'
 			);
@@ -827,11 +826,11 @@ test.describe('Object Display page', () => {
 
 			// Go to lemon basket display page
 
-			const objectDefinitionApiClient =
-				await apiHelpers.buildRestClient(ObjectDefinitionApi);
+			const objectDefinitionAPIClient =
+				await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 			const {className: objectDefinitionClassName} = (
-				await objectDefinitionApiClient.getObjectDefinitionByExternalReferenceCode(
+				await objectDefinitionAPIClient.getObjectDefinitionByExternalReferenceCode(
 					getObjectERC('Lemon Basket')
 				)
 			).body;
@@ -867,7 +866,7 @@ test.describe('Object Display page', () => {
 			// Create ticket object definition
 
 			const objectDefinitionAPIClient =
-				await apiHelpers.buildRestClient(ObjectDefinitionApi);
+				await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 			const {body: ticketObjectDefinition} =
 				await objectDefinitionAPIClient.postObjectDefinition({
@@ -879,8 +878,8 @@ test.describe('Object Display page', () => {
 					name: 'Ticket',
 					objectFields: [
 						{
-							DBType: ObjectField.DBTypeEnum.String,
-							businessType: ObjectField.BusinessTypeEnum.Text,
+							DBType: 'String',
+							businessType: 'Text',
 							externalReferenceCode: 'textERC',
 							indexed: true,
 							indexedAsKeyword: false,
@@ -922,10 +921,10 @@ test.describe('Object Display page', () => {
 
 			// Add object action
 
-			const objectActionApiClient =
-				await apiHelpers.buildRestClient(ObjectActionApi);
+			const objectActionAPIClient =
+				await apiHelpers.buildRestClient(ObjectActionAPI);
 
-			await objectActionApiClient.postObjectDefinitionByExternalReferenceCodeObjectAction(
+			await objectActionAPIClient.postObjectDefinitionByExternalReferenceCodeObjectAction(
 				ticketObjectDefinition.externalReferenceCode,
 				{
 					active: true,
@@ -1061,11 +1060,11 @@ test.describe('Object Display page', () => {
 
 			// Create a default display page for lemon object
 
-			const objectDefinitionApiClient =
-				await apiHelpers.buildRestClient(ObjectDefinitionApi);
+			const objectDefinitionAPIClient =
+				await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 			const {className: objectDefinitionClassName} = (
-				await objectDefinitionApiClient.getObjectDefinitionByExternalReferenceCode(
+				await objectDefinitionAPIClient.getObjectDefinitionByExternalReferenceCode(
 					getObjectERC('Lemon')
 				)
 			).body;
@@ -1159,11 +1158,11 @@ test.describe('Object Display page', () => {
 
 			// Create object definition with attachment field
 
-			const objectDefinitionApiClient =
-				await apiHelpers.buildRestClient(ObjectDefinitionApi);
+			const objectDefinitionAPIClient =
+				await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 			const {body: objectDefinition} =
-				await objectDefinitionApiClient.postObjectDefinition({
+				await objectDefinitionAPIClient.postObjectDefinition({
 					active: true,
 					externalReferenceCode: 'attachmentERC',
 					label: {
@@ -1172,9 +1171,8 @@ test.describe('Object Display page', () => {
 					name: 'Attachment',
 					objectFields: [
 						{
-							DBType: ObjectField.DBTypeEnum.Long,
-							businessType:
-								ObjectField.BusinessTypeEnum.Attachment,
+							DBType: 'Long',
+							businessType: 'Attachment',
 							indexed: true,
 							indexedAsKeyword: false,
 							label: {
@@ -1196,7 +1194,7 @@ test.describe('Object Display page', () => {
 								} as any,
 							],
 							required: false,
-							type: ObjectField.TypeEnum.Long,
+							type: 'Long',
 						},
 					],
 					pluralLabel: {
@@ -1216,7 +1214,7 @@ test.describe('Object Display page', () => {
 			// Create a default display page
 
 			const {className: objectDefinitionClassName} = (
-				await objectDefinitionApiClient.getObjectDefinitionByExternalReferenceCode(
+				await objectDefinitionAPIClient.getObjectDefinitionByExternalReferenceCode(
 					objectDefinition.externalReferenceCode
 				)
 			).body;
@@ -1345,11 +1343,11 @@ test.describe('Object Display page', () => {
 
 			// Create object definition
 
-			const objectDefinitionApiClient =
-				await apiHelpers.buildRestClient(ObjectDefinitionApi);
+			const objectDefinitionAPIClient =
+				await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 			const {body: objectDefinition} =
-				await objectDefinitionApiClient.postObjectDefinition({
+				await objectDefinitionAPIClient.postObjectDefinition({
 					active: true,
 					externalReferenceCode: 'filmERC',
 					label: {
@@ -1358,10 +1356,8 @@ test.describe('Object Display page', () => {
 					name: 'Film',
 					objectFields: [
 						{
-							DBType: ObjectField.DBTypeEnum.String,
-							businessType:
-								ObjectField.BusinessTypeEnum
-									.MultiselectPicklist,
+							DBType: 'String',
+							businessType: 'MultiselectPicklist',
 							externalReferenceCode: 'genreERC',
 							indexed: true,
 							indexedAsKeyword: false,
@@ -1373,8 +1369,8 @@ test.describe('Object Display page', () => {
 							name: 'genre',
 						},
 						{
-							DBType: ObjectField.DBTypeEnum.String,
-							businessType: ObjectField.BusinessTypeEnum.Picklist,
+							DBType: 'String',
+							businessType: 'Picklist',
 							externalReferenceCode: 'originERC',
 							indexed: true,
 							indexedAsKeyword: false,
@@ -1386,7 +1382,7 @@ test.describe('Object Display page', () => {
 							name: 'origin',
 						},
 						{
-							DBType: ObjectField.DBTypeEnum.DateTime,
+							DBType: 'DateTime',
 							externalReferenceCode: 'releaseDateERC',
 							indexed: true,
 							indexedAsKeyword: false,
@@ -1419,7 +1415,7 @@ test.describe('Object Display page', () => {
 			// Create a display page
 
 			const {className: objectDefinitionClassName} = (
-				await objectDefinitionApiClient.getObjectDefinitionByExternalReferenceCode(
+				await objectDefinitionAPIClient.getObjectDefinitionByExternalReferenceCode(
 					objectDefinition.externalReferenceCode
 				)
 			).body;

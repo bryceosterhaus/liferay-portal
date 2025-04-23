@@ -13,12 +13,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
+import com.liferay.headless.batch.engine.client.dto.v1_0.ImportTask;
+import com.liferay.headless.batch.engine.client.resource.v1_0.ImportTaskResource;
 import com.liferay.headless.commerce.admin.shipment.client.dto.v1_0.Shipment;
 import com.liferay.headless.commerce.admin.shipment.client.http.HttpInvoker;
 import com.liferay.headless.commerce.admin.shipment.client.pagination.Page;
 import com.liferay.headless.commerce.admin.shipment.client.pagination.Pagination;
 import com.liferay.headless.commerce.admin.shipment.client.resource.v1_0.ShipmentResource;
 import com.liferay.headless.commerce.admin.shipment.client.serdes.v1_0.ShipmentSerDes;
+import com.liferay.oauth2.provider.scope.ScopeChecker;
 import com.liferay.petra.function.UnsafeTriConsumer;
 import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.reflect.ReflectionUtil;
@@ -29,11 +32,17 @@ import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.service.CompanyLocalServiceUtil;
+import com.liferay.portal.kernel.service.GroupLocalService;
+import com.liferay.portal.kernel.service.ResourceActionLocalService;
+import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
+import com.liferay.portal.kernel.service.RoleLocalService;
+import com.liferay.portal.kernel.service.UserLocalService;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
-import com.liferay.portal.kernel.util.DateFormatFactoryUtil;
+import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -43,12 +52,18 @@ import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.search.test.rule.SearchTestRule;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
 import com.liferay.portal.util.PropsValues;
+import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
+import com.liferay.portal.vulcan.crud.VulcanCRUDItemDelegate;
+import com.liferay.portal.vulcan.crud.VulcanCRUDItemDelegateBuilderRegistry;
 import com.liferay.portal.vulcan.resource.EntityModelResource;
 
 import java.lang.reflect.Method;
 
-import java.text.DateFormat;
+import java.net.URI;
+
+import java.text.Format;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -57,13 +72,20 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
 import javax.annotation.Generated;
 
+import javax.servlet.http.HttpServletRequest;
+
 import javax.ws.rs.core.MultivaluedHashMap;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.PathSegment;
+import javax.ws.rs.core.UriBuilder;
+import javax.ws.rs.core.UriInfo;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -72,6 +94,9 @@ import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockHttpServletResponse;
 
 /**
  * @author Andrea Sbarra
@@ -82,12 +107,14 @@ public abstract class BaseShipmentResourceTestCase {
 
 	@ClassRule
 	@Rule
-	public static final LiferayIntegrationTestRule liferayIntegrationTestRule =
-		new LiferayIntegrationTestRule();
+	public static final AggregateTestRule aggregateTestRule =
+		new AggregateTestRule(
+			new LiferayIntegrationTestRule(),
+			PermissionCheckerMethodTestRule.INSTANCE);
 
 	@BeforeClass
 	public static void setUpClass() throws Exception {
-		_dateFormat = DateFormatFactoryUtil.getSimpleDateFormat(
+		_format = FastDateFormatFactoryUtil.getSimpleDateFormat(
 			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 	}
 
@@ -101,12 +128,22 @@ public abstract class BaseShipmentResourceTestCase {
 
 		_shipmentResource.setContextCompany(testCompany);
 
-		com.liferay.portal.kernel.model.User testCompanyAdminUser =
-			UserTestUtil.getAdminUser(testCompany.getCompanyId());
+		_testCompanyAdminUser = UserTestUtil.getAdminUser(
+			testCompany.getCompanyId());
 
 		shipmentResource = ShipmentResource.builder(
 		).authentication(
-			testCompanyAdminUser.getEmailAddress(),
+			_testCompanyAdminUser.getEmailAddress(),
+			PropsValues.DEFAULT_ADMIN_PASSWORD
+		).endpoint(
+			testCompany.getVirtualHostname(), 8080, "http"
+		).locale(
+			LocaleUtil.getDefault()
+		).build();
+
+		importTaskResource = ImportTaskResource.builder(
+		).authentication(
+			_testCompanyAdminUser.getEmailAddress(),
 			PropsValues.DEFAULT_ADMIN_PASSWORD
 		).endpoint(
 			testCompany.getVirtualHostname(), 8080, "http"
@@ -192,6 +229,620 @@ public abstract class BaseShipmentResourceTestCase {
 		Assert.assertEquals(regex, shipment.getTrackingNumber());
 		Assert.assertEquals(regex, shipment.getTrackingURL());
 		Assert.assertEquals(regex, shipment.getUserName());
+	}
+
+	@Test
+	public void testDeleteShipment() throws Exception {
+		@SuppressWarnings("PMD.UnusedLocalVariable")
+		Shipment shipment = testDeleteShipment_addShipment();
+
+		assertHttpResponseStatusCode(
+			204, shipmentResource.deleteShipmentHttpResponse(shipment.getId()));
+
+		assertHttpResponseStatusCode(
+			404, shipmentResource.getShipmentHttpResponse(shipment.getId()));
+		assertHttpResponseStatusCode(
+			404, shipmentResource.getShipmentHttpResponse(0L));
+	}
+
+	protected Shipment testDeleteShipment_addShipment() throws Exception {
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	@Test
+	public void testGraphQLDeleteShipment() throws Exception {
+
+		// No namespace
+
+		Shipment shipment1 = testGraphQLDeleteShipment_addShipment();
+
+		Assert.assertTrue(
+			JSONUtil.getValueAsBoolean(
+				invokeGraphQLMutation(
+					new GraphQLField(
+						"deleteShipment",
+						new HashMap<String, Object>() {
+							{
+								put("shipmentId", shipment1.getId());
+							}
+						})),
+				"JSONObject/data", "Object/deleteShipment"));
+
+		JSONArray errorsJSONArray1 = JSONUtil.getValueAsJSONArray(
+			invokeGraphQLQuery(
+				new GraphQLField(
+					"shipment",
+					new HashMap<String, Object>() {
+						{
+							put("shipmentId", shipment1.getId());
+						}
+					},
+					new GraphQLField("id"))),
+			"JSONArray/errors");
+
+		Assert.assertTrue(errorsJSONArray1.length() > 0);
+
+		// Using the namespace headlessCommerceAdminShipment_v1_0
+
+		Shipment shipment2 = testGraphQLDeleteShipment_addShipment();
+
+		Assert.assertTrue(
+			JSONUtil.getValueAsBoolean(
+				invokeGraphQLMutation(
+					new GraphQLField(
+						"headlessCommerceAdminShipment_v1_0",
+						new GraphQLField(
+							"deleteShipment",
+							new HashMap<String, Object>() {
+								{
+									put("shipmentId", shipment2.getId());
+								}
+							}))),
+				"JSONObject/data",
+				"JSONObject/headlessCommerceAdminShipment_v1_0",
+				"Object/deleteShipment"));
+
+		JSONArray errorsJSONArray2 = JSONUtil.getValueAsJSONArray(
+			invokeGraphQLQuery(
+				new GraphQLField(
+					"headlessCommerceAdminShipment_v1_0",
+					new GraphQLField(
+						"shipment",
+						new HashMap<String, Object>() {
+							{
+								put("shipmentId", shipment2.getId());
+							}
+						},
+						new GraphQLField("id")))),
+			"JSONArray/errors");
+
+		Assert.assertTrue(errorsJSONArray2.length() > 0);
+	}
+
+	protected Shipment testGraphQLDeleteShipment_addShipment()
+		throws Exception {
+
+		return testGraphQLShipment_addShipment();
+	}
+
+	@Test
+	public void testDeleteShipmentBatch() throws Exception {
+		Shipment shipment1 = testDeleteShipmentBatch_addShipment();
+
+		testDeleteShipmentBatch_deleteShipment(
+			"COMPLETED", null, shipment1.getId());
+
+		assertHttpResponseStatusCode(
+			404, shipmentResource.getShipmentHttpResponse(shipment1.getId()));
+
+		Shipment shipment2 = testDeleteShipmentBatch_addShipment();
+
+		testDeleteShipmentBatch_deleteShipment(
+			"COMPLETED", shipment2.getExternalReferenceCode(), null);
+
+		assertHttpResponseStatusCode(
+			404, shipmentResource.getShipmentHttpResponse(shipment2.getId()));
+
+		shipment1 = testDeleteShipmentBatch_addShipment();
+		shipment2 = testDeleteShipmentBatch_addShipment();
+
+		testDeleteShipmentBatch_deleteShipment(
+			"COMPLETED", shipment2.getExternalReferenceCode(),
+			shipment1.getId());
+
+		assertHttpResponseStatusCode(
+			404, shipmentResource.getShipmentHttpResponse(shipment1.getId()));
+		assertHttpResponseStatusCode(
+			200, shipmentResource.getShipmentHttpResponse(shipment2.getId()));
+
+		testDeleteShipmentBatch_deleteShipment(
+			"COMPLETED", shipment2.getExternalReferenceCode(),
+			shipment1.getId());
+
+		assertHttpResponseStatusCode(
+			404, shipmentResource.getShipmentHttpResponse(shipment2.getId()));
+	}
+
+	protected Shipment testDeleteShipmentBatch_addShipment() throws Exception {
+		return testDeleteShipment_addShipment();
+	}
+
+	protected void testDeleteShipmentBatch_deleteShipment(
+			String expectedExecuteStatus, String externalReferenceCode, Long id)
+		throws Exception {
+
+		HttpInvoker.HttpResponse httpResponse =
+			shipmentResource.deleteShipmentBatchHttpResponse(
+				null,
+				JSONUtil.putAll(
+					JSONUtil.put(
+						"externalReferenceCode", () -> externalReferenceCode
+					).put(
+						"id", () -> id
+					)));
+
+		Assert.assertEquals(202, httpResponse.getStatusCode());
+
+		waitForFinish(
+			expectedExecuteStatus,
+			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+	}
+
+	@Test
+	public void testDeleteShipmentByExternalReferenceCode() throws Exception {
+		@SuppressWarnings("PMD.UnusedLocalVariable")
+		Shipment shipment =
+			testDeleteShipmentByExternalReferenceCode_addShipment();
+
+		assertHttpResponseStatusCode(
+			204,
+			shipmentResource.deleteShipmentByExternalReferenceCodeHttpResponse(
+				shipment.getExternalReferenceCode()));
+
+		assertHttpResponseStatusCode(
+			404,
+			shipmentResource.getShipmentByExternalReferenceCodeHttpResponse(
+				shipment.getExternalReferenceCode()));
+		assertHttpResponseStatusCode(
+			404,
+			shipmentResource.getShipmentByExternalReferenceCodeHttpResponse(
+				"-"));
+	}
+
+	protected Shipment testDeleteShipmentByExternalReferenceCode_addShipment()
+		throws Exception {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	@Test
+	public void testGetShipment() throws Exception {
+		Shipment postShipment = testGetShipment_addShipment();
+
+		Shipment getShipment = shipmentResource.getShipment(
+			postShipment.getId());
+
+		assertEquals(postShipment, getShipment);
+		assertValid(getShipment);
+	}
+
+	@Test
+	public void testVulcanCRUDItemDelegateGetItem() throws Exception {
+		Shipment postShipment = testGetShipment_addShipment();
+
+		Shipment getShipment = shipmentResource.getShipment(
+			postShipment.getId());
+
+		VulcanCRUDItemDelegate vulcanCRUDItemDelegate =
+			_vulcanCRUDItemDelegateBuilderRegistry.builder(
+				testCompany,
+				"com.liferay.headless.commerce.admin.shipment.dto.v1_0.Shipment"
+			).acceptLanguage(
+				new AcceptLanguage() {
+
+					@Override
+					public List<Locale> getLocales() {
+						return Arrays.asList(LocaleUtil.getDefault());
+					}
+
+					@Override
+					public String getPreferredLanguageId() {
+						return LocaleUtil.toLanguageId(LocaleUtil.getDefault());
+					}
+
+					@Override
+					public Locale getPreferredLocale() {
+						return LocaleUtil.getDefault();
+					}
+
+				}
+			).groupLocalService(
+				_groupLocalService
+			).httpServletRequest(
+				testVulcanCRUDItemDelegate_getHttpServletRequest()
+			).httpServletResponse(
+				new MockHttpServletResponse()
+			).resourceActionLocalService(
+				_resourceActionLocalService
+			).resourcePermissionLocalService(
+				_resourcePermissionLocalService
+			).roleLocalService(
+				_roleLocalService
+			).scopeChecker(
+				_scopeChecker
+			).uriInfo(
+				testVulcanCRUDItemDelegate_getUriInfo()
+			).user(
+				testVulcanCRUDItemDelegate_getUser()
+			).build();
+
+		Object item = vulcanCRUDItemDelegate.getItem(postShipment.getId());
+
+		assertEquals(getShipment, ShipmentSerDes.toDTO(item.toString()));
+	}
+
+	protected HttpServletRequest
+		testVulcanCRUDItemDelegate_getHttpServletRequest() {
+
+		return new MockHttpServletRequest() {
+
+			@Override
+			public StringBuffer getRequestURL() {
+				return new StringBuffer(
+					StringBundler.concat(
+						"http://localhost:8080/o/v1.0/",
+						RandomTestUtil.randomString(), "/",
+						RandomTestUtil.randomString()));
+			}
+
+		};
+	}
+
+	protected UriInfo testVulcanCRUDItemDelegate_getUriInfo() {
+		String applicationPath = RandomTestUtil.randomString() + "/";
+		String resourcePath = RandomTestUtil.randomString();
+
+		return new UriInfo() {
+
+			@Override
+			public String getPath() {
+				return resourcePath;
+			}
+
+			@Override
+			public String getPath(boolean decode) {
+				return getPath();
+			}
+
+			@Override
+			public List<PathSegment> getPathSegments() {
+				return Collections.emptyList();
+			}
+
+			@Override
+			public List<PathSegment> getPathSegments(boolean decode) {
+				return getPathSegments();
+			}
+
+			@Override
+			public URI getRequestUri() {
+				return URI.create(
+					"http://localhost:8080/o/" + applicationPath +
+						resourcePath);
+			}
+
+			@Override
+			public UriBuilder getRequestUriBuilder() {
+				return UriBuilder.fromUri(getRequestUri());
+			}
+
+			@Override
+			public URI getAbsolutePath() {
+				return getRequestUri();
+			}
+
+			@Override
+			public UriBuilder getAbsolutePathBuilder() {
+				return getRequestUriBuilder();
+			}
+
+			@Override
+			public URI getBaseUri() {
+				return URI.create("http://localhost:8080/o/" + applicationPath);
+			}
+
+			@Override
+			public UriBuilder getBaseUriBuilder() {
+				return UriBuilder.fromUri(getBaseUri());
+			}
+
+			@Override
+			public MultivaluedMap<String, String> getPathParameters() {
+				return new MultivaluedHashMap<>();
+			}
+
+			@Override
+			public MultivaluedMap<String, String> getPathParameters(
+				boolean decode) {
+
+				return getPathParameters();
+			}
+
+			@Override
+			public MultivaluedMap<String, String> getQueryParameters() {
+				return new MultivaluedHashMap<>();
+			}
+
+			@Override
+			public MultivaluedMap<String, String> getQueryParameters(
+				boolean decode) {
+
+				return getQueryParameters();
+			}
+
+			@Override
+			public List<String> getMatchedURIs() {
+				return Collections.emptyList();
+			}
+
+			@Override
+			public List<String> getMatchedURIs(boolean decode) {
+				return getMatchedURIs();
+			}
+
+			@Override
+			public List<Object> getMatchedResources() {
+				return Collections.emptyList();
+			}
+
+			@Override
+			public URI resolve(URI requestUri) {
+				return getBaseUri().resolve(requestUri);
+			}
+
+			@Override
+			public URI relativize(URI uri) {
+				return getBaseUri().relativize(uri);
+			}
+
+		};
+	}
+
+	protected com.liferay.portal.kernel.model.User
+		testVulcanCRUDItemDelegate_getUser() {
+
+		return _testCompanyAdminUser;
+	}
+
+	protected Shipment testGetShipment_addShipment() throws Exception {
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	@Test
+	public void testGraphQLGetShipment() throws Exception {
+		Shipment shipment = testGraphQLGetShipment_addShipment();
+
+		// No namespace
+
+		Assert.assertTrue(
+			equals(
+				shipment,
+				ShipmentSerDes.toDTO(
+					JSONUtil.getValueAsString(
+						invokeGraphQLQuery(
+							new GraphQLField(
+								"shipment",
+								new HashMap<String, Object>() {
+									{
+										put("shipmentId", shipment.getId());
+									}
+								},
+								getGraphQLFields())),
+						"JSONObject/data", "Object/shipment"))));
+
+		// Using the namespace headlessCommerceAdminShipment_v1_0
+
+		Assert.assertTrue(
+			equals(
+				shipment,
+				ShipmentSerDes.toDTO(
+					JSONUtil.getValueAsString(
+						invokeGraphQLQuery(
+							new GraphQLField(
+								"headlessCommerceAdminShipment_v1_0",
+								new GraphQLField(
+									"shipment",
+									new HashMap<String, Object>() {
+										{
+											put("shipmentId", shipment.getId());
+										}
+									},
+									getGraphQLFields()))),
+						"JSONObject/data",
+						"JSONObject/headlessCommerceAdminShipment_v1_0",
+						"Object/shipment"))));
+	}
+
+	@Test
+	public void testGraphQLGetShipmentNotFound() throws Exception {
+		Long irrelevantShipmentId = RandomTestUtil.randomLong();
+
+		// No namespace
+
+		Assert.assertEquals(
+			"Not Found",
+			JSONUtil.getValueAsString(
+				invokeGraphQLQuery(
+					new GraphQLField(
+						"shipment",
+						new HashMap<String, Object>() {
+							{
+								put("shipmentId", irrelevantShipmentId);
+							}
+						},
+						getGraphQLFields())),
+				"JSONArray/errors", "Object/0", "JSONObject/extensions",
+				"Object/code"));
+
+		// Using the namespace headlessCommerceAdminShipment_v1_0
+
+		Assert.assertEquals(
+			"Not Found",
+			JSONUtil.getValueAsString(
+				invokeGraphQLQuery(
+					new GraphQLField(
+						"headlessCommerceAdminShipment_v1_0",
+						new GraphQLField(
+							"shipment",
+							new HashMap<String, Object>() {
+								{
+									put("shipmentId", irrelevantShipmentId);
+								}
+							},
+							getGraphQLFields()))),
+				"JSONArray/errors", "Object/0", "JSONObject/extensions",
+				"Object/code"));
+	}
+
+	protected Shipment testGraphQLGetShipment_addShipment() throws Exception {
+		return testGraphQLShipment_addShipment();
+	}
+
+	@Test
+	public void testGetShipmentByExternalReferenceCode() throws Exception {
+		Shipment postShipment =
+			testGetShipmentByExternalReferenceCode_addShipment();
+
+		Shipment getShipment =
+			shipmentResource.getShipmentByExternalReferenceCode(
+				postShipment.getExternalReferenceCode());
+
+		assertEquals(postShipment, getShipment);
+		assertValid(getShipment);
+	}
+
+	protected Shipment testGetShipmentByExternalReferenceCode_addShipment()
+		throws Exception {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	@Test
+	public void testGraphQLGetShipmentByExternalReferenceCode()
+		throws Exception {
+
+		Shipment shipment =
+			testGraphQLGetShipmentByExternalReferenceCode_addShipment();
+
+		// No namespace
+
+		Assert.assertTrue(
+			equals(
+				shipment,
+				ShipmentSerDes.toDTO(
+					JSONUtil.getValueAsString(
+						invokeGraphQLQuery(
+							new GraphQLField(
+								"shipmentByExternalReferenceCode",
+								new HashMap<String, Object>() {
+									{
+										put(
+											"externalReferenceCode",
+											"\"" +
+												shipment.
+													getExternalReferenceCode() +
+														"\"");
+									}
+								},
+								getGraphQLFields())),
+						"JSONObject/data",
+						"Object/shipmentByExternalReferenceCode"))));
+
+		// Using the namespace headlessCommerceAdminShipment_v1_0
+
+		Assert.assertTrue(
+			equals(
+				shipment,
+				ShipmentSerDes.toDTO(
+					JSONUtil.getValueAsString(
+						invokeGraphQLQuery(
+							new GraphQLField(
+								"headlessCommerceAdminShipment_v1_0",
+								new GraphQLField(
+									"shipmentByExternalReferenceCode",
+									new HashMap<String, Object>() {
+										{
+											put(
+												"externalReferenceCode",
+												"\"" +
+													shipment.
+														getExternalReferenceCode() +
+															"\"");
+										}
+									},
+									getGraphQLFields()))),
+						"JSONObject/data",
+						"JSONObject/headlessCommerceAdminShipment_v1_0",
+						"Object/shipmentByExternalReferenceCode"))));
+	}
+
+	@Test
+	public void testGraphQLGetShipmentByExternalReferenceCodeNotFound()
+		throws Exception {
+
+		String irrelevantExternalReferenceCode =
+			"\"" + RandomTestUtil.randomString() + "\"";
+
+		// No namespace
+
+		Assert.assertEquals(
+			"Not Found",
+			JSONUtil.getValueAsString(
+				invokeGraphQLQuery(
+					new GraphQLField(
+						"shipmentByExternalReferenceCode",
+						new HashMap<String, Object>() {
+							{
+								put(
+									"externalReferenceCode",
+									irrelevantExternalReferenceCode);
+							}
+						},
+						getGraphQLFields())),
+				"JSONArray/errors", "Object/0", "JSONObject/extensions",
+				"Object/code"));
+
+		// Using the namespace headlessCommerceAdminShipment_v1_0
+
+		Assert.assertEquals(
+			"Not Found",
+			JSONUtil.getValueAsString(
+				invokeGraphQLQuery(
+					new GraphQLField(
+						"headlessCommerceAdminShipment_v1_0",
+						new GraphQLField(
+							"shipmentByExternalReferenceCode",
+							new HashMap<String, Object>() {
+								{
+									put(
+										"externalReferenceCode",
+										irrelevantExternalReferenceCode);
+								}
+							},
+							getGraphQLFields()))),
+				"JSONArray/errors", "Object/0", "JSONObject/extensions",
+				"Object/code"));
+	}
+
+	protected Shipment
+			testGraphQLGetShipmentByExternalReferenceCode_addShipment()
+		throws Exception {
+
+		return testGraphQLShipment_addShipment();
 	}
 
 	@Test
@@ -579,183 +1230,29 @@ public abstract class BaseShipmentResourceTestCase {
 	}
 
 	@Test
-	public void testPostShipment() throws Exception {
-		Shipment randomShipment = randomShipment();
+	public void testPatchShipment() throws Exception {
+		Shipment postShipment = testPatchShipment_addShipment();
 
-		Shipment postShipment = testPostShipment_addShipment(randomShipment);
+		Shipment randomPatchShipment = randomPatchShipment();
 
-		assertEquals(randomShipment, postShipment);
-		assertValid(postShipment);
-	}
-
-	protected Shipment testPostShipment_addShipment(Shipment shipment)
-		throws Exception {
-
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
-	}
-
-	@Test
-	public void testDeleteShipmentByExternalReferenceCode() throws Exception {
 		@SuppressWarnings("PMD.UnusedLocalVariable")
-		Shipment shipment =
-			testDeleteShipmentByExternalReferenceCode_addShipment();
+		Shipment patchShipment = shipmentResource.patchShipment(
+			postShipment.getId(), randomPatchShipment);
 
-		assertHttpResponseStatusCode(
-			204,
-			shipmentResource.deleteShipmentByExternalReferenceCodeHttpResponse(
-				shipment.getExternalReferenceCode()));
+		Shipment expectedPatchShipment = postShipment.clone();
 
-		assertHttpResponseStatusCode(
-			404,
-			shipmentResource.getShipmentByExternalReferenceCodeHttpResponse(
-				shipment.getExternalReferenceCode()));
+		BeanTestUtil.copyProperties(randomPatchShipment, expectedPatchShipment);
 
-		assertHttpResponseStatusCode(
-			404,
-			shipmentResource.getShipmentByExternalReferenceCodeHttpResponse(
-				shipment.getExternalReferenceCode()));
-	}
+		Shipment getShipment = shipmentResource.getShipment(
+			patchShipment.getId());
 
-	protected Shipment testDeleteShipmentByExternalReferenceCode_addShipment()
-		throws Exception {
-
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
-	}
-
-	@Test
-	public void testGetShipmentByExternalReferenceCode() throws Exception {
-		Shipment postShipment =
-			testGetShipmentByExternalReferenceCode_addShipment();
-
-		Shipment getShipment =
-			shipmentResource.getShipmentByExternalReferenceCode(
-				postShipment.getExternalReferenceCode());
-
-		assertEquals(postShipment, getShipment);
+		assertEquals(expectedPatchShipment, getShipment);
 		assertValid(getShipment);
 	}
 
-	protected Shipment testGetShipmentByExternalReferenceCode_addShipment()
-		throws Exception {
-
+	protected Shipment testPatchShipment_addShipment() throws Exception {
 		throw new UnsupportedOperationException(
 			"This method needs to be implemented");
-	}
-
-	@Test
-	public void testGraphQLGetShipmentByExternalReferenceCode()
-		throws Exception {
-
-		Shipment shipment =
-			testGraphQLGetShipmentByExternalReferenceCode_addShipment();
-
-		// No namespace
-
-		Assert.assertTrue(
-			equals(
-				shipment,
-				ShipmentSerDes.toDTO(
-					JSONUtil.getValueAsString(
-						invokeGraphQLQuery(
-							new GraphQLField(
-								"shipmentByExternalReferenceCode",
-								new HashMap<String, Object>() {
-									{
-										put(
-											"externalReferenceCode",
-											"\"" +
-												shipment.
-													getExternalReferenceCode() +
-														"\"");
-									}
-								},
-								getGraphQLFields())),
-						"JSONObject/data",
-						"Object/shipmentByExternalReferenceCode"))));
-
-		// Using the namespace headlessCommerceAdminShipment_v1_0
-
-		Assert.assertTrue(
-			equals(
-				shipment,
-				ShipmentSerDes.toDTO(
-					JSONUtil.getValueAsString(
-						invokeGraphQLQuery(
-							new GraphQLField(
-								"headlessCommerceAdminShipment_v1_0",
-								new GraphQLField(
-									"shipmentByExternalReferenceCode",
-									new HashMap<String, Object>() {
-										{
-											put(
-												"externalReferenceCode",
-												"\"" +
-													shipment.
-														getExternalReferenceCode() +
-															"\"");
-										}
-									},
-									getGraphQLFields()))),
-						"JSONObject/data",
-						"JSONObject/headlessCommerceAdminShipment_v1_0",
-						"Object/shipmentByExternalReferenceCode"))));
-	}
-
-	@Test
-	public void testGraphQLGetShipmentByExternalReferenceCodeNotFound()
-		throws Exception {
-
-		String irrelevantExternalReferenceCode =
-			"\"" + RandomTestUtil.randomString() + "\"";
-
-		// No namespace
-
-		Assert.assertEquals(
-			"Not Found",
-			JSONUtil.getValueAsString(
-				invokeGraphQLQuery(
-					new GraphQLField(
-						"shipmentByExternalReferenceCode",
-						new HashMap<String, Object>() {
-							{
-								put(
-									"externalReferenceCode",
-									irrelevantExternalReferenceCode);
-							}
-						},
-						getGraphQLFields())),
-				"JSONArray/errors", "Object/0", "JSONObject/extensions",
-				"Object/code"));
-
-		// Using the namespace headlessCommerceAdminShipment_v1_0
-
-		Assert.assertEquals(
-			"Not Found",
-			JSONUtil.getValueAsString(
-				invokeGraphQLQuery(
-					new GraphQLField(
-						"headlessCommerceAdminShipment_v1_0",
-						new GraphQLField(
-							"shipmentByExternalReferenceCode",
-							new HashMap<String, Object>() {
-								{
-									put(
-										"externalReferenceCode",
-										irrelevantExternalReferenceCode);
-								}
-							},
-							getGraphQLFields()))),
-				"JSONArray/errors", "Object/0", "JSONObject/extensions",
-				"Object/code"));
-	}
-
-	protected Shipment
-			testGraphQLGetShipmentByExternalReferenceCode_addShipment()
-		throws Exception {
-
-		return testGraphQLShipment_addShipment();
 	}
 
 	@Test
@@ -790,52 +1287,16 @@ public abstract class BaseShipmentResourceTestCase {
 	}
 
 	@Test
-	public void testPutShipmentByExternalReferenceCode() throws Exception {
-		Shipment postShipment =
-			testPutShipmentByExternalReferenceCode_addShipment();
-
+	public void testPostShipment() throws Exception {
 		Shipment randomShipment = randomShipment();
 
-		Shipment putShipment =
-			shipmentResource.putShipmentByExternalReferenceCode(
-				postShipment.getExternalReferenceCode(), randomShipment);
+		Shipment postShipment = testPostShipment_addShipment(randomShipment);
 
-		assertEquals(randomShipment, putShipment);
-		assertValid(putShipment);
-
-		Shipment getShipment =
-			shipmentResource.getShipmentByExternalReferenceCode(
-				putShipment.getExternalReferenceCode());
-
-		assertEquals(randomShipment, getShipment);
-		assertValid(getShipment);
-
-		Shipment newShipment =
-			testPutShipmentByExternalReferenceCode_createShipment();
-
-		putShipment = shipmentResource.putShipmentByExternalReferenceCode(
-			newShipment.getExternalReferenceCode(), newShipment);
-
-		assertEquals(newShipment, putShipment);
-		assertValid(putShipment);
-
-		getShipment = shipmentResource.getShipmentByExternalReferenceCode(
-			putShipment.getExternalReferenceCode());
-
-		assertEquals(newShipment, getShipment);
-
-		Assert.assertEquals(
-			newShipment.getExternalReferenceCode(),
-			putShipment.getExternalReferenceCode());
+		assertEquals(randomShipment, postShipment);
+		assertValid(postShipment);
 	}
 
-	protected Shipment testPutShipmentByExternalReferenceCode_createShipment()
-		throws Exception {
-
-		return randomShipment();
-	}
-
-	protected Shipment testPutShipmentByExternalReferenceCode_addShipment()
+	protected Shipment testPostShipment_addShipment(Shipment shipment)
 		throws Exception {
 
 		throw new UnsupportedOperationException(
@@ -912,234 +1373,6 @@ public abstract class BaseShipmentResourceTestCase {
 	}
 
 	@Test
-	public void testDeleteShipment() throws Exception {
-		@SuppressWarnings("PMD.UnusedLocalVariable")
-		Shipment shipment = testDeleteShipment_addShipment();
-
-		assertHttpResponseStatusCode(
-			204, shipmentResource.deleteShipmentHttpResponse(shipment.getId()));
-
-		assertHttpResponseStatusCode(
-			404, shipmentResource.getShipmentHttpResponse(shipment.getId()));
-
-		assertHttpResponseStatusCode(
-			404, shipmentResource.getShipmentHttpResponse(0L));
-	}
-
-	protected Shipment testDeleteShipment_addShipment() throws Exception {
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
-	}
-
-	@Test
-	public void testGraphQLDeleteShipment() throws Exception {
-
-		// No namespace
-
-		Shipment shipment1 = testGraphQLDeleteShipment_addShipment();
-
-		Assert.assertTrue(
-			JSONUtil.getValueAsBoolean(
-				invokeGraphQLMutation(
-					new GraphQLField(
-						"deleteShipment",
-						new HashMap<String, Object>() {
-							{
-								put("shipmentId", shipment1.getId());
-							}
-						})),
-				"JSONObject/data", "Object/deleteShipment"));
-
-		JSONArray errorsJSONArray1 = JSONUtil.getValueAsJSONArray(
-			invokeGraphQLQuery(
-				new GraphQLField(
-					"shipment",
-					new HashMap<String, Object>() {
-						{
-							put("shipmentId", shipment1.getId());
-						}
-					},
-					new GraphQLField("id"))),
-			"JSONArray/errors");
-
-		Assert.assertTrue(errorsJSONArray1.length() > 0);
-
-		// Using the namespace headlessCommerceAdminShipment_v1_0
-
-		Shipment shipment2 = testGraphQLDeleteShipment_addShipment();
-
-		Assert.assertTrue(
-			JSONUtil.getValueAsBoolean(
-				invokeGraphQLMutation(
-					new GraphQLField(
-						"headlessCommerceAdminShipment_v1_0",
-						new GraphQLField(
-							"deleteShipment",
-							new HashMap<String, Object>() {
-								{
-									put("shipmentId", shipment2.getId());
-								}
-							}))),
-				"JSONObject/data",
-				"JSONObject/headlessCommerceAdminShipment_v1_0",
-				"Object/deleteShipment"));
-
-		JSONArray errorsJSONArray2 = JSONUtil.getValueAsJSONArray(
-			invokeGraphQLQuery(
-				new GraphQLField(
-					"headlessCommerceAdminShipment_v1_0",
-					new GraphQLField(
-						"shipment",
-						new HashMap<String, Object>() {
-							{
-								put("shipmentId", shipment2.getId());
-							}
-						},
-						new GraphQLField("id")))),
-			"JSONArray/errors");
-
-		Assert.assertTrue(errorsJSONArray2.length() > 0);
-	}
-
-	protected Shipment testGraphQLDeleteShipment_addShipment()
-		throws Exception {
-
-		return testGraphQLShipment_addShipment();
-	}
-
-	@Test
-	public void testGetShipment() throws Exception {
-		Shipment postShipment = testGetShipment_addShipment();
-
-		Shipment getShipment = shipmentResource.getShipment(
-			postShipment.getId());
-
-		assertEquals(postShipment, getShipment);
-		assertValid(getShipment);
-	}
-
-	protected Shipment testGetShipment_addShipment() throws Exception {
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
-	}
-
-	@Test
-	public void testGraphQLGetShipment() throws Exception {
-		Shipment shipment = testGraphQLGetShipment_addShipment();
-
-		// No namespace
-
-		Assert.assertTrue(
-			equals(
-				shipment,
-				ShipmentSerDes.toDTO(
-					JSONUtil.getValueAsString(
-						invokeGraphQLQuery(
-							new GraphQLField(
-								"shipment",
-								new HashMap<String, Object>() {
-									{
-										put("shipmentId", shipment.getId());
-									}
-								},
-								getGraphQLFields())),
-						"JSONObject/data", "Object/shipment"))));
-
-		// Using the namespace headlessCommerceAdminShipment_v1_0
-
-		Assert.assertTrue(
-			equals(
-				shipment,
-				ShipmentSerDes.toDTO(
-					JSONUtil.getValueAsString(
-						invokeGraphQLQuery(
-							new GraphQLField(
-								"headlessCommerceAdminShipment_v1_0",
-								new GraphQLField(
-									"shipment",
-									new HashMap<String, Object>() {
-										{
-											put("shipmentId", shipment.getId());
-										}
-									},
-									getGraphQLFields()))),
-						"JSONObject/data",
-						"JSONObject/headlessCommerceAdminShipment_v1_0",
-						"Object/shipment"))));
-	}
-
-	@Test
-	public void testGraphQLGetShipmentNotFound() throws Exception {
-		Long irrelevantShipmentId = RandomTestUtil.randomLong();
-
-		// No namespace
-
-		Assert.assertEquals(
-			"Not Found",
-			JSONUtil.getValueAsString(
-				invokeGraphQLQuery(
-					new GraphQLField(
-						"shipment",
-						new HashMap<String, Object>() {
-							{
-								put("shipmentId", irrelevantShipmentId);
-							}
-						},
-						getGraphQLFields())),
-				"JSONArray/errors", "Object/0", "JSONObject/extensions",
-				"Object/code"));
-
-		// Using the namespace headlessCommerceAdminShipment_v1_0
-
-		Assert.assertEquals(
-			"Not Found",
-			JSONUtil.getValueAsString(
-				invokeGraphQLQuery(
-					new GraphQLField(
-						"headlessCommerceAdminShipment_v1_0",
-						new GraphQLField(
-							"shipment",
-							new HashMap<String, Object>() {
-								{
-									put("shipmentId", irrelevantShipmentId);
-								}
-							},
-							getGraphQLFields()))),
-				"JSONArray/errors", "Object/0", "JSONObject/extensions",
-				"Object/code"));
-	}
-
-	protected Shipment testGraphQLGetShipment_addShipment() throws Exception {
-		return testGraphQLShipment_addShipment();
-	}
-
-	@Test
-	public void testPatchShipment() throws Exception {
-		Shipment postShipment = testPatchShipment_addShipment();
-
-		Shipment randomPatchShipment = randomPatchShipment();
-
-		@SuppressWarnings("PMD.UnusedLocalVariable")
-		Shipment patchShipment = shipmentResource.patchShipment(
-			postShipment.getId(), randomPatchShipment);
-
-		Shipment expectedPatchShipment = postShipment.clone();
-
-		BeanTestUtil.copyProperties(randomPatchShipment, expectedPatchShipment);
-
-		Shipment getShipment = shipmentResource.getShipment(
-			patchShipment.getId());
-
-		assertEquals(expectedPatchShipment, getShipment);
-		assertValid(getShipment);
-	}
-
-	protected Shipment testPatchShipment_addShipment() throws Exception {
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
-	}
-
-	@Test
 	public void testPostShipmentStatusDelivered() throws Exception {
 		Shipment randomShipment = randomShipment();
 
@@ -1190,6 +1423,59 @@ public abstract class BaseShipmentResourceTestCase {
 
 	protected Shipment testPostShipmentStatusShipped_addShipment(
 			Shipment shipment)
+		throws Exception {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	@Test
+	public void testPutShipmentByExternalReferenceCode() throws Exception {
+		Shipment postShipment =
+			testPutShipmentByExternalReferenceCode_addShipment();
+
+		Shipment randomShipment = randomShipment();
+
+		Shipment putShipment =
+			shipmentResource.putShipmentByExternalReferenceCode(
+				postShipment.getExternalReferenceCode(), randomShipment);
+
+		assertEquals(randomShipment, putShipment);
+		assertValid(putShipment);
+
+		Shipment getShipment =
+			shipmentResource.getShipmentByExternalReferenceCode(
+				putShipment.getExternalReferenceCode());
+
+		assertEquals(randomShipment, getShipment);
+		assertValid(getShipment);
+
+		Shipment newShipment =
+			testPutShipmentByExternalReferenceCode_createShipment();
+
+		putShipment = shipmentResource.putShipmentByExternalReferenceCode(
+			newShipment.getExternalReferenceCode(), newShipment);
+
+		assertEquals(newShipment, putShipment);
+		assertValid(putShipment);
+
+		getShipment = shipmentResource.getShipmentByExternalReferenceCode(
+			putShipment.getExternalReferenceCode());
+
+		assertEquals(newShipment, getShipment);
+
+		Assert.assertEquals(
+			newShipment.getExternalReferenceCode(),
+			putShipment.getExternalReferenceCode());
+	}
+
+	protected Shipment testPutShipmentByExternalReferenceCode_createShipment()
+		throws Exception {
+
+		return randomShipment();
+	}
+
+	protected Shipment testPutShipmentByExternalReferenceCode_addShipment()
 		throws Exception {
 
 		throw new UnsupportedOperationException(
@@ -1963,13 +2249,11 @@ public abstract class BaseShipmentResourceTestCase {
 				sb.append("(");
 				sb.append(entityFieldName);
 				sb.append(" gt ");
-				sb.append(
-					_dateFormat.format(date.getTime() - (2 * Time.SECOND)));
+				sb.append(_format.format(date.getTime() - (2 * Time.SECOND)));
 				sb.append(" and ");
 				sb.append(entityFieldName);
 				sb.append(" lt ");
-				sb.append(
-					_dateFormat.format(date.getTime() + (2 * Time.SECOND)));
+				sb.append(_format.format(date.getTime() + (2 * Time.SECOND)));
 				sb.append(")");
 			}
 			else {
@@ -1979,7 +2263,7 @@ public abstract class BaseShipmentResourceTestCase {
 				sb.append(operator);
 				sb.append(" ");
 
-				sb.append(_dateFormat.format(shipment.getCreateDate()));
+				sb.append(_format.format(shipment.getCreateDate()));
 			}
 
 			return sb.toString();
@@ -1999,13 +2283,11 @@ public abstract class BaseShipmentResourceTestCase {
 				sb.append("(");
 				sb.append(entityFieldName);
 				sb.append(" gt ");
-				sb.append(
-					_dateFormat.format(date.getTime() - (2 * Time.SECOND)));
+				sb.append(_format.format(date.getTime() - (2 * Time.SECOND)));
 				sb.append(" and ");
 				sb.append(entityFieldName);
 				sb.append(" lt ");
-				sb.append(
-					_dateFormat.format(date.getTime() + (2 * Time.SECOND)));
+				sb.append(_format.format(date.getTime() + (2 * Time.SECOND)));
 				sb.append(")");
 			}
 			else {
@@ -2015,7 +2297,7 @@ public abstract class BaseShipmentResourceTestCase {
 				sb.append(operator);
 				sb.append(" ");
 
-				sb.append(_dateFormat.format(shipment.getExpectedDate()));
+				sb.append(_format.format(shipment.getExpectedDate()));
 			}
 
 			return sb.toString();
@@ -2081,13 +2363,11 @@ public abstract class BaseShipmentResourceTestCase {
 				sb.append("(");
 				sb.append(entityFieldName);
 				sb.append(" gt ");
-				sb.append(
-					_dateFormat.format(date.getTime() - (2 * Time.SECOND)));
+				sb.append(_format.format(date.getTime() - (2 * Time.SECOND)));
 				sb.append(" and ");
 				sb.append(entityFieldName);
 				sb.append(" lt ");
-				sb.append(
-					_dateFormat.format(date.getTime() + (2 * Time.SECOND)));
+				sb.append(_format.format(date.getTime() + (2 * Time.SECOND)));
 				sb.append(")");
 			}
 			else {
@@ -2097,7 +2377,7 @@ public abstract class BaseShipmentResourceTestCase {
 				sb.append(operator);
 				sb.append(" ");
 
-				sb.append(_dateFormat.format(shipment.getModifiedDate()));
+				sb.append(_format.format(shipment.getModifiedDate()));
 			}
 
 			return sb.toString();
@@ -2178,13 +2458,11 @@ public abstract class BaseShipmentResourceTestCase {
 				sb.append("(");
 				sb.append(entityFieldName);
 				sb.append(" gt ");
-				sb.append(
-					_dateFormat.format(date.getTime() - (2 * Time.SECOND)));
+				sb.append(_format.format(date.getTime() - (2 * Time.SECOND)));
 				sb.append(" and ");
 				sb.append(entityFieldName);
 				sb.append(" lt ");
-				sb.append(
-					_dateFormat.format(date.getTime() + (2 * Time.SECOND)));
+				sb.append(_format.format(date.getTime() + (2 * Time.SECOND)));
 				sb.append(")");
 			}
 			else {
@@ -2194,7 +2472,7 @@ public abstract class BaseShipmentResourceTestCase {
 				sb.append(operator);
 				sb.append(" ");
 
-				sb.append(_dateFormat.format(shipment.getShippingDate()));
+				sb.append(_format.format(shipment.getShippingDate()));
 			}
 
 			return sb.toString();
@@ -2475,7 +2753,30 @@ public abstract class BaseShipmentResourceTestCase {
 		return randomShipment();
 	}
 
+	protected final JSONObject waitForFinish(
+			String expectedExecuteStatus, JSONObject jsonObject)
+		throws Exception {
+
+		while (true) {
+			ImportTask importTask = importTaskResource.getImportTask(
+				jsonObject.getLong("id"));
+
+			ImportTask.ExecuteStatus executeStatus =
+				importTask.getExecuteStatus();
+
+			if (StringUtil.equals(executeStatus.getValue(), "COMPLETED") ||
+				StringUtil.equals(executeStatus.getValue(), "FAILED")) {
+
+				Assert.assertEquals(
+					expectedExecuteStatus, executeStatus.getValue());
+
+				return jsonObject;
+			}
+		}
+	}
+
 	protected ShipmentResource shipmentResource;
+	protected ImportTaskResource importTaskResource;
 	protected com.liferay.portal.kernel.model.Group irrelevantGroup;
 	protected com.liferay.portal.kernel.model.Company testCompany;
 	protected com.liferay.portal.kernel.model.Group testGroup;
@@ -2676,11 +2977,35 @@ public abstract class BaseShipmentResourceTestCase {
 	private static final com.liferay.portal.kernel.log.Log _log =
 		LogFactoryUtil.getLog(BaseShipmentResourceTestCase.class);
 
-	private static DateFormat _dateFormat;
+	private static Format _format;
+
+	private com.liferay.portal.kernel.model.User _testCompanyAdminUser;
 
 	@Inject
 	private
 		com.liferay.headless.commerce.admin.shipment.resource.v1_0.
 			ShipmentResource _shipmentResource;
+
+	@Inject
+	private GroupLocalService _groupLocalService;
+
+	@Inject
+	private ResourceActionLocalService _resourceActionLocalService;
+
+	@Inject
+	private ResourcePermissionLocalService _resourcePermissionLocalService;
+
+	@Inject
+	private RoleLocalService _roleLocalService;
+
+	@Inject
+	private ScopeChecker _scopeChecker;
+
+	@Inject
+	private UserLocalService _userLocalService;
+
+	@Inject
+	private VulcanCRUDItemDelegateBuilderRegistry
+		_vulcanCRUDItemDelegateBuilderRegistry;
 
 }

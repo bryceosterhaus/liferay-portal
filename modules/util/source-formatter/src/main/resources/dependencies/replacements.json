@@ -3230,6 +3230,103 @@
 		"to": "getVirtualHostnames().firstKey"
 	},
 	{
+		"from": "MailEngine.send(InternetAddress paramName, InternetAddress paramName, String paramName, String paramName, boolean paramName)",
+		"issueKey": "LPD-32001",
+		"newImports": [
+			"com.liferay.mail.kernel.model.MailMessage",
+			"com.liferay.mail.kernel.service.MailServiceUtil"
+		],
+		"to": "MailServiceUtil.sendEmail(new MailMessage(param#0#, param#1#, param#2#, param#3#, param#4#))"
+	},
+	{
+		"classNames": [
+			"AccountEntryLocalService",
+			"AccountEntryLocalServiceUtil",
+			"AccountEntryService",
+			"AccountEntryServiceUtil"
+		],
+		"from": "deleteCommerceAccounts",
+		"issueKey": "LPD-34771",
+		"to": "deleteAccountEntriesByCompanyId"
+	},
+	{
+		"classNames": [
+			"AccountEntryLocalService",
+			"AccountEntryLocalServiceUtil",
+			"AccountEntryService",
+			"AccountEntryServiceUtil"
+		],
+		"from": "getPersonalAccountEntry",
+		"issueKey": "LPD-34771",
+		"to": "fetchPersonAccountEntry"
+	},
+	{
+		"classNames": [
+			"AccountEntryLocalService",
+			"AccountEntryLocalServiceUtil",
+			"AccountEntryService",
+			"AccountEntryServiceUtil"
+		],
+		"from": "getUserCommerceAccounts(long paramName, Long paramName, int paramName, String paramName, Boolean paramName, int paramName, int paramName)",
+		"issueKey": "LPD-34771",
+		"to": "getUserAccountEntries(param#0#, param#1#, param#3#, null, null, param#5#, param#6#)"
+	},
+	{
+		"classNames": [
+			"AccountEntryLocalService",
+			"AccountEntryLocalServiceUtil",
+			"AccountEntryService",
+			"AccountEntryServiceUtil"
+		],
+		"from": "getUserCommerceAccounts(long paramName, Long paramName, int paramName, String paramName, int paramName, int paramName)",
+		"issueKey": "LPD-34771",
+		"to": "getUserAccountEntries(param#0#, param#1#, param#3#, null, param#4#, param#5#)"
+	},
+	{
+		"classNames": [
+			"AccountEntryLocalService",
+			"AccountEntryLocalServiceUtil",
+			"AccountEntryService",
+			"AccountEntryServiceUtil"
+		],
+		"from": "getUserCommerceAccountsCount(long paramName, Long paramName, int paramName, String paramName)",
+		"issueKey": "LPD-34771",
+		"to": "getUserAccountEntriesCount(param#0#, param#1#, param#3#, null)"
+	},
+	{
+		"classNames": [
+			"AccountEntryLocalService",
+			"AccountEntryLocalServiceUtil",
+			"AccountEntryService",
+			"AccountEntryServiceUtil"
+		],
+		"from": "getUserCommerceAccountsCount(long paramName, Long paramName, int paramName, String paramName, Boolean paramName)",
+		"issueKey": "LPD-34771",
+		"to": "getUserAccountEntriesCount(param#0#, param#1#, param#3#, null, null)"
+	},
+	{
+		"classNames": [
+			"AccountEntryLocalService",
+			"AccountEntryLocalServiceUtil",
+			"AccountEntryService",
+			"AccountEntryServiceUtil"
+		],
+		"from": "updateAccountEntry(long paramName, String paramName, boolean paramName, byte[] paramName, String paramName, String paramName, boolean paramName, long paramName, long paramName, ServiceContext paramName)",
+		"issueKey": "LPD-34771",
+		"to": "updateAccountEntry(param#0#, null, param#1#, null, !param#2#, null, param#4#, param#3#, param#5#, null, param#9#)"
+	},
+	{
+		"classNames": [
+			"AccountEntryLocalService",
+			"AccountEntryLocalServiceUtil",
+			"AccountEntryService",
+			"AccountEntryServiceUtil"
+		],
+		"from": "updateAccountEntry(long paramName, String paramName, boolean paramName, byte[] paramName, String paramName, String paramName, boolean paramName, long paramName, long paramName, String paramName, ServiceContext paramName)",
+		"issueKey": "LPD-34771",
+		"to": "updateAccountEntry(param#0#, null, param#1#, null, !param#2#, null, param#4#, param#3#, param#5#, null, param#10#)"
+	},
+	{
 		"classNames": [
 			"Country"
 		],
@@ -3317,11 +3414,20 @@
 	{
 		"classNames": [
 			"DLAppLocalService",
-			"DLAppService"
+			"DLAppLocalServiceUtil"
 		],
 		"from": "addFileEntry(long paramName, long paramName, long paramName, String paramName, String paramName, byte[] paramName, ServiceContext paramName)",
 		"issueKey": "LPD-36311",
-		"to": "addFileEntry(null, param#0#, param#1#, param#2#, param#3#, param#4#, param#5#, null, null, param#6#)"
+		"to": "addFileEntry(null, param#0#, param#1#, param#2#, param#3#, param#4#, param#5#, null, null, null, param#6#)"
+	},
+	{
+		"classNames": [
+			"DLAppService",
+			"DLAppServiceUtil"
+		],
+		"from": "addFileEntry(long paramName, long paramName, String paramName, String paramName, byte[] paramName, ServiceContext paramName)",
+		"issueKey": "LPD-36311",
+		"to": "addFileEntry(null, param#0#, param#1#, param#2#, param#3#, param#4#, null, null, null, param#5#)"
 	},
 	{
 		"classNames": [
@@ -3437,6 +3543,93 @@
 		"to": "FallbackKeysSettingsUtil.getSettings(param#0#)"
 	},
 	{
+		"classNames": [
+			"CountryLocalService",
+			"CountryLocalServiceUtil"
+		],
+		"from": "deleteCommerceCountries",
+		"issueKey": "LPD-40539",
+		"to": "deleteCompanyCountries"
+	},
+	{
+		"classNames": [
+			"RegionLocalService",
+			"RegionLocalServiceUtil"
+		],
+		"from": "deleteCommerceRegions",
+		"issueKey": "LPD-40539",
+		"to": "deleteCountryRegions"
+	},
+	{
+		"classNames": [
+			"CountryLocalService",
+			"CountryLocalServiceUtil",
+			"CountryService",
+			"CountryServiceUtil"
+		],
+		"from": "getCommerceCountries",
+		"issueKey": "LPD-40539",
+		"to": "getCompanyCountries"
+	},
+	{
+		"classNames": [
+			"CountryLocalService",
+			"CountryLocalServiceUtil",
+			"CountryService",
+			"CountryServiceUtil"
+		],
+		"from": "getCommerceCountriesCount",
+		"issueKey": "LPD-40539",
+		"to": "getCompanyCountriesCount"
+	},
+	{
+		"classNames": [
+			"Country"
+		],
+		"from": "getCommerceCountryId",
+		"issueKey": "LPD-40539",
+		"to": "getCountryId"
+	},
+	{
+		"classNames": [
+			"RegionLocalService",
+			"RegionLocalServiceUtil"
+		],
+		"from": "getCommerceRegionByUuidAndCompanyId",
+		"issueKey": "LPD-40539",
+		"to": "getRegionByUuidAndCompanyId"
+	},
+	{
+		"classNames": [
+			"Region"
+		],
+		"from": "getCommerceRegionId",
+		"issueKey": "LPD-40539",
+		"to": "getRegionId"
+	},
+	{
+		"classNames": [
+			"RegionLocalService",
+			"RegionLocalServiceUtil",
+			"RegionService",
+			"RegionServiceUtil"
+		],
+		"from": "getCommerceRegions",
+		"issueKey": "LPD-40539",
+		"to": "getRegions"
+	},
+	{
+		"classNames": [
+			"RegionLocalService",
+			"RegionLocalServiceUtil",
+			"RegionService",
+			"RegionServiceUtil"
+		],
+		"from": "getCommerceRegionsCount",
+		"issueKey": "LPD-40539",
+		"to": "getRegionsCount"
+	},
+	{
 		"classNames": "CommercePaymentMethodGroupRel",
 		"from": "getEngineKey",
 		"issueKey": "LPD-40549",
@@ -3465,6 +3658,34 @@
 			"com.liferay.commerce.constants.CommercePaymentMethodConstants"
 		],
 		"to": "CommercePaymentMethodConstants.TYPE_ONLINE_STANDARD"
+	},
+	{
+		"classNames": [
+			"OrganizationLocalService",
+			"OrganizationLocalServiceUtil"
+		],
+		"from": "addOrganization(long paramName, long paramName, String paramName, String paramName, long paramName, long paramName, long paramName, String paramName, boolean paramName, ServiceContext paramName)",
+		"issueKey": "LPD-40617",
+		"newImports": [
+			"com.liferay.portal.kernel.model.ListTypeConstants",
+			"com.liferay.portal.kernel.security.auth.CompanyThreadLocal"
+		],
+		"newReference": "ListTypeLocalService _listTypeLocalService",
+		"to": "addOrganization(null, param#0#, param#1#, param#2#, param#3#, param#4#, param#5#,  _listTypeLocalService.getListTypeId(CompanyThreadLocal.getCompanyId(), param#6#, ListTypeConstants.ORGANIZATION_STATUS), param#7#, param#8#, param#9#)"
+	},
+	{
+		"classNames": [
+			"OrganizationService",
+			"OrganizationServiceUtil"
+		],
+		"from": "addOrganization(long paramName, String paramName, String paramName, long paramName, long paramName, long paramName, String paramName, boolean paramName, ServiceContext paramName)",
+		"issueKey": "LPD-40617",
+		"newImports": [
+			"com.liferay.portal.kernel.model.ListTypeConstants",
+			"com.liferay.portal.kernel.security.auth.CompanyThreadLocal"
+		],
+		"newReference": "ListTypeService _listTypeService",
+		"to": "addOrganization(null, param#0#, param#1#, param#2#, param#3#, param#4#,  _listTypeService.getListTypeId(CompanyThreadLocal.getCompanyId(), param#5#, ListTypeConstants.ORGANIZATION_STATUS), param#6#, param#7#, param#8#)"
 	},
 	{
 		"classNames": [
@@ -3508,6 +3729,121 @@
 		"from": "updateFileEntry(long paramName, String paramName, String paramName, String paramName, String paramName, String paramName, DLVersionNumberIncrease paramName, byte[] paramName, ServiceContext paramName)",
 		"issueKey": "LPD-41239",
 		"to": "updateFileEntry(param#0#, param#1#, param#2#, param#3#, null, param#4#, param#5#, param#6#, param#7#, null, null, null, param#8#)"
+	},
+	{
+		"classNames": [
+			"CommercePriceEntryLocalService",
+			"CommercePriceEntryLocalServiceUtil"
+		],
+		"from": "addCommercePriceEntry(long paramName, long paramName, BigDecimal paramName, BigDecimal paramName, ServiceContext paramName)",
+		"issueKey": "LPD-41244",
+		"to": "addCommercePriceEntry(null, param#0#, null, param#1#, param#2#, false, param#3#, null, param#4#)"
+	},
+	{
+		"classNames": [
+			"CommercePriceEntryService",
+			"CommercePriceEntryServiceUtil"
+		],
+		"from": "addCommercePriceEntry(long paramName, long paramName, BigDecimal paramName, BigDecimal paramName, ServiceContext paramName)",
+		"issueKey": "LPD-41244",
+		"to": "addCommercePriceEntry(null, param#0#, param#1#, param#2#, false, param#3#, null, param#4#)"
+	},
+	{
+		"classNames": [
+			"CommercePriceEntryLocalService",
+			"CommercePriceEntryLocalServiceUtil"
+		],
+		"from": "addCommercePriceEntry(long paramName, long paramName, String paramName, BigDecimal paramName, BigDecimal paramName, ServiceContext paramName)",
+		"issueKey": "LPD-41244",
+		"to": "addCommercePriceEntry(param#2#, param#0#, null, param#1#, param#3#, false, param#4#, null, param#5#)"
+	},
+	{
+		"classNames": [
+			"CommercePriceEntryService",
+			"CommercePriceEntryServiceUtil"
+		],
+		"from": "addCommercePriceEntry(long paramName, long paramName, String paramName, BigDecimal paramName, BigDecimal paramName, ServiceContext paramName)",
+		"issueKey": "LPD-41244",
+		"to": "addCommercePriceEntry(param#2#, param#0#, param#1#, param#3#, false, param#4#, null, param#5#)"
+	},
+	{
+		"classNames": [
+			"CommercePriceEntryLocalService",
+			"CommercePriceEntryLocalServiceUtil"
+		],
+		"from": "addCommercePriceEntry(long paramName, String paramName, long paramName, BigDecimal paramName, BigDecimal paramName, ServiceContext paramName)",
+		"issueKey": "LPD-41244",
+		"to": "addCommercePriceEntry(null, param#0#, param#1#, param#2#, param#3#, false, param#4#, null, param#5#)"
+	},
+	{
+		"classNames": [
+			"CommercePriceEntryLocalService",
+			"CommercePriceEntryLocalServiceUtil",
+			"CommercePriceEntryService",
+			"CommercePriceEntryServiceUtil"
+		],
+		"from": "fetchCommercePriceEntry(long paramName, long paramName)",
+		"issueKey": "LPD-41285",
+		"newImports": [
+			"com.liferay.petra.string.StringPool"
+		],
+		"to": "fetchCommercePriceEntry(param#1#, null, StringPool.BLANK)"
+	},
+	{
+		"classNames": [
+			"CommercePriceEntryLocalService",
+			"CommercePriceEntryLocalServiceUtil",
+			"CommercePriceEntryService",
+			"CommercePriceEntryServiceUtil"
+		],
+		"from": "fetchCommercePriceEntry(long paramName, long paramName, boolean paramName)",
+		"issueKey": "LPD-41285",
+		"newImports": [
+			"com.liferay.petra.string.StringPool"
+		],
+		"to": "fetchCommercePriceEntry(param#1#, null, StringPool.BLANK, param#2#)"
+	},
+	{
+		"classNames": [
+			"CommercePriceEntryLocalService",
+			"CommercePriceEntryLocalServiceUtil",
+			"CommercePriceEntryService",
+			"CommercePriceEntryServiceUtil"
+		],
+		"from": "fetchCommercePriceEntry(long paramName, String paramName)",
+		"issueKey": "LPD-41285",
+		"newImports": [
+			"com.liferay.petra.string.StringPool"
+		],
+		"to": "fetchCommercePriceEntry(param#0#, param#1#, StringPool.BLANK)"
+	},
+	{
+		"classNames": [
+			"CommercePriceEntryLocalService",
+			"CommercePriceEntryLocalServiceUtil",
+			"CommercePriceEntryService",
+			"CommercePriceEntryServiceUtil"
+		],
+		"from": "fetchCommercePriceEntry(long paramName, String paramName, boolean paramName)",
+		"issueKey": "LPD-41285",
+		"newImports": [
+			"com.liferay.petra.string.StringPool"
+		],
+		"to": "fetchCommercePriceEntry(param#0#, param#1#, StringPool.BLANK, param#2#)"
+	},
+	{
+		"classNames": [
+			"CommercePriceEntryLocalService",
+			"CommercePriceEntryLocalServiceUtil",
+			"CommercePriceEntryService",
+			"CommercePriceEntryServiceUtil"
+		],
+		"from": "fetchCommercePriceEntry(long paramName, String paramName, int paramName)",
+		"issueKey": "LPD-41285",
+		"newImports": [
+			"com.liferay.petra.string.StringPool"
+		],
+		"to": "fetchCommercePriceEntry(param#0#, param#1#, param#2#, StringPool.BLANK)"
 	},
 	{
 		"classNames": [
@@ -3591,6 +3927,14 @@
 	},
 	{
 		"classNames": [
+			"PortletSharedSearchSettings"
+		],
+		"from": "getParameterValues71",
+		"issueKey": "LPD-48215",
+		"to": "getParameterValues"
+	},
+	{
+		"classNames": [
 			"CommerceOrderItem"
 		],
 		"from": "getBookedQuantityId",
@@ -3599,7 +3943,8 @@
 	},
 	{
 		"classNames": [
-			"AccountEntry"
+			"AccountEntry",
+			"CommerceContext"
 		],
 		"from": "getCommerceAccountId",
 		"issueKey": "LPD-48402",
@@ -3622,13 +3967,40 @@
 		]
 	},
 	{
+		"from": "regex:(?<utilName>CPAttachmentFileEntryServiceUtil|CPAttachmentFileEntryLocalServiceUtil)\\.fetchByExternalReferenceCode",
+		"issueKey": "LPD-48708",
+		"to": "${utilName}.fetchCPAttachmentFileEntryByExternalReferenceCode",
+		"validExtensions": [
+			"java",
+			"jsp"
+		]
+	},
+	{
+		"classNames": [
+			"CPAttachmentFileEntryService",
+			"CPAttachmentFileEntryServiceUtil"
+		],
+		"from": "addCPAttachmentFileEntry(long paramName, long paramName, long paramName, long paramName, long paramName, int paramName, int paramName, int paramName, int paramName, int paramName, int paramName, int paramName, int paramName, int paramName, int paramName, boolean paramName, Map<Locale, String> paramName, String paramName, double paramName, int paramName, ServiceContext paramName)",
+		"issueKey": "LPD-48712",
+		"to": "addCPAttachmentFileEntry(param#1#, param#2#, param#3#, param#4#, false, null, param#5#, param#6#, param#7#, param#8#, param#9#, param#10#, param#11#, param#12#, param#13#, param#14#, param#15#, true, param#16#, param#17#, param#18#, param#19#, param#20#)"
+	},
+	{
+		"classNames": [
+			"CPAttachmentFileEntryLocalService",
+			"CPAttachmentFileEntryLocalServiceUtil"
+		],
+		"from": "addCPAttachmentFileEntry(long paramName, long paramName, long paramName, long paramName, long paramName, int paramName, int paramName, int paramName, int paramName, int paramName, int paramName, int paramName, int paramName, int paramName, int paramName, boolean paramName, Map<Locale, String> paramName, String paramName, double paramName, int paramName, String paramName, ServiceContext paramName)",
+		"issueKey": "LPD-48712",
+		"to": "addCPAttachmentFileEntry(param#20#, param#0#, param#1#, param#2#, param#3#, param#4#, false, null, param#5#, param#6#, param#7#, param#8#, param#9#, param#10#, param#11#, param#12#, param#13#, param#14#, param#15#, true, param#16#, param#17#, param#18#, param#19#, param#21#)"
+	},
+	{
 		"classNames": [
 			"CPAttachmentFileEntryService",
 			"CPAttachmentFileEntryServiceUtil"
 		],
 		"from": "addOrUpdateCPAttachmentFileEntry(String paramName, long paramName, long paramName, long paramName, long paramName, long paramName, boolean paramName, String paramName, int paramName, int paramName, int paramName, int paramName, int paramName, int paramName, int paramName, int paramName, int paramName, int paramName, boolean paramName, Map<Locale, String> paramName, String paramName, double paramName, int paramName, ServiceContext paramName)",
 		"issueKey": "LPD-48759",
-		"to": "addOrUpdateCPAttachmentFileEntry(param#0#, param#1#, param#2#, param#3#, param#4#, param#5#, param#6#, param#7#, param#8#, param#9#, param#10#, param#11#, param#12#, param#13#, param#14#, param#15#, param#16#, param#17#, param#18#, null, param#19#, param#20#, param#21#, param#22#, param#23#)"
+		"to": "addOrUpdateCPAttachmentFileEntry(param#0#, param#1#, param#2#, param#3#, param#4#, param#5#, param#6#, param#7#, param#8#, param#9#, param#10#, param#11#, param#12#, param#13#, param#14#, param#15#, param#16#, param#17#, param#18#, true, param#19#, param#20#, param#21#, param#22#, param#23#)"
 	},
 	{
 		"classNames": [
@@ -3637,7 +4009,165 @@
 		],
 		"from": "addOrUpdateCPAttachmentFileEntry(String paramName, long paramName, long paramName, long paramName, long paramName, long paramName, long paramName, boolean paramName, String paramName, int paramName, int paramName, int paramName, int paramName, int paramName, int paramName, int paramName, int paramName, int paramName, int paramName, boolean paramName, Map<Locale, String> paramName, String paramName, double paramName, int paramName, ServiceContext paramName)",
 		"issueKey": "LPD-48759",
-		"to": "addOrUpdateCPAttachmentFileEntry(param#0#, param#1#, param#2#, param#3#, param#4#, param#5#, param#6#, param#7#, param#8#, param#9#, param#10#, param#11#, param#12#, param#13#, param#14#, param#15#, param#16#, param#17#, param#18#, param#19#, null, param#20#, param#21#, param#22#, param#23#, param#24#)"
+		"to": "addOrUpdateCPAttachmentFileEntry(param#0#, param#1#, param#2#, param#3#, param#4#, param#5#, param#6#, param#7#, param#8#, param#9#, param#10#, param#11#, param#12#, param#13#, param#14#, param#15#, param#16#, param#17#, param#18#, param#19#, true, param#20#, param#21#, param#22#, param#23#, param#24#)"
+	},
+	{
+		"from": "ZipWriterFactory.getZipWriter",
+		"issueKey": "LPD-48770",
+		"newReference": "ZipWriterFactory _zipWriterFactory",
+		"to": "_zipWriterFactory.getZipWriter"
+	},
+	{
+		"from": "AccountConstants.ACCOUNT_TYPE_BUSINESS",
+		"issueKey": "LPD-48783",
+		"to": "AccountConstants.ACCOUNT_ENTRY_TYPE_BUSINESS",
+		"validExtensions": [
+			"java",
+			"jsp"
+		]
+	},
+	{
+		"from": "AccountConstants.ACCOUNT_TYPE_GUEST",
+		"issueKey": "LPD-48783",
+		"to": "AccountConstants.ACCOUNT_ENTRY_TYPE_GUEST",
+		"validExtensions": [
+			"java",
+			"jsp"
+		]
+	},
+	{
+		"from": "AccountConstants.ACCOUNT_TYPE_PERSONAL",
+		"issueKey": "LPD-48783",
+		"to": "AccountConstants.ACCOUNT_ENTRY_TYPE_PERSON",
+		"validExtensions": [
+			"java",
+			"jsp"
+		]
+	},
+	{
+		"classNames": [
+			"CommerceInventoryBookedQuantityLocalService",
+			"CommerceInventoryBookedQuantityLocalServiceUtil"
+		],
+		"from": "getCommerceBookedQuantity(long paramName, String paramName)",
+		"issueKey": "LPD-48784",
+		"newImports": [
+			"com.liferay.petra.string.StringPool"
+		],
+		"to": "getCommerceInventoryBookedQuantity(param#0#, param#1#, StringPool.BLANK)"
+	},
+	{
+		"classNames": [
+			"DLFileEntryLocalService",
+			"DLFileEntryLocalServiceUtil"
+		],
+		"from": "addFileEntry(long paramName, long paramName, long paramName, long paramName, String paramName, String paramName, String paramName, String paramName, String paramName, long paramName, Map<String, DDMFormValues> paramName, File paramName, InputStream paramName, long paramName, ServiceContext paramName)",
+		"issueKey": "LPD-49109",
+		"to": "addFileEntry(null, param#0#, param#1#, param#2#, param#3#, param#4#, param#5#, param#6#, null, param#7#, param#8#, param#9#, param#10#, param#11#, param#12#, param#13#, null, null, null, param#14#)"
+	},
+	{
+		"classNames": [
+			"DLFileEntryService",
+			"DLFileEntryServiceUtil"
+		],
+		"from": "addFileEntry(long paramName, long paramName, long paramName, String paramName, String paramName, String paramName, String paramName, String paramName, long paramName, Map<String, DDMFormValues> paramName, File paramName, InputStream paramName, long paramName, ServiceContext paramName)",
+		"issueKey": "LPD-49109",
+		"to": "addFileEntry(null, param#0#, param#1#, param#2#, param#3#, param#4#, param#5#, null, param#6#, param#7#, param#8#, param#9#, param#10#, param#11#, param#12#, null,  null, null, param#13#)"
+	},
+	{
+		"classNames": [
+			"CommerceOrderItemLocalService",
+			"CommerceOrderItemLocalServiceUtil"
+		],
+		"from": "addOrUpdateCommerceOrderItem(long paramName, long paramName, long paramName, String paramName, BigDecimal paramName, long paramName, int paramName, String paramName, CommerceContext paramName, ServiceContext paramName)",
+		"issueKey": "LPD-49117",
+		"newImports": [
+			"java.math.BigDecimal"
+		],
+		"to": "addOrUpdateCommerceOrderItem(param#0#, param#1#, param#2#, param#3#, param#4#, param#5#, BigDecimal.valueOf(param#6#), param#7#, param#8#, param#9#)"
+	},
+	{
+		"classNames": [
+			"CPAttachmentFileEntryLocalService",
+			"CPAttachmentFileEntryLocalServiceUtil"
+		],
+		"from": "updateCPAttachmentFileEntry(long paramName, long paramName, int paramName, int paramName, int paramName, int paramName, int paramName, int paramName, int paramName, int paramName, int paramName, int paramName, boolean paramName, Map<Locale, String> paramName, String paramName, double paramName, int paramName, ServiceContext paramName)",
+		"issueKey": "LPD-49281",
+		"to": "updateCPAttachmentFileEntry(null, param#0#, param#1#, false, null, param#2#, param#3#, param#4#, param#5#, param#6#, param#7#, param#8#, param#9#, param#10#, param#11#, param#12#, true, param#13#, param#14#, param#15#, param#16#, param#17#)"
+	},
+	{
+		"classNames": [
+			"CPAttachmentFileEntryService",
+			"CPAttachmentFileEntryServiceUtil"
+		],
+		"from": "updateCPAttachmentFileEntry(long paramName, long paramName, int paramName, int paramName, int paramName, int paramName, int paramName, int paramName, int paramName, int paramName, int paramName, int paramName, boolean paramName, Map<Locale, String> paramName, String paramName, double paramName, int paramName, ServiceContext paramName)",
+		"issueKey": "LPD-49281",
+		"to": "updateCPAttachmentFileEntry(param#0#, param#1#, false, null, param#2#, param#3#, param#4#, param#5#, param#6#, param#7#, param#8#, param#9#, param#10#, param#11#, param#12#, true, param#13#, param#14#, param#15#, param#16#, param#17#)"
+	},
+	{
+		"classNames": [
+			"CPAttachmentFileEntryLocalService",
+			"CPAttachmentFileEntryLocalServiceUtil"
+		],
+		"from": "updateCPAttachmentFileEntry(long paramName, long paramName, long paramName, int paramName, int paramName, int paramName, int paramName, int paramName, int paramName, int paramName, int paramName, int paramName, int paramName, boolean paramName, Map<Locale, String> paramName, String paramName, double paramName, int paramName, ServiceContext paramName)",
+		"issueKey": "LPD-49281",
+		"to": "updateCPAttachmentFileEntry(param#0#, param#1#, param#2#, false, null, param#3#, param#4#, param#5#, param#6#, param#7#, param#8#, param#9#, param#10#, param#11#, param#12#, param#13#, true, param#14#, param#15#, param#16#, param#17#, param#18#)"
+	},
+	{
+		"classNames": [
+			"CPSpecificationOptionLocalService",
+			"CPSpecificationOptionLocalServiceUtil"
+		],
+		"from": "addCPSpecificationOption(long paramName, long paramName, Map<Locale, String> paramName, Map<Locale, String> paramName, boolean paramName, String paramName, ServiceContext paramName)",
+		"issueKey": "LPD-49731",
+		"to": "addCPSpecificationOption(null, param#0#, param#1#, null, param#2#, param#3#, param#4#, param#5#, 0, param#6#)"
+	},
+	{
+		"classNames": [
+			"CommerceOrderItem"
+		],
+		"from": "getDeliveryGroup",
+		"issueKey": "LPD-49755",
+		"to": "getDeliveryGroupName"
+	},
+	{
+		"from": "SitemapManager.addURLElement",
+		"issueKey": "LPD-50074",
+		"newReference": "SitemapManager _sitemapManager",
+		"to": "_sitemapManager.addURLElement"
+	},
+	{
+		"classNames": [
+			"AccountEntryLocalService",
+			"AccountEntryLocalServiceUtil",
+			"AccountEntryService",
+			"AccountEntryServiceUtil"
+		],
+		"from": "fetchByExternalReferenceCode(long paramName, String paramName)",
+		"issueKey": "LPD-50175",
+		"to": "fetchAccountEntryByExternalReferenceCode(param#1#, param#0#)"
+	},
+	{
+		"classNames": [
+			"CommercePriceEntryLocalService",
+			"CommercePriceEntryLocalServiceUtil",
+			"CommercePriceEntryService",
+			"CommercePriceEntryServiceUtil"
+		],
+		"from": "fetchCommercePriceEntryByExternalReferenceCode(long paramName, String paramName)",
+		"issueKey": "LPD-53012",
+		"to": "fetchCommercePriceEntryByExternalReferenceCode(param#1#, param#0#)"
+	},
+	{
+		"classNames": [
+			"CommercePriceEntryLocalService",
+			"CommercePriceEntryLocalServiceUtil",
+			"CommercePriceEntryService",
+			"CommercePriceEntryServiceUtil"
+		],
+		"from": "fetchCommercePriceEntryByReferenceCode(long paramName, String paramName)",
+		"issueKey": "LPD-53012",
+		"to": "fetchCommercePriceEntryByExternalReferenceCode(param#1#, param#0#)"
 	},
 	{
 		"from": "CookieKeys.COMMERCE_CONTINUE_AS_GUEST",
@@ -4014,7 +4544,7 @@
 		],
 		"from": "addFileEntry(long paramName, long paramName, long paramName, String paramName, String paramName, String paramName, String paramName, String paramName, byte[] paramName, ServiceContext paramName)",
 		"issueKey": "LPS-194818",
-		"to": "addFileEntry(null, param#0#, param#1#, param#2#, param#3#, param#4#, param#5#, null, param#6#, param#7#, param#8#, null, null, param#9#)"
+		"to": "addFileEntry(null, param#0#, param#1#, param#2#, param#3#, param#4#, param#5#, null, param#6#, param#7#, param#8#, null, null, null, param#9#)"
 	},
 	{
 		"from": "ServiceTrackerList<Class<T>, Class<E>>",
@@ -4225,8 +4755,12 @@
 		"classNames": [
 			"CommerceOrderItem"
 		],
-		"from": "getQuantity()",
-		"issueKey": "LPS-197931"
+		"from": "regex:(?<!\\.valueOf\\()\\b(?<variableName>_?\\w+)\\.(?<methodName>getQuantity\\(\\))",
+		"issueKey": "LPS-197931",
+		"newImports": [
+			"java.math.BigDecimal"
+		],
+		"to": "BigDecimal.valueOf(${variableName}.${methodName})"
 	},
 	{
 		"classNames": [

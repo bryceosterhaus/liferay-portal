@@ -76,7 +76,8 @@ public class PageSpecificationResourceImpl
 		if (!layout.isDraftLayout() ||
 			(layout.isApproved() &&
 			 GetterUtil.getBoolean(
-				 layout.getTypeSettingsProperty("published")))) {
+				 layout.getTypeSettingsProperty(
+					 LayoutTypeSettingsConstants.KEY_PUBLISHED)))) {
 
 			throw new UnsupportedOperationException();
 		}
@@ -171,7 +172,9 @@ public class PageSpecificationResourceImpl
 				true, true, contextCompany.getCompanyId(),
 				siteExternalReferenceCode));
 
-		if (!_isPageSpecificationSupported(layout)) {
+		if (!layout.isTypeAssetDisplay() && !layout.isTypeContent() &&
+			!layout.isTypePortlet()) {
+
 			throw new UnsupportedOperationException();
 		}
 
@@ -315,7 +318,9 @@ public class PageSpecificationResourceImpl
 
 			return _pageSpecificationDTOConverter.toDTO(
 				LayoutUtil.updateLayout(
-					layout, pageSpecification.getSettings(), serviceContext));
+					layout, layout.getNameMap(), layout.getTitleMap(),
+					layout.getDescriptionMap(), layout.getFriendlyURLMap(),
+					pageSpecification.getSettings(), serviceContext));
 		}
 
 		if (!Objects.equals(
@@ -332,7 +337,9 @@ public class PageSpecificationResourceImpl
 		return _pageSpecificationDTOConverter.toDTO(
 			LayoutUtil.updateLayout(
 				(ContentPageSpecification)pageSpecification, layout,
-				serviceContext));
+				layout.getNameMap(), layout.getTitleMap(),
+				layout.getDescriptionMap(), layout.getFriendlyURLMap(),
+				WorkflowConstants.STATUS_DRAFT, serviceContext));
 	}
 
 	@Override
@@ -417,7 +424,7 @@ public class PageSpecificationResourceImpl
 		Layout layout = _layoutLocalService.getLayout(draftLayout.getClassPK());
 
 		try {
-			boolean published = layout.isPublished();
+			boolean published = LayoutUtil.isPublished(layout);
 
 			draftLayout = _layoutLocalService.copyLayoutContent(
 				layout, draftLayout);
@@ -463,18 +470,6 @@ public class PageSpecificationResourceImpl
 		throw new UnsupportedOperationException();
 	}
 
-	private boolean _isPageSpecificationSupported(Layout layout) {
-		if (LayoutUtil.isPublished(layout)) {
-			if (!layout.isApproved() || !layout.isDraftLayout()) {
-				return true;
-			}
-
-			return false;
-		}
-
-		return layout.isDraftLayout();
-	}
-
 	private void _preparePatch(
 		ContentPageSpecification contentPageSpecification,
 		ContentPageSpecification existingContentPageSpecification) {
@@ -500,22 +495,17 @@ public class PageSpecificationResourceImpl
 
 		Layout draftLayout = layout.fetchDraftLayout();
 
-		if (LayoutUtil.isPublished(layout)) {
-			if ((draftLayout != null) && !draftLayout.isApproved()) {
-				return ListUtil.fromArray(
-					_pageSpecificationDTOConverter.toDTO(layout),
-					_pageSpecificationDTOConverter.toDTO(draftLayout));
+		if (draftLayout == null) {
+			if (!layout.isTypePortlet()) {
+				throw new UnsupportedOperationException();
 			}
 
 			return ListUtil.fromArray(
 				_pageSpecificationDTOConverter.toDTO(layout));
 		}
 
-		if (draftLayout == null) {
-			throw new UnsupportedOperationException();
-		}
-
 		return ListUtil.fromArray(
+			_pageSpecificationDTOConverter.toDTO(layout),
 			_pageSpecificationDTOConverter.toDTO(draftLayout));
 	}
 

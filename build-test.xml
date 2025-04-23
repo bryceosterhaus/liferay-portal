@@ -457,6 +457,8 @@ module.framework.properties.osgi.console=11312</echo>
 
 			<echo file="${script.sh.file}"><![CDATA[@{script}]]></echo>
 
+			<print-file file.name="${script.sh.file}" />
+
 			<execute>
 				<![CDATA[
 					docker exec @{container} mkdir -p /tmp
@@ -531,7 +533,7 @@ module.framework.properties.osgi.console=11312</echo>
 		</sequential>
 	</macrodef>
 
-	<macrodef name="export-database-mysql-compact">
+	<macrodef name="export-database-mysql">
 		<attribute default="mysql" name="database.file.prefix" />
 		<attribute default="lportal" name="database.schema.name" />
 
@@ -659,6 +661,134 @@ module.framework.properties.osgi.console=11312</echo>
 			/>
 
 			<delete failonerror="false" file="${project.dir}/export_database_mysql_compact_export.sh" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="export-database-postgresql">
+		<attribute default="postgresql" name="database.file.prefix" />
+		<attribute default="lportal" name="database.schema.name" />
+
+		<sequential>
+			<if>
+				<not>
+					<available file="${selenium.output.dir.name}" type="dir" />
+				</not>
+				<then>
+					<mkdir dir="${selenium.output.dir.name}" />
+				</then>
+			</if>
+
+			<get-database-property property.name="database.password" />
+			<get-database-property property.name="database.schema" />
+			<get-database-property property.name="database.username" />
+
+			<if>
+				<or>
+					<equals arg1="${env.DOCKER_ENABLED}" arg2="true" />
+					<isset property="database.${database.type}.docker.image" />
+				</or>
+				<then>
+					<local name="export.dmp.file.path" />
+
+					<property location="export_database_postgresql_export.sh" name="export.database.postgresql.file.path" />
+					<property name="docker.src.file.path" value="/tmp/export.sql" />
+					<property name="export.dmp.file.path" value="${selenium.output.dir.name}/@{database.file.prefix}-@{database.schema.name}.sql" />
+
+					<echo file="${export.database.postgresql.file.path}">
+						<![CDATA[
+							#!/bin/bash
+
+							export PGPASSWORD=${database.password}
+
+							pg_dump \
+								--dbname=lportal \
+								--encoding=UTF8 \
+								--exclude-table=^L_[0-9]+_* \
+								--exclude-table=^l_[0-9]+_* \
+								--no-comments \
+								--no-owner \
+								--no-privileges \
+								--no-publications \
+								--no-security-labels \
+								--no-subscriptions \
+								--no-unlogged-table-data \
+								--schema==${database.schema.name} \
+								--schema-only \
+								--username=${database.postgresql.username}
+								> ${docker.src.file.path}
+						]]>
+					</echo>
+
+					<get-database-property property.name="database.host" />
+
+					<execute>
+						<![CDATA[
+							docker cp ${export.database.postgresql.file.path} ${database.host}:/tmp/export_database_postgresql_export.sh
+
+							docker exec ${database.host} /bin/bash /tmp/export_database_postgresql_export.sh
+						]]>
+					</execute>
+
+					<execute>
+						<![CDATA[
+							docker cp ${database.host}:${docker.src.file.path} ${export.dmp.file.path}
+						]]>
+					</execute>
+				</then>
+				<else>
+					<exec executable="pg_dump" output="${selenium.output.dir.name}/@{database.file.prefix}-@{database.schema.name}.sql">
+						<arg value="--dbname=lportal" />
+						<arg value="--encoding=UTF8" />
+						<arg value="--exclude-table=^L_[0-9]+_*" />
+						<arg value="--exclude-table=^l_[0-9]+_*" />
+						<arg value="--no-comments" />
+						<arg value="--no-owner" />
+						<arg value="--no-privileges" />
+						<arg value="--no-publications" />
+						<arg value="--no-security-labels" />
+						<arg value="--no-subscriptions" />
+						<arg value="--no-unlogged-table-data" />
+						<arg value="--password=${database.password}" />
+						<arg value="--schema=${database.schema.name}" />
+						<arg value="--schema-only" />
+						<arg value="--username=${database.postgresql.username}" />
+					</exec>
+				</else>
+			</if>
+
+			<echo file="export_database_postgresql_sort_sql.sh">
+				<![CDATA[
+					#!/bin/bash
+
+					gawk '/CREATE/ {f=1; delete a}
+						/^);/ {f=0; n=asort(a); print a[length(a)]; for (i=1;i<n;i++) print a[i]}
+						!f
+						f{a[$0]=$0}' ${1} |
+					sed '/^--/d' |
+					sed 's=/[^/]*$==;s/\,$//' |
+					sed 's/_x_.*//' |
+					sed 's/\/\*.*\*//' |
+					sed '/SELECT /d' |
+					sed '/SET /d' |
+					sed '/lpartition_/d' |
+					sed '/^$/d' |
+					sed 's/^[[:space:]]*//'
+				]]>
+			</echo>
+
+			<execute>
+				export_database_postgresql_sort_sql.sh ${selenium.output.dir.name}/@{database.file.prefix}-@{database.schema.name}.sql > ${selenium.output.dir.name}/@{database.file.prefix}-@{database.schema.name}-sorted.sql
+			</execute>
+
+			<delete file="${selenium.output.dir.name}/@{database.file.prefix}-@{database.schema.name}.sql" />
+			<delete file="export_database_postgresql_sort_sql.sh" />
+
+			<move
+				file="${selenium.output.dir.name}/@{database.file.prefix}-@{database.schema.name}-sorted.sql"
+				tofile="${selenium.output.dir.name}/@{database.file.prefix}-@{database.schema.name}.sql"
+			/>
+
+			<delete failonerror="false" file="${project.dir}/export_database_postgresql_export.sh" />
 		</sequential>
 	</macrodef>
 
@@ -2339,6 +2469,7 @@ war.path=${app.server.portal.dir}/</echo>
 						<delete dir="${test.app.server.parent.dir}" />
 
 						<copy
+							preservelastmodified="true"
 							todir="${test.app.server.parent.dir}"
 						>
 							<fileset
@@ -2790,6 +2921,9 @@ sendPasswordCaptchaEnabled=&quot;false&quot;</echo>
 								/>
 							</not>
 							<then>
+								<var name="security.line" unless:blank="${database.password}" value="&lt;security user-name=&quot;${database.username}&quot; password=&quot;${database.password}&quot; /&gt;" />
+								<var if:blank="${database.password}" name="security.line" value="&lt;security user-name=&quot;${database.username}&quot; /&gt;" />
+
 								<replace
 									file="${app.server.dir}/standalone/configuration/standalone.xml"
 								>
@@ -2800,10 +2934,7 @@ sendPasswordCaptchaEnabled=&quot;false&quot;</echo>
 														<datasource jndi-name="java:/jdbc/LiferayPool" pool-name="LiferayPool" enabled="true" jta="true" use-java-context="true" use-ccm="true">
 															<connection-url>${database.url}</connection-url>
 															<driver>${database.type}</driver>
-															<security>
-																<user-name>${database.username}</user-name>
-																<password>${database.password}</password>
-															</security>
+															${security.line}
 														</datasource>
 												]]>
 									</replacevalue>
@@ -3353,17 +3484,147 @@ tell application "Safari" to quit
 			<get-testcase-property property.name="analytics.cloud.enabled" />
 
 			<if>
-				<isset property="test.analytics.cloud.url" />
+				<isset property="env.OSB_ASAH_API_TOKEN" />
 				<then>
 					<echo append="true" file="${test.ext.properties.file}">
-						analytics.cloud.url=${test.analytics.cloud.url}
+						analytics.cloud.asah.api.token=${env.OSB_ASAH_API_TOKEN}
 					</echo>
 				</then>
+				<elseif>
+					<isset property="analytics.cloud.asah.api.token" />
+					<then>
+						<echo append="true" file="${test.ext.properties.file}">
+							analytics.cloud.asah.api.token=${analytics.cloud.asah.api.token}
+						</echo>
+					</then>
+				</elseif>
+			</if>
+
+			<if>
+				<isset property="env.OSB_ASAH_BACKEND_URL" />
+				<then>
+					<echo append="true" file="${test.ext.properties.file}">
+						analytics.cloud.asah.backend.url=${env.OSB_ASAH_BACKEND_URL}
+					</echo>
+				</then>
+				<elseif>
+					<isset property="analytics.cloud.asah.backend.url" />
+					<then>
+						<echo append="true" file="${test.ext.properties.file}">
+							analytics.cloud.asah.backend.url=${analytics.cloud.asah.backend.url}
+						</echo>
+					</then>
+				</elseif>
+			</if>
+
+			<if>
+				<isset property="env.OSB_ASAH_BATCH_CURATOR_URL" />
+				<then>
+					<echo append="true" file="${test.ext.properties.file}">
+						analytics.cloud.asah.curator.batch.url=${env.OSB_ASAH_BATCH_CURATOR_URL}
+					</echo>
+				</then>
+				<elseif>
+					<isset property="analytics.cloud.asah.curator.batch.url" />
+					<then>
+						<echo append="true" file="${test.ext.properties.file}">
+							analytics.cloud.asah.curator.batch.url=${analytics.cloud.asah.curator.batch.url}
+						</echo>
+					</then>
+				</elseif>
+			</if>
+
+			<if>
+				<isset property="env.OSB_ASAH_PROJECT_ID" />
+				<then>
+					<echo append="true" file="${test.ext.properties.file}">
+						analytics.cloud.asah.project.id=${env.OSB_ASAH_PROJECT_ID}
+					</echo>
+				</then>
+				<elseif>
+					<isset property="analytics.cloud.asah.project.id" />
+					<then>
+						<echo append="true" file="${test.ext.properties.file}">
+							analytics.cloud.asah.project.id=${analytics.cloud.asah.project.id}
+						</echo>
+					</then>
+				</elseif>
+			</if>
+
+			<if>
+				<isset property="env.OSB_FARO_PASSWORD" />
+				<then>
+					<echo append="true" file="${test.ext.properties.file}">
+						analytics.cloud.faro.password=${env.OSB_FARO_PASSWORD}
+					</echo>
+				</then>
+				<elseif>
+					<isset property="analytics.cloud.faro.password" />
+					<then>
+						<echo append="true" file="${test.ext.properties.file}">
+							analytics.cloud.faro.password=${analytics.cloud.faro.password}
+						</echo>
+					</then>
+				</elseif>
+			</if>
+
+			<if>
+				<isset property="env.OSB_FARO_URL" />
+				<then>
+					<echo append="true" file="${test.ext.properties.file}">
+						analytics.cloud.faro.frontend.url=${env.OSB_FARO_URL}
+						analytics.cloud.url=${env.OSB_FARO_URL}
+					</echo>
+				</then>
+				<elseif>
+					<isset property="test.analytics.cloud.url" />
+					<then>
+						<echo append="true" file="${test.ext.properties.file}">
+							analytics.cloud.faro.frontend.url=${test.analytics.cloud.url}
+							analytics.cloud.url=${test.analytics.cloud.url}
+						</echo>
+					</then>
+				</elseif>
 				<elseif>
 					<equals arg1="${analytics.cloud.enabled}" arg2="true" />
 					<then>
 						<echo append="true" file="${test.ext.properties.file}">
+							analytics.cloud.faro.frontend.url=${analytics.cloud.faro.frontend.url}
 							analytics.cloud.url=${analytics.cloud.faro.frontend.url}
+						</echo>
+					</then>
+				</elseif>
+			</if>
+
+			<if>
+				<isset property="env.OSB_FARO_USER_LOGIN" />
+				<then>
+					<echo append="true" file="${test.ext.properties.file}">
+						analytics.cloud.faro.user.login=${env.OSB_FARO_USER_LOGIN}
+					</echo>
+				</then>
+				<elseif>
+					<isset property="analytics.cloud.faro.user.login" />
+					<then>
+						<echo append="true" file="${test.ext.properties.file}">
+							analytics.cloud.faro.user.login=${analytics.cloud.faro.user.login}
+						</echo>
+					</then>
+				</elseif>
+			</if>
+
+			<if>
+				<isset property="env.OSB_FARO_WORKSPACE_NAME" />
+				<then>
+					<echo append="true" file="${test.ext.properties.file}">
+						analytics.cloud.faro.workspace.name=${env.OSB_FARO_WORKSPACE_NAME}
+					</echo>
+				</then>
+				<elseif>
+					<isset property="analytics.cloud.faro.workspace.name" />
+					<then>
+						<echo append="true" file="${test.ext.properties.file}">
+							analytics.cloud.faro.workspace.name=${analytics.cloud.faro.workspace.name}
 						</echo>
 					</then>
 				</elseif>
@@ -3387,11 +3648,8 @@ tell application "Safari" to quit
 			</if>
 
 			<echo append="true" file="${test.ext.properties.file}">
-				analytics.cloud.asah.backend.url=${analytics.cloud.asah.backend.url}
-				analytics.cloud.asah.curator.batch.url=${analytics.cloud.asah.curator.batch.url}
 				analytics.cloud.asah.curator.stream.url=${analytics.cloud.asah.curator.stream.url}
 				analytics.cloud.asah.publisher.url=${analytics.cloud.asah.publisher.url}
-				analytics.cloud.faro.frontend.url=${analytics.cloud.faro.frontend.url}
 			</echo>
 		</sequential>
 	</macrodef>
@@ -4846,15 +5104,6 @@ tell application "Safari" to quit
 				</then>
 			</if>
 
-			<get-testcase-property property.name="release.feature.flags.disable.DISABLE_PRIVATE_LAYOUTS" />
-
-			<if>
-				<equals arg1="${release.feature.flags.disable.DISABLE_PRIVATE_LAYOUTS}" arg2="true" />
-				<then>
-					<echo file="${liferay.home}/osgi/configs/com.liferay.release.feature.flag.web.internal.configuration.ReleaseFeatureFlagConfiguration.config">disabledReleaseFeatureFlags=["DISABLE_PRIVATE_LAYOUTS"]</echo>
-				</then>
-			</if>
-
 			<get-testcase-property property.name="test.assert.javascript.errors" />
 
 			<if>
@@ -5780,11 +6029,13 @@ ${custom.upgrade.properties}</echo>
 								<elseif>
 									<equals arg1="${database.type}" arg2="sqlserver" />
 									<then>
+										<get-database-property property.name="database.executable" />
+
 										<echo file="${create.sh.file.path}">
 											<![CDATA[
 												#!/bin/bash
 
-												/opt/mssql-tools/bin/sqlcmd -P ${database.password} -U ${database.username} -i /tmp/create.sql
+												${database.executable} -P ${database.password} -U ${database.username} -i /tmp/create.sql
 											]]>
 										</echo>
 									</then>
@@ -6833,7 +7084,7 @@ log.sanitizer.enabled=false</echo>
 					</then>
 				</elseif>
 				<else>
-					<var name="app.server.tomcat.version" value="9.0.98" />
+					<var name="app.server.tomcat.version" value="9.0.102" />
 				</else>
 			</if>
 
@@ -6991,6 +7242,11 @@ log.sanitizer.enabled=false</echo>
 	<macrodef name="setup-testable-jboss">
 		<sequential>
 			<setup-testable-jboss-jsp-configuration />
+
+			<ant antfile="build-dist.xml" target="set-up-jakarta-ee-transformer-agent">
+				<property name="app.server.type" value="jboss" />
+				<property name="app.server.version" value="${app.server.jboss.version}" />
+			</ant>
 		</sequential>
 	</macrodef>
 
@@ -7022,6 +7278,11 @@ log.sanitizer.enabled=false</echo>
 			<setup-testable-tomcat-osgi-modules />
 
 			<setup-testable-tomcat-setenv />
+
+			<ant antfile="build-dist.xml" target="set-up-jakarta-ee-transformer-agent">
+				<property name="app.server.type" value="tomcat" />
+				<property name="app.server.version" value="${app.server.tomcat.version}" />
+			</ant>
 		</sequential>
 	</macrodef>
 
@@ -7697,7 +7958,7 @@ ${docker.start.error}</fail>
 						<equals arg1="${database.type}" arg2="mysql" />
 					</or>
 					<then>
-						<property name="docker.database.wait.condition">mysqladmin ping --host=${database.host} --silent</property>
+						<property name="docker.database.wait.condition">mysqladmin ping > /dev/null 2>&amp;1</property>
 					</then>
 				</elseif>
 				<elseif>
@@ -7715,10 +7976,11 @@ ${docker.start.error}</fail>
 				<elseif>
 					<equals arg1="${database.type}" arg2="sqlserver" />
 					<then>
+						<get-database-property property.name="database.executable" />
 						<get-database-property property.name="database.password" />
 						<get-database-property property.name="database.username" />
 
-						<property name="docker.database.wait.condition">/opt/mssql-tools/bin/sqlcmd -P ${database.password} -U ${database.username} -Q "select name from sys.databases" 2>/dev/null</property>
+						<property name="docker.database.wait.condition">${database.executable} -P ${database.password} -U ${database.username} -Q "select name from sys.databases" 2>/dev/null</property>
 					</then>
 				</elseif>
 			</if>
@@ -8726,7 +8988,7 @@ war.path=${app.server.portal.dir}/</echo>
 		</sequential>
 	</macrodef>
 
-	<macrodef name="validate-mysql-schemas">
+	<macrodef name="validate-schemas">
 		<attribute default="upgraded" name="upgraded.db.schema" />
 		<attribute default="fresh" name="fresh.db.schema" />
 
@@ -8741,7 +9003,37 @@ war.path=${app.server.portal.dir}/</echo>
 			</if>
 
 			<echo file="validate_db_upgrade_schemas.sh">
-diff -B --new-line-format='%L' --old-line-format= --unchanged-line-format= ${selenium.output.dir.name}/upgraded-@{upgraded.db.schema}.sql ${selenium.output.dir.name}/fresh-@{fresh.db.schema}.sql || true
+				<![CDATA[
+					#!/bin/bash
+
+					function main {
+						grep -i "CREATE TABLE" "${selenium.output.dir.name}/fresh-@{fresh.db.schema}.sql" | awk '{print $3}' | tr -d '`' > ${selenium.output.dir.name}/tables-fresh.txt
+
+						local upgraded_sql_file="${selenium.output.dir.name}/upgraded-@{upgraded.db.schema}.sql"
+
+						grep -i "CREATE TABLE" "${upgraded_sql_file}" | awk '{print $3}' | tr -d '`' > ${selenium.output.dir.name}/tables-upgraded.txt
+
+						grep -Fxvf ${selenium.output.dir.name}/tables-fresh.txt ${selenium.output.dir.name}/tables-upgraded.txt > ${selenium.output.dir.name}/tables-to-remove.txt
+
+						#
+						# Remove SQL statements for tables that are only present in the upgraded SQL file
+						#
+
+						while read -r table; do
+							sed -i "/^CREATE TABLE \`$table\`/,/ENDCREATE/d" "${upgraded_sql_file}"
+							sed -i "/^CREATE TABLE public.$table/,/^);/d" "${upgraded_sql_file}"
+							sed -i "/^CREATE INDEX.*$TABLE/d" "${upgraded_sql_file}"
+							sed -i "/^CREATE UNIQUE INDEX.*$TABLE/d" "${upgraded_sql_file}"
+							sed -i "/^ALTER TABLE ONLY public\.$table/,/^);/d" "${upgraded_sql_file}"
+							sed -i "/^CREATE RULE update_$table/,/);$/d" "${upgraded_sql_file}"
+							sed -i "/^CREATE RULE delete_$table/,/);$/d" "${upgraded_sql_file}"
+						done < ${selenium.output.dir.name}/tables-to-remove.txt
+
+						diff -B -W250 -y ${selenium.output.dir.name}/upgraded-@{upgraded.db.schema}.sql ${selenium.output.dir.name}/fresh-@{fresh.db.schema}.sql | expand | grep -C5 -E '^.{123} [|><]( |$)' || true
+					}
+
+					main
+				]]>
 			</echo>
 
 			<chmod
@@ -8751,27 +9043,18 @@ diff -B --new-line-format='%L' --old-line-format= --unchanged-line-format= ${sel
 
 			<exec executable="./validate_db_upgrade_schemas.sh" outputproperty="database.changes.master" />
 
+			<delete failonerror="false" file="${selenium.output.dir.name}/tables-fresh.txt" />
+			<delete failonerror="false" file="${selenium.output.dir.name}/tables-to-remove.txt" />
+			<delete failonerror="false" file="${selenium.output.dir.name}/tables-upgraded.txt" />
+
 			<if>
 				<not>
 					<equals arg1="${database.changes.master}" arg2="" />
 				</not>
 				<then>
 					<echo file="${selenium.output.dir.name}/@{upgraded.db.schema}-@{fresh.db.schema}-validate-db-schemas.txt">
-Upgraded database is missing the following elements from a fresh database: ${line.separator}${database.changes.master}
-
-diff:${line.separator}${selenium.output.dir.name}/upgraded-@{upgraded.db.schema}.sql > ${selenium.output.dir.name}/fresh-@{fresh.db.schema}.sql
+						Fresh and upgraded schemas differ: ${line.separator}${database.changes.master}
 					</echo>
-
-					<echo file="validate_db_upgrade_schemas.sh">
-diff -y -B -W250 ${selenium.output.dir.name}/upgraded-@{upgraded.db.schema}.sql ${selenium.output.dir.name}/fresh-@{fresh.db.schema}.sql | expand | grep -E -C40 '^.{123} [|>]( |$)'
-					</echo>
-
-					<chmod
-						file="validate_db_upgrade_schemas.sh"
-						perm="a+x"
-					/>
-
-					<exec append="true" executable="./validate_db_upgrade_schemas.sh" output="${selenium.output.dir.name}/@{upgraded.db.schema}-@{fresh.db.schema}-validate-db-schemas.txt" />
 				</then>
 				<else>
 					<echo file="${selenium.output.dir.name}/@{upgraded.db.schema}-@{fresh.db.schema}-validate-db-schemas.txt">Database schemas match</echo>
@@ -9183,12 +9466,12 @@ create database lportal${database.index} character set utf8;</echo>
 						</and>
 						<then>
 							<echo file="create.sql">
-drop database lportal;
+drop database if exists lportal;
 create database lportal encoding = 'UNICODE';</echo>
 
 							<echo append="true" file="create.sql">
 
-drop database lportal${databases.size};
+drop database if exists lportal${databases.size};
 create database lportal${databases.size} encoding = 'UNICODE';</echo>
 						</then>
 					</elseif>
@@ -9572,29 +9855,11 @@ go</echo>
 	</target>
 
 	<target name="cluster-session-replication">
-		<if>
-			<not>
-				<resourcecontains
-					resource="${app.server.tomcat.dir}/webapps/ROOT/WEB-INF/classes/logging.properties"
-					substring="org.apache.catalina.ha.session.handlers"
-				/>
-			</not>
-			<then>
-				<echo append="true" file="${app.server.tomcat.dir}/webapps/ROOT/WEB-INF/classes/logging.properties">
-			<![CDATA[
-org.apache.catalina.ha.session.handlers=java.util.logging.ConsoleHandler
-org.apache.catalina.ha.session.level=INFO]]>
-				</echo>
-			</then>
-		</if>
-
 		<replace
-			failOnNoReplacements="true"
-			file="${app.server.tomcat.dir}/webapps/ROOT/WEB-INF/web.xml"
+			file="${app.server.tomcat.dir}/conf/context.xml"
 		>
-			<replacetoken><![CDATA[xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">]]></replacetoken>
-			<replacevalue><![CDATA[xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">
-	<distributable />]]></replacevalue>
+			<replacetoken><![CDATA[    <Manager pathname="SESSIONS.ser" />]]></replacetoken>
+			<replacevalue><![CDATA[]]></replacevalue>
 		</replace>
 
 		<echo append="true" file="${app.server.tomcat.dir}/conf/logging.properties">
@@ -9639,6 +9904,31 @@ org.apache.catalina.tribes.level = FINE]]>
 			</Sender>
 		</Channel>
 	</Cluster>]]></replacevalue>
+		</replace>
+
+		<if>
+			<not>
+				<resourcecontains
+					resource="${app.server.tomcat.dir}/webapps/ROOT/WEB-INF/classes/logging.properties"
+					substring="org.apache.catalina.ha.session.handlers"
+				/>
+			</not>
+			<then>
+				<echo append="true" file="${app.server.tomcat.dir}/webapps/ROOT/WEB-INF/classes/logging.properties">
+			<![CDATA[
+org.apache.catalina.ha.session.handlers=java.util.logging.ConsoleHandler
+org.apache.catalina.ha.session.level=INFO]]>
+				</echo>
+			</then>
+		</if>
+
+		<replace
+			failOnNoReplacements="true"
+			file="${app.server.tomcat.dir}/webapps/ROOT/WEB-INF/web.xml"
+		>
+			<replacetoken><![CDATA[xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">]]></replacetoken>
+			<replacevalue><![CDATA[xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">
+	<distributable />]]></replacevalue>
 		</replace>
 	</target>
 
@@ -10784,22 +11074,63 @@ send_user $expect_out(buffer)]]></echo>
 		<get-test-app-server-lib-portal-dir />
 
 		<if>
+			<not>
+				<isset property="custom.database.url" />
+			</not>
+			<then>
+				<get-testcase-property property.name="custom.database.url" />
+			</then>
+		</if>
+
+		<if>
+			<isset property="custom.database.url" />
+			<then>
+				<if>
+					<equals arg1="${database.type}" arg2="mysql" />
+					<then>
+						<sql autocommit="${sql.autocommit}" classpath="${test.app.server.lib.portal.dir}/${jdbc.mysql.driver}" driver="${database.mysql.driver}" onerror="continue" output="${sql.output.file}" password="${database.mysql.password}" print="true" showheaders="false" showtrailers="false" src="${sql.input.file}" url="${custom.database.url}" userid="${database.mysql.username}" />
+					</then>
+				</if>
+
+				<if>
+					<equals arg1="${database.type}" arg2="postgresql" />
+					<then>
+						<sql autocommit="${sql.autocommit}" classpath="${test.app.server.lib.portal.dir}/${jdbc.postgresql.driver}" driver="${database.postgresql.driver}" onerror="continue" output="${sql.output.file}" password="${database.postgresql.password}" print="true" showheaders="false" showtrailers="false" src="${sql.input.file}" url="${custom.database.url}" userid="${database.postgresql.username}" />
+					</then>
+				</if>
+			</then>
+			<else>
+				<if>
+					<equals arg1="${database.type}" arg2="mysql" />
+					<then>
+						<sql autocommit="${sql.autocommit}" classpath="${test.app.server.lib.portal.dir}/${jdbc.mysql.driver}" driver="${database.mysql.driver}" onerror="continue" output="${sql.output.file}" password="${database.mysql.password}" print="true" showheaders="false" showtrailers="false" src="${sql.input.file}" url="${database.mysql.url}" userid="${database.mysql.username}" />
+					</then>
+				</if>
+
+				<if>
+					<equals arg1="${database.type}" arg2="postgresql" />
+					<then>
+						<sql autocommit="${sql.autocommit}" classpath="${test.app.server.lib.portal.dir}/${jdbc.postgresql.driver}" driver="${database.postgresql.driver}" onerror="continue" output="${sql.output.file}" password="${database.postgresql.password}" print="true" showheaders="false" showtrailers="false" src="${sql.input.file}" url="${database.postgresql.url}" userid="${database.postgresql.username}" />
+					</then>
+				</if>
+			</else>
+		</if>
+	</target>
+
+	<target name="export-database-schema">
+		<if>
 			<equals arg1="${database.type}" arg2="mysql" />
 			<then>
-				<sql autocommit="${sql.autocommit}" classpath="${test.app.server.lib.portal.dir}/${jdbc.mysql.driver}" driver="${database.mysql.driver}" onerror="continue" output="${sql.output.file}" password="${database.mysql.password}" print="true" showheaders="false" showtrailers="false" src="${sql.input.file}" url="${database.mysql.url}" userid="${database.mysql.username}" />
+				<export-database-mysql database.file.prefix="${database.file.prefix}" database.schema.name="${database.schema.name}" />
 			</then>
 		</if>
 
 		<if>
 			<equals arg1="${database.type}" arg2="postgresql" />
 			<then>
-				<sql autocommit="${sql.autocommit}" classpath="${test.app.server.lib.portal.dir}/${jdbc.postgresql.driver}" driver="${database.postgresql.driver}" onerror="continue" output="${sql.output.file}" password="${database.postgresql.password}" print="true" showheaders="false" showtrailers="false" src="${sql.input.file}" url="${database.postgresql.url}" userid="${database.postgresql.username}" />
+				<export-database-postgresql database.file.prefix="${database.file.prefix}" database.schema.name="${database.schema.name}" />
 			</then>
 		</if>
-	</target>
-
-	<target name="export-database-schema">
-		<export-database-mysql-compact database.file.prefix="${database.file.prefix}" database.schema.name="${database.schema.name}" />
 	</target>
 
 	<target name="generate-changelog">
@@ -11667,6 +11998,8 @@ ${update.properties}</echo>
 
 		<Logger level="ERROR" name="com.zaxxer.hikari.pool.PoolBase" />
 
+		<Logger level="ERROR" name="org.apache.http.client.protocol.ResponseProcessCookies" />
+
 		${log4j.logggers.root}
 	</Loggers>
 </Configuration>]]></echo>
@@ -11708,7 +12041,7 @@ ${update.properties}</echo>
 		<echo file="${liferay.home}/osgi/log4j/com.liferay.portal.cache.ehcache.impl-log4j-ext.xml"><![CDATA[<?xml version="1.0"?>
 <Configuration strict="true">
 	<Loggers>
-		<Logger level="DEBUG" name="com.liferay.portal.cache.ehcache.internal.event.PortalCacheCacheEventListener.test.cache" />
+		<Logger level="DEBUG" name="com.liferay.portal.cache.ehcache.internal.events.PortalCacheCacheEventListener.test.cache" />
 	</Loggers>
 </Configuration>]]></echo>
 
@@ -12427,6 +12760,8 @@ mail.session.mail.smtp.port=25000</echo>
 		</if>
 
 		<echo append="true" file="portal-impl/src/portal-ext.properties">
+analytics.cloud.domain.allowed=*
+
 captcha.enforce.disabled=true</echo>
 
 		<apply-portal-ext-properties />
@@ -12636,6 +12971,24 @@ captcha.enforce.disabled=true</echo>
 				<echo append="true" file="${project.dir}/portal-test/src/test-portal-impl.properties">
 					object.storage.sugarcrm.username=${object.storage.sugarcrm.username}
 				</echo>
+			</then>
+		</if>
+	</target>
+
+	<target name="prepare-portal-test-portal-impl-properties">
+		<if>
+			<equals arg1="${database.partition.copy}" arg2="true" />
+			<then>
+				<echo append="true" file="${project.dir}/portal-test/src/test-portal-impl.properties">
+					database.partition.copy=true</echo>
+			</then>
+		</if>
+
+		<if>
+			<equals arg1="${database.partition.extract.and.insert}" arg2="true" />
+			<then>
+				<echo append="true" file="${project.dir}/portal-test/src/test-portal-impl.properties">
+					database.partition.extract.and.insert=true</echo>
 			</then>
 		</if>
 	</target>
@@ -14691,7 +15044,7 @@ cluster.link.bind.addr["cluster-link-udp"]=127.0.0.1</echo>
 								<![CDATA[
 									#!/bin/bash
 
-									/opt/mssql-tools/bin/sqlcmd -P ${database.sqlserver.password} -Q "RESTORE DATABASE ${database.sqlserver.schema} FROM DISK='/tmp/${database.type}.bak'" -S localhost -U ${database.sqlserver.username}
+									${database.sqlserver.executable} -P ${database.sqlserver.password} -Q "RESTORE DATABASE ${database.sqlserver.schema} FROM DISK='/tmp/${database.type}.bak'" -S localhost -U ${database.sqlserver.username}
 								]]>
 							</echo>
 
@@ -16846,7 +17199,7 @@ CATALINA_OPTS="$CATALINA_OPTS -Dcom.sun.management.jmxremote -Dcom.sun.managemen
 	</target>
 
 	<target name="validate-db-upgrade-schemas">
-		<validate-mysql-schemas fresh.db.schema="${fresh.db.schema}" upgraded.db.schema="${upgraded.db.schema}" />
+		<validate-schemas fresh.db.schema="${fresh.db.schema}" upgraded.db.schema="${upgraded.db.schema}" />
 	</target>
 
 	<target name="wait-for-license-activation">

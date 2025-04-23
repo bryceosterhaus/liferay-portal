@@ -4,10 +4,9 @@
  */
 
 import {
-	ObjectDefinitionApi,
-	ObjectFolderApi,
-	ObjectRelationship,
-	ObjectRelationshipApi,
+	ObjectDefinitionAPI,
+	ObjectFolderAPI,
+	ObjectRelationshipAPI,
 } from '@liferay/object-admin-rest-client-js';
 import {expect, mergeTests} from '@playwright/test';
 
@@ -354,11 +353,11 @@ test.describe('Manage object definitions through Model Builder', () => {
 		const objectRelationshipName =
 			'objectRelationshipName' + Math.floor(Math.random() * 99);
 
-		const objectRelationshipApiClient = await apiHelpers.buildRestClient(
-			ObjectRelationshipApi
+		const objectRelationshipAPIClient = await apiHelpers.buildRestClient(
+			ObjectRelationshipAPI
 		);
 
-		await objectRelationshipApiClient.postObjectDefinitionByExternalReferenceCodeObjectRelationship(
+		await objectRelationshipAPIClient.postObjectDefinitionByExternalReferenceCodeObjectRelationship(
 			objectDefinition1.externalReferenceCode,
 			{
 				label: {
@@ -372,7 +371,7 @@ test.describe('Manage object definitions through Model Builder', () => {
 				objectDefinitionId1: objectDefinition1.id,
 				objectDefinitionId2: objectDefinition2.id,
 				objectDefinitionName2: objectDefinition2.name,
-				type: ObjectRelationship.TypeEnum.OneToMany,
+				type: 'oneToMany',
 			}
 		);
 
@@ -414,10 +413,10 @@ test.describe('Manage object definitions through Model Builder', () => {
 
 		// Clean up
 
-		const objectFolderApiClient =
-			await apiHelpers.buildRestClient(ObjectFolderApi);
+		const objectFolderAPIClient =
+			await apiHelpers.buildRestClient(ObjectFolderAPI);
 
-		await objectFolderApiClient.deleteObjectFolder(objectFolder.id);
+		await objectFolderAPIClient.deleteObjectFolder(objectFolder.id);
 	});
 
 	test('navigate to edit object definition page', async ({
@@ -460,7 +459,7 @@ test.describe('Manage object definitions through Model Builder', () => {
 		apiHelpers.data.push({id: objectFolder.id, type: 'objectFolder'});
 
 		const objectDefinitionAPIClient =
-			await apiHelpers.buildRestClient(ObjectDefinitionApi);
+			await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 		const {body: department} =
 			await objectDefinitionAPIClient.postObjectDefinition({

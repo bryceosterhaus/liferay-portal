@@ -34,6 +34,7 @@
 		<column name="street1" type="String" />
 		<column name="street2" type="String" />
 		<column name="street3" type="String" />
+		<column name="subtype" type="String" />
 		<column name="validationDate" type="Date" />
 		<column name="validationStatus" type="int" />
 		<column name="zip" type="String" />
@@ -160,9 +161,6 @@
 
 		<finder name="WebId" return-type="Company" unique="true">
 			<finder-column name="webId" />
-		</finder>
-		<finder name="Mx" return-type="Company">
-			<finder-column name="mx" />
 		</finder>
 		<finder name="LogoId" return-type="Collection">
 			<finder-column name="logoId" />
@@ -670,11 +668,11 @@
 			<finder-column name="companyId" />
 			<finder-column name="layoutPrototypeUuid" />
 		</finder>
-		<finder name="P_I" return-type="Layout">
+		<finder name="P_I" return-type="Collection">
 			<finder-column name="privateLayout" />
 			<finder-column name="iconImageId" />
 		</finder>
-		<finder name="C_C" return-type="Layout">
+		<finder name="C_C" return-type="Collection">
 			<finder-column name="classNameId" />
 			<finder-column name="classPK" />
 		</finder>
@@ -1015,7 +1013,7 @@
 			<finder-column name="companyId" />
 			<finder-column name="layoutSetPrototypeUuid" />
 		</finder>
-		<finder name="P_L" return-type="Layout">
+		<finder name="P_L" return-type="Collection">
 			<finder-column name="privateLayout" />
 			<finder-column name="logoId" />
 		</finder>
@@ -1363,10 +1361,6 @@
 		<finder name="CompanyId" return-type="Collection">
 			<finder-column name="companyId" />
 		</finder>
-		<finder name="C_DP" return-type="PasswordPolicy">
-			<finder-column name="companyId" />
-			<finder-column name="defaultPolicy" />
-		</finder>
 		<finder name="C_N" return-type="PasswordPolicy" unique="true">
 			<finder-column name="companyId" />
 			<finder-column name="name" />
@@ -1532,7 +1526,7 @@
 		<finder name="OwnerType" return-type="Collection">
 			<finder-column name="ownerType" />
 		</finder>
-		<finder name="O_O" return-type="PortalPreferences">
+		<finder name="O_O" return-type="PortalPreferences" unique="true">
 			<finder-column name="ownerId" />
 			<finder-column name="ownerType" />
 		</finder>
@@ -2198,6 +2192,7 @@
 		<column localized="true" name="description" type="String" />
 		<column name="type" type="int" />
 		<column name="subtype" type="String" />
+		<column name="status" type="int" />
 
 		<!-- Relationships -->
 
@@ -2548,7 +2543,7 @@
 		<finder name="EmailAddress" return-type="Collection">
 			<finder-column name="emailAddress" />
 		</finder>
-		<finder name="PortraitId" return-type="User">
+		<finder name="PortraitId" return-type="Collection">
 			<finder-column name="portraitId" />
 		</finder>
 		<finder db-index="false" name="GtU_C" return-type="Collection" where="type_ = 1">
@@ -3015,11 +3010,6 @@
 			<finder-column comparator="!=" name="layoutSetId" />
 			<finder-column arrayable-operator="OR" name="hostname" />
 		</finder>
-		<finder name="C_L_D" return-type="VirtualHost">
-			<finder-column name="companyId" />
-			<finder-column name="layoutSetId" />
-			<finder-column name="defaultVirtualHost" />
-		</finder>
 	</entity>
 	<entity local-service="true" name="WebDAVProps" remote-service="false">
 
@@ -3157,7 +3147,7 @@
 			<finder-column name="classNameId" />
 			<finder-column name="classPK" />
 		</finder>
-		<finder name="G_C_C_C_T" return-type="WorkflowDefinitionLink">
+		<finder name="G_C_C_C_T" return-type="Collection">
 			<finder-column name="groupId" />
 			<finder-column name="companyId" />
 			<finder-column name="classNameId" />
@@ -3212,6 +3202,7 @@
 	<exceptions>
 		<exception>AddressCity</exception>
 		<exception>AddressStreet</exception>
+		<exception>AddressSubtype</exception>
 		<exception>AddressZip</exception>
 		<exception>AvailableLocale</exception>
 		<exception>CompanyMaxUsers</exception>

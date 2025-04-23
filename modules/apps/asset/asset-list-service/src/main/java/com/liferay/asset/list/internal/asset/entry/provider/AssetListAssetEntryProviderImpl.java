@@ -256,7 +256,7 @@ public class AssetListAssetEntryProviderImpl
 	private InfoPage<AssetEntry> _dynamicSearch(
 		long companyId, long[][] assetCategoryIds,
 		List<AssetEntryQuery> assetEntryQueries, String[][] assetTagNames,
-		String keywords) {
+		String keywords, int start, int end) {
 
 		try {
 			if (ListUtil.isEmpty(assetEntryQueries)) {
@@ -270,30 +270,24 @@ public class AssetListAssetEntryProviderImpl
 					_getDynamicSearchContext(
 						companyId, assetCategoryIds, assetEntryQuery,
 						assetTagNames, keywords),
-					assetEntryQuery, assetEntryQuery.getStart(),
-					assetEntryQuery.getEnd());
+					assetEntryQuery, start, end);
 
 				return InfoPage.of(
 					_assetHelper.getAssetEntries(hits),
-					Pagination.of(
-						assetEntryQuery.getEnd(), assetEntryQuery.getStart()),
-					hits.getLength());
+					Pagination.of(end, start), hits.getLength());
 			}
 
 			SearchHits searchHits = _assetHelper.search(
 				_getDynamicSearchContext(
 					companyId, assetCategoryIds, assetEntryQueries.get(0),
 					assetTagNames, keywords),
-				assetEntryQueries, assetEntryQuery.getStart(),
-				assetEntryQuery.getEnd());
+				assetEntryQueries, start, end);
 
 			Long totalHits = searchHits.getTotalHits();
 
 			return InfoPage.of(
 				_assetHelper.getAssetEntries(searchHits),
-				Pagination.of(
-					assetEntryQuery.getEnd(), assetEntryQuery.getStart()),
-				totalHits.intValue());
+				Pagination.of(end, start), totalHits.intValue());
 		}
 		catch (Exception exception) {
 			_log.error("Unable to get asset entries", exception);
@@ -303,7 +297,7 @@ public class AssetListAssetEntryProviderImpl
 	}
 
 	private long[] _filterAssetCategoryIds(long[] assetCategoryIds) {
-		List<Long> assetCategoryIdsList = new ArrayList<>();
+		List<Long> filteredAssetCategoryIds = new ArrayList<>();
 
 		for (long assetCategoryId : assetCategoryIds) {
 			AssetCategory category =
@@ -313,10 +307,10 @@ public class AssetListAssetEntryProviderImpl
 				continue;
 			}
 
-			assetCategoryIdsList.add(assetCategoryId);
+			filteredAssetCategoryIds.add(assetCategoryId);
 		}
 
-		return ArrayUtil.toArray(assetCategoryIdsList.toArray(new Long[0]));
+		return ArrayUtil.toArray(filteredAssetCategoryIds.toArray(new Long[0]));
 	}
 
 	private long[] _getAssetCategoryIds(UnicodeProperties unicodeProperties) {
@@ -610,7 +604,7 @@ public class AssetListAssetEntryProviderImpl
 			return _dynamicSearch(
 				assetListEntry.getCompanyId(), assetCategoryIds,
 				Collections.singletonList(assetEntryQuery), assetTagNames,
-				keywords);
+				keywords, start, end);
 		}
 
 		return _dynamicSearch(
@@ -619,7 +613,7 @@ public class AssetListAssetEntryProviderImpl
 				_getCombinedSegmentsEntryIds(assetListEntry, segmentsEntryIds),
 				segmentsEntryId -> getAssetEntryQuery(
 					assetListEntry, segmentsEntryId, userId)),
-			assetTagNames, keywords);
+			assetTagNames, keywords, start, end);
 	}
 
 	private SearchContext _getDynamicSearchContext(

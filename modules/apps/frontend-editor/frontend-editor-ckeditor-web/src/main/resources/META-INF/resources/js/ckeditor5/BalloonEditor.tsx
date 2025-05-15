@@ -36,6 +36,9 @@ const BalloonEditor = ({
 				config={{
 					...getDefaultEditorConfig({
 						editorType: EEditorType.BALLOON,
+						includePremiumPlugins: Boolean(
+							config?.includePremiumPlugins
+						),
 						preset: config?.preset || EEditorConfigPreset.ADVANCED,
 					}),
 					...config,

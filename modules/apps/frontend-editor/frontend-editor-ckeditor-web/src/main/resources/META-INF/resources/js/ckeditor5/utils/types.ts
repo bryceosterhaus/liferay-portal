@@ -17,6 +17,7 @@ export enum EEditorType {
 export interface LiferayEditorConfig extends EditorConfig {
 	filebrowserImageBrowseUrl?: string;
 	filebrowserVideoBrowseUrl?: string;
+	includePremiumPlugins?: boolean;
 	itemSelectorEventName?: string;
 	preset?: EEditorConfigPreset;
 }

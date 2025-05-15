@@ -7,6 +7,7 @@ package com.liferay.frontend.editor.ckeditor.web.internal.configuration;
 
 import aQute.bnd.annotation.metatype.Meta;
 
+import com.liferay.frontend.editor.ckeditor.web.internal.constants.CKEditorConstants;
 import com.liferay.portal.configuration.metatype.annotations.ExtendedObjectClassDefinition;
 
 /**
@@ -19,8 +20,7 @@ import com.liferay.portal.configuration.metatype.annotations.ExtendedObjectClass
 public interface CKEditor5Configuration {
 
 	@Meta.AD(
-		deflt = "eyJhbGciOiJFUzI1NiJ9.eyJleHAiOjE3NjcyMjU1OTksImp0aSI6IjNjOTQxM2FhLWI1MDctNGU4ZC05ZTAwLTNhY2UyNGY5MTU4ZiIsImRpc3RyaWJ1dGlvbkNoYW5uZWwiOlsic2giLCJkcnVwYWwiXSwid2hpdGVMYWJlbCI6dHJ1ZSwiZmVhdHVyZXMiOlsiRFJVUCJdLCJ2YyI6ImMyMWZmYTJhIn0.GgM-msNhbUOmXDImVGf7FO9ueeLgtB_0aGDgEygAhI3k5TyAlusZzhFzPmTDQpXiPQ1V5SI3UMAoxH5u-MRYew",
-		required = false
+		deflt = CKEditorConstants.OPEN_SOURCE_LICENSE_KEY, required = false
 	)
 	public String licenseKey();
 

@@ -6,6 +6,7 @@
 package com.liferay.frontend.editor.ckeditor.web.internal.editor.configuration;
 
 import com.liferay.frontend.editor.ckeditor.web.internal.configuration.CKEditor5Configuration;
+import com.liferay.frontend.editor.ckeditor.web.internal.constants.CKEditorConstants;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.editor.configuration.BaseEditorConfigContributor;
 import com.liferay.portal.kernel.editor.configuration.EditorConfigContributor;
@@ -45,10 +46,15 @@ public class CKEditor5EditorConfigContributor
 		String name = GetterUtil.getString(
 			inputEditorTaglibAttributes.get("liferay-ui:input-editor:name"));
 
+		String licenseKey = _ckEditor5Configuration.licenseKey();
+
 		jsonObject.put(
+			"includePremiumPlugins",
+			!licenseKey.equals(CKEditorConstants.OPEN_SOURCE_LICENSE_KEY)
+		).put(
 			"itemSelectorEventName", namespace + name + "selectItem"
 		).put(
-			"licenseKey", _ckEditor5Configuration.licenseKey()
+			"licenseKey", licenseKey
 		).put(
 			"preset", "advanced"
 		);

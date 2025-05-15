@@ -23,4 +23,7 @@ public class CKEditorConstants {
 	 */
 	public static final String ATTRIBUTE_NAMESPACE = "liferay-ui:input-editor";
 
+	public static final String OPEN_SOURCE_LICENSE_KEY =
+		"eyJhbGciOiJFUzI1NiJ9.eyJleHAiOjE3NjcyMjU1OTksImp0aSI6IjNjOTQxM2FhLWI1MDctNGU4ZC05ZTAwLTNhY2UyNGY5MTU4ZiIsImRpc3RyaWJ1dGlvbkNoYW5uZWwiOlsic2giLCJkcnVwYWwiXSwid2hpdGVMYWJlbCI6dHJ1ZSwiZmVhdHVyZXMiOlsiRFJVUCJdLCJ2YyI6ImMyMWZmYTJhIn0.GgM-msNhbUOmXDImVGf7FO9ueeLgtB_0aGDgEygAhI3k5TyAlusZzhFzPmTDQpXiPQ1V5SI3UMAoxH5u-MRYew";
+
 }

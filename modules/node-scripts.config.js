@@ -10,7 +10,7 @@
  */
 
 module.exports = {
-	hash: 'f09add8795237917e9a54cb25033e66fc4311e4f7fe4bd854c0ac3373e5f6753',
+	hash: '2dea6af516934cf41216274ae4f7fc8724f056d0cbd72112f05cd3072ab8794a',
 	imports: {
 		'@liferay/accessibility-menu-web': [],
 		'@liferay/accessibility-settings-state-web': [],
@@ -266,6 +266,7 @@ module.exports = {
 		'frontend-editor-ckeditor-web': [
 			'@ckeditor/ckeditor5-react',
 			'ckeditor5',
+			'ckeditor5-premium-features',
 			'ckeditor5/ckeditor5.css',
 		],
 		'frontend-js-aui-web': [],

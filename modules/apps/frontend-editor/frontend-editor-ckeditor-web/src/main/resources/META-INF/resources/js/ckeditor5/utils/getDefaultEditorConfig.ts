@@ -36,6 +36,7 @@ import {
 	TableToolbar,
 	Underline,
 } from 'ckeditor5';
+import {SourceEditingEnhanced} from 'ckeditor5-premium-features';
 import {sub} from 'frontend-js-web';
 
 import ItemSelector from '../plugins/ItemSelector';
@@ -43,9 +44,11 @@ import {EEditorConfigPreset, EEditorType} from './types';
 
 const getDefaultEditorConfig = ({
 	editorType,
+	includePremiumPlugins,
 	preset,
 }: {
 	editorType: EEditorType;
+	includePremiumPlugins: boolean;
 	preset: EEditorConfigPreset;
 }): EditorConfig => {
 	const basicPlugins = [
@@ -120,6 +123,13 @@ const getDefaultEditorConfig = ({
 		advancedPlugins.push(SourceEditing);
 	}
 
+	if (includePremiumPlugins) {
+		advancedPlugins.push(SourceEditingEnhanced);
+	}
+	else if (editorType === EEditorType.CLASSIC) {
+		advancedPlugins.push(SourceEditing);
+	}
+
 	const toolbarItems = [
 		'undo',
 		'redo',
@@ -156,7 +166,10 @@ const getDefaultEditorConfig = ({
 		'alignment',
 	];
 
-	if (editorType === EEditorType.CLASSIC) {
+	if (includePremiumPlugins) {
+		toolbarItems.push('sourceEditingEnhanced');
+	}
+	else if (editorType === EEditorType.CLASSIC) {
 		toolbarItems.push('sourceEditing');
 	}
 

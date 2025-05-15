@@ -37,6 +37,9 @@ const ClassicEditor = ({
 				config={{
 					...getDefaultEditorConfig({
 						editorType: EEditorType.CLASSIC,
+						includePremiumPlugins: Boolean(
+							config?.includePremiumPlugins
+						),
 						preset: config?.preset || EEditorConfigPreset.ADVANCED,
 					}),
 					...config,

@@ -36,7 +36,10 @@ import {
 	TableToolbar,
 	Underline,
 } from 'ckeditor5';
-import {SourceEditingEnhanced} from 'ckeditor5-premium-features';
+
+// @ts-ignore
+
+import {SourceEditingEnhanced} from 'frontend-editor-ckeditor-web/ck5-premium-features';
 import {sub} from 'frontend-js-web';
 
 import ItemSelector from '../plugins/ItemSelector';

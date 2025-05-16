@@ -29,7 +29,8 @@ export default async function bundleJavaScriptMain(
 	overridenPackageSymbols,
 	projectDescription,
 	projectEntryPoints,
-	projectWebContextPath
+	projectWebContextPath,
+	emitStats
 ) {
 	const {main: mainEntryPoint, submodules = {}} = projectEntryPoints;
 
@@ -94,7 +95,7 @@ export default async function bundleJavaScriptMain(
 		);
 	}
 
-	await runEsbuild(esbuildConfig, 'main');
+	await runEsbuild(esbuildConfig, 'main', emitStats);
 
 	await Promise.all([
 		relocateSourcemap(

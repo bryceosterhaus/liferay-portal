@@ -7,18 +7,37 @@ import esbuild from 'esbuild';
 import fs from 'fs/promises';
 import path from 'path';
 
-export default async function runEsbuild(esbuildConfig, configName) {
+function formatBytes(byteString) {
+	const bytes = parseFloat(byteString);
+
+	if (bytes < 1024) {
+		return `${bytes} B`;
+	}
+	else if (bytes < 1024 * 1024) {
+		return `${(bytes / 1024).toFixed(2)} KB`;
+	}
+	else {
+		return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+	}
+}
+
+export default async function runEsbuild(esbuildConfig, configName, emitStats) {
 	await Promise.all([
-		doRunEsbuild(esbuildConfig, configName),
+		doRunEsbuild(esbuildConfig, configName, emitStats),
 		writeDebugEsbuildConfig(esbuildConfig, configName),
 	]);
 }
 
-async function doRunEsbuild(esbuildesbuildConfig, configName) {
+async function doRunEsbuild(
+	esbuildesbuildConfig,
+	configName,
+	emitStats = false
+) {
 	const start = performance.now();
+	let buildResult;
 
 	try {
-		await esbuild.build({
+		buildResult = await esbuild.build({
 			define: {
 
 				// Flag to use React 16 instead of React 18. See render.tsx in frontend-js-react-web.
@@ -27,6 +46,7 @@ async function doRunEsbuild(esbuildesbuildConfig, configName) {
 					? 'true'
 					: 'false',
 			},
+			metafile: emitStats,
 			minify: process.env.NODE_ENV === 'production',
 			...esbuildesbuildConfig,
 		});
@@ -38,8 +58,23 @@ async function doRunEsbuild(esbuildesbuildConfig, configName) {
 	const lapse = performance.now() - start;
 
 	console.log(
-		`⌛ Esbuild for ${configName} took: ${(lapse / 1000).toFixed(3)} s`
+		`⌛ Esbuild for ${configName} took: ${(lapse / 1000).toFixed(3)}s`
 	);
+
+	if (emitStats && buildResult?.metafile?.outputs) {
+		console.table(
+			Object.entries(buildResult.metafile.outputs).reduce(
+				(acc, [inputPath, data]) => {
+					if (!inputPath.endsWith('.map')) {
+						acc[inputPath] = formatBytes(data.bytes);
+					}
+
+					return acc;
+				},
+				{}
+			)
+		);
+	}
 }
 
 async function writeDebugEsbuildConfig(esbuildConfig, configName) {

@@ -23,7 +23,8 @@ export default async function bundleJavaScriptExports(
 	globalImports,
 	overridenPackageSymbols,
 	projectExports,
-	projectWebContextPath
+	projectWebContextPath,
+	emitStats
 ) {
 	if (!projectExports.length) {
 		return;
@@ -37,7 +38,8 @@ export default async function bundleJavaScriptExports(
 					globalImports,
 					overridenPackageSymbols,
 					projectWebContextPath,
-					moduleName
+					moduleName,
+					emitStats
 				)
 			)
 	);
@@ -47,7 +49,8 @@ async function bundle(
 	globalImports,
 	overridenPackageSymbols,
 	projectWebContextPath,
-	moduleName
+	moduleName,
+	emitStats
 ) {
 	const entryPoint = getEntryPoint(moduleName);
 
@@ -99,7 +102,7 @@ async function bundle(
 
 	const flatModuleName = getFlatName(moduleName);
 
-	await runEsbuild(esbuildConfig, flatModuleName);
+	await runEsbuild(esbuildConfig, flatModuleName, emitStats);
 
 	await relocateSourcemap(
 		path.join(

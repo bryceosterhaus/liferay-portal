@@ -26,7 +26,7 @@ export default async function bundleCSSExports(projectExports) {
 	);
 }
 
-async function bundle(moduleName) {
+async function bundle(moduleName, emitStats) {
 	const entryPoint = getEntryPoint(moduleName);
 
 	const esbuildConfig = {
@@ -69,5 +69,5 @@ async function bundle(moduleName) {
 		);
 	}
 
-	return runEsbuild(esbuildConfig, getFlatName(moduleName));
+	return runEsbuild(esbuildConfig, getFlatName(moduleName), emitStats);
 }

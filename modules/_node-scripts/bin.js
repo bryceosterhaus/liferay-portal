@@ -11,7 +11,7 @@ const COMMANDS = {
 		description: `
 		Builds current project.
 `,
-		parameters: '',
+		parameters: '[--stats]',
 		script: './bundle/index.mjs',
 	},
 	'build:custom': {

@@ -10,6 +10,7 @@ import getProjectDescription from '../configuration/getProjectDescription.mjs';
 import getProjectEntryPoints from '../configuration/getProjectEntryPoints.mjs';
 import getProjectExports from '../configuration/getProjectExports.mjs';
 import getProjectWebContextPath from '../configuration/getProjectWebContextPath.mjs';
+import getNamedArguments from '../util/getNamedArguments.mjs';
 import writeExportBridges from './amd/writeExportBridges.mjs';
 import writeMainBridge from './amd/writeMainBridge.mjs';
 import writeManifestJson from './amd/writeManifestJson.mjs';
@@ -24,6 +25,10 @@ import writeTimings from './writeTimings.mjs';
 
 export default async function main() {
 	const start = Date.now();
+
+	const {stats} = getNamedArguments({
+		stats: '--stats',
+	});
 
 	const [
 		globalImports,
@@ -55,18 +60,20 @@ export default async function main() {
 			overridenPackageSymbols,
 			projectDescription,
 			projectEntryPoints,
-			projectWebContextPath
+			projectWebContextPath,
+			stats
 		),
 		bundleJavaScriptExports(
 			globalImports,
 			overridenPackageSymbols,
 			projectExports,
-			projectWebContextPath
+			projectWebContextPath,
+			stats
 		),
 
 		// CSS exports bundling
 
-		bundleCSSExports(projectExports),
+		bundleCSSExports(projectExports, stats),
 		writeCSSExportsLoaderModules(projectExports, projectWebContextPath),
 
 		// AMD bridging

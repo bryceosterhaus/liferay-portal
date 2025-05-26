@@ -55,39 +55,52 @@ if (portletTitleBasedNavigation) {
 							</div>
 						</aui:form>
 
-						<aui:script use="liferay-upload">
-							new Liferay.Upload({
-								boundingBox: '#<portlet:namespace />fileUpload',
+						<aui:script type="module">
+							import React from 'react';
+							import {FileUploader} from '/o/frontend-js-components-web/__liferay__/index.js';
+							import ReactDOM from 'react-dom';
 
-								<%
-								DecimalFormatSymbols decimalFormatSymbols = DecimalFormatSymbols.getInstance(locale);
-								%>
+							<%
+							DecimalFormatSymbols decimalFormatSymbols = DecimalFormatSymbols.getInstance(locale);
+							%>
 
-								decimalSeparator: '<%= decimalFormatSymbols.getDecimalSeparator() %>',
-
-								deleteFile:
-									'<liferay-portlet:actionURL name="/document_library/upload_multiple_file_entries"><portlet:param name="<%= Constants.CMD %>" value="<%= Constants.DELETE_TEMP %>" /><portlet:param name="folderId" value="<%= String.valueOf(folderId) %>" /></liferay-portlet:actionURL>',
-								fileDescription:
-									'<%= StringUtil.merge(dlConfiguration.fileExtensions()) %>',
-								maxFileSize:
-									'<%= DLValidatorUtil.getMaxAllowableSize(themeDisplay.getScopeGroupId(), null) %> B',
-								metadataContainer: '#<portlet:namespace />commonFileMetadataContainer',
-								metadataExplanationContainer:
-									'#<portlet:namespace />metadataExplanationContainer',
-								namespace: '<portlet:namespace />',
-								simultaneousUploads: 1,
-								tempFileURL: {
-									method: Liferay.Service.bind('/dlapp/get-temp-file-names'),
-									params: {
-										folderId: <%= folderId %>,
-										folderName: '<%= EditFileEntryMVCActionCommand.TEMP_FOLDER_NAME %>',
-										groupId: <%= scopeGroupId %>,
+							ReactDOM.render(
+								React.createElement(FileUploader, {
+									containerId: '#<portlet:namespace />commonFileMetadataContainer',
+									explanationContainerId:
+										'#<portlet:namespace />metadataExplanationContainer',
+									deleteFileURL:
+										'<liferay-portlet:actionURL name="/document_library/upload_multiple_file_entries"><portlet:param name="<%= Constants.CMD %>" value="<%= Constants.DELETE_TEMP %>" /><portlet:param name="folderId" value="<%= String.valueOf(folderId) %>" /></liferay-portlet:actionURL>',
+									fileDescription:
+										'<%= StringUtil.merge(dlConfiguration.fileExtensions()) %>',
+									maxFileSize:
+										'<%= DLValidatorUtil.getMaxAllowableSize(themeDisplay.getScopeGroupId(), null) %> B',
+									namespace: '<portlet:namespace />',
+									portletNamespace: '<portlet:namespace />',
+									fetchTempFiles: () => {
+										return new Promise((res) =>
+											Liferay.Service(
+												'/dlapp/get-temp-file-names',
+												{
+													folderId: <%= folderId %>,
+													folderName:
+														'<%= EditFileEntryMVCActionCommand.TEMP_FOLDER_NAME %>',
+													groupId: <%= scopeGroupId %>,
+												},
+												(data) => {
+													res(data);
+												}
+											)
+										);
 									},
-								},
-								tempRandomSuffix: '<%= TempFileEntryUtil.TEMP_RANDOM_SUFFIX %>',
-								uploadFile:
-									'<liferay-portlet:actionURL name="/document_library/upload_multiple_file_entries"><portlet:param name="<%= Constants.CMD %>" value="<%= Constants.ADD_TEMP %>" /><portlet:param name="folderId" value="<%= String.valueOf(folderId) %>" /></liferay-portlet:actionURL>',
-							});
+									tempRandomSuffix: '<%= TempFileEntryUtil.TEMP_RANDOM_SUFFIX %>',
+
+									multiple: true,
+									uploadURL:
+										'<liferay-portlet:actionURL name="/document_library/upload_multiple_file_entries"><portlet:param name="<%= Constants.CMD %>" value="<%= Constants.ADD_TEMP %>" /><portlet:param name="folderId" value="<%= String.valueOf(folderId) %>" /></liferay-portlet:actionURL>',
+								}),
+								document.querySelector('#<portlet:namespace />fileUpload')
+							);
 						</aui:script>
 					</clay:col>
 

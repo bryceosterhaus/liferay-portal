@@ -16,6 +16,7 @@ taglib uri="http://liferay.com/tld/util" prefix="liferay-util" %>
 
 <%@ page import="com.liferay.analytics.web.internal.constants.AnalyticsWebKeys" %><%@
 page import="com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil" %><%@
+page import="com.liferay.portal.kernel.frontend.spa.FrontendSPAUtil" %><%@
 page import="com.liferay.portal.kernel.util.GetterUtil" %><%@
 page import="com.liferay.portal.kernel.util.PropsKeys" %><%@
 page import="com.liferay.portal.kernel.util.PropsUtil" %>

@@ -71,6 +71,10 @@ import org.osgi.util.tracker.ServiceTrackerCustomizer;
 )
 public class SPAHelper {
 
+	public boolean isEnabled() {
+		return _spaConfiguration.enabled();
+	}
+
 	public long getCacheExpirationTime(long companyId) {
 		return _cacheExpirationTime;
 	}

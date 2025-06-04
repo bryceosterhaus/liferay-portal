@@ -7,11 +7,15 @@ package com.liferay.frontend.js.spa.web.internal.servlet.taglib;
 
 import com.liferay.frontend.js.loader.modules.extender.esm.ESImportUtil;
 import com.liferay.frontend.js.spa.web.internal.servlet.taglib.helper.SPAHelper;
+import com.liferay.frontend.js.spa.web.internal.configuration.SPAConfiguration;
 import com.liferay.portal.kernel.json.JSONArray;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.module.service.Snapshot;
 import com.liferay.portal.kernel.servlet.taglib.BaseJSPDynamicInclude;
 import com.liferay.portal.kernel.servlet.taglib.DynamicInclude;
@@ -20,6 +24,7 @@ import com.liferay.portal.kernel.servlet.taglib.aui.ScriptData;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
+import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.Props;
 import com.liferay.portal.kernel.util.PropsKeys;
@@ -30,6 +35,7 @@ import com.liferay.portal.url.builder.AbsolutePortalURLBuilderFactory;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import com.liferay.portal.configuration.module.configuration.ConfigurationProvider;
 
 import java.io.IOException;
 
@@ -41,7 +47,10 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Bruno Basto
  */
-@Component(service = DynamicInclude.class)
+@Component(
+	configurationPid = "com.liferay.frontend.js.spa.web.internal.configuration.SPAConfiguration",
+	service = DynamicInclude.class
+)
 public class SPATopHeadJSPDynamicInclude extends BaseJSPDynamicInclude {
 
 	@Override
@@ -50,7 +59,34 @@ public class SPATopHeadJSPDynamicInclude extends BaseJSPDynamicInclude {
 			HttpServletResponse httpServletResponse, String key)
 		throws IOException {
 
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
+
+		Group group = themeDisplay.getScopeGroup();
+
 		SPAHelper spaHelper = _spaHelperSnapshot.get();
+
+
+		System.out.println("ENABLED_HELPER: " + spaHelper.isEnabled());
+
+
+		try {
+					SPAConfiguration spaConfiguration =
+			_configurationProvider.getGroupConfiguration(
+				SPAConfiguration.class,
+				group.getGroupId()
+			);
+
+			System.out.println("ENABLED_CONFIG: " + spaConfiguration.enabled());
+
+		if (!spaConfiguration.enabled()) {
+			return;
+		}
+		}
+		catch (Exception exception) {
+			_log.error(exception);
+		}
 
 		JSONArray excludedPathsJSONArray =
 			spaHelper.getExcludedPathsJSONArray();
@@ -62,10 +98,6 @@ public class SPATopHeadJSPDynamicInclude extends BaseJSPDynamicInclude {
 				return;
 			}
 		}
-
-		ThemeDisplay themeDisplay =
-			(ThemeDisplay)httpServletRequest.getAttribute(
-				WebKeys.THEME_DISPLAY);
 
 		JSONObject configJSONObject = JSONUtil.put(
 			"cacheExpirationTime",
@@ -135,13 +167,7 @@ public class SPATopHeadJSPDynamicInclude extends BaseJSPDynamicInclude {
 
 	@Override
 	public void register(DynamicIncludeRegistry dynamicIncludeRegistry) {
-		boolean singlePageApplicationEnabled = GetterUtil.getBoolean(
-			_props.get(PropsKeys.JAVASCRIPT_SINGLE_PAGE_APPLICATION_ENABLED));
-
-		if (singlePageApplicationEnabled) {
-			dynamicIncludeRegistry.register(
-				"/html/common/themes/top_head.jsp#post");
-		}
+			dynamicIncludeRegistry.register("/html/common/themes/top_head.jsp#post");
 	}
 
 	@Override
@@ -174,5 +200,11 @@ public class SPATopHeadJSPDynamicInclude extends BaseJSPDynamicInclude {
 
 	@Reference
 	private Props _props;
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		SPATopHeadJSPDynamicInclude.class);
+
+	@Reference
+	private ConfigurationProvider _configurationProvider;
 
 }

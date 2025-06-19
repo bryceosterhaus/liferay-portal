@@ -2,6 +2,7 @@
 
 <Configuration strict="true">
 	<Loggers>
+		<Logger level="DEBUG" name="com.liferay.client.extension.type.internal.configuration" />
 		<Logger level="WARN" name="com.liferay.client.extension.type.internal.manager" />
 	</Loggers>
 </Configuration>

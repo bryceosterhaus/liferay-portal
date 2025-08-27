@@ -64,11 +64,6 @@ export enum DisplayType {
 	WARNING = 'warning',
 }
 
-export enum ESelectionTrigger {
-	CONTAINER = 'container',
-	INPUT = 'input',
-}
-
 export interface IInlineEditingSettings {
 	alwaysOn: boolean;
 	defaultBodyContent: object;
@@ -310,7 +305,7 @@ export interface IFrontendDataSetProps {
 	portletId?: string;
 	selectedItems?: any[];
 	selectedItemsKey?: string | undefined;
-	selectionType?: 'single' | 'multiple';
+	selectionType?: 'single' | 'multiple' | null;
 	showBulkActionsManagementBar?: boolean;
 	showBulkActionsManagementBarActions?: boolean;
 	showManagementBar?: boolean;

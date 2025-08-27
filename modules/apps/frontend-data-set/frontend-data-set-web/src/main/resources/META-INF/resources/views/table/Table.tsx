@@ -37,13 +37,7 @@ import {
 } from '../../utils/getLocalizedValue';
 import getSelectedItemValue from '../../utils/getSelectedItemValue';
 import {getInputRendererById} from '../../utils/renderer';
-import {
-	ESelectionTrigger,
-	IItemsActions,
-	ITableSchema,
-	IView,
-	TSort,
-} from '../../utils/types';
+import {IItemsActions, ITableSchema, IView, TSort} from '../../utils/types';
 import ViewsContext, {
 	IViewsContext,
 	TViewsContextDispatch,
@@ -104,7 +98,7 @@ const Head = ({
 }: {
 	fields: Array<Field>;
 	items: Array<any>;
-	selectionType?: string;
+	selectionType?: string | null;
 }) => {
 	const {selectable} = useContext(FrontendDataSetContext);
 
@@ -168,7 +162,7 @@ const Row = ({
 	itemInlineChanges?: {[key: string]: any};
 	itemsActions: Array<IItemsActions>;
 	onItemSelectionChange: Function;
-	selectionType?: string;
+	selectionType?: string | null;
 }) => {
 	const {itemsChanges, selectedItemsKey, updateItem} = useContext(
 		FrontendDataSetContext
@@ -233,8 +227,6 @@ const Row = ({
 										onChange={() =>
 											onItemSelectionChange({
 												item,
-												trigger:
-													ESelectionTrigger.INPUT,
 											})
 										}
 										title={Liferay.Language.get(
@@ -347,7 +339,7 @@ const Body = ({
 	items: Array<any>;
 	itemsActions: Array<IItemsActions>;
 	onItemSelectionChange: Function;
-	selectionType?: string;
+	selectionType?: string | null;
 }) => {
 	const {
 		allItemsSelectedActive,
@@ -411,7 +403,7 @@ function ClayTableRowOptionalDropTarget({
 	onItemSelectionChange: Function;
 }) {
 	const [viewsContext] = useContext(ViewsContext);
-	const {onSelect, selectable} = useContext(FrontendDataSetContext);
+	const {selectable} = useContext(FrontendDataSetContext);
 
 	const {className: dropClassName, dropRef} = useFDSDrop({item});
 
@@ -425,10 +417,7 @@ function ClayTableRowOptionalDropTarget({
 			? () => {
 					onItemSelectionChange({
 						item,
-						trigger: ESelectionTrigger.CONTAINER,
 					});
-
-					onSelect?.({selectedItems: [item]});
 				}
 			: undefined,
 		ref: dropRef,

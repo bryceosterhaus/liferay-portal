@@ -3,32 +3,47 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-import {useState} from 'react';
+import {useCallback, useState} from 'react';
 
-export default function useControlledState<T>({
+export type InternalDispatch<Value> =
+	| ((value: Value) => void)
+	| ((value?: Value) => void)
+	| ((value: Value | (() => Value)) => void)
+	| ((value?: Value | (() => Value)) => void)
+	| React.Dispatch<React.SetStateAction<Value>>;
+
+type Props<Value> = {
+	defaultValue?: Value | (() => Value);
+	onChange?: InternalDispatch<Value>;
+	value?: Value;
+};
+
+export default function useControlledState<Value>({
 	defaultValue,
 	onChange,
-	value: valueProp,
-}: {
-	defaultValue: T;
-	onChange?: (value: T) => void;
-	value?: T;
-}) {
-	const [internalState, setInternalState] = useState(defaultValue);
+	value,
+}: Props<Value>) {
+	const [stateValue, setStateValue] = useState(
+		defaultValue === undefined ? value : defaultValue
+	);
 
-	const isControlled = valueProp !== undefined;
+	const isControlled = onChange !== undefined && value !== undefined;
 
-	const value = isControlled ? valueProp : internalState;
+	const setValue = useCallback(
+		(value: Value) => {
+			if (isControlled) {
+				onChange(value);
+			}
+			else {
+				setStateValue(value);
+			}
+		},
+		[isControlled, onChange]
+	);
 
-	const setValue = (newValue: T) => {
-		if (!isControlled) {
-			setInternalState(newValue);
-		}
-
-		if (onChange) {
-			onChange(newValue);
-		}
-	};
-
-	return [value, setValue] as const;
+	return [isControlled ? value : stateValue, setValue, isControlled] as [
+		Value,
+		InternalDispatch<Value>,
+		boolean,
+	];
 }

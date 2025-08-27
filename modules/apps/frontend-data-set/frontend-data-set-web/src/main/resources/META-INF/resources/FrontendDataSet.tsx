@@ -5,7 +5,11 @@
 
 import ClayLoadingIndicator from '@clayui/loading-indicator';
 import {ClayPaginationBarWithBasicItems} from '@clayui/pagination-bar';
-import {useIsMounted, useThunk} from '@liferay/frontend-js-react-web';
+import {
+	useControlledState,
+	useIsMounted,
+	useThunk,
+} from '@liferay/frontend-js-react-web';
 import classNames from 'classnames';
 import {openToast} from 'frontend-js-components-web';
 import {
@@ -69,7 +73,6 @@ import {loadData} from './utils/loadData';
 
 import {logError} from './utils/logError';
 import {
-	ESelectionTrigger,
 	IField,
 	IFrontendDataSetProps,
 	IModalConfig,
@@ -120,14 +123,13 @@ const FrontendDataSetContent = ({
 	nestedItemsReferenceKey,
 	onActionDropdownItemClick,
 	onBulkActionItemClick,
-	onSelect,
 	onSelectedItemsChange,
 	overrideEmptyResultView,
 	pagination,
 	portletId,
-	selectedItems: initialSelectedItemsValues,
+	selectedItems: selectedItemsProp,
 	selectedItemsKey = 'id',
-	selectionType = 'multiple',
+	selectionType,
 	showBulkActionsManagementBar = true,
 	showBulkActionsManagementBarActions = true,
 	showManagementBar = true,
@@ -165,10 +167,21 @@ const FrontendDataSetContent = ({
 
 	const [allItemsSelectedActive, setAllItemsSelectedActive] = useState(false);
 
-	const [selectedItemsValue, setSelectedItemsValue] = useState(
-		initialSelectedItemsValues || []
+	const [selectedItems, setSelectedItems] = useControlledState({
+		onChange: onSelectedItemsChange,
+		value: selectedItemsProp || [],
+	});
+
+	let selectedItemsValue = (selectedItems || []).map((item) =>
+		getSelectedItemValue({item, path: selectedItemsKey})
 	);
-	const [selectedItems, setSelectedItems] = useState<Array<any>>([]);
+
+	if (allItemsSelectedActive) {
+		selectedItemsValue = items.map((item) =>
+			getSelectedItemValue({item, path: selectedItemsKey})
+		);
+	}
+
 	const [total, setTotal] = useState(0);
 
 	const {fileDropSettings} = useContext(DnDContext);
@@ -480,60 +493,47 @@ const FrontendDataSetContent = ({
 	}, [itemsProp]);
 
 	function deselectItems(value: any) {
-		if (Array.isArray(value)) {
-			return setSelectedItemsValue(
-				selectedItemsValue.filter((item) => !value.includes(item))
-			);
-		}
+		const values = Array.isArray(value) ? value : [value];
 
-		setSelectedItemsValue(
-			selectedItemsValue.filter((item) => item !== value)
-		);
+		const newSelectedItems = selectedItems.filter((selectedItem) => {
+			const selectedItemValue = getSelectedItemValue({
+				item: selectedItem,
+				path: selectedItemsKey,
+			});
+
+			return !values.includes(selectedItemValue);
+		});
+
+		setSelectedItems(newSelectedItems);
 	}
 
-	function selectItems({
-		trigger,
-		value,
-	}: {
-		trigger: ESelectionTrigger;
-		value: any;
-	}) {
-		if (selectionType === 'single') {
-			return setSelectedItemsValue(
-				Array.isArray(value) ? value : [value]
-			);
-		}
+	function selectItems({value}: {value: any}) {
+		const values = Array.isArray(value) ? value : [value];
 
-		if (trigger === ESelectionTrigger.CONTAINER) {
-			return setSelectedItemsValue((previousValues) => {
-				const newValue = Array.isArray(value) ? value : [value];
+		const nextSelectedValues = [...selectedItemsValue];
 
-				if (previousValues.length === 1) {
-					return selectedItemsValue.includes(newValue[0])
-						? []
-						: [value];
-				}
+		values.forEach((val) => {
+			const index = nextSelectedValues.indexOf(val);
 
-				return newValue;
-			});
-		}
+			if (index > -1) {
+				nextSelectedValues.splice(index, 1);
+			}
+			else {
+				nextSelectedValues.push(val);
+			}
+		});
 
-		if (Array.isArray(value)) {
-			const newItems = value.filter(
-				(item) => !selectedItemsValue.includes(item)
-			);
+		const nextSelectedItems = nextSelectedValues
+			.map((val) =>
+				[...selectedItems, ...items].find(
+					(item) =>
+						getSelectedItemValue({item, path: selectedItemsKey}) ===
+						val
+				)
+			)
+			.filter(Boolean);
 
-			return setSelectedItemsValue([...selectedItemsValue, ...newItems]);
-		}
-
-		if (selectedItemsValue.includes(value)) {
-			setSelectedItemsValue(
-				selectedItemsValue.filter((item) => item !== value)
-			);
-		}
-		else {
-			setSelectedItemsValue([...selectedItemsValue, value]);
-		}
+		setSelectedItems(nextSelectedItems);
 	}
 
 	function highlightItems(value = []) {
@@ -578,19 +578,15 @@ const FrontendDataSetContent = ({
 					if (isMounted()) {
 						updateDataSetItems(data);
 
-						const itemKeys = new Set(
-							data.items.map((item: any) =>
-								getSelectedItemValue({
+						setSelectedItems(
+							data.items.filter((item: any) => {
+								const itemValue = getSelectedItemValue({
 									item,
 									path: selectedItemsKey,
-								})
-							)
-						);
+								});
 
-						setSelectedItemsValue(
-							selectedItemsValue.filter((item) =>
-								itemKeys.has(item)
-							)
+								return selectedItemsValue.includes(itemValue);
+							})
 						);
 
 						setDataLoading(false);
@@ -606,40 +602,15 @@ const FrontendDataSetContent = ({
 					throw error;
 				});
 		},
-		[id, isMounted, requestData, selectedItemsKey, selectedItemsValue]
+		[
+			id,
+			isMounted,
+			requestData,
+			selectedItemsKey,
+			selectedItemsValue,
+			setSelectedItems,
+		]
 	);
-
-	useEffect(() => {
-		setSelectedItems((selectedItems: Array<any>) => {
-			const newSelectedItems: Array<any> = [];
-
-			selectedItemsValue.forEach((value) => {
-				let selectedItem = items.find(
-					(item) =>
-						getSelectedItemValue({item, path: selectedItemsKey}) ===
-						value
-				);
-
-				if (!selectedItem) {
-					selectedItem = selectedItems.find(
-						(item) =>
-							getSelectedItemValue({
-								item,
-								path: selectedItemsKey,
-							}) === value
-					);
-				}
-
-				if (selectedItem) {
-					newSelectedItems.push(selectedItem);
-				}
-			});
-
-			onSelectedItemsChange && onSelectedItemsChange(newSelectedItems);
-
-			return newSelectedItems;
-		});
-	}, [selectedItemsValue, items, onSelectedItemsChange, selectedItemsKey]);
 
 	useEffect(() => {
 		if (View || !contentRendererModuleURL) {
@@ -789,15 +760,14 @@ const FrontendDataSetContent = ({
 
 					setAllItemsSelectedActive(false);
 				}}
-				onSelectAll={(value: boolean) =>
-					setAllItemsSelectedActive(value)
-				}
-				selectItems={(items: Array<any>) =>
+				onSelectAll={(value: boolean) => {
+					setAllItemsSelectedActive(value);
+				}}
+				selectItems={(items: Array<any>) => {
 					selectItems({
-						trigger: ESelectionTrigger.INPUT,
 						value: items,
-					})
-				}
+					});
+				}}
 				selectedItems={selectedItems}
 				selectedItemsKey={selectedItemsKey}
 				selectedItemsValue={selectedItemsValue}
@@ -831,38 +801,28 @@ const FrontendDataSetContent = ({
 						itemsActions={itemsActions}
 						onItemSelectionChange={({
 							item: selectedItem,
-							trigger,
 						}: {
 							item: any;
-							trigger: ESelectionTrigger;
 						}) => {
 							if (allItemsSelectedActive) {
-								setSelectedItemsValue(
-									items
-										.filter(
-											(item) =>
-												getSelectedItemValue({
-													item,
-													path: selectedItemsKey,
-												}) !==
-												getSelectedItemValue({
-													item: selectedItem,
-													path: selectedItemsKey,
-												})
-										)
-										.map((item) =>
+								setSelectedItems(
+									items.filter(
+										(item) =>
 											getSelectedItemValue({
 												item,
 												path: selectedItemsKey,
+											}) !==
+											getSelectedItemValue({
+												item: selectedItem,
+												path: selectedItemsKey,
 											})
-										)
+									)
 								);
 
 								setAllItemsSelectedActive(false);
 							}
 							else {
 								selectItems({
-									trigger,
 									value: getSelectedItemValue({
 										item: selectedItem,
 										path: selectedItemsKey,
@@ -1189,9 +1149,7 @@ const FrontendDataSetContent = ({
 		}
 	};
 
-	const selectable = Boolean(
-		selectedItemsKey && (bulkActions?.length || selectionType === 'single')
-	);
+	const selectable = !!selectionType;
 
 	const {className} = useFDSDrop({
 		targetDropRef: dataSetWrapperRef,
@@ -1232,7 +1190,6 @@ const FrontendDataSetContent = ({
 				},
 				onItemsChange,
 				onSearch,
-				onSelect,
 				openModal,
 				openSidePanel,
 				portletId,

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-export * from '@clayui/alert';
+// export * from '@clayui/alert';
 export * from '@clayui/autocomplete';
 export * from '@clayui/badge';
 export * from '@clayui/breadcrumb';

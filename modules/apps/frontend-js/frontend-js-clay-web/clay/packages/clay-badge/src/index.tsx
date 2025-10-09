@@ -6,15 +6,7 @@
 import classNames from 'classnames';
 import React from 'react';
 
-type DisplayType =
-	| 'primary'
-	| 'secondary'
-	| 'info'
-	| 'danger'
-	| 'success'
-	| 'warning'
-	| 'beta'
-	| 'beta-dark';
+type DisplayType = 'primary' | 'secondary' | 'beta' | 'beta-dark';
 
 interface IProps extends React.HTMLAttributes<HTMLSpanElement> {
 	/**

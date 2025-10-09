@@ -10,18 +10,6 @@ type DisplayType = 'primary' | 'secondary' | 'beta' | 'beta-dark';
 
 interface IProps extends React.HTMLAttributes<HTMLSpanElement> {
 	/**
-	 * Flag to indicate if the badge should use the clay-dark variant.
-	 */
-	dark?: boolean;
-
-	/**
-	 * Determines the color of the badge.
-	 * The values `beta` and `beta-dark` are deprecated since v3.100.0 - use
-	 * `translucent` and `dark` instead.
-	 */
-	displayType?: DisplayType;
-
-	/**
 	 * Info that is shown inside of the badge itself.
 	 */
 	label?: string | number;

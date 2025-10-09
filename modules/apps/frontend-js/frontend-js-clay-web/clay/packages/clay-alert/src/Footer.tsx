@@ -18,4 +18,4 @@ export const ClayAlertFooter = ({
 	);
 };
 
-ClayAlertFooter.displayName = 'ClayAlertFooter';
+ClayAlertFooter.displayName = 'ClayAlertFooterTestChange';

@@ -5,8 +5,7 @@
 	"license": "BSD-3-Clause",
 	"repository": "https://github.com/liferay/clay",
 	"main": "lib/cjs/index.js",
-	"types": "lib/index.d.ts",
-	"ts:main": "src/index.ts",
+	"main": "src/index.ts",
 	"files": [
 		"lib"
 	],

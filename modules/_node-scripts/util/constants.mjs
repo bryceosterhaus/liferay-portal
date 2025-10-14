@@ -56,6 +56,7 @@ const NO_RECURSE_PROJECT_DIRS = [
 	'_node-scripts',
 	'build',
 	'classes',
+	'clay',
 	'node_modules',
 	'osb-faro',
 	'sdk',

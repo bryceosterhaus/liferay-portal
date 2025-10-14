@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-package com.liferay.frontend.taglib.clay.internal.js.importmaps.extender;
+package com.liferay.frontend.js.clay.web.internal.js.importmaps.extender;
 
 import com.liferay.frontend.js.importmaps.extender.JSImportMapsContributor;
 import com.liferay.petra.string.StringBundler;
@@ -22,10 +22,10 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 /**
- * @author Iván Zaera Avellón
+ * @author Bryce Osterhaus
  */
 @Component(service = JSImportMapsContributor.class)
-public class FrontendTaglibClayJSImportMapsContributor
+public class FrontendJSClayWebJSImportMapsContributor
 	implements JSImportMapsContributor {
 
 	@Override
@@ -72,7 +72,7 @@ public class FrontendTaglibClayJSImportMapsContributor
 	private JSONFactory _jsonFactory;
 
 	@Reference(
-		target = "(osgi.web.symbolicname=com.liferay.frontend.taglib.clay)",
+		target = "(osgi.web.symbolicname=com.liferay.frontend.js.clay.web)",
 		unbind = "-"
 	)
 	private ServletContext _servletContext;

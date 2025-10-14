@@ -25,11 +25,5 @@
 		}
 	},
 	"include": ["clay-*/src/**/*.{tsx,ts}"],
-	"exclude": [
-		"node_modules",
-		"**/lib",
-		"**/stories",
-		"**/__tests__",
-		"generator-clay-component/**/*"
-	]
+	"exclude": ["node_modules", "**/lib", "**/stories", "**/__tests__"]
 }

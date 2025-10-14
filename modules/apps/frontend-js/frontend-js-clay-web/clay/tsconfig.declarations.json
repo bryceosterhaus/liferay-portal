@@ -9,10 +9,5 @@
 		"skipLibCheck": true,
 		"paths": {}
 	},
-	"exclude": [
-		"node_modules",
-		"packages/**/lib",
-		"packages/generator-clay-component",
-		"**/__tests__/**"
-	]
+	"exclude": ["node_modules", "packages/**/lib", "**/__tests__/**"]
 }

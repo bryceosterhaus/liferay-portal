@@ -15,13 +15,7 @@ const CLI_ARGS = process.argv.slice(2);
 
 const TOTAL_THRESHHOLD_PERCENT = 5;
 
-const WORKSPACE_PACKAGES_WHITELIST = [
-	'browserslist-config-clay',
-	'demos',
-	'generator-clay-component',
-	'clay-css',
-	'tsconfig.json',
-];
+const WORKSPACE_PACKAGES_WHITELIST = ['demos', 'clay-css', 'tsconfig.json'];
 
 const TEMP_DIR = os.tmpdir();
 

@@ -95,12 +95,7 @@ function getDependencies(config) {
 	];
 }
 
-const WORKSPACE_PACKAGES_WHITELIST = new Set([
-	'browserslist-config-clay',
-	'clay-css',
-	'demos',
-	'generator-clay-component',
-]);
+const WORKSPACE_PACKAGES_WHITELIST = new Set(['clay-css', 'demos']);
 
 /**
  * Make sure built code explcitly declares its dependencies.
@@ -166,7 +161,7 @@ async function checkForMissingDependencies() {
 	}, WORKSPACE_PACKAGES_WHITELIST);
 
 	print();
-	const success = Object.keys(missing).length === 0;
+	const success = !Object.keys(missing).length;
 	if (!success) {
 		print.line.red('Add missing dependencies with:\n');
 		Object.entries(missing).forEach(([name, dependencies]) => {

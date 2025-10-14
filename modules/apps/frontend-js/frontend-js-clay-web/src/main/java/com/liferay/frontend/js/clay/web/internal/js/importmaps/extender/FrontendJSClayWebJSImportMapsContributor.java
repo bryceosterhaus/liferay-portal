@@ -6,16 +6,11 @@
 package com.liferay.frontend.js.clay.web.internal.js.importmaps.extender;
 
 import com.liferay.frontend.js.importmaps.extender.JSImportMapsContributor;
-import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.kernel.json.JSONException;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONObject;
-import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.petra.string.StringBundler;
 
 import jakarta.servlet.ServletContext;
-
-import java.io.IOException;
-import java.io.InputStream;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -34,19 +29,10 @@ public class FrontendJSClayWebJSImportMapsContributor
 	}
 
 	@Activate
-	protected void activate() throws IOException, JSONException {
+	protected void activate() {
 		_importMapsJSONObject = _jsonFactory.createJSONObject();
 
-		JSONObject packageJSONObject = _getPackageJSONObject();
-
-		JSONObject dependenciesJSONObject = packageJSONObject.getJSONObject(
-			"dependencies");
-
-		for (String moduleName : dependenciesJSONObject.keySet()) {
-			if (!moduleName.startsWith("@clayui/")) {
-				continue;
-			}
-
+		for (String moduleName : _MODULE_NAMES) {
 			_importMapsJSONObject.put(
 				moduleName,
 				StringBundler.concat(
@@ -55,16 +41,50 @@ public class FrontendJSClayWebJSImportMapsContributor
 		}
 	}
 
-	private JSONObject _getPackageJSONObject()
-		throws IOException, JSONException {
-
-		try (InputStream inputStream =
-				FrontendTaglibClayJSImportMapsContributor.class.
-					getResourceAsStream("dependencies/package.json")) {
-
-			return _jsonFactory.createJSONObject(StringUtil.read(inputStream));
-		}
-	}
+	private static final String[] _MODULE_NAMES = {
+		"@clayui/alert",
+		"@clayui/autocomplete",
+		"@clayui/badge",
+		"@clayui/breadcrumb",
+		"@clayui/button",
+		"@clayui/card",
+		"@clayui/charts",
+		"@clayui/color-picker",
+		"@clayui/core",
+		"@clayui/data-provider",
+		"@clayui/date-picker",
+		"@clayui/drop-down",
+		"@clayui/empty-state",
+		"@clayui/form",
+		"@clayui/icon",
+		"@clayui/label",
+		"@clayui/layout",
+		"@clayui/link",
+		"@clayui/list",
+		"@clayui/loading-indicator",
+		"@clayui/localized-input",
+		"@clayui/management-toolbar",
+		"@clayui/modal",
+		"@clayui/multi-select",
+		"@clayui/multi-step-nav",
+		"@clayui/nav",
+		"@clayui/navigation-bar",
+		"@clayui/pagination",
+		"@clayui/pagination-bar",
+		"@clayui/panel",
+		"@clayui/popover",
+		"@clayui/progress-bar",
+		"@clayui/provider",
+		"@clayui/shared",
+		"@clayui/slider",
+		"@clayui/sticker",
+		"@clayui/table",
+		"@clayui/tabs",
+		"@clayui/time-picker",
+		"@clayui/toolbar",
+		"@clayui/tooltip",
+		"@clayui/upper-toolbar",
+	};
 
 	private JSONObject _importMapsJSONObject;
 

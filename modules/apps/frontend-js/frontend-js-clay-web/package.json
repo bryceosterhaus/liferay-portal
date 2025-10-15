@@ -1,7 +1,8 @@
 {
+	"main": "js/index.ts",
 	"name": "@liferay/frontend-js-clay-web",
 	"scripts": {
-		"build": "node-scripts build",
+		"build": "node ./clay/packages/clay-css/scripts/build && node-scripts build",
 		"checkFormat": "node-scripts format --check",
 		"format": "node-scripts format"
 	},

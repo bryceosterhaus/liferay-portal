@@ -11,16 +11,16 @@ const path = require('path');
 const sass = require('sass');
 const {optimize} = require('svgo');
 
-const OUTPUT_DIRECTORY = path.resolve('./lib');
+const OUTPUT_DIRECTORY = path.resolve(__dirname, '..', './lib');
 
 const HEADER_REGEXP = /<!--(.*)-->/s;
 const CSS_OUTPUT_DIRECTORY = path.join(OUTPUT_DIRECTORY, 'css');
-const ICONS_DIRECTORY = path.resolve('./src/images/icons');
+const ICONS_DIRECTORY = path.resolve(__dirname, '..', './src/images/icons');
 const ICONS_OUTPUT_FILEPATH = path.join(
 	OUTPUT_DIRECTORY,
 	'images/icons/icons.svg'
 );
-const SASS_SOURCE_DIRECTORY = path.resolve('src/scss');
+const SASS_SOURCE_DIRECTORY = path.resolve(__dirname, '..', 'src/scss');
 
 const REGEX_FLAGS = /^flags-/;
 
@@ -230,18 +230,25 @@ async function buildScssIcons(filesPath) {
 }
 
 async function build() {
-	const licenseText = path.join('.', 'src', 'scss', '_license-text.scss');
+	const licenseText = path.join(
+		__dirname,
+		'..',
+		'src',
+		'scss',
+		'_license-text.scss'
+	);
 
 	fs.readFile(licenseText, 'utf8', (error, data) => {
 		if (error) {
 			return console.error(error);
 		}
 
-		var result = data.replace(
+		const result = data.replace(
 			/\*\s+Clay\s(.+)\n/g,
 			`* Clay ${
-				JSON.parse(fs.readFileSync(path.join('.', 'package.json')))
-					.version
+				JSON.parse(
+					fs.readFileSync(path.join(__dirname, '..', 'package.json'))
+				).version
 			}\n`
 		);
 
@@ -255,16 +262,16 @@ async function build() {
 	await ensureDirectory(OUTPUT_DIRECTORY);
 
 	copyRecursiveSync(
-		path.resolve('./src/js'),
+		path.resolve(__dirname, '..', './src/js'),
 		path.join(OUTPUT_DIRECTORY, 'js')
 	);
 	copyRecursiveSync(
-		path.resolve('./src/images/icons'),
+		path.resolve(__dirname, '..', './src/images/icons'),
 		path.join(OUTPUT_DIRECTORY, 'images/icons')
 	);
 	copyRecursiveSync(
-		path.join('..', '..', 'LICENSES'),
-		path.resolve('./LICENSES')
+		path.join(__dirname, '..', '..', '..', 'LICENSES'),
+		path.resolve(__dirname, '..', './LICENSES')
 	);
 
 	const filesPath = await fs.promises.readdir(ICONS_DIRECTORY);
@@ -272,7 +279,10 @@ async function build() {
 	const svgFiles = filesPath.filter((file) => path.extname(file) === '.svg');
 
 	await buildIconsSvg(svgFiles);
-	await buildScssIcons(svgFiles);
+
+	if (process.argv.includes('--generate-src-icons')) {
+		await buildScssIcons(svgFiles);
+	}
 
 	const fileNames = ['atlas.scss', 'base.scss', 'cadmin.scss'];
 

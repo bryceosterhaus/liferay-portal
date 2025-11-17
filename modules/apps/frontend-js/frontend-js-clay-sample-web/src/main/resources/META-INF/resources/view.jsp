@@ -10,5 +10,6 @@
 <div>
 	<react:component
 		module="{App} from frontend-js-clay-sample-web"
+		ssr="<%= true %>"
 	/>
 </div>

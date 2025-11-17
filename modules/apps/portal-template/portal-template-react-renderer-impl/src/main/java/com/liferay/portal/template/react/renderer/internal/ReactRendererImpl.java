@@ -6,6 +6,7 @@
 package com.liferay.portal.template.react.renderer.internal;
 
 import com.liferay.frontend.js.loader.modules.extender.esm.ESImportUtil;
+import com.liferay.portal.kernel.servlet.taglib.aui.ESImport;
 import com.liferay.frontend.js.loader.modules.extender.npm.NPMResolvedPackageNameUtil;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.util.LocaleUtil;
@@ -13,11 +14,16 @@ import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.template.react.renderer.ComponentDescriptor;
 import com.liferay.portal.template.react.renderer.ReactRenderer;
+import com.liferay.portal.url.builder.AbsolutePortalURLBuilder;
 import com.liferay.portal.url.builder.AbsolutePortalURLBuilderFactory;
+import com.liferay.portal.kernel.util.Http;
+import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.WebKeys;
 
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.http.HttpServletRequest;
 
+import java.net.HttpURLConnection;
 import java.io.IOException;
 import java.io.Writer;
 
@@ -39,11 +45,58 @@ public class ReactRendererImpl implements ReactRenderer {
 			HttpServletRequest httpServletRequest, Writer writer)
 		throws IOException {
 
+		renderReact(componentDescriptor, data, httpServletRequest, writer, false);
+	}
+
+	@Override
+	public void renderReact(
+			ComponentDescriptor componentDescriptor, Map<String, Object> data,
+			HttpServletRequest httpServletRequest, Writer writer, boolean ssr)
+		throws IOException {
+
 		String placeholderId = StringUtil.randomId();
 
 		_renderPlaceholder(writer, placeholderId);
 
 		if (ESImportUtil.isESImport(componentDescriptor.getModule())) {
+			AbsolutePortalURLBuilder absolutePortalURLBuilder = _absolutePortalURLBuilderFactory.getAbsolutePortalURLBuilder(
+					httpServletRequest);
+
+			if (ssr) {
+				ThemeDisplay themeDisplay =
+					(ThemeDisplay)httpServletRequest.getAttribute(
+						WebKeys.THEME_DISPLAY);
+
+				String cdnBaseURL = themeDisplay.getCDNBaseURL();
+
+				ESImport esImport = ESImportUtil.getESImport(absolutePortalURLBuilder, componentDescriptor.getModule());
+
+				String namedImport = esImport.getAlias();
+
+				if (namedImport == null || namedImport == "") {
+					namedImport = esImport.getSymbol();
+				}
+
+				Http.Options options = new Http.Options();
+
+				System.out.println("http://localhost:3030/render?url=" + cdnBaseURL + esImport.getModule() + "&component=" + namedImport);
+
+				options.setLocation("http://localhost:3030/render?url=" + cdnBaseURL + esImport.getModule() + "&component=" + namedImport);
+				options.setPost(false);
+				options.addHeader("Content-Type", "text/html");
+
+				String html = _http.URLtoString(options);
+
+				Http.Response response = options.getResponse();
+
+				if (response.getResponseCode() == HttpURLConnection.HTTP_OK) {
+					writer.append(html);
+				} else {
+					System.out.println("Server Side Rendering failed: '" + componentDescriptor.getModule() + "' fails 'ReactDOMServer.renderToString(...)'.");
+				}
+
+			}
+
 			ReactRendererUtil.renderEcmaScript(
 				_absolutePortalURLBuilderFactory.getAbsolutePortalURLBuilder(
 					httpServletRequest),
@@ -131,6 +184,9 @@ public class ReactRendererImpl implements ReactRenderer {
 
 	@Reference
 	private Portal _portal;
+
+	@Reference
+	private Http _http;
 
 	@Reference(
 		target = "(osgi.web.symbolicname=com.liferay.portal.template.react.renderer.impl)",

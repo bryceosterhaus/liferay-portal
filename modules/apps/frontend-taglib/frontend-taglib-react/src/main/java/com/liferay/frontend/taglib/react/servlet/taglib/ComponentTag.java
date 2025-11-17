@@ -45,7 +45,7 @@ public class ComponentTag extends ParamAndPropertyAncestorTagImpl {
 			ReactRenderer reactRenderer = ServicesProvider.getReactRenderer();
 
 			reactRenderer.renderReact(
-				componentDescriptor, props, getRequest(), jspWriter);
+				componentDescriptor, props, getRequest(), jspWriter, isSSR());
 		}
 		catch (Exception exception) {
 			throw new JspException(exception);
@@ -64,6 +64,10 @@ public class ComponentTag extends ParamAndPropertyAncestorTagImpl {
 
 	public String getComponentId() {
 		return _componentId;
+	}
+
+	public boolean getSsr() {
+		return _ssr;
 	}
 
 	public String getModule() {
@@ -97,6 +101,10 @@ public class ComponentTag extends ParamAndPropertyAncestorTagImpl {
 		_module = module;
 	}
 
+	public void setSsr(boolean ssr) {
+		_ssr = ssr;
+	}
+
 	public void setProps(Map<String, Object> props) {
 		_props = props;
 	}
@@ -113,6 +121,7 @@ public class ComponentTag extends ParamAndPropertyAncestorTagImpl {
 		_module = null;
 		_props = Collections.emptyMap();
 		_setServletContext = false;
+		_ssr = false;
 	}
 
 	/**
@@ -131,6 +140,10 @@ public class ComponentTag extends ParamAndPropertyAncestorTagImpl {
 		}
 
 		return NPMResolvedPackageNameUtil.get(servletContext);
+	}
+
+	protected boolean isSSR() {
+		return _ssr;
 	}
 
 	protected Map<String, Object> getProps() {
@@ -187,5 +200,6 @@ public class ComponentTag extends ParamAndPropertyAncestorTagImpl {
 	private String _module;
 	private Map<String, Object> _props = Collections.emptyMap();
 	private boolean _setServletContext;
+	private boolean _ssr;
 
 }

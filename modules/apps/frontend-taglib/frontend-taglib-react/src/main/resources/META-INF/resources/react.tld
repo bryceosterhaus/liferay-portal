@@ -32,6 +32,12 @@
 			<rtexprvalue>true</rtexprvalue>
 		</attribute>
 		<attribute>
+			<description>Flag to indicate if server side rendering should be used.</description>
+			<name>ssr</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
 			<description>The chosen template's props.</description>
 			<name>props</name>
 			<required>false</required>

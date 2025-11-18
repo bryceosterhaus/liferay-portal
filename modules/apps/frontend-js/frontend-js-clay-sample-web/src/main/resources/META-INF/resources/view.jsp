@@ -16,12 +16,12 @@
 
 <div>
 	<react:component
+		module="{App} from frontend-js-clay-sample-web"
 		props='<%=
 			HashMapBuilder.<String, Object>put(
 				"user", themeDisplay.getRealUser()
 			).build()
 		%>'
-		module="{App} from frontend-js-clay-sample-web"
 		ssr="<%= true %>"
 	/>
 </div>

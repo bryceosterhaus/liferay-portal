@@ -5,14 +5,12 @@
 
 package com.liferay.portal.template.react.renderer.internal;
 
-import com.liferay.portal.kernel.json.JSONFactory;
-import com.liferay.portal.kernel.json.JSONSerializer;
-import com.liferay.portal.kernel.json.JSONFactoryUtil;
-import com.liferay.portal.kernel.json.JSONObject;
-import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.frontend.js.loader.modules.extender.esm.ESImportUtil;
 import com.liferay.frontend.js.loader.modules.extender.npm.NPMResolvedPackageNameUtil;
 import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
+import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.json.JSONSerializer;
 import com.liferay.portal.kernel.servlet.taglib.aui.ESImport;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Http;
@@ -86,29 +84,28 @@ public class ReactRendererImpl implements ReactRenderer {
 					namedImport = esImport.getSymbol();
 				}
 
-
 				System.out.println("----------------");
 
-				Map<String, Object> props = _prepareProps(componentDescriptor, data, httpServletRequest);
+				Map<String, Object> props = _prepareProps(
+					componentDescriptor, data, httpServletRequest);
 
-				JSONSerializer jsonSerializer = _jsonFactory.createJSONSerializer();
+				JSONSerializer jsonSerializer =
+					_jsonFactory.createJSONSerializer();
 
 				System.out.println(jsonSerializer.serializeDeep(props));
 				System.out.println("----------------");
 
-
-
 				Http.Options options = new Http.Options();
 
-				JSONObject jsonObj = JSONFactoryUtil.createJSONObject();
-
-				jsonObj.put("url", cdnBaseURL + esImport.getModule());
-				jsonObj.put("component", namedImport);
-				jsonObj.put("props", jsonSerializer.serializeDeep(props));
+				JSONObject jsonObj = JSONFactoryUtil.createJSONObject()
+					.put("component", namedImport)
+					.put("props", jsonSerializer.serializeDeep(props))
+					.put("url", cdnBaseURL + esImport.getModule());
 
 				String jsonBody = jsonObj.toString();
 
 				// POST
+
 				options.setLocation("http://localhost:3030/render");
 				options.setPost(true);
 				options.addHeader("Content-Type", "application/json");
@@ -117,10 +114,6 @@ public class ReactRendererImpl implements ReactRenderer {
 				String html = _http.URLtoString(options);
 
 				Http.Response response = options.getResponse();
-
-
-
-
 
 				if (response.getResponseCode() == HttpURLConnection.HTTP_OK) {
 					writer.append(html);

@@ -33,12 +33,17 @@ const dogNames = [
 	['Cody', 20],
 ];
 
-export function App({user}) {
+export function App(props) {
+	const {user} = props;
 	const [value, setValue] = useState('');
 
 	return (
-		<div>
-			<h2>{/* {user.greeting} your email is {user.email} */}</h2>
+		<div className="m-4 p-4">
+			{user.firstName && (
+				<h2>
+					{user.greeting} your email is {user.emailAddress}
+				</h2>
+			)}
 
 			<ClayManagementToolbar>
 				<ClayManagementToolbar.Search onlySearch>

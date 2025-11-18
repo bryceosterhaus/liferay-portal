@@ -5,6 +5,8 @@
 
 package com.liferay.portal.template.react.renderer.internal;
 
+import com.liferay.portal.kernel.json.JSONSerializer;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.frontend.js.loader.modules.extender.esm.ESImportUtil;
 import com.liferay.frontend.js.loader.modules.extender.npm.NPMResolvedPackageNameUtil;
 import com.liferay.portal.kernel.json.JSONFactory;
@@ -82,26 +84,21 @@ public class ReactRendererImpl implements ReactRenderer {
 					namedImport = esImport.getSymbol();
 				}
 
-				System.out.println("----------------");
+				Map<String, Object> body = HashMapBuilder.<String, Object>put(
+					"component", namedImport
+				).put(
+					"props", _prepareProps(componentDescriptor, data, httpServletRequest)
+				).put(
+					"url", cdnBaseURL + esImport.getModule()
+				).build();
 
-				Map<String, Object> props = _prepareProps(
-					componentDescriptor, data, httpServletRequest)
-
-				JSONObject jsonObj = _jsonFactory.createJSONObject();
-
-				jsonObj.put("component", namedImport);
-				jsonObj.put("props", props);
-				jsonObj.put("url", cdnBaseURL + esImport.getModule());
-
-				String jsonBody = jsonObj.toString();
-
-				// POST
+				JSONSerializer jsonSerializer = _jsonFactory.createJSONSerializer();
 
 				Http.Options options = new Http.Options();
 				options.setLocation("http://localhost:3030/render");
 				options.setPost(true);
 				options.addHeader("Content-Type", "application/json");
-				options.setBody(jsonBody, "application/json", "UTF-8");
+				options.setBody(jsonSerializer.serializeDeep(body), "application/json", "UTF-8");
 
 				String html = _http.URLtoString(options);
 

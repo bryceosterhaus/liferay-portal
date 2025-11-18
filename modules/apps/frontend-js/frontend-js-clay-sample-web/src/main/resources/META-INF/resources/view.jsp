@@ -7,8 +7,20 @@
 
 <%@ include file="/init.jsp" %>
 
+<style>
+.card-page-item-directory {
+	flex-basis: 25%;
+	max-width: 25%;
+}
+</style>
+
 <div>
 	<react:component
+		props='<%=
+			HashMapBuilder.<String, Object>put(
+				"user", themeDisplay.getRealUser()
+			).build()
+		%>'
 		module="{App} from frontend-js-clay-sample-web"
 		ssr="<%= true %>"
 	/>

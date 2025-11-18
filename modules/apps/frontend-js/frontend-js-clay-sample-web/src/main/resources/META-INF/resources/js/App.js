@@ -1,99 +1,91 @@
 /**
- * SPDX-FileCopyrightText: (c) 2000 Liferay, Inc. https://liferay.com
+ * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-import ClayAlert from '@clayui/alert';
-import ClayDatePicker from '@clayui/date-picker';
-import ClayTabs from '@clayui/tabs';
-import {dateUtils} from 'frontend-js-web';
+import {ClayButtonWithIcon} from '@clayui/button';
+import ClayCard, {ClayCardWithInfo} from '@clayui/card';
+import {ClayInput} from '@clayui/form';
+import ClayLayout from '@clayui/layout';
+import ClayManagementToolbar from '@clayui/management-toolbar';
 import React, {useState} from 'react';
 
-export function App() {
-	const [active, setActive] = useState(0);
+const dogNames = [
+	['Bailey', 1],
+	['Max', 2],
+	['Charlie', 3],
+	['Buddy', 4],
+	['Rocky', 5],
+	['Jake', 6],
+	['Jack', 7],
+	['Sadie', 8],
+	['Toby', 9],
+	['Chloe', 10],
+	['Cody', 11],
+	['Buster', 12],
+	['Buddy', 13],
+	['Rocky', 14],
+	['Jake', 15],
+	['Jack', 16],
+	['Sadie', 17],
+	['Toby', 18],
+	['Chloe', 19],
+	['Cody', 20],
+];
+
+export function App({user}) {
+	const [value, setValue] = useState('');
 
 	return (
 		<div>
-			<ClayTabs
-				activation="manual"
-				active={active}
-				justified={false}
-				onActiveChange={setActive}
-			>
-				<ClayTabs.Item
-					innerProps={{
-						'aria-controls': 'tabpanel1',
-					}}
-				>
-					Clay Alert
-				</ClayTabs.Item>
+			<h2>{/* {user.greeting} your email is {user.email} */}</h2>
 
-				<ClayTabs.Item
-					innerProps={{
-						'aria-controls': 'tabpanel2',
-					}}
-				>
-					Clay Date Picker
-				</ClayTabs.Item>
-			</ClayTabs>
+			<ClayManagementToolbar>
+				<ClayManagementToolbar.Search onlySearch>
+					<ClayInput.Group>
+						<ClayInput.GroupItem>
+							<ClayInput
+								aria-label="Search"
+								className="form-control input-group-inset input-group-inset-after"
+								onChange={(event) =>
+									setValue(event.target.value)
+								}
+								placeholder="Search..."
+								type="text"
+								value={value}
+							/>
 
-			<ClayTabs.Content activeIndex={active} fade>
-				<ClayTabs.TabPane id="tabpanel1">
-					<ClayAlert title="Info">
-						This widget is used to test out Clay components. Simply
-						add whatever JS you want to App.js and redeploy.
-					</ClayAlert>
+							<ClayInput.GroupInsetItem after tag="span">
+								<ClayButtonWithIcon
+									displayType="unstyled"
+									symbol="search"
+									type="submit"
+								/>
+							</ClayInput.GroupInsetItem>
+						</ClayInput.GroupItem>
+					</ClayInput.Group>
+				</ClayManagementToolbar.Search>
+			</ClayManagementToolbar>
 
-					<div className="clay-test-class">
-						This is where your code goes.
-					</div>
-				</ClayTabs.TabPane>
-
-				<ClayTabs.TabPane id="tabpanel2">
-					<ClayDatePicker
-						ariaLabels={{
-							buttonChooseDate: `${Liferay.Language.get(
-								'select-date'
-							)}`,
-							buttonDot: `${Liferay.Language.get(
-								'select-current-date'
-							)}`,
-							buttonNextMonth: `${Liferay.Language.get(
-								'select-next-month'
-							)}`,
-							buttonPreviousMonth: `${Liferay.Language.get(
-								'select-previous-month'
-							)}`,
-							dialog: `${Liferay.Language.get('select-date')}`,
-							selectMonth: `${Liferay.Language.get('select-a-month')}`,
-							selectYear: `${Liferay.Language.get('select-a-year')}`,
-						}}
-						firstDayOfWeek={dateUtils.getFirstDayOfWeek()}
-						months={[
-							`${Liferay.Language.get('january')}`,
-							`${Liferay.Language.get('february')}`,
-							`${Liferay.Language.get('march')}`,
-							`${Liferay.Language.get('april')}`,
-							`${Liferay.Language.get('may')}`,
-							`${Liferay.Language.get('june')}`,
-							`${Liferay.Language.get('july')}`,
-							`${Liferay.Language.get('august')}`,
-							`${Liferay.Language.get('september')}`,
-							`${Liferay.Language.get('october')}`,
-							`${Liferay.Language.get('november')}`,
-							`${Liferay.Language.get('december')}`,
-						]}
-						placeholder="YYYY-MM-DD HH:mm"
-						required
-						time
-						weekdaysShort={dateUtils.getWeekdaysShort()}
-						years={{
-							end: 9999,
-							start: new Date().getFullYear(),
-						}}
-					/>
-				</ClayTabs.TabPane>
-			</ClayTabs.Content>
+			<ClayLayout.ContainerFluid view>
+				<ClayCard.Group label="Good Boys">
+					{dogNames
+						.filter(([name]) =>
+							name.toLowerCase().match(value.toLowerCase())
+						)
+						.map(([doggoName, doggoId]) => (
+							<ClayCardWithInfo
+								description="the goodest boy"
+								href={`https://placedog.net/1000?id=${doggoId}`}
+								imgProps={{
+									src: `https://placedog.net/640/480?id=${doggoId}`,
+								}}
+								key={doggoId}
+								title={`${doggoName}.jpg`}
+							/>
+						))}
+				</ClayCard.Group>
+			</ClayLayout.ContainerFluid>
 		</div>
 	);
 }

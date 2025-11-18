@@ -5,27 +5,33 @@
 
 package com.liferay.portal.template.react.renderer.internal;
 
+import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONSerializer;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
+import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.frontend.js.loader.modules.extender.esm.ESImportUtil;
-import com.liferay.portal.kernel.servlet.taglib.aui.ESImport;
 import com.liferay.frontend.js.loader.modules.extender.npm.NPMResolvedPackageNameUtil;
 import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.servlet.taglib.aui.ESImport;
+import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.template.react.renderer.ComponentDescriptor;
 import com.liferay.portal.template.react.renderer.ReactRenderer;
 import com.liferay.portal.url.builder.AbsolutePortalURLBuilder;
 import com.liferay.portal.url.builder.AbsolutePortalURLBuilderFactory;
-import com.liferay.portal.kernel.util.Http;
-import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.WebKeys;
 
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.http.HttpServletRequest;
 
-import java.net.HttpURLConnection;
 import java.io.IOException;
 import java.io.Writer;
+
+import java.net.HttpURLConnection;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -45,7 +51,8 @@ public class ReactRendererImpl implements ReactRenderer {
 			HttpServletRequest httpServletRequest, Writer writer)
 		throws IOException {
 
-		renderReact(componentDescriptor, data, httpServletRequest, writer, false);
+		renderReact(
+			componentDescriptor, data, httpServletRequest, writer, false);
 	}
 
 	@Override
@@ -59,7 +66,8 @@ public class ReactRendererImpl implements ReactRenderer {
 		_renderPlaceholder(writer, placeholderId);
 
 		if (ESImportUtil.isESImport(componentDescriptor.getModule())) {
-			AbsolutePortalURLBuilder absolutePortalURLBuilder = _absolutePortalURLBuilderFactory.getAbsolutePortalURLBuilder(
+			AbsolutePortalURLBuilder absolutePortalURLBuilder =
+				_absolutePortalURLBuilderFactory.getAbsolutePortalURLBuilder(
 					httpServletRequest);
 
 			if (ssr) {
@@ -69,32 +77,60 @@ public class ReactRendererImpl implements ReactRenderer {
 
 				String cdnBaseURL = themeDisplay.getCDNBaseURL();
 
-				ESImport esImport = ESImportUtil.getESImport(absolutePortalURLBuilder, componentDescriptor.getModule());
+				ESImport esImport = ESImportUtil.getESImport(
+					absolutePortalURLBuilder, componentDescriptor.getModule());
 
 				String namedImport = esImport.getAlias();
 
-				if (namedImport == null || namedImport == "") {
+				if ((namedImport == null) || (namedImport == "")) {
 					namedImport = esImport.getSymbol();
 				}
 
+
+				System.out.println("----------------");
+
+				Map<String, Object> props = _prepareProps(componentDescriptor, data, httpServletRequest);
+
+				JSONSerializer jsonSerializer = _jsonFactory.createJSONSerializer();
+
+				System.out.println(jsonSerializer.serializeDeep(props));
+				System.out.println("----------------");
+
+
+
 				Http.Options options = new Http.Options();
 
-				System.out.println("http://localhost:3030/render?url=" + cdnBaseURL + esImport.getModule() + "&component=" + namedImport);
+				JSONObject jsonObj = JSONFactoryUtil.createJSONObject();
 
-				options.setLocation("http://localhost:3030/render?url=" + cdnBaseURL + esImport.getModule() + "&component=" + namedImport);
-				options.setPost(false);
-				options.addHeader("Content-Type", "text/html");
+				jsonObj.put("url", cdnBaseURL + esImport.getModule());
+				jsonObj.put("component", namedImport);
+				jsonObj.put("props", jsonSerializer.serializeDeep(props));
+
+				String jsonBody = jsonObj.toString();
+
+				// POST
+				options.setLocation("http://localhost:3030/render");
+				options.setPost(true);
+				options.addHeader("Content-Type", "application/json");
+				options.setBody(jsonBody, "application/json", "UTF-8");
 
 				String html = _http.URLtoString(options);
 
 				Http.Response response = options.getResponse();
 
+
+
+
+
 				if (response.getResponseCode() == HttpURLConnection.HTTP_OK) {
 					writer.append(html);
-				} else {
-					System.out.println("Server Side Rendering failed: '" + componentDescriptor.getModule() + "' fails 'ReactDOMServer.renderToString(...)'.");
 				}
-
+				else {
+					System.out.println(
+						"Server Side Rendering failed: '" +
+							componentDescriptor.getModule() +
+								"' fails 'ReactDOMServer.renderToString(...)'.");
+				}
 			}
 
 			ReactRendererUtil.renderEcmaScript(
@@ -180,13 +216,13 @@ public class ReactRendererImpl implements ReactRenderer {
 	private AbsolutePortalURLBuilderFactory _absolutePortalURLBuilderFactory;
 
 	@Reference
+	private Http _http;
+
+	@Reference
 	private JSONFactory _jsonFactory;
 
 	@Reference
 	private Portal _portal;
-
-	@Reference
-	private Http _http;
 
 	@Reference(
 		target = "(osgi.web.symbolicname=com.liferay.portal.template.react.renderer.impl)",

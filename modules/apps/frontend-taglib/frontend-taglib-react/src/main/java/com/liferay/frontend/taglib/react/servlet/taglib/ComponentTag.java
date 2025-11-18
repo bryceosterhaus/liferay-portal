@@ -66,16 +66,16 @@ public class ComponentTag extends ParamAndPropertyAncestorTagImpl {
 		return _componentId;
 	}
 
-	public boolean getSsr() {
-		return _ssr;
-	}
-
 	public String getModule() {
 		if (_module.contains(" from ")) {
 			return _module;
 		}
 
 		return StringBundler.concat(getNamespace(), "/", _module);
+	}
+
+	public boolean getSsr() {
+		return _ssr;
 	}
 
 	@Override
@@ -101,10 +101,6 @@ public class ComponentTag extends ParamAndPropertyAncestorTagImpl {
 		_module = module;
 	}
 
-	public void setSsr(boolean ssr) {
-		_ssr = ssr;
-	}
-
 	public void setProps(Map<String, Object> props) {
 		_props = props;
 	}
@@ -114,6 +110,10 @@ public class ComponentTag extends ParamAndPropertyAncestorTagImpl {
 		super.setServletContext(servletContext);
 
 		_setServletContext = true;
+	}
+
+	public void setSsr(boolean ssr) {
+		_ssr = ssr;
 	}
 
 	protected void cleanUp() {
@@ -140,10 +140,6 @@ public class ComponentTag extends ParamAndPropertyAncestorTagImpl {
 		}
 
 		return NPMResolvedPackageNameUtil.get(servletContext);
-	}
-
-	protected boolean isSSR() {
-		return _ssr;
 	}
 
 	protected Map<String, Object> getProps() {
@@ -182,6 +178,10 @@ public class ComponentTag extends ParamAndPropertyAncestorTagImpl {
 		}
 
 		return false;
+	}
+
+	protected boolean isSSR() {
+		return _ssr;
 	}
 
 	/**

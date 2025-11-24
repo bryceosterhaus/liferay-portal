@@ -5,6 +5,7 @@
 
 import {ClayButtonWithIcon} from '@clayui/button';
 import ClayCard, {ClayCardWithInfo} from '@clayui/card';
+import {Provider as ClayIconProvider} from '@clayui/core';
 import {ClayInput} from '@clayui/form';
 import ClayLayout from '@clayui/layout';
 import ClayManagementToolbar from '@clayui/management-toolbar';
@@ -38,59 +39,63 @@ export function App(props) {
 	const [value, setValue] = useState('');
 
 	return (
-		<div className="m-4 p-4">
-			{user.firstName && (
-				<h2>
-					{user.greeting} your email is {user.emailAddress}
-				</h2>
-			)}
+		<ClayIconProvider
+			spritemap={`${Liferay.ThemeDisplay.getPathThemeImages()}/clay/icons.svg`}
+		>
+			<div className="m-4 p-4">
+				{user.firstName && (
+					<h2>
+						{user.greeting} your email is {user.emailAddress}
+					</h2>
+				)}
 
-			<ClayManagementToolbar>
-				<ClayManagementToolbar.Search onlySearch>
-					<ClayInput.Group>
-						<ClayInput.GroupItem>
-							<ClayInput
-								aria-label="Search"
-								className="form-control input-group-inset input-group-inset-after"
-								onChange={(event) =>
-									setValue(event.target.value)
-								}
-								placeholder="Search..."
-								type="text"
-								value={value}
-							/>
-
-							<ClayInput.GroupInsetItem after tag="span">
-								<ClayButtonWithIcon
-									displayType="unstyled"
-									symbol="search"
-									type="submit"
+				<ClayManagementToolbar>
+					<ClayManagementToolbar.Search onlySearch>
+						<ClayInput.Group>
+							<ClayInput.GroupItem>
+								<ClayInput
+									aria-label="Search"
+									className="form-control input-group-inset input-group-inset-after"
+									onChange={(event) =>
+										setValue(event.target.value)
+									}
+									placeholder="Search..."
+									type="text"
+									value={value}
 								/>
-							</ClayInput.GroupInsetItem>
-						</ClayInput.GroupItem>
-					</ClayInput.Group>
-				</ClayManagementToolbar.Search>
-			</ClayManagementToolbar>
 
-			<ClayLayout.ContainerFluid view>
-				<ClayCard.Group label="Good Boys">
-					{dogNames
-						.filter(([name]) =>
-							name.toLowerCase().match(value.toLowerCase())
-						)
-						.map(([doggoName, doggoId]) => (
-							<ClayCardWithInfo
-								description="the goodest boy"
-								href={`https://placedog.net/1000?id=${doggoId}`}
-								imgProps={{
-									src: `https://placedog.net/640/480?id=${doggoId}`,
-								}}
-								key={doggoId}
-								title={`${doggoName}.jpg`}
-							/>
-						))}
-				</ClayCard.Group>
-			</ClayLayout.ContainerFluid>
-		</div>
+								<ClayInput.GroupInsetItem after tag="span">
+									<ClayButtonWithIcon
+										displayType="unstyled"
+										symbol="search"
+										type="submit"
+									/>
+								</ClayInput.GroupInsetItem>
+							</ClayInput.GroupItem>
+						</ClayInput.Group>
+					</ClayManagementToolbar.Search>
+				</ClayManagementToolbar>
+
+				<ClayLayout.ContainerFluid view>
+					<ClayCard.Group label="Good Boys">
+						{dogNames
+							.filter(([name]) =>
+								name.toLowerCase().match(value.toLowerCase())
+							)
+							.map(([doggoName, doggoId]) => (
+								<ClayCardWithInfo
+									description="the goodest boy"
+									href={`https://placedog.net/1000?id=${doggoId}`}
+									imgProps={{
+										src: ``,
+									}}
+									key={doggoId}
+									title={`${doggoName}.jpg`}
+								/>
+							))}
+					</ClayCard.Group>
+				</ClayLayout.ContainerFluid>
+			</div>
+		</ClayIconProvider>
 	);
 }

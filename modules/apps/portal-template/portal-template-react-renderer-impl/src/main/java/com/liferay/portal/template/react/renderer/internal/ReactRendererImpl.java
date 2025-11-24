@@ -94,24 +94,27 @@ public class ReactRendererImpl implements ReactRenderer {
 
 				JSONSerializer jsonSerializer = _jsonFactory.createJSONSerializer();
 
-				Http.Options options = new Http.Options();
-				options.setLocation("http://localhost:3030/render");
-				options.setPost(true);
-				options.addHeader("Content-Type", "application/json");
-				options.setBody(jsonSerializer.serializeDeep(body), "application/json", "UTF-8");
+				try {
+					Http.Options options = new Http.Options();
+					options.setLocation("http://localhost:3030/render");
+					options.setPost(true);
+					options.addHeader("Content-Type", "application/json");
+					options.setBody(jsonSerializer.serializeDeep(body), "application/json", "UTF-8");
 
-				String html = _http.URLtoString(options);
+					String html = _http.URLtoString(options);
 
-				Http.Response response = options.getResponse();
+					Http.Response response = options.getResponse();
 
-				if (response.getResponseCode() == HttpURLConnection.HTTP_OK) {
-					writer.append(html);
-				}
-				else {
-					System.out.println(
-						"Server Side Rendering failed: '" +
-							componentDescriptor.getModule() +
-								"' fails 'ReactDOMServer.renderToString(...)'.");
+					if (response.getResponseCode() == HttpURLConnection.HTTP_OK) {
+						writer.append(html);
+					}
+					else {
+						System.out.println(
+							"Server Side Rendering failed: '" +
+								componentDescriptor.getModule() +
+									"' fails 'ReactDOMServer.renderToString(...)'.");
+					}
+				} catch (Exception e) {
 				}
 			}
 

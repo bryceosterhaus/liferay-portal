@@ -10,7 +10,7 @@
  */
 
 module.exports = {
-	hash: '8eed4a8c86d4a756e5a87f1ebb3604572a9102ece36c3aa215881b50f19a2e6b',
+	hash: '0db9c74f75ea3655cbeb7c9f9b4dbf2871820be3e540d02311308b8d4b16bd48',
 	imports: {
 		'@liferay/accessibility-menu-web': [],
 		'@liferay/accessibility-settings-state-web': [],
@@ -90,6 +90,11 @@ module.exports = {
 		'@liferay/frontend-editor-ckeditor-sample-web': [],
 		'@liferay/frontend-icons-web': [],
 		'@liferay/frontend-js-bootstrap-support-web': [],
+		'@liferay/frontend-js-clay-web': [
+			'@clayui/css/lib/css/atlas.css',
+			'@clayui/css/lib/css/base.css',
+			'@clayui/css/lib/css/cadmin.css',
+		],
 		'@liferay/frontend-js-codemirror-web': [
 			'codemirror/addon/fold/foldgutter.css',
 			'codemirror/addon/hint/show-hint.css',
@@ -354,9 +359,6 @@ module.exports = {
 			'@clayui/charts',
 			'@clayui/color-picker',
 			'@clayui/core',
-			'@clayui/css/lib/css/atlas.css',
-			'@clayui/css/lib/css/base.css',
-			'@clayui/css/lib/css/cadmin.css',
 			'@clayui/data-provider',
 			'@clayui/date-picker',
 			'@clayui/drop-down',

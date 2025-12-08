@@ -9,7 +9,6 @@ module.exports = {
 		'@clayui/autocomplete',
 		'@clayui/badge',
 		'@clayui/breadcrumb',
-		'@clayui/button',
 		'@clayui/card',
 		'@clayui/charts',
 		'@clayui/color-picker',

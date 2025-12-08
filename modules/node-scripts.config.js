@@ -10,7 +10,7 @@
  */
 
 module.exports = {
-	hash: '0db9c74f75ea3655cbeb7c9f9b4dbf2871820be3e540d02311308b8d4b16bd48',
+	hash: 'a8d87f150806b4dce62b96e3222568e7ac44c57d6688884255dbac0980d8caf8',
 	imports: {
 		'@liferay/accessibility-menu-web': [],
 		'@liferay/accessibility-settings-state-web': [],
@@ -91,6 +91,7 @@ module.exports = {
 		'@liferay/frontend-icons-web': [],
 		'@liferay/frontend-js-bootstrap-support-web': [],
 		'@liferay/frontend-js-clay-web': [
+			'@clayui/button',
 			'@clayui/css/lib/css/atlas.css',
 			'@clayui/css/lib/css/base.css',
 			'@clayui/css/lib/css/cadmin.css',
@@ -354,7 +355,6 @@ module.exports = {
 			'@clayui/autocomplete',
 			'@clayui/badge',
 			'@clayui/breadcrumb',
-			'@clayui/button',
 			'@clayui/card',
 			'@clayui/charts',
 			'@clayui/color-picker',

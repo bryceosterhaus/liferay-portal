@@ -5,7 +5,7 @@
 
 module.exports = {
 	exports: [
-		{name: '@clayui/button', internal: true},
+		'@clayui/button',
 		'@clayui/css/lib/css/atlas.css',
 		'@clayui/css/lib/css/base.css',
 		'@clayui/css/lib/css/cadmin.css',

@@ -3,9 +3,11 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-import {parse} from 'acorn';
+import {parse as parseTS} from '@typescript-eslint/typescript-estree';
+import {parse as parseJS} from 'acorn';
 import estraverse from 'estraverse';
 import fs from 'fs/promises';
+import path from 'path';
 import resolve from 'resolve';
 
 import projectScopeRequire from './projectScopeRequire.mjs';
@@ -54,9 +56,7 @@ async function loadSymbols(moduleName) {
 		module = projectScopeRequire(moduleName);
 	}
 	catch (error) {
-		if (error.code === 'ERR_REQUIRE_ESM') {
-			module = await parseESMExports(moduleName);
-		}
+		module = await parseESMExports(moduleName);
 	}
 
 	const symbols = Object.keys(module).reduce((symbols, key) => {
@@ -76,35 +76,42 @@ async function loadSymbols(moduleName) {
 
 async function parseESMExports(moduleName, projectDir = '.') {
 	const modulePath = resolve.sync(moduleName, {basedir: projectDir});
+	const code = await fs.readFile(modulePath, 'utf8');
+	const ext = path.extname(modulePath);
 
-	const ast = parse(await fs.readFile(modulePath, 'utf-8'), {
-		ecmaVersion: 2022,
-		sourceType: 'module',
-	});
+	const ast =
+		ext === '.ts' || ext === '.tsx'
+			? parseTS(code, {
+					ecmaVersion: 2022,
+					jsx: ext === '.tsx',
+					sourceType: 'module',
+				})
+			: parseJS(code, {
+					ecmaVersion: 2022,
+					sourceType: 'module',
+				});
 
 	const symbols = {};
 
 	estraverse.traverse(ast, {
-		enter: (node) => {
+		enter(node) {
 			switch (node.type) {
 				case 'ExportAllDeclaration':
 					throw new Error('Cannot infer symbols if export * is used');
 
 				case 'ExportDefaultDeclaration':
-					symbols['default'] = true;
+					symbols.default = true;
 					break;
 
 				case 'ExportNamedDeclaration':
-					for (const specifier of node.specifiers) {
+					for (const specifier of node.specifiers ?? []) {
 						symbols[specifier.exported.name] = true;
 					}
 					break;
-
 				default:
 					break;
 			}
 		},
-
 		fallback: 'iteration',
 	});
 

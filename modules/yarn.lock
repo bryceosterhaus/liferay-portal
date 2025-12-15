@@ -1882,16 +1882,6 @@
     classnames "^2.2.6"
     warning "^4.0.3"
 
-"@clayui/button@3.144.1", "@clayui/button@^3.144.1":
-  version "3.144.1"
-  resolved "https://registry.yarnpkg.com/@clayui/button/-/button-3.144.1.tgz#0d1b71d15e6a784ae9cf1325fe6d292c9538ec88"
-  integrity sha512-sQBEHoZeVms/nIBBG4FNruedn4gRNNz0ZMpTCVY/owU8nTNkbgDdsQBK5KmKCF6IZAwzYWxO5TCfT5obJjzDfw==
-  dependencies:
-    "@clayui/icon" "^3.144.1"
-    "@clayui/loading-indicator" "^3.144.1"
-    classnames "^2.2.6"
-    warning "^4.0.3"
-
 "@clayui/card@3.155.0":
   version "3.155.0"
   resolved "https://registry.yarnpkg.com/@clayui/card/-/card-3.155.0.tgz#4ed03f895d565bde7169f9e5d2e6d9284fff9605"

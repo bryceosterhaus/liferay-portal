@@ -10,7 +10,7 @@
  */
 
 module.exports = {
-	hash: 'a8d87f150806b4dce62b96e3222568e7ac44c57d6688884255dbac0980d8caf8',
+	hash: 'a94ef9d9ea670ad8fe11ef56b34ed51ce2c398809977781cb57736cb4c70bfe6',
 	imports: {
 		'@liferay/accessibility-menu-web': [],
 		'@liferay/accessibility-settings-state-web': [],
@@ -91,7 +91,10 @@ module.exports = {
 		'@liferay/frontend-icons-web': [],
 		'@liferay/frontend-js-bootstrap-support-web': [],
 		'@liferay/frontend-js-clay-web': [
-			'@clayui/button',
+			{
+				internal: true,
+				name: '@clayui/button',
+			},
 			'@clayui/css/lib/css/atlas.css',
 			'@clayui/css/lib/css/base.css',
 			'@clayui/css/lib/css/cadmin.css',

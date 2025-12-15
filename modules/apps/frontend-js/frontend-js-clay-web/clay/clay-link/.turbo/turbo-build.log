@@ -1,0 +1,4 @@
+[33m@clayui/link:build: [0mcache hit, replaying output [2m2007c8ab51cb2570[0m
+[33m@clayui/link:build: [0m$ yarn build:cjs && yarn build:esm
+[33m@clayui/link:build: [0merror Command failed with signal "SIGINT".
+[33m@clayui/link:build: [0minfo Visit https://yarnpkg.com/en/docs/cli/run for documentation about this command.

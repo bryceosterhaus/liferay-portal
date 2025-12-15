@@ -1,0 +1,2 @@
+[32m@clayui/sticker:build: [0mcache hit, replaying output [2mb0d7986765788af4[0m
+[32m@clayui/sticker:build: [0m$ yarn build:cjs && yarn build:esm

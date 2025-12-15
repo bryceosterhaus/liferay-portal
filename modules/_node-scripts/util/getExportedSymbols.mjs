@@ -41,6 +41,7 @@ export default async function getExportedSymbols(
 		}
 	}
 	catch (error) {
+		console.log('fire-', overridenPackageSymbols[moduleName]);
 		throw new Error(
 			`Cannot infer exported symbols for ${moduleName}: ${error}`
 		);

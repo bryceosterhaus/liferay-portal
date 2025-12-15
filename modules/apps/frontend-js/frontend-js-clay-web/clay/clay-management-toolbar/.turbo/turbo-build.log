@@ -1,0 +1,2 @@
+[35m@clayui/management-toolbar:build: [0mcache hit, replaying output [2m72e81ad4957811c7[0m
+[35m@clayui/management-toolbar:build: [0m$ yarn build:cjs && yarn build:esm

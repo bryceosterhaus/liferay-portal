@@ -1,0 +1,3 @@
+[33m@clayui/charts:build: [0mcache hit, replaying output [2m74f2c65e42fa3383[0m
+[33m@clayui/charts:build: [0mwarning package.json: No license field
+[33m@clayui/charts:build: [0m$ yarn build:cjs && yarn build:esm

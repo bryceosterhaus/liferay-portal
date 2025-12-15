@@ -1,0 +1,4 @@
+[36m@clayui/table:build: [0mcache hit, replaying output [2m0e94ba57b9e9345c[0m
+[36m@clayui/table:build: [0m$ yarn build:cjs && yarn build:esm
+[36m@clayui/table:build: [0merror Command failed with signal "SIGINT".
+[36m@clayui/table:build: [0minfo Visit https://yarnpkg.com/en/docs/cli/run for documentation about this command.

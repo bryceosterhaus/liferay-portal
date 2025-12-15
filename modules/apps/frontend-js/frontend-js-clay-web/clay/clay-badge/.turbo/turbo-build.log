@@ -1,0 +1,2 @@
+[32m@clayui/badge:build: [0mcache hit, replaying output [2m5a00ba201927a944[0m
+[32m@clayui/badge:build: [0m$ yarn build:cjs && yarn build:esm

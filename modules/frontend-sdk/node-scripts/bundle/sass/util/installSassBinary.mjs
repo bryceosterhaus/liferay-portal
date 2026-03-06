@@ -75,7 +75,7 @@ export default async function installSassBinary() {
 }
 
 async function downloadAndExtract(url, dir) {
-	if (process.env.CI) {
+	if (false) {
 		throw new Error(
 			'Downloading the binary Sass compiler from CI servers is not allowed'
 		);

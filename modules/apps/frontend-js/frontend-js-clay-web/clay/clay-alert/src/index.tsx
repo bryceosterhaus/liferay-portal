@@ -12,7 +12,7 @@ import {ClayAlertFooter} from './Footer';
 import {ClayToastContainer} from './ToastContainer';
 
 function useAutoClose(autoClose?: boolean | number, onClose = () => {}) {
-	const startedTimeRef = React.useRef<number>(0);
+	const startedTimeRef = React.useRef<any>(0);
 	const timerRef = React.useRef<number | undefined>(undefined);
 	const timeToCloseRef = React.useRef(autoClose === true ? 10000 : autoClose);
 	let pauseTimer = () => {};

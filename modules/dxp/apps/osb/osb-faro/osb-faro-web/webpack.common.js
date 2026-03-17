@@ -27,6 +27,7 @@ const config = {
 			callback();
 		},
 		{
+			'@liferay/frontend-data-set-web': '@liferay/frontend-data-set-web',
 			react: 'react',
 			'react-dom': 'react-dom'
 		}

@@ -15,15 +15,16 @@
 		<link href="${htmlUtil.escape(portalUtil.getStaticResourceURL(request, "/o/osb-faro-web/dist/main.css"))}" ${nonceAttribute} rel="stylesheet" type = "text/css" />
 	</#if>
 
-	<@liferay_util["include"] page=top_head_include />
+	<@liferay_util["dynamic-include"] key="importmap" />
 </head>
 
 <body class="dxp">
 	<#if is_signed_in>
 		<@liferay_portlet["runtime"] portletName="faro_portlet" />
 
-		<script defer ${nonceAttribute} src="${htmlUtil.escape(portalUtil.getStaticResourceURL(request, "/o/osb-faro-web/dist/main.js"))}" type="module"></script>
+		<script defer ${nonceAttribute} src="${htmlUtil.escape(portalUtil.getStaticResourceURL(request, "/o/osb-faro-web/dist/main.js"))}" type="module></script>
 	<#else>
+		<@liferay_util["include"] page=top_head_include />
 
 		<@liferay_util["include"] page=body_top_include />
 

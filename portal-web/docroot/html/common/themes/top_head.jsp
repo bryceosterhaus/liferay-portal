@@ -11,6 +11,8 @@
 
 <liferay-util:dynamic-include key="/html/common/themes/top_head.jsp#consent_management_platform" />
 
+<liferay-util:dynamic-include key="importmap" />
+
 <liferay-util:dynamic-include key="/html/common/themes/top_head.jsp#pre" />
 
 <link href="<%= themeDisplay.getFaviconURL() %>" rel="apple-touch-icon" />

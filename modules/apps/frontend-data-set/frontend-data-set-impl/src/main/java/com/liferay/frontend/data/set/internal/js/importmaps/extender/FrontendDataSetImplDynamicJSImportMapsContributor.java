@@ -38,7 +38,8 @@ public class FrontendDataSetImplDynamicJSImportMapsContributor
 				httpServletRequest);
 
 		ESModuleAbsolutePortalURLBuilder esModuleAbsolutePortalURLBuilder =
-			absolutePortalURLBuilder.forESModule("frontend-data-set-web", "index.js");
+			absolutePortalURLBuilder.forESModule(
+				"frontend-data-set-web", "index.js");
 
 		writer.write(esModuleAbsolutePortalURLBuilder.build());
 
